@@ -1,0 +1,22 @@
+## Interface: 110000
+## Title: RPG Loot Feed
+## Author: McTalian
+## Version: @project-version@
+## Notes: A non-intrusive way to see what you just looted.
+## SavedVariables: RPGLootFeedDB
+## IconTexture: Interface/AddOns/RPGLootFeed/Icons/logo
+## OptionalDeps: Ace3
+## X-GitHub: https://github.com/Mctalian/RPGLootFeed
+## X-Curse-Project-ID:
+## X-WoWI-ID:
+## X-Wago-ID:
+
+Libs\LibStub\LibStub.lua
+Libs\AceAddon-3.0\AceAddon-3.0.xml
+Libs\AceEvent-3.0\AceEvent-3.0.xml
+Libs\AceDB-3.0\AceDB-3.0.xml
+Libs\AceConsole-3.0\AceConsole-3.0.xml
+Libs\AceGUI-3.0\AceGUI-3.0.xml
+Libs\AceConfig-3.0\AceConfig-3.0.xml
+
+RPGLootFeed.lua
