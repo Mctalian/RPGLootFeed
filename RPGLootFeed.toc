@@ -1,7 +1,7 @@
 ## Interface: 110000
 ## Title: RPG Loot Feed
 ## Author: McTalian
-## Version: @project-version@
+## Version: b7e8875
 ## Notes: A non-intrusive way to see what you just looted.
 ## SavedVariables: RPGLootFeedDB
 ## IconTexture: Interface/AddOns/RPGLootFeed/Icons/logo
@@ -19,4 +19,6 @@ Libs\AceConsole-3.0\AceConsole-3.0.xml
 Libs\AceGUI-3.0\AceGUI-3.0.xml
 Libs\AceConfig-3.0\AceConfig-3.0.xml
 
+LootInfo.lua
+LootDisplay.lua
 RPGLootFeed.lua
