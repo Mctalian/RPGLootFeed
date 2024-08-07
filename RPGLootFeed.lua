@@ -1,133 +1,6 @@
-local addonName = "RPGLootFeed"
-local dbName = addonName .. "DB"
-RLF = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0")
-
-local options = {
-    name = addonName,
-    handler = RLF,
-    type = "group",
-    args = {
-        visual = {
-            type = "group",
-            name = "Visual",
-            desc = "Position and size the loot feed and its elements",
-            args = {
-                positioning = {
-                    type = "header",
-                    name = "Positioning",
-                    order = 1,
-                },
-                anchorPoint = {
-                    type = "select",
-                    name = "Anchor Point",
-                    desc = "Where on the screen to base the loot feed positioning (also impacts sizing direction)",
-                    get = "GetRelativePosition",
-                    set = "SetRelativePosition",
-                    values = {},
-                    order = 2,
-                },
-                xOffset = {
-                    type = "range",
-                    name = "X Offset",
-                    desc = "Adjust the loot feed left (negative) or right (positive)",
-                    min = -1500,
-                    max = 1500,
-                    get = "GetXOffset",
-                    set = "SetXOffset",
-                    order = 3,
-                },
-                yOffset = {
-                    type = "range",
-                    name = "Y Offset",
-                    desc = "Adjust the loot feed down (negative) or up (positive)",
-                    min = -1500,
-                    max = 1500,
-                    get = "GetYOffset",
-                    set = "SetYOffset",
-                    order = 4,
-                },
-                sizing = {
-                    type = "header",
-                    name = "Sizing",
-                    order = 5,
-                },
-                feedWidth = {
-                    type = "range",
-                    name = "Feed Width",
-                    desc = "The width of the loot feed parent frame",
-                    min = 10,
-                    max = 1000,
-                    get = "GetFeedWidth",
-                    set = "SetFeedWidth",
-                    order = 6,
-                },
-                maxRows = {
-                    type = "range",
-                    name = "Maximum Rows to Display",
-                    desc = "The maximum number of loot items to display in the feed",
-                    min = 10,
-                    max = 1000,
-                    step = 1,
-                    bigStep = 5,
-                    get = "GetMaxRows",
-                    set = "SetMaxRows",
-                    order = 6,
-                },
-                rowHeight = {
-                    type = "range",
-                    name = "Loot Item Height",
-                    desc = "The height of each item \"row\" in the loot feed",
-                    min = 5,
-                    max = 100,
-                    get = "GetRowHeight",
-                    set = "SetRowHeight",
-                    order = 7,
-                },
-                iconSize = {
-                    type = "range",
-                    name = "Loot Item Icon Size",
-                    desc = "The size of the icons in each item \"row\" in the loot feed",
-                    min = 5,
-                    max = 100,
-                    get = "GetIconSize",
-                    set = "SetIconSize",
-                    order = 8,
-                },
-                rowPadding = {
-                    type = "range",
-                    name = "Loot Item Padding",
-                    desc = "The amount of space between item \"rows\" in the loot feed",
-                    min = 0,
-                    max = 10,
-                    get = "GetRowPadding",
-                    set = "SetRowPadding",
-                    order = 9,
-                },
-            }
-        },
-        testMode = {
-            type = "execute",
-            name = "Toggle Test Mode",
-            -- width = "double",
-            func = "ToggleTestMode",
-            order = 1,
-        },
-        clearRows = {
-            type = "execute",
-            name = "Clear rows",
-            -- width = "double",
-            func = "ClearRows",
-            order = 2,
-        },
-        boundingBox = {
-            type = "execute",
-            name = "Toggle Area",
-            -- width = "double",
-            func = "ToggleBoundingBox",
-            order = 3,
-        },
-    }
-}
+local addonName = G_RLF.addonName
+local dbName = G_RLF.dbName
+RLF = G_RLF.RLF
 
 local defaults = {
     profile = {},
@@ -144,19 +17,10 @@ local defaults = {
 }
 
 function RLF:OnInitialize()
-    self.db = LibStub("AceDB-3.0"):New(dbName, defaults, true)
-    LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
+    G_RLF.db = LibStub("AceDB-3.0"):New(dbName, defaults, true)
+    LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
     self.initialized = false
-    LootDisplay:Initialize(
-        self.db.global.anchorPoint,
-        self.db.global.xOffset,
-        self.db.global.yOffset,
-        self.db.global.feedWidth,
-        self.db.global.maxRows,
-        self.db.global.rowHeight,
-        self.db.global.rowPadding,
-        self.db.global.iconSize
-    )
+    G_RLF.LootDisplay:Initialize()
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
     self:RegisterEvent("CHAT_MSG_LOOT")
@@ -174,19 +38,16 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 end
 
 function RLF:CURRENCY_DISPLAY_UPDATE(eventName, currencyType, quantity, quantityChange, quantityGainSource, quantityLostSource)
-    if currencyType == nil then
+    if currencyType == nil or quantityChange == 0 then
         return
     end
+
     local info = C_CurrencyInfo.GetCurrencyInfo(currencyType)
-    -- local info = C_Item.GetItemInfo(iId)
     if info == nil then
         return
     end
-    local currencyInfo = LootInfo:new(info)
-    if currencyInfo == nil then
-        return
-    end
-    LootDisplay:ShowLoot(currencyInfo.currencyID, LootDisplay:GetCurrencyLink(currencyInfo), currencyInfo.iconFileID, quantityChange)
+
+    G_RLF.LootDisplay:ShowLoot(info.currencyID, G_RLF.LootDisplay:GetCurrencyLink(info.currencyID, info.name), info.iconFileID, quantityChange)
 end
 
 function RLF:CHAT_MSG_LOOT(eventName, msg)
@@ -198,7 +59,7 @@ function RLF:CHAT_MSG_LOOT(eventName, msg)
     if itemID ~= nil then
         local amount = msg:match("rx(%d+)") or 1
         local _, itemLink, _, _, _, _, _, _, _, itemTexture = C_Item.GetItemInfo(itemID)
-        LootDisplay:ShowLoot(itemID, itemLink, itemTexture, amount)
+        G_RLF.LootDisplay:ShowLoot(itemID, itemLink, itemTexture, amount)
     end
 end
 
@@ -216,116 +77,11 @@ function dump(o)
 end
 
 function RLF:InitializeOptions()
-    options.args.visual.args.anchorPoint.values["TOPLEFT"] = "Top Left"
-    options.args.visual.args.anchorPoint.values["TOPRIGHT"] = "Top Right"
-    options.args.visual.args.anchorPoint.values["BOTTOMLEFT"] = "Bottom Left"
-    options.args.visual.args.anchorPoint.values["BOTTOMRIGHT"] = "Bottom Right"
-    options.args.visual.args.anchorPoint.values["TOP"] = "Top"
-    options.args.visual.args.anchorPoint.values["BOTTOM"] = "Bottom"
-    options.args.visual.args.anchorPoint.values["LEFT"] = "Left"
-    options.args.visual.args.anchorPoint.values["RIGHT"] = "Right"
-    options.args.visual.args.anchorPoint.values["CENTER"] = "Center"
-
     if self.optionsFrame == nil then
         self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName, addonName)
     end
 end
 
-function RLF:SetRelativePosition(info, value)
-    self.db.global.anchorPoint = value
-    self:UpdateLootFeedPosition()
-end
-
-function RLF:GetRelativePosition(info)
-    return self.db.global.anchorPoint
-end
-
-function RLF:SetXOffset(info, value)
-    self.db.global.xOffset = value
-    self:UpdateLootFeedPosition()
-end
-
-function RLF:GetXOffset(info)
-    return self.db.global.xOffset
-end
-
-function RLF:SetYOffset(info, value)
-    self.db.global.yOffset = value
-    self:UpdateLootFeedPosition()
-end
-
-function RLF:GetYOffset(info)
-    return self.db.global.yOffset
-end
-
-function RLF:SetFeedWidth(info, value)
-    self.db.global.feedWidth = value
-    self:UpdateLootFeedSize()
-end
-
-function RLF:GetFeedWidth(info)
-    return self.db.global.feedWidth
-end
-
-function RLF:SetMaxRows(info, value)
-    self.db.global.maxRows = value
-    self:UpdateLootFeedSize()
-end
-
-function RLF:GetMaxRows(info)
-    return self.db.global.maxRows
-end
-
-function RLF:SetRowHeight(info, value)
-    self.db.global.rowHeight = value
-    self:UpdateRowStyles()
-end
-
-function RLF:GetRowHeight(info, value)
-    return self.db.global.rowHeight
-end
-
-function RLF:SetIconSize(info, value)
-    self.db.global.iconSize = value
-    self:UpdateRowStyles()
-end
-
-function RLF:GetIconSize(info, value)
-    return self.db.global.iconSize
-end
-
-function RLF:SetRowPadding(info, value)
-    self.db.global.rowPadding = value
-    self:UpdateRowStyles()
-end
-
-function RLF:GetRowPadding(info, value)
-    return self.db.global.rowPadding
-end
-
-function RLF:ToggleBoundingBox()
-    LootDisplay:ToggleBoundingBox()
-end
-
-function RLF:ToggleTestMode()
-    LootDisplay:ToggleTestMode()
-end
-
-function RLF:UpdateLootFeedPosition()
-    LootDisplay:UpdatePosition(self.db.global.anchorPoint, self.db.global.xOffset, self.db.global.yOffset)
-end
-
-function RLF:ClearRows()
-    LootDisplay:HideLoot()
-end
-
-function RLF:UpdateLootFeedSize()
-    LootDisplay:UpdateSize(self.db.global.feedWidth, self.db.global.maxRows)
-end
-
-function RLF:UpdateRowStyles()
-    LootDisplay:UpdateRowStyles(self.db.global.rowHeight, self.db.global.rowPadding, self.db.global.iconSize)
-end
 
 function RLF:SlashCommand(msg, editBox)
     LibStub("AceConfigDialog-3.0"):Open(addonName)

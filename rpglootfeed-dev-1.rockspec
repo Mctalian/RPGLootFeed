@@ -19,8 +19,9 @@ dependencies = {
 build = {
    type = "builtin",
    modules = {
+      AddonScope = "AddonScope.lua",
+      ConfigOptions = "ConfigOptions.lua",
       LootDisplay = "LootDisplay.lua",
-      LootInfo = "LootInfo.lua",
       RPGLootFeed = "RPGLootFeed.lua",
       TestModeData = "TestModeData.lua"
    }
