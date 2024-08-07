@@ -8,6 +8,8 @@ local defaults = {
   rowPadding = 2,
   iconSize = 20,
   fadeOutDelay = 15,
+  rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 }, -- Default to dark grey with 80% opacity
+  rowBackgroundGradientEnd = { 0.1, 0.1, 0.1, 0 }, -- Default to dark grey with 0% opacity
 }
 
 function LootDisplay:Initialize(
@@ -19,7 +21,9 @@ function LootDisplay:Initialize(
   rowHeight,
   rowPadding,
   iconSize,
-  fadeOutDelay
+  fadeOutDelay,
+  rowBackgroundGradientStart,
+  rowBackgroundGradientEnd
 )
   self.feedWidth = feedWidth or defaults.width
   self.feedHeight = feedHeight or defaults.height
@@ -28,10 +32,14 @@ function LootDisplay:Initialize(
   self.padding = rowPadding or defaults.rowPadding -- Space between rows
   self.iconSize = iconSize or defaults.iconSize
   self.fadeOutDelay = fadeOutDelay or defaults.fadeOutDelay
+  self.rowBackgroundGradientStart = rowBackgroundGradientStart or defaults.rowBackgroundGradientStart
+  self.rowBackgroundGradientEnd = rowBackgroundGradientEnd or defaults.rowBackgroundGradientEnd
 
   self.frame = CreateFrame("Frame", "LootDisplayFrame", UIParent)
   self.frame:SetSize(self.feedWidth, self.feedHeight)
   self.frame:SetPoint(anchorPoint, UIParent, xOffset, yOffset)
+
+  self.frame:SetClipsChildren(true) -- Enable clipping of child elements
   
   self.boundingBox = self.frame:CreateTexture(nil, "BACKGROUND")
   self.boundingBox:SetColorTexture(1, 0, 0, 0.5) -- Red with 50% opacity
@@ -72,10 +80,12 @@ function LootDisplay:UpdateSize(feedWidth, feedHeight)
   self.frame:SetSize(self.feedWidth, self.feedHeight)
 end
 
-function LootDisplay:UpdateRowSize(rowHeight, padding, iconSize)
+function LootDisplay:UpdateRowStyles(rowHeight, padding, iconSize, rowBackgroundGradientStart, rowBackgroundGradientEnd)
   self.rowHeight = rowHeight or self.rowHeight
   self.padding = padding or self.padding
   self.iconSize = iconSize or self.iconSize
+  self.rowBackgroundGradientStart = rowBackgroundGradientStart or self.rowBackgroundGradientStart
+  self.rowBackgroundGradientEnd = rowBackgroundGradientEnd or self.rowBackgroundGradientEnd
 end
 
 function LootDisplay:ShowLoot(id, link, icon, amountLooted)
@@ -85,6 +95,12 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
       -- Create a new row
       local row = CreateFrame("Frame", nil, self.frame)
       row:SetSize(self.feedWidth, self.rowHeight)
+
+      -- Create row background
+      row.background = row:CreateTexture(nil, "BACKGROUND")
+      row.background:SetTexture("Interface/Buttons/WHITE8x8")
+      row.background:SetGradient("HORIZONTAL", CreateColor(unpack(self.rowBackgroundGradientStart)), CreateColor(unpack(self.rowBackgroundGradientEnd)) )
+      row.background:SetAllPoints()
       
       row.icon = row:CreateTexture(nil, "ARTWORK")
       row.icon:SetSize(self.iconSize, self.iconSize)
@@ -108,6 +124,7 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
       -- Initialize row content
       row.icon:SetTexture(icon)
       row.amount = amountLooted
+      row.link = link
       row.amountText:SetText(link .. " x" .. amountLooted)
 
       -- Track the row
@@ -130,7 +147,8 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
     if self.rows[key] then
         -- Update existing entry
         self.rows[key].amount = self.rows[key].amount + amountLooted
-        self.rows[key].amountText:SetText(link .. " x" .. self.rows[key].amount)
+
+        self.rows[key].amountText:SetText(self.rows[key].link .. " x" .. self.rows[key].amount)
         self.rows[key].fadeOutAnimation:Stop()
         self.rows[key].fadeOutAnimation:Play()
     else
@@ -157,7 +175,8 @@ end
 function LootDisplay:HideLoot()
     -- Hide all rows
     for key, row in pairs(self.rows) do
-        row:Hide()
+        self.rows[key].fadeOutAnimation:Stop()
+        self.rows[key]:Hide()
         self.rows[key] = nil
     end
 end
@@ -168,12 +187,36 @@ end
 
 local testItemNumber = 0
 local testItems = {
-  { id = 2589 },
-  { id = 2592 },
-  { id = 1515 },
-  { id = 730 },
-  { id = 19019 },
-  { id = 128507 },
+  { 
+    id = 2589, 
+    link = "|cffffffff|Hitem:2589::::::::1:::::::|h[Linen Cloth]|h|r", 
+    icon = 132889 
+  },
+  { 
+    id = 2592, 
+    link = "|cffffffff|Hitem:2592::::::::1:::::::|h[Wool Cloth]|h|r", 
+    icon = 132911 
+  },
+  { 
+    id = 1515, 
+    link = "|cff9d9d9d|Hitem:1515::::::::1:::::::|h[Rough Wooden Staff]|h|r", 
+    icon = 135146
+  },
+  { 
+    id = 730, 
+    link = "|cff9d9d9d|Hitem:730::::::::1:::::::|h[Murloc Eye]|h|r", 
+    icon = 133884 
+  },
+  { 
+    id = 19019, 
+    link = "|cffff8000|Hitem:19019::::::::1:::::::|h[Thunderfury, Blessed Blade of the Windseeker]|h|r", 
+    icon = 135349
+  },
+  { 
+    id = 128507, 
+    link = "|cff0070dd|Hitem:128507::::::::1:::::::|h[Inflatable Thunderfury, Blessed Blade of the Windseeker]|h|r", 
+    icon = 135349
+  },
 }
 
 local testCurrencies = {
@@ -204,20 +247,9 @@ function LootDisplay:ToggleTestMode()
       self.testMode = true
       print("Test Mode Enabled")
       for k, item in pairs(testItems) do
-        local _, itemLink, _, _, _, _, _, _, _, itemTexture = C_Item.GetItemInfo(item.id)
-        if itemLink == nil then
-          print(item.id .. " does not have a link...")
-        else
-          testItems[k].link = itemLink
-        end
-        if itemTexture == nil then
-          print(item.id .. " does not have an icon...")
-        else
-          testItems[k].icon = itemTexture
-        end
         testItemNumber = testItemNumber + 1
       end
-      self.testTimer = C_Timer.NewTicker(5, function() self:GenerateRandomLoot() end)
+      self.testTimer = C_Timer.NewTicker(1.5, function() self:GenerateRandomLoot() end)
   end
 end
 

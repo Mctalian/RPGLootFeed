@@ -30,8 +30,8 @@ local options = {
                     type = "range",
                     name = "X Offset",
                     desc = "Adjust the loot feed left (negative) or right (positive)",
-                    min = -500,
-                    max = 500,
+                    min = -1500,
+                    max = 1500,
                     get = "GetXOffset",
                     set = "SetXOffset",
                     order = 3,
@@ -39,9 +39,9 @@ local options = {
                 yOffset = {
                     type = "range",
                     name = "Y Offset",
-                    desc = "Adjust the loot feed up (negative) or down (positive)",
-                    min = -500,
-                    max = 500,
+                    desc = "Adjust the loot feed down (negative) or up (positive)",
+                    min = -1500,
+                    max = 1500,
                     get = "GetYOffset",
                     set = "SetYOffset",
                     order = 4,
@@ -103,19 +103,26 @@ local options = {
                 },
             }
         },
-        boundingBox = {
-            type = "execute",
-            name = "Show/Hide Bounding Box",
-            width = "double",
-            func = "ToggleBoundingBox",
-            order = 1,
-        },
         testMode = {
             type = "execute",
             name = "Toggle Test Mode",
-            width = "double",
+            -- width = "double",
             func = "ToggleTestMode",
+            order = 1,
+        },
+        clearRows = {
+            type = "execute",
+            name = "Clear rows",
+            -- width = "double",
+            func = "ClearRows",
             order = 2,
+        },
+        boundingBox = {
+            type = "execute",
+            name = "Toggle Area",
+            -- width = "double",
+            func = "ToggleBoundingBox",
+            order = 3,
         },
     }
 }
@@ -269,7 +276,7 @@ end
 
 function RLF:SetRowHeight(info, value)
     self.db.global.rowHeight = value
-    self:UpdateRowSize()
+    self:UpdateRowStyles()
 end
 
 function RLF:GetRowHeight(info, value)
@@ -278,7 +285,7 @@ end
 
 function RLF:SetIconSize(info, value)
     self.db.global.iconSize = value
-    self:UpdateRowSize()
+    self:UpdateRowStyles()
 end
 
 function RLF:GetIconSize(info, value)
@@ -287,7 +294,7 @@ end
 
 function RLF:SetRowPadding(info, value)
     self.db.global.rowPadding = value
-    self:UpdateRowSize()
+    self:UpdateRowStyles()
 end
 
 function RLF:GetRowPadding(info, value)
@@ -306,12 +313,16 @@ function RLF:UpdateLootFeedPosition()
     LootDisplay:UpdatePosition(self.db.global.anchorPoint, self.db.global.xOffset, self.db.global.yOffset)
 end
 
+function RLF:ClearRows()
+    LootDisplay:HideLoot()
+end
+
 function RLF:UpdateLootFeedSize()
     LootDisplay:UpdateSize(self.db.global.feedWidth, self.db.global.feedHeight)
 end
 
-function RLF:UpdateRowSize()
-    LootDisplay:UpdateRowSize(self.db.global.rowHeight, self.db.global.rowPadding, self.db.global.iconSize)
+function RLF:UpdateRowStyles()
+    LootDisplay:UpdateRowStyles(self.db.global.rowHeight, self.db.global.rowPadding, self.db.global.iconSize)
 end
 
 function RLF:SlashCommand(msg, editBox)
