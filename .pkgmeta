@@ -9,4 +9,8 @@ externals:
   Libs/AceConfig-3.0: https://repos.wowace.com/wow/ace3/trunk/AceConfig-3.0
 
 ignore:
-  - README.md
+  - *.md
+  - spec
+  - *.rockspec
+  - lua
+  - luarocks

@@ -41,3 +41,7 @@ luac.out
 
 .release
 
+/luarocks
+/lua
+/lua_modules
+/.luarocks
