@@ -1,5 +1,3 @@
-G_RLF = {}
-
 local p = "ff9d9d9d"
 local c = "ffffffff"
 local u = "ff1eff00"

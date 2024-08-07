@@ -13,7 +13,8 @@ An addon for World of Warcraft that improves the looting experience by providing
    license = "MIT"
 }
 dependencies = {
-   "busted 2.2.0-1"
+   "busted 2.2.0-1",
+   "luacheck 0.23.0-1"
 }
 build = {
    type = "builtin",
