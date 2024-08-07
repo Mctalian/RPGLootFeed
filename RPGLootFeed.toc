@@ -19,6 +19,7 @@ Libs\AceConsole-3.0\AceConsole-3.0.xml
 Libs\AceGUI-3.0\AceGUI-3.0.xml
 Libs\AceConfig-3.0\AceConfig-3.0.xml
 
+TestModeData.lua
 LootInfo.lua
 LootDisplay.lua
 RPGLootFeed.lua

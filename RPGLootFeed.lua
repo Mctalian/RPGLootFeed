@@ -19,8 +19,8 @@ local options = {
                 },
                 anchorPoint = {
                     type = "select",
-                    name = "Relative Screen Position",
-                    desc = "Where on the screen to base the loot feed positioning",
+                    name = "Anchor Point",
+                    desc = "Where on the screen to base the loot feed positioning (also impacts sizing direction)",
                     get = "GetRelativePosition",
                     set = "SetRelativePosition",
                     values = {},
@@ -61,14 +61,16 @@ local options = {
                     set = "SetFeedWidth",
                     order = 6,
                 },
-                feedHeight = {
+                maxRows = {
                     type = "range",
-                    name = "Feed Height",
-                    desc = "The height of the loot feed parent frame",
+                    name = "Maximum Rows to Display",
+                    desc = "The maximum number of loot items to display in the feed",
                     min = 10,
                     max = 1000,
-                    get = "GetFeedHeight",
-                    set = "SetFeedHeight",
+                    step = 1,
+                    bigStep = 5,
+                    get = "GetMaxRows",
+                    set = "SetMaxRows",
                     order = 6,
                 },
                 rowHeight = {
@@ -134,7 +136,7 @@ local defaults = {
         xOffset = 0,
         yOffset = 0,
         feedWidth = 200,
-        feedHeight = 500,
+        maxRows = 15,
         rowHeight = 20,
         rowPadding = 2,
         iconSize = 20
@@ -150,7 +152,7 @@ function RLF:OnInitialize()
         self.db.global.xOffset,
         self.db.global.yOffset,
         self.db.global.feedWidth,
-        self.db.global.feedHeight,
+        self.db.global.maxRows,
         self.db.global.rowHeight,
         self.db.global.rowPadding,
         self.db.global.iconSize
@@ -265,13 +267,13 @@ function RLF:GetFeedWidth(info)
     return self.db.global.feedWidth
 end
 
-function RLF:SetFeedHeight(info, value)
-    self.db.global.feedHeight = value
+function RLF:SetMaxRows(info, value)
+    self.db.global.maxRows = value
     self:UpdateLootFeedSize()
 end
 
-function RLF:GetFeedHeight(info)
-    return self.db.global.feedHeight
+function RLF:GetMaxRows(info)
+    return self.db.global.maxRows
 end
 
 function RLF:SetRowHeight(info, value)
@@ -318,7 +320,7 @@ function RLF:ClearRows()
 end
 
 function RLF:UpdateLootFeedSize()
-    LootDisplay:UpdateSize(self.db.global.feedWidth, self.db.global.feedHeight)
+    LootDisplay:UpdateSize(self.db.global.feedWidth, self.db.global.maxRows)
 end
 
 function RLF:UpdateRowStyles()

@@ -3,7 +3,7 @@ LootDisplay = {}
 
 local defaults = {
   width = 200,
-  height = 500,
+  maxRows = 15,
   rowHeight = 20,
   rowPadding = 2,
   iconSize = 20,
@@ -17,7 +17,7 @@ function LootDisplay:Initialize(
   xOffset,
   yOffset,
   feedWidth,
-  feedHeight,
+  maxRows,
   rowHeight,
   rowPadding,
   iconSize,
@@ -26,7 +26,7 @@ function LootDisplay:Initialize(
   rowBackgroundGradientEnd
 )
   self.feedWidth = feedWidth or defaults.width
-  self.feedHeight = feedHeight or defaults.height
+  self.maxRows = maxRows or defaults.maxRows
   self.rows = {} -- Table to track displayed loot rows
   self.rowHeight = rowHeight or defaults.rowHeight -- Height of each row
   self.padding = rowPadding or defaults.rowPadding -- Space between rows
@@ -36,7 +36,7 @@ function LootDisplay:Initialize(
   self.rowBackgroundGradientEnd = rowBackgroundGradientEnd or defaults.rowBackgroundGradientEnd
 
   self.frame = CreateFrame("Frame", "LootDisplayFrame", UIParent)
-  self.frame:SetSize(self.feedWidth, self.feedHeight)
+  self.frame:SetSize(self.feedWidth, self:GetFrameHeight())
   self.frame:SetPoint(anchorPoint, UIParent, xOffset, yOffset)
 
   self.frame:SetClipsChildren(true) -- Enable clipping of child elements
@@ -74,10 +74,10 @@ function LootDisplay:UpdatePosition(anchor, xOffset, yOffset)
   self:SetPosition(anchor or "CENTER", relativePoint, xOffset or 0, yOffset or 0)
 end
 
-function LootDisplay:UpdateSize(feedWidth, feedHeight)
+function LootDisplay:UpdateSize(feedWidth, maxRows)
   self.feedWidth = feedWidth or self.feedWidth or defaults.width
-  self.feedHeight = feedHeight or self.feedHeight or defaults.height
-  self.frame:SetSize(self.feedWidth, self.feedHeight)
+  self.maxRows = maxRows or self.maxRows or defaults.maxRows
+  self.frame:SetSize(self.feedWidth, self:GetFrameHeight())
 end
 
 function LootDisplay:UpdateRowStyles(rowHeight, padding, iconSize, rowBackgroundGradientStart, rowBackgroundGradientEnd)
@@ -86,6 +86,11 @@ function LootDisplay:UpdateRowStyles(rowHeight, padding, iconSize, rowBackground
   self.iconSize = iconSize or self.iconSize
   self.rowBackgroundGradientStart = rowBackgroundGradientStart or self.rowBackgroundGradientStart
   self.rowBackgroundGradientEnd = rowBackgroundGradientEnd or self.rowBackgroundGradientEnd
+  self:UpdateSize()
+end
+
+function LootDisplay:GetFrameHeight()
+  return self.maxRows * (self.rowHeight + self.padding) - self.padding
 end
 
 function LootDisplay:ShowLoot(id, link, icon, amountLooted)
@@ -185,54 +190,6 @@ function LootDisplay:GetCurrencyLink(currencyInfo)
     return string.format("|cffffffff|Hcurrency:%d|h[%s]|h|r", currencyInfo.currencyID, currencyInfo.name)
 end
 
-local testItemNumber = 0
-local testItems = {
-  { 
-    id = 2589, 
-    link = "|cffffffff|Hitem:2589::::::::1:::::::|h[Linen Cloth]|h|r", 
-    icon = 132889 
-  },
-  { 
-    id = 2592, 
-    link = "|cffffffff|Hitem:2592::::::::1:::::::|h[Wool Cloth]|h|r", 
-    icon = 132911 
-  },
-  { 
-    id = 1515, 
-    link = "|cff9d9d9d|Hitem:1515::::::::1:::::::|h[Rough Wooden Staff]|h|r", 
-    icon = 135146
-  },
-  { 
-    id = 730, 
-    link = "|cff9d9d9d|Hitem:730::::::::1:::::::|h[Murloc Eye]|h|r", 
-    icon = 133884 
-  },
-  { 
-    id = 19019, 
-    link = "|cffff8000|Hitem:19019::::::::1:::::::|h[Thunderfury, Blessed Blade of the Windseeker]|h|r", 
-    icon = 135349
-  },
-  { 
-    id = 128507, 
-    link = "|cff0070dd|Hitem:128507::::::::1:::::::|h[Inflatable Thunderfury, Blessed Blade of the Windseeker]|h|r", 
-    icon = 135349
-  },
-}
-
-local testCurrencies = {
-  { currencyID = 2245, name = "Flightstone", iconFileID = 4638586 }, -- Dragonflight
-  { currencyID = 1191, name = "Valor", iconFileID = 463447 },
-  { currencyID = 1828, name = "Soul Ash", iconFileID = 3743738 }, -- Shadowlands
-  { currencyID = 1792, name = "Honor", iconFileID = 255347 },
-  { currencyID = 1755, name = "Argus Waystone", iconFileID = 399041 }, -- Legion
-  { currencyID = 1580, name = "Seal of Wartorn Fate", iconFileID = 1416740 }, -- Battle for Azeroth
-  { currencyID = 1273, name = "Seal of Broken Fate", iconFileID = 1604168 }, -- Legion
-  { currencyID = 1166, name = "Timewarped Badge", iconFileID = 463446 },
-  { currencyID = 515, name = "Darkmoon Prize Ticket", iconFileID = 134481 },
-  { currencyID = 241, name = "Champion's Seal", iconFileID = 236689 } -- Wrath of the Lich King
-}
-
-
 function LootDisplay:ToggleTestMode()
   if self.testMode then
       -- Stop test mode
@@ -246,9 +203,6 @@ function LootDisplay:ToggleTestMode()
       -- Start test mode
       self.testMode = true
       print("Test Mode Enabled")
-      for k, item in pairs(testItems) do
-        testItemNumber = testItemNumber + 1
-      end
       self.testTimer = C_Timer.NewTicker(1.5, function() self:GenerateRandomLoot() end)
   end
 end
@@ -257,12 +211,12 @@ function LootDisplay:GenerateRandomLoot()
   -- Randomly decide whether to generate an item or currency
   if math.random() < 0.8 then
       -- Generate random item
-      local item = testItems[math.random(testItemNumber)]
+      local item = G_RLF.TestItems[math.random(#G_RLF.TestItems)]
       local amountLooted = math.random(1, 5)
       self:ShowLoot(item.id, item.link, item.icon, amountLooted)
   else
       -- Generate random currency
-      local currency = testCurrencies[math.random(#testCurrencies)]
+      local currency = G_RLF.TestCurrencies[math.random(#G_RLF.TestCurrencies)]
       local amountLooted = math.random(1, 500)
       local currencyLink = self:GetCurrencyLink(currency)
       self:ShowLoot(currency.currencyID, currencyLink, currency.iconFileID, amountLooted)
