@@ -39,7 +39,8 @@ luac.out
 *.x86_64
 *.hex
 
-.release
+.release/*
+!.release/local.sh
 
 /luarocks
 /lua
