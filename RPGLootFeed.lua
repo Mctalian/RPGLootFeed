@@ -5,11 +5,11 @@ RLF = G_RLF.RLF
 function RLF:OnInitialize()
     G_RLF.db = LibStub("AceDB-3.0"):New(dbName, G_RLF.defaults, true)
     LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
-    self.initialized = false
     G_RLF.LootDisplay:Initialize()
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
     self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
     self:RegisterEvent("CHAT_MSG_LOOT")
+    self:RegisterEvent("CHAT_MSG_MONEY")
     self:RegisterChatCommand("rlf", "SlashCommand")
     self:RegisterChatCommand("RLF", "SlashCommand")
     self:RegisterChatCommand("rpglootfeed", "SlashCommand")
@@ -17,8 +17,7 @@ function RLF:OnInitialize()
 end
 
 function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
-    if self.initialized == false then
-        self.initialized = true
+    if isLogin and isReload == false then
         self:InitializeOptions()
     end
 end
@@ -48,6 +47,27 @@ function RLF:CHAT_MSG_LOOT(eventName, msg)
         local _, itemLink, _, _, _, _, _, _, _, itemTexture = C_Item.GetItemInfo(itemID)
         G_RLF.LootDisplay:ShowLoot(itemID, itemLink, itemTexture, amount)
     end
+end
+
+function RLF:CHAT_MSG_MONEY(eventName, msg)
+    local amountInCopper
+    -- Initialize default values
+    local gold, silver, copper = 0, 0, 0
+
+    -- Patterns to match optional sections
+    local goldPattern = "(%d+) Gold"
+    local silverPattern = "(%d+) Silver"
+    local copperPattern = "(%d+) Copper"
+
+    -- Find and convert matches to numbers if they exist
+    gold = tonumber(msg:match(goldPattern)) or gold
+    silver = tonumber(msg:match(silverPattern)) or silver
+    copper = tonumber(msg:match(copperPattern)) or copper
+    
+    amountInCopper = (gold * 100 * 100)
+    amountInCopper = amountInCopper + (silver * 100)
+    amountInCopper = amountInCopper + copper
+    self:Print(C_CurrencyInfo.GetCoinTextureString(amountInCopper))
 end
 
 function RLF:InitializeOptions()
