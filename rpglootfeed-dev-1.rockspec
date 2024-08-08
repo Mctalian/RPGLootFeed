@@ -22,6 +22,7 @@ build = {
    modules = {
       AddonScope = "AddonScope.lua",
       ConfigOptions = "ConfigOptions.lua",
+      DoubleLinkedList = "DoubleLinkedList.lua",
       LootDisplay = "LootDisplay.lua",
       RPGLootFeed = "RPGLootFeed.lua",
       TestMode = "TestMode.lua"

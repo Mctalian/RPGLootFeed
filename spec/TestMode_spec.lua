@@ -28,13 +28,13 @@ describe("TestMode", function()
     end)
   end)
 
-  -- describe("GenerateRandomLoot", function()
-  --   it("should generate and display a random item when the RNG condition is met", function()
-  --     -- Call the method
-  --     TestMode:GenerateRandomLoot()
+  describe("GenerateRandomLoot", function()
+    it("should generate and display a random item when the RNG condition is met", function()
+      -- Call the method
+      TestMode:GenerateRandomLoot()
 
-  --     -- Extract the call arguments
-  --     assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was_called_with(match.is_not_number(), match.is_string(), match.is_number(), match.is_number())
-  --   end)
-  -- end)
+      -- Extract the call arguments
+      assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was_called_with(match._, match.is_number(), match.is_string(), match.is_number(), match.is_number())
+    end)
+  end)
 end)
