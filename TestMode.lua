@@ -1,3 +1,5 @@
+TestMode = {}
+
 local p = "ff9d9d9d"
 local c = "ffffffff"
 local u = "ff1eff00"
@@ -27,16 +29,16 @@ local testItems = {
   { name = "Band of Radiant Echoes", id = 219325, icon = 4638575, color = h },
 }
 
-G_RLF.TestItems = {}
+TestMode.TestItems = {}
 for _, item in ipairs(testItems) do
-  table.insert(G_RLF.TestItems, {
+  table.insert(TestMode.TestItems, {
     id = item.id,
     link = createItemLink(item.name, item.id, item.color),
     icon = item.icon
   })
 end
 
-G_RLF.TestCurrencies = {
+TestMode.TestCurrencies = {
   -- Existing currencies
   { currencyID = 2245, name = "Flightstone", iconFileID = 4638586 }, -- Dragonflight
   { currencyID = 1191, name = "Valor", iconFileID = 463447 },
@@ -50,9 +52,44 @@ G_RLF.TestCurrencies = {
   { currencyID = 241, name = "Champion's Seal", iconFileID = 236689 }, -- Wrath of the Lich King
   -- New currencies
   { currencyID = 1813, name = "Reservoir Anima", iconFileID = 3528288 }, -- Shadowlands
-  { currencyID = 2000, name = "Catalyst", iconFileID = 1386555 }, -- Dragonflight
+  { currencyID = 2778, name = "Bronze", iconFileID = 4638724 }, -- Remix
   { currencyID = 3089, name = "Residual Memories", iconFileID = 3015740 }, -- TWW: Pre-Patch
   { currencyID = 1101, name = "Oil", iconFileID = 1131085 }, -- Legion
   { currencyID = 1704, name = "Spirit Shard", iconFileID = 133286 } -- Burning Crusade
 }
+
+function TestMode:ToggleTestMode()
+  if self.testMode then
+      -- Stop test mode
+      self.testMode = false
+      if self.testTimer then
+          self.testTimer:Cancel()
+          self.testTimer = nil
+      end
+      G_RLF:Print("Test Mode Disabled")
+  else
+      -- Start test mode
+      self.testMode = true
+      G_RLF:Print("Test Mode Enabled")
+      self.testTimer = C_Timer.NewTicker(1.5, function() self:GenerateRandomLoot() end)
+  end
+end
+
+function TestMode:GenerateRandomLoot()
+  -- Randomly decide whether to generate an item or currency
+  if math.random() < 0.8 then
+      -- Generate random item
+      local item = self.TestItems[math.random(#self.TestItems)]
+      local amountLooted = math.random(1, 5)
+      G_RLF.LootDisplay:ShowLoot(item.id, item.link, item.icon, amountLooted)
+  else
+      -- Generate random currency
+      local currency = self.TestCurrencies[math.random(#self.TestCurrencies)]
+      local amountLooted = math.random(1, 500)
+      local currencyLink = G_RLF:GetCurrencyLink(currency.currencyID, currency.name)
+      G_RLF.LootDisplay:ShowLoot(currency.currencyID, currencyLink, currency.iconFileID, amountLooted)
+  end
+end
+
+G_RLF.TestMode = TestMode
 

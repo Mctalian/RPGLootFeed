@@ -14,6 +14,7 @@ An addon for World of Warcraft that improves the looting experience by providing
 }
 dependencies = {
    "busted 2.2.0-1",
+   "luassert",
    "luacheck 0.23.0-1"
 }
 build = {
@@ -23,7 +24,7 @@ build = {
       ConfigOptions = "ConfigOptions.lua",
       LootDisplay = "LootDisplay.lua",
       RPGLootFeed = "RPGLootFeed.lua",
-      TestModeData = "TestModeData.lua"
+      TestMode = "TestMode.lua"
    }
 }
 test = {

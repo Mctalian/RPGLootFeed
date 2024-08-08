@@ -9,3 +9,7 @@ G_RLF.dbName = dbName
 function G_RLF:Print(...)
   G_RLF.RLF:Print(...)
 end
+
+function G_RLF:GetCurrencyLink(currencyID, name)
+  return string.format("|cffffffff|Hcurrency:%d|h[%s]|h|r", currencyID, name)
+end

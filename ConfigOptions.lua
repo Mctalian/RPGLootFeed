@@ -1,5 +1,19 @@
 local ConfigOptions = {}
 
+G_RLF.defaults = {
+    profile = {},
+    global = {
+        anchorPoint = "CENTER",
+        xOffset = 0,
+        yOffset = 0,
+        feedWidth = 200,
+        maxRows = 15,
+        rowHeight = 20,
+        padding = 2,
+        iconSize = 20
+    }
+}
+
 G_RLF.options = {
   name = addonName,
   handler = ConfigOptions,
@@ -202,12 +216,12 @@ function ConfigOptions:GetIconSize(info, value)
 end
 
 function ConfigOptions:SetRowPadding(info, value)
-    G_RLF.db.global.rowPadding = value
+    G_RLF.db.global.padding = value
     G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function ConfigOptions:GetRowPadding(info, value)
-    return G_RLF.db.global.rowPadding
+    return G_RLF.db.global.padding
 end
 
 function ConfigOptions:ToggleBoundingBox()
@@ -215,7 +229,7 @@ function ConfigOptions:ToggleBoundingBox()
 end
 
 function ConfigOptions:ToggleTestMode()
-    G_RLF.LootDisplay:ToggleTestMode()
+    G_RLF.TestMode:ToggleTestMode()
 end
 
 function ConfigOptions:ClearRows()

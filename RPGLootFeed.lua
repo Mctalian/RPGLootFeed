@@ -2,22 +2,8 @@ local addonName = G_RLF.addonName
 local dbName = G_RLF.dbName
 RLF = G_RLF.RLF
 
-local defaults = {
-    profile = {},
-    global = {
-        anchorPoint = "CENTER",
-        xOffset = 0,
-        yOffset = 0,
-        feedWidth = 200,
-        maxRows = 15,
-        rowHeight = 20,
-        rowPadding = 2,
-        iconSize = 20
-    }
-}
-
 function RLF:OnInitialize()
-    G_RLF.db = LibStub("AceDB-3.0"):New(dbName, defaults, true)
+    G_RLF.db = LibStub("AceDB-3.0"):New(dbName, G_RLF.defaults, true)
     LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
     self.initialized = false
     G_RLF.LootDisplay:Initialize()
@@ -47,10 +33,11 @@ function RLF:CURRENCY_DISPLAY_UPDATE(eventName, currencyType, quantity, quantity
         return
     end
 
-    G_RLF.LootDisplay:ShowLoot(info.currencyID, G_RLF.LootDisplay:GetCurrencyLink(info.currencyID, info.name), info.iconFileID, quantityChange)
+    G_RLF.LootDisplay:ShowLoot(info.currencyID, G_RLF:GetCurrencyLink(info.currencyID, info.name), info.iconFileID, quantityChange)
 end
 
 function RLF:CHAT_MSG_LOOT(eventName, msg)
+    -- This will not work if another addon is overriding formatting globals like LOOT_ITEM, LOOT_ITEM_MULTIPLE, etc.
     local notSelf = msg:match("receives")
     if notSelf ~= null then
         return
@@ -60,19 +47,6 @@ function RLF:CHAT_MSG_LOOT(eventName, msg)
         local amount = msg:match("rx(%d+)") or 1
         local _, itemLink, _, _, _, _, _, _, _, itemTexture = C_Item.GetItemInfo(itemID)
         G_RLF.LootDisplay:ShowLoot(itemID, itemLink, itemTexture, amount)
-    end
-end
-
-function dump(o)
-    if type(o) == 'table' then
-        local s = '{ '
-        for k, v in pairs(o) do
-            if type(k) ~= 'number' then k = '"' .. k .. '"' end
-            s = s .. '[' .. k .. '] = ' .. dump(v) .. ','
-        end
-        return s .. '} '
-    else
-        return tostring(o)
     end
 end
 

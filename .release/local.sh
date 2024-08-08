@@ -406,7 +406,6 @@ shift $((OPTIND - 1))
 
 if [ "$LOCAL_FLAG" = true ]; then
 	print_cyan "\n🖥️  Local Mode enabled! Taking a bunch of shortcuts...\n"
-	sleep 2
 	skip_zipfile="true"
 	skip_cf_upload="true"
 	skip_upload="true"
@@ -436,11 +435,16 @@ if [ -z "$topdir" ]; then
 fi
 
 # Handle folding sections in CI logs
-start_group() { echo "$1"; }
+start_group() { echo -e "$1"; }
 end_group() { echo; }
 
 # Check for Travis CI
 if [ -n "$TRAVIS" ]; then
+	yellow=""
+	cyan=""
+	green=""
+	red=""
+	no_color=""
 	# Don't run the packager for pull requests
 	if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then
 		echo "Not packaging pull request."
@@ -477,6 +481,11 @@ fi
 
 # Check for GitHub Actions
 if [[ -n $GITHUB_ACTIONS ]]; then
+	yellow=""
+	cyan=""
+	green=""
+	red=""
+	no_color=""
 	# Prevent duplicate builds from multiple pushes
 	if [[ $GITHUB_EVENT_NAME == "push" && $GITHUB_REF == "refs/heads"* ]]; then
 		check_tag=$( git -C "$topdir" tag --points-at HEAD )
@@ -1454,13 +1463,13 @@ fi
 [ "$addonid" = "0" ] && addonid=
 [ "$wagoid" = "0" ] && wagoid=
 
-print_yellow "📦  Packaging $package  📦\n"
+print_yellow "📦  Packaging $package  📦"
 if [ -n "$project_version" ]; then
-	echo -n "Current version: "
+	echo -n "  Current version: "
 	print_cyan "$project_version"
 fi
 if [ -n "$previous_version" ]; then
-	echo -n "Previous version: "
+	echo -n "  Previous version: "
 	print_red: "$previous_version"
 fi
 (
@@ -1470,9 +1479,9 @@ fi
 		version="multi-version "
 	fi
 	[ "$file_type" = "alpha" ] && alpha="alpha" || alpha="non-alpha"
-	echo -n "Build type: "
+	echo -n "  Build type: "
 	print_cyan "${version}${alpha} non-debug${nolib:+ nolib}"
-	echo -n "Game version: "
+	echo -n "  Game version: "
 	print_cyan "${game_version}"
 	echo
 )
@@ -1814,7 +1823,7 @@ copy_directory_tree() {
 	_cdt_destdir=$2
 
 	if [ -z "$_cdt_external" ]; then
-		start_group "Copying files into ${_cdt_destdir#$topdir/}:" "copy"
+		start_group "${yellow}Copying files into ${_cdt_destdir#$topdir/}:${no_color}" "copy"
 	else # don't nest groups
 		echo "Copying files into ${_cdt_destdir#$topdir/}:"
 	fi
@@ -2033,6 +2042,7 @@ copy_directory_tree() {
 			fi
 		fi
 	done < <( cd "$_cdt_srcdir" && eval "$_cdt_find_cmd" )
+	print_no_verbose -e "  ${cyan}❌ Anything not explictly mentioned as being copied above is ignored. Use -v or -V flag to see ignores.${no_color}\n"
 	if [ -z "$_external_dir" ]; then
 		end_group "copy"
 	fi
@@ -2048,7 +2058,6 @@ if [ -z "$skip_copying" ]; then
 	[ -n "$ignore" ] && cdt_args+=" -i \"$ignore\""
 	[ -n "$unchanged" ] && cdt_args+=" -u \"$unchanged\""
 	eval copy_directory_tree "$cdt_args" "\"$topdir\"" "\"$pkgdir\""
-	print_no_verbose -e "\n${cyan}❌ *** Anything not explictly mentioned as being copied above is ignored. Use -v or -V flag to see ignores. ***${no_color}\n"
 fi
 
 # Reset ignore and parse pkgmeta ignores again to handle ignoring external paths
@@ -2298,7 +2307,7 @@ trap kill_externals INT
 
 if [ -z "$skip_externals" ] && [ -f "$pkgmeta_file" ]; then
 	if [ "$LOCAL_FLAG" = true ]; then
-			print_cyan "\n🖥️  *** Local Mode is enabled, so external libs will not be fetched/updated if they are already present. ***\n"
+			print_cyan "🌐  Local Mode is enabled, so external libs will not be fetched/updated if they are already present.\n"
 	fi
 	yaml_eof=
 	while [ -z "$yaml_eof" ]; do
@@ -2475,8 +2484,8 @@ else
 		wowi_markup="markdown"
 	fi
 
-	start_group "🗒️  Generating changelog of commits into $changelog" "changelog"
-	echo
+	start_group "🗒️  ${yellow}Generating changelog of commits into $changelog${no_color}" "changelog"
+	print_debug
 
 	_changelog_range=
 	if [ "$repository_type" = "git" ]; then
@@ -2641,7 +2650,7 @@ else
 	fi
 
 	print_debug "$(<"$changelog_path")"
-	print_no_verbose "${changelog_path#$topdir/} generated!"
+	print_no_verbose -e "  ☑️  ${cyan}Changelog generated at ${changelog_path#$topdir/}${no_color}"
 	end_group "changelog"
 fi
 
