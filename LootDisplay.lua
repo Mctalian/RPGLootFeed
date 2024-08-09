@@ -8,7 +8,11 @@ local rowBackground
 local rowIcon
 local rowAmountText
 local rowFadeOutAnimation
+local rowHightlightBorder
 local rowStyles
+local rowMoneyIcon
+local rowMoneyStyles
+local rowMoneyText
 local getNumberOfRows
 local getFrameHeight
 local doesRowExist
@@ -88,38 +92,29 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
     if row then
         -- Update existing entry
         row.amount = row.amount + amountLooted
-
-        row.amountText:SetText(row.link .. " x" .. row.amount)
-        row.fadeOutAnimation:Stop()
-        row.fadeOutAnimation:Play()
+        row.highlightAnimation:Stop()
+        row.highlightAnimation:Play()
     else
-        -- if #rows >= config.maxRows then
-        --   -- Skip this, we've already allocated too much
-        --   return
-        -- end
+        if getNumberOfRows() >= config.maxRows then
+          -- Skip this, we've already allocated too much
+          return
+        end
         if #rowFramePool == 0 then
           -- Create a new row
-          G_RLF:Print("Creating a new frame")
           row = CreateFrame("Frame", nil, frame)
         else
-          G_RLF:Print("Reusing a frame")
           row = tremove(rowFramePool)
           row:ClearAllPoints()
         end
         rows:push(row)
         row.key = key
         row:Show()
-        rowStyles(row, key)
+        rowStyles(row)
 
         -- Initialize row content
         row.icon:SetTexture(icon)
         row.amount = amountLooted
         row.link = link
-        row.amountText:SetText(link .. " x" .. amountLooted)
-
-        -- Track the row
-        G_RLF:Print(getNumberOfRows() .. " rows tracked")
-        G_RLF:Print(#rowFramePool .. " rows in pool")
 
         -- Position the new row at the bottom of the frame
         if getNumberOfRows() == 1 then
@@ -128,18 +123,66 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
           updateRowPositions()
         end
 
-        row.fadeOutAnimation:Stop()
-        row.fadeOutAnimation:Play()
     end
+    row.amountText:SetText(row.link .. " x" .. row.amount)
+    row.fadeOutAnimation:Stop()
+    row.fadeOutAnimation:Play()
+end
+
+function LootDisplay:ShowMoney(copper)
+  local key = "MONEY_LOOT" -- Use ID as a unique key
+  local text
+
+  -- Check if the item or currency is already displayed
+  local row = getRow(key)
+  if row then
+      -- Update existing entry
+      row.copper = row.copper + copper
+      row.highlightAnimation:Stop()
+      row.highlightAnimation:Play()
+  else
+      if getNumberOfRows() >= config.maxRows then
+        -- Skip this, we've already allocated too much
+        return
+      end
+      if #rowFramePool == 0 then
+        -- Create a new row
+        row = CreateFrame("Frame", nil, frame)
+      else
+        row = tremove(rowFramePool)
+        row:ClearAllPoints()
+      end
+      rows:push(row)
+      row.key = key
+      row:Show()
+      rowMoneyStyles(row)
+
+      -- Initialize row content
+      row.copper = copper
+
+      -- Position the new row at the bottom of the frame
+      if getNumberOfRows() == 1 then
+        row:SetPoint("BOTTOM", frame, "BOTTOM")
+      else
+        updateRowPositions()
+      end
+  end
+
+  text = C_CurrencyInfo.GetCoinTextureString(row.copper)
+  row.amountText:SetText(text)
+
+  row.fadeOutAnimation:Stop()
+  row.fadeOutAnimation:Play()
 end
 
 function LootDisplay:HideLoot()
-    -- Hide all rows
-    for row in rows:iterate() do
-        row.fadeOutAnimation:Stop()
-        row:Hide()
-        rows:remove(row)
-        tinsert(rowFramePool, row)
+    local row = rows:shift()
+
+    while row do
+      row.fadeOutAnimation:Stop()
+      row:Hide()
+      tinsert(rowFramePool, row)
+      row = rows:shift()
     end
 end
 
@@ -192,6 +235,28 @@ rowIcon = function(row)
   end
   row.icon:SetSize(config.iconSize, config.iconSize)
   row.icon:SetPoint("LEFT", config.iconSize / 4, 0)
+  row.icon:Show()
+end
+
+rowMoneyIcon = function(row)
+  if row.icon == nil then
+    row.icon = row:CreateTexture(nil, "ARTWORK")
+  else
+    row.icon:ClearAllPoints()
+    row.icon:SetTexture(nil)
+  end
+  row.icon:SetSize(config.iconSize, config.iconSize)
+  row.icon:SetPoint("LEFT", config.iconSize / 4, 0)
+  row.icon:Hide()
+end
+
+rowMoneyText = function(row)
+  if row.amountText == nil then
+    row.amountText = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+  else
+    row.amountText:ClearAllPoints()
+  end
+  row.amountText:SetPoint("LEFT", row.icon, "LEFT", 0, 0)
 end
 
 rowAmountText = function(row)
@@ -203,7 +268,7 @@ rowAmountText = function(row)
   row.amountText:SetPoint("LEFT", row.icon, "RIGHT", config.iconSize / 2, 0)
 end
 
-rowFadeOutAnimation = function(row, key, m)
+rowFadeOutAnimation = function(row)
   if row.fadeOutAnimation == nil then
     row.fadeOutAnimation = row:CreateAnimationGroup()
     local fadeOut = row.fadeOutAnimation:CreateAnimation("Alpha")
@@ -220,13 +285,52 @@ rowFadeOutAnimation = function(row, key, m)
   end
 end
 
-rowStyles = function(row, key)
+-- Function to create and handle the highlight border
+rowHighlightBorder = function(row)
+  if row.highlightBorder == nil then
+    row.highlightBorder = row:CreateTexture(nil, "OVERLAY")
+    row.highlightBorder:SetTexture("Interface\\Buttons\\UI-ActionButton-Border")
+    row.highlightBorder:SetBlendMode("ADD")
+    row.highlightBorder:SetAlpha(0) -- Start with it invisible
+    row.highlightBorder:SetSize(config.feedWidth * 2, config.rowHeight * 2)
+    row.highlightBorder:SetPoint("LEFT", row, "LEFT", -config.feedWidth / 2, 0)
+    
+    -- Create the animation group
+    row.highlightAnimation = row.highlightBorder:CreateAnimationGroup()
+    
+    -- Fade in animation
+    local fadeIn = row.highlightAnimation:CreateAnimation("Alpha")
+    fadeIn:SetFromAlpha(0)
+    fadeIn:SetToAlpha(1)
+    fadeIn:SetDuration(0.2)
+
+    -- Fade out animation
+    local fadeOut = row.highlightAnimation:CreateAnimation("Alpha")
+    fadeOut:SetFromAlpha(1)
+    fadeOut:SetToAlpha(0)
+    fadeOut:SetDuration(0.2)
+    fadeOut:SetStartDelay(0.3)
+  end
+end
+
+rowMoneyStyles = function(row)
+  row:SetSize(config.feedWidth, config.rowHeight)
+
+  rowBackground(row)
+  rowMoneyIcon(row)
+  rowHighlightBorder(row)
+  rowMoneyText(row)
+  rowFadeOutAnimation(row)
+end
+
+rowStyles = function(row)
   row:SetSize(config.feedWidth, config.rowHeight)
 
   rowBackground(row)
   rowIcon(row)
+  rowHighlightBorder(row)
   rowAmountText(row)
-  rowFadeOutAnimation(row, key, self)
+  rowFadeOutAnimation(row)
 end
 
 updateRowPositions = function()

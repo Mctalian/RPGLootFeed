@@ -67,7 +67,7 @@ function RLF:CHAT_MSG_MONEY(eventName, msg)
     amountInCopper = (gold * 100 * 100)
     amountInCopper = amountInCopper + (silver * 100)
     amountInCopper = amountInCopper + copper
-    self:Print(C_CurrencyInfo.GetCoinTextureString(amountInCopper))
+    G_RLF.LootDisplay:ShowMoney(amountInCopper)
 end
 
 function RLF:InitializeOptions()

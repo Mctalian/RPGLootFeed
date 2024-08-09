@@ -77,11 +77,16 @@ end
 
 function TestMode:GenerateRandomLoot()
   -- Randomly decide whether to generate an item or currency
-  if math.random() < 0.8 then
+  local rng = math.random()
+  if rng < 0.8 then
       -- Generate random item
       local item = self.TestItems[math.random(#self.TestItems)]
       local amountLooted = math.random(1, 5)
       G_RLF.LootDisplay:ShowLoot(item.id, item.link, item.icon, amountLooted)
+      if rng < 0.1 then
+        local copper = math.random(1, 100000000)
+        G_RLF.LootDisplay:ShowMoney(copper)
+      end
   else
       -- Generate random currency
       local currency = self.TestCurrencies[math.random(#self.TestCurrencies)]
