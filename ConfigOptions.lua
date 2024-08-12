@@ -3,15 +3,15 @@ local ConfigOptions = {}
 G_RLF.defaults = {
     profile = {},
     global = {
-        anchorPoint = "CENTER",
-        xOffset = 0,
-        yOffset = 0,
-        feedWidth = 200,
-        maxRows = 15,
-        rowHeight = 20,
+        anchorPoint = "BOTTOMLEFT",
+        xOffset = 720,
+        yOffset = 375,
+        feedWidth = 330,
+        maxRows = 10,
+        rowHeight = 22,
         padding = 2,
-        iconSize = 20,
-        fadeOutDelay = 15
+        iconSize = 18,
+        fadeOutDelay = 5
     }
 }
 

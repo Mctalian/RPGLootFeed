@@ -1,5 +1,11 @@
 #!/usr/bin/env bash
 
+##########################################################################################################
+# This is a heavily modified version of BigWigs/packager release.sh, optimized for local development flow
+#
+# Please go to the original source for release script capabilities.
+##########################################################################################################
+
 # release.sh generates an addon zip file from a Git, SVN, or Mercurial checkout.
 #
 # This is free and unencumbered software released into the public domain.

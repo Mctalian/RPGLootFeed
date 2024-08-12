@@ -2,55 +2,46 @@ local LootDisplay = {}
 
 -- Private method declaration
 local createDynamicPropertyTable
-local updateRowPositions
-local rowBackground
-local rowIcon
+local doesRowExist
+local getFrameHeight
+local getNumberOfRows
+local getRow
+local getTextWidth
+local leaseRow
 local rowAmountText
+local rowBackground
 local rowFadeOutAnimation
-local rowHightlightBorder
-local rowStyles
+local rowHighlightBorder
+local rowIcon
 local rowMoneyIcon
 local rowMoneyStyles
 local rowMoneyText
-local getNumberOfRows
-local getFrameHeight
-local doesRowExist
+local rowStyles
+local truncateItemLink
+local updateRowPositions
 
 -- Private variable declaration
 local defaults = {
-    anchorPoint = "CENTER",
+    anchorPoint = "BOTTOMLEFT",
     relativePoint = UIParent,
-    xOffset = 0,
-    yOffset = 0,
-    feedWidth = 200,
-    maxRows = 15,
-    rowHeight = 20,
+    xOffset = 720,
+    yOffset = 375,
+    feedWidth = 330,
+    maxRows = 10,
+    rowHeight = 22,
     padding = 2,
-    iconSize = 20,
-    fadeOutDelay = 15,
+    iconSize = 18,
+    fadeOutDelay = 5,
     rowBackgroundGradientStart = {0.1, 0.1, 0.1, 0.8}, -- Default to dark grey with 80% opacity
-    rowBackgroundGradientEnd = {0.1, 0.1, 0.1, 0} -- Default to dark grey with 0% opacity
+    rowBackgroundGradientEnd = {0.1, 0.1, 0.1, 0}, -- Default to dark grey with 0% opacity
+    font = "GameFontNormalSmall"
 }
 local config = nil
 local rows = G_RLF.list()
 local rowFramePool = {}
 local frame = nil
 local boundingBox = nil
-
-function dump(o)
-    if type(o) == 'table' then
-        local s = '{ '
-        for k, v in pairs(o) do
-            if type(k) ~= 'number' then
-                k = '"' .. k .. '"'
-            end
-            s = s .. '[' .. k .. '] = ' .. dump(v) .. ','
-        end
-        return s .. '} '
-    else
-        return tostring(o)
-    end
-end
+local tempFontString = nil
 
 -- Public methods
 function LootDisplay:Initialize()
@@ -66,6 +57,9 @@ function LootDisplay:Initialize()
     boundingBox:SetColorTexture(1, 0, 0, 0.5) -- Red with 50% opacity
     boundingBox:SetAllPoints()
     boundingBox:Hide()
+
+    tempFontString = UIParent:CreateFontString(nil, "ARTWORK", config.font)
+    tempFontString:Hide() -- Prevent it from showing up
 end
 
 function LootDisplay:ToggleBoundingBox()
@@ -83,10 +77,18 @@ end
 
 function LootDisplay:UpdateRowStyles()
     frame:SetSize(config.feedWidth, getFrameHeight())
+
+    for row in rows:iterate() do
+        if row.copper ~= nil then
+            rowMoneyStyles(row)
+        else
+            rowStyles(row)
+        end
+    end
 end
 
 function LootDisplay:UpdateFadeDelay()
-    for k, row in pairs(rows:iterate()) do
+    for row in rows:iterate() do
         rowFadeOutAnimation(row)
     end
 end
@@ -102,34 +104,17 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
         row.highlightAnimation:Stop()
         row.highlightAnimation:Play()
     else
-        if getNumberOfRows() >= config.maxRows then
-            -- Skip this, we've already allocated too much
+        row = leaseRow(key)
+        if (row == nil) then
             return
         end
-        if #rowFramePool == 0 then
-            -- Create a new row
-            row = CreateFrame("Frame", nil, frame)
-        else
-            row = tremove(rowFramePool)
-            row:ClearAllPoints()
-        end
-        rows:push(row)
-        row.key = key
-        row:Show()
-        rowStyles(row)
 
         -- Initialize row content
+        rowStyles(row)
         row.icon:SetTexture(icon)
         row.amount = amountLooted
-        row.link = link
-
-        -- Position the new row at the bottom of the frame
-        if getNumberOfRows() == 1 then
-            row:SetPoint("BOTTOM", frame, "BOTTOM")
-        else
-            updateRowPositions()
-        end
-
+        local extraWidth = getTextWidth(" x" .. row.amount)
+        row.link = truncateItemLink(link, extraWidth)
     end
     row.amountText:SetText(row.link .. " x" .. row.amount)
     row.fadeOutAnimation:Stop()
@@ -148,31 +133,14 @@ function LootDisplay:ShowMoney(copper)
         row.highlightAnimation:Stop()
         row.highlightAnimation:Play()
     else
-        if getNumberOfRows() >= config.maxRows then
-            -- Skip this, we've already allocated too much
+        row = leaseRow(key)
+        if (row == nil) then
             return
         end
-        if #rowFramePool == 0 then
-            -- Create a new row
-            row = CreateFrame("Frame", nil, frame)
-        else
-            row = tremove(rowFramePool)
-            row:ClearAllPoints()
-        end
-        rows:push(row)
-        row.key = key
-        row:Show()
-        rowMoneyStyles(row)
 
         -- Initialize row content
+        rowMoneyStyles(row)
         row.copper = copper
-
-        -- Position the new row at the bottom of the frame
-        if getNumberOfRows() == 1 then
-            row:SetPoint("BOTTOM", frame, "BOTTOM")
-        else
-            updateRowPositions()
-        end
     end
 
     text = C_CurrencyInfo.GetCoinTextureString(row.copper)
@@ -259,7 +227,7 @@ end
 
 rowMoneyText = function(row)
     if row.amountText == nil then
-        row.amountText = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+        row.amountText = row:CreateFontString(nil, "ARTWORK", config.font)
     else
         row.amountText:ClearAllPoints()
     end
@@ -268,7 +236,7 @@ end
 
 rowAmountText = function(row)
     if row.amountText == nil then
-        row.amountText = row:CreateFontString(nil, "ARTWORK", "GameFontNormalSmall")
+        row.amountText = row:CreateFontString(nil, "ARTWORK", config.font)
     else
         row.amountText:ClearAllPoints()
     end
@@ -303,24 +271,31 @@ rowHighlightBorder = function(row)
         row.highlightBorder:SetTexture("Interface\\Buttons\\UI-ActionButton-Border")
         row.highlightBorder:SetBlendMode("ADD")
         row.highlightBorder:SetAlpha(0) -- Start with it invisible
-        row.highlightBorder:SetSize(config.feedWidth * 2, config.rowHeight * 2)
-        row.highlightBorder:SetPoint("LEFT", row, "LEFT", -config.feedWidth / 2, 0)
+    end
 
-        -- Create the animation group
+    row.highlightBorder:SetSize(config.feedWidth * 2, config.rowHeight * 2)
+    row.highlightBorder:SetPoint("LEFT", row, "LEFT", -config.feedWidth / 2, 0)
+
+    -- Create the animation group
+    if row.highlightAnimation == nil then
         row.highlightAnimation = row.highlightBorder:CreateAnimationGroup()
+    end
 
+    if row.highlightAnimation.fadeInAlpha == nil then
         -- Fade in animation
-        local fadeIn = row.highlightAnimation:CreateAnimation("Alpha")
-        fadeIn:SetFromAlpha(0)
-        fadeIn:SetToAlpha(1)
-        fadeIn:SetDuration(0.2)
+        row.highlightAnimation.fadeInAlpha = row.highlightAnimation:CreateAnimation("Alpha")
+        row.highlightAnimation.fadeInAlpha:SetFromAlpha(0)
+        row.highlightAnimation.fadeInAlpha:SetToAlpha(1)
+        row.highlightAnimation.fadeInAlpha:SetDuration(0.2)
+    end
 
+    if row.highlightAnimation.fadeOutAlpha == nil then
         -- Fade out animation
-        local fadeOut = row.highlightAnimation:CreateAnimation("Alpha")
-        fadeOut:SetFromAlpha(1)
-        fadeOut:SetToAlpha(0)
-        fadeOut:SetDuration(0.2)
-        fadeOut:SetStartDelay(0.3)
+        row.highlightAnimation.fadeOutAlpha = row.highlightAnimation:CreateAnimation("Alpha")
+        row.highlightAnimation.fadeOutAlpha:SetFromAlpha(1)
+        row.highlightAnimation.fadeOutAlpha:SetToAlpha(0)
+        row.highlightAnimation.fadeOutAlpha:SetDuration(0.2)
+        row.highlightAnimation.fadeOutAlpha:SetStartDelay(0.3)
     end
 end
 
@@ -376,3 +351,65 @@ getRow = function(key)
     end
     return nil
 end
+
+getTextWidth = function(text)
+    tempFontString:SetText(text)
+    local width = tempFontString:GetStringWidth()
+    return width
+end
+
+truncateItemLink = function(itemLink, extraWidth)
+    local originalLink = itemLink .. ""
+    local itemName = string.match(itemLink, "%[(.-)%]")
+    local nameIndex = string.find(originalLink, itemName)
+    local linkStart = string.sub(originalLink, 0, nameIndex - 1)
+    local linkEnd = string.sub(originalLink, nameIndex + #itemName)
+    
+    local maxWidth = config.feedWidth - config.iconSize - (config.iconSize / 4) - (config.iconSize / 2) - extraWidth
+    
+    -- Calculate the width of the item name plus the link start and end
+    local itemNameWidth = getTextWidth("[" .. itemName .. "]")
+    
+    -- If the width exceeds maxWidth, truncate and add ellipses
+    if itemNameWidth > maxWidth then
+        -- Approximate truncation by progressively shortening the name
+        while getTextWidth("[" .. itemName .. "...]") > maxWidth and #itemName > 0 do
+            itemName = string.sub(itemName, 1, -2)
+        end
+        itemName = itemName .. "..."
+    end
+
+    return linkStart .. itemName .. linkEnd
+end
+
+leaseRow = function(key)
+    if getNumberOfRows() >= config.maxRows then
+        -- Skip this, we've already allocated too much
+        return nil
+    end
+    local row
+    if #rowFramePool == 0 then
+        -- Create a new row
+        row = CreateFrame("Frame", nil, frame)
+    else
+        row = tremove(rowFramePool)
+        row:ClearAllPoints()
+        row.amount = nil
+        row.copper = nil
+        row.link = nil
+    end
+
+    rows:push(row)
+    row.key = key
+    row:Show()
+
+    -- Position the new row at the bottom of the frame
+    if getNumberOfRows() == 1 then
+        row:SetPoint("BOTTOM", frame, "BOTTOM")
+    else
+        updateRowPositions()
+    end
+
+    return row
+end
+
