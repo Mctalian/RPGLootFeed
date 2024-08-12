@@ -22,7 +22,8 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
     end
 end
 
-function RLF:CURRENCY_DISPLAY_UPDATE(eventName, currencyType, quantity, quantityChange, quantityGainSource, quantityLostSource)
+function RLF:CURRENCY_DISPLAY_UPDATE(eventName, currencyType, quantity, quantityChange, quantityGainSource,
+    quantityLostSource)
     if currencyType == nil or quantityChange == 0 then
         return
     end
@@ -32,7 +33,8 @@ function RLF:CURRENCY_DISPLAY_UPDATE(eventName, currencyType, quantity, quantity
         return
     end
 
-    G_RLF.LootDisplay:ShowLoot(info.currencyID, G_RLF:GetCurrencyLink(info.currencyID, info.name), info.iconFileID, quantityChange)
+    G_RLF.LootDisplay:ShowLoot(info.currencyID, G_RLF:GetCurrencyLink(info.currencyID, info.name), info.iconFileID,
+        quantityChange)
 end
 
 function RLF:CHAT_MSG_LOOT(eventName, msg)
@@ -63,7 +65,7 @@ function RLF:CHAT_MSG_MONEY(eventName, msg)
     gold = tonumber(msg:match(goldPattern)) or gold
     silver = tonumber(msg:match(silverPattern)) or silver
     copper = tonumber(msg:match(copperPattern)) or copper
-    
+
     amountInCopper = (gold * 100 * 100)
     amountInCopper = amountInCopper + (silver * 100)
     amountInCopper = amountInCopper + copper
@@ -75,7 +77,6 @@ function RLF:InitializeOptions()
         self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName, addonName)
     end
 end
-
 
 function RLF:SlashCommand(msg, editBox)
     LibStub("AceConfigDialog-3.0"):Open(addonName)

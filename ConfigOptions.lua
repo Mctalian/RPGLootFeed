@@ -10,147 +10,162 @@ G_RLF.defaults = {
         maxRows = 15,
         rowHeight = 20,
         padding = 2,
-        iconSize = 20
+        iconSize = 20,
+        fadeOutDelay = 15
     }
 }
 
 G_RLF.options = {
-  name = addonName,
-  handler = ConfigOptions,
-  type = "group",
-  args = {
-      visual = {
-          type = "group",
-          name = "Visual",
-          desc = "Position and size the loot feed and its elements",
-          args = {
-              positioning = {
-                  type = "header",
-                  name = "Positioning",
-                  order = 1,
-              },
-              anchorPoint = {
-                  type = "select",
-                  name = "Anchor Point",
-                  desc = "Where on the screen to base the loot feed positioning (also impacts sizing direction)",
-                  get = "GetRelativePosition",
-                  set = "SetRelativePosition",
-                  values = {
-                    ["TOPLEFT"] = "Top Left",
-                    ["TOPRIGHT"] = "Top Right",
-                    ["BOTTOMLEFT"] = "Bottom Left",
-                    ["BOTTOMRIGHT"] = "Bottom Right",
-                    ["TOP"] = "Top",
-                    ["BOTTOM"] = "Bottom",
-                    ["LEFT"] = "Left",
-                    ["RIGHT"] = "Right",
-                    ["CENTER"] = "Center",
+    name = addonName,
+    handler = ConfigOptions,
+    type = "group",
+    args = {
+        visual = {
+            type = "group",
+            name = "Visual",
+            desc = "Position and size the loot feed and its elements",
+            args = {
+                positioning = {
+                    type = "header",
+                    name = "Positioning",
+                    order = 1
                 },
-                  order = 2,
-              },
-              xOffset = {
-                  type = "range",
-                  name = "X Offset",
-                  desc = "Adjust the loot feed left (negative) or right (positive)",
-                  min = -1500,
-                  max = 1500,
-                  get = "GetXOffset",
-                  set = "SetXOffset",
-                  order = 3,
-              },
-              yOffset = {
-                  type = "range",
-                  name = "Y Offset",
-                  desc = "Adjust the loot feed down (negative) or up (positive)",
-                  min = -1500,
-                  max = 1500,
-                  get = "GetYOffset",
-                  set = "SetYOffset",
-                  order = 4,
-              },
-              sizing = {
-                  type = "header",
-                  name = "Sizing",
-                  order = 5,
-              },
-              feedWidth = {
-                  type = "range",
-                  name = "Feed Width",
-                  desc = "The width of the loot feed parent frame",
-                  min = 10,
-                  max = 1000,
-                  get = "GetFeedWidth",
-                  set = "SetFeedWidth",
-                  order = 6,
-              },
-              maxRows = {
-                  type = "range",
-                  name = "Maximum Rows to Display",
-                  desc = "The maximum number of loot items to display in the feed",
-                  min = 10,
-                  max = 1000,
-                  step = 1,
-                  bigStep = 5,
-                  get = "GetMaxRows",
-                  set = "SetMaxRows",
-                  order = 6,
-              },
-              rowHeight = {
-                  type = "range",
-                  name = "Loot Item Height",
-                  desc = "The height of each item \"row\" in the loot feed",
-                  min = 5,
-                  max = 100,
-                  get = "GetRowHeight",
-                  set = "SetRowHeight",
-                  order = 7,
-              },
-              iconSize = {
-                  type = "range",
-                  name = "Loot Item Icon Size",
-                  desc = "The size of the icons in each item \"row\" in the loot feed",
-                  min = 5,
-                  max = 100,
-                  get = "GetIconSize",
-                  set = "SetIconSize",
-                  order = 8,
-              },
-              rowPadding = {
-                  type = "range",
-                  name = "Loot Item Padding",
-                  desc = "The amount of space between item \"rows\" in the loot feed",
-                  min = 0,
-                  max = 10,
-                  get = "GetRowPadding",
-                  set = "SetRowPadding",
-                  order = 9,
-              },
-          }
-      },
-      testMode = {
-          type = "execute",
-          name = "Toggle Test Mode",
-          -- width = "double",
-          func = "ToggleTestMode",
-          order = 1,
-      },
-      clearRows = {
-          type = "execute",
-          name = "Clear rows",
-          -- width = "double",
-          func = "ClearRows",
-          order = 2,
-      },
-      boundingBox = {
-          type = "execute",
-          name = "Toggle Area",
-          -- width = "double",
-          func = "ToggleBoundingBox",
-          order = 3,
-      },
-  }
+                anchorPoint = {
+                    type = "select",
+                    name = "Anchor Point",
+                    desc = "Where on the screen to base the loot feed positioning (also impacts sizing direction)",
+                    get = "GetRelativePosition",
+                    set = "SetRelativePosition",
+                    values = {
+                        ["TOPLEFT"] = "Top Left",
+                        ["TOPRIGHT"] = "Top Right",
+                        ["BOTTOMLEFT"] = "Bottom Left",
+                        ["BOTTOMRIGHT"] = "Bottom Right",
+                        ["TOP"] = "Top",
+                        ["BOTTOM"] = "Bottom",
+                        ["LEFT"] = "Left",
+                        ["RIGHT"] = "Right",
+                        ["CENTER"] = "Center"
+                    },
+                    order = 2
+                },
+                xOffset = {
+                    type = "range",
+                    name = "X Offset",
+                    desc = "Adjust the loot feed left (negative) or right (positive)",
+                    min = -1500,
+                    max = 1500,
+                    get = "GetXOffset",
+                    set = "SetXOffset",
+                    order = 3
+                },
+                yOffset = {
+                    type = "range",
+                    name = "Y Offset",
+                    desc = "Adjust the loot feed down (negative) or up (positive)",
+                    min = -1500,
+                    max = 1500,
+                    get = "GetYOffset",
+                    set = "SetYOffset",
+                    order = 4
+                },
+                sizing = {
+                    type = "header",
+                    name = "Sizing",
+                    order = 5
+                },
+                feedWidth = {
+                    type = "range",
+                    name = "Feed Width",
+                    desc = "The width of the loot feed parent frame",
+                    min = 10,
+                    max = 1000,
+                    get = "GetFeedWidth",
+                    set = "SetFeedWidth",
+                    order = 6
+                },
+                maxRows = {
+                    type = "range",
+                    name = "Maximum Rows to Display",
+                    desc = "The maximum number of loot items to display in the feed",
+                    min = 10,
+                    max = 1000,
+                    step = 1,
+                    bigStep = 5,
+                    get = "GetMaxRows",
+                    set = "SetMaxRows",
+                    order = 6
+                },
+                rowHeight = {
+                    type = "range",
+                    name = "Loot Item Height",
+                    desc = "The height of each item \"row\" in the loot feed",
+                    min = 5,
+                    max = 100,
+                    get = "GetRowHeight",
+                    set = "SetRowHeight",
+                    order = 7
+                },
+                iconSize = {
+                    type = "range",
+                    name = "Loot Item Icon Size",
+                    desc = "The size of the icons in each item \"row\" in the loot feed",
+                    min = 5,
+                    max = 100,
+                    get = "GetIconSize",
+                    set = "SetIconSize",
+                    order = 8
+                },
+                rowPadding = {
+                    type = "range",
+                    name = "Loot Item Padding",
+                    desc = "The amount of space between item \"rows\" in the loot feed",
+                    min = 0,
+                    max = 10,
+                    get = "GetRowPadding",
+                    set = "SetRowPadding",
+                    order = 9
+                },
+                timing = {
+                    type = "header",
+                    name = "Timing",
+                    order = 10
+                },
+                fadeOutDelay = {
+                    type = "range",
+                    name = "Fade Out Delay",
+                    desc = "The number of seconds to show the loot row before it fades out.",
+                    min = 1,
+                    max = 30,
+                    get = "GetFadeOutDelay",
+                    set = "SetFadeOutDelay",
+                    order = 11
+                },
+            }
+        },
+        testMode = {
+            type = "execute",
+            name = "Toggle Test Mode",
+            -- width = "double",
+            func = "ToggleTestMode",
+            order = 1
+        },
+        clearRows = {
+            type = "execute",
+            name = "Clear rows",
+            -- width = "double",
+            func = "ClearRows",
+            order = 2
+        },
+        boundingBox = {
+            type = "execute",
+            name = "Toggle Area",
+            -- width = "double",
+            func = "ToggleBoundingBox",
+            order = 3
+        }
+    }
 }
-
 
 function ConfigOptions:SetRelativePosition(info, value)
     G_RLF.db.global.anchorPoint = value
@@ -224,6 +239,15 @@ function ConfigOptions:GetRowPadding(info, value)
     return G_RLF.db.global.padding
 end
 
+function ConfigOptions:SetFadeOutDelay(info, value)
+    G_RLF.db.global.fadeOutDelay = value
+    G_RLF.LootDisplay:UpdateFadeDelay()
+end
+
+function ConfigOptions:GetFadeOutDelay(info, value)
+    return G_RLF.db.global.fadeOutDelay
+end
+
 function ConfigOptions:ToggleBoundingBox()
     G_RLF.LootDisplay:ToggleBoundingBox()
 end
@@ -235,3 +259,4 @@ end
 function ConfigOptions:ClearRows()
     G_RLF.LootDisplay:HideLoot()
 end
+
