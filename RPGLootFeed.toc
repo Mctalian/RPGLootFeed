@@ -7,9 +7,9 @@
 ## IconTexture: Interface/AddOns/RPGLootFeed/Icons/logo
 ## OptionalDeps: Ace3
 ## X-GitHub: https://github.com/Mctalian/RPGLootFeed
-## X-Curse-Project-ID:
+## X-Curse-Project-ID: 1082791
 ## X-WoWI-ID:
-## X-Wago-ID:
+## X-Wago-ID: 56n9R0N9
 
 Libs\LibStub\LibStub.lua
 Libs\AceAddon-3.0\AceAddon-3.0.xml
