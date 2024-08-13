@@ -1,4 +1,4 @@
-## Interface: 110000
+## Interface: 110002
 ## Title: RPG Loot Feed
 ## Author: McTalian
 ## Version: @project-version@
