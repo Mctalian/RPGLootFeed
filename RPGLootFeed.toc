@@ -2,7 +2,7 @@
 ## Title: RPG Loot Feed
 ## Author: McTalian
 ## Version: @project-version@
-## Notes: A non-intrusive way to see what you just looted.
+## Notes: A non-intrusive way to see what you just looted.|n|n|cffFFC700Slash command: /rlf, /rpgLootFeed|r
 ## SavedVariables: RPGLootFeedDB
 ## IconTexture: Interface/AddOns/RPGLootFeed/Icons/logo
 ## OptionalDeps: Ace3

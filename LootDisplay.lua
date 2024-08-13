@@ -72,7 +72,7 @@ end
 
 function LootDisplay:UpdatePosition()
     frame:ClearAllPoints()
-    frame:SetPoint(config.anchor, config.relativePoint, config.xOffset, config.yOffset)
+    frame:SetPoint(config.anchorPoint, config.relativePoint, config.xOffset, config.yOffset)
 end
 
 function LootDisplay:UpdateRowStyles()
