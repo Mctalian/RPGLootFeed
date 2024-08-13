@@ -17,8 +17,8 @@ function RLF:OnInitialize()
 end
 
 function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
+    self:InitializeOptions()
     if isLogin and isReload == false then
-        self:InitializeOptions()
         self:Print("Welcome! Use /rlf to view options.")
     end
 end
