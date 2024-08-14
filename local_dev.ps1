@@ -11,4 +11,19 @@
 # To undo this, simply delete the RPGLootFeed link/folder in your WoW addons directory
 
 # Be sure to replace your WSL Distro (Debian) and your username (mctalian) in the following command
-New-Item -ItemType SymbolicLink -Target "\\wsl.localhost\Debian\home\mctalian\Projects\RPGLootFeed\.release\RPGLootFeed" -Path "C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\RPGLootFeed"
+
+$scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
+
+Write-Host $scriptDirectory
+
+$sourcePath = "$scriptDirectory\.release\RPGLootFeed"
+$destPath = "C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\RPGLootFeed"
+
+Write-Host $sourcePath
+
+if (Test-Path $destPath) {
+    Remove-Item $destPath -Recurse -Force
+    Write-Host "Directory deleted: $destPath"
+}
+
+New-Item -ItemType SymbolicLink -Target "$sourcePath" -Path "$destPath"

@@ -361,15 +361,18 @@ end
 truncateItemLink = function(itemLink, extraWidth)
     local originalLink = itemLink .. ""
     local itemName = string.match(itemLink, "%[(.-)%]")
-    local nameIndex = string.find(originalLink, itemName)
-    local linkStart = string.sub(originalLink, 0, nameIndex - 1)
-    local linkEnd = string.sub(originalLink, nameIndex + #itemName)
-    
+    local begIndex, endIndex = string.find(originalLink, itemName, 1, true)
+    if begIndex == nil then
+        return originalLink
+    end
+    local linkStart = string.sub(originalLink, 0, begIndex - 1)
+    local linkEnd = string.sub(originalLink, endIndex + 1)
+
     local maxWidth = config.feedWidth - config.iconSize - (config.iconSize / 4) - (config.iconSize / 2) - extraWidth
-    
+
     -- Calculate the width of the item name plus the link start and end
     local itemNameWidth = getTextWidth("[" .. itemName .. "]")
-    
+
     -- If the width exceeds maxWidth, truncate and add ellipses
     if itemNameWidth > maxWidth then
         -- Approximate truncation by progressively shortening the name
