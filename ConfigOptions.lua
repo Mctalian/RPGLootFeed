@@ -11,7 +11,8 @@ G_RLF.defaults = {
         rowHeight = 22,
         padding = 2,
         iconSize = 18,
-        fadeOutDelay = 5
+        fadeOutDelay = 5,
+        disableBlizzLootToasts = false,
     }
 }
 
@@ -20,10 +21,32 @@ G_RLF.options = {
     handler = ConfigOptions,
     type = "group",
     args = {
+        testMode = {
+            type = "execute",
+            name = "Toggle Test Mode",
+            -- width = "double",
+            func = "ToggleTestMode",
+            order = 1
+        },
+        clearRows = {
+            type = "execute",
+            name = "Clear rows",
+            -- width = "double",
+            func = "ClearRows",
+            order = 2
+        },
+        boundingBox = {
+            type = "execute",
+            name = "Toggle Area",
+            -- width = "double",
+            func = "ToggleBoundingBox",
+            order = 3
+        },
         visual = {
             type = "group",
             name = "Visual",
             desc = "Position and size the loot feed and its elements",
+            order = 4,
             args = {
                 positioning = {
                     type = "header",
@@ -143,26 +166,21 @@ G_RLF.options = {
                 },
             }
         },
-        testMode = {
-            type = "execute",
-            name = "Toggle Test Mode",
-            -- width = "double",
-            func = "ToggleTestMode",
-            order = 1
-        },
-        clearRows = {
-            type = "execute",
-            name = "Clear rows",
-            -- width = "double",
-            func = "ClearRows",
-            order = 2
-        },
-        boundingBox = {
-            type = "execute",
-            name = "Toggle Area",
-            -- width = "double",
-            func = "ToggleBoundingBox",
-            order = 3
+        blizz = {
+            type = "group",
+            name = "Blizzard UI",
+            desc = "Override behavior of Blizzard-related UI elements",
+            order = 5,
+            args = {
+                disableLootToast = {
+                    type = "toggle",
+                    name = "Disable Loot Toasts",
+                    desc = "The boxes that appear at the bottom of the screen when you loot special items",
+                    get = "GetDisableLootToast",
+                    set = "SetDisableLootToast",
+                    order = 1
+                }
+            }
         }
     }
 }
@@ -246,6 +264,14 @@ end
 
 function ConfigOptions:GetFadeOutDelay(info, value)
     return G_RLF.db.global.fadeOutDelay
+end
+
+function ConfigOptions:SetDisableLootToast(info, value)
+    G_RLF.db.global.disableBlizzLootToasts = value
+end
+
+function ConfigOptions:GetDisableLootToast(info, value)
+    return G_RLF.db.global.disableBlizzLootToasts
 end
 
 function ConfigOptions:ToggleBoundingBox()

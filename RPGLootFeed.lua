@@ -16,8 +16,35 @@ function RLF:OnInitialize()
     self:RegisterChatCommand("rpgLootFeed", "SlashCommand")
 end
 
+local attempts = 0
+function RLF:CheckForLootAlertSystem()
+    if LootAlertSystem and LootAlertSystem.AddAlert then
+        self:RawHook(LootAlertSystem, "AddAlert", "InterceptAddAlert", true)
+    else
+        if attempts <= 30 then
+            attempts = attempts + 1
+            -- Keep checking until it's available
+            self:ScheduleTimer("CheckForLootAlertSystem", 1)
+        else
+            self:Print("LootAlertSystem:AddAlert was unavailable for > 30 seconds, Loot Toasts could not be disabled :(")
+            self:Print("Please report this issue @ github: McTalian/RPGLootFeed")
+        end
+        
+    end
+end
+
+function RLF:InterceptAddAlert(frame, ...)
+    if G_RLF.db.global.disableBlizzLootToasts then
+        return
+    end
+    -- Call the original AddAlert function if not blocked
+    self.hooks[LootAlertSystem].AddAlert(frame, ...)
+end
+
+
 function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
     self:InitializeOptions()
+    self:CheckForLootAlertSystem()
     if isLogin and isReload == false then
         self:Print("Welcome! Use /rlf to view options.")
     end
