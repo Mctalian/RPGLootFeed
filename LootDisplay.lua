@@ -49,7 +49,7 @@ function LootDisplay:Initialize()
 
     frame = CreateFrame("Frame", "LootDisplayFrame", UIParent)
     frame:SetSize(config.feedWidth, getFrameHeight())
-    frame:SetPoint(config.anchorPoint, UIParent, config.xOffset, config.yOffset)
+    frame:SetPoint(config.anchorPoint, _G[config.relativePoint], config.xOffset, config.yOffset)
 
     frame:SetClipsChildren(true) -- Enable clipping of child elements
 
@@ -72,7 +72,7 @@ end
 
 function LootDisplay:UpdatePosition()
     frame:ClearAllPoints()
-    frame:SetPoint(config.anchorPoint, config.relativePoint, config.xOffset, config.yOffset)
+    frame:SetPoint(config.anchorPoint, _G[config.relativePoint], config.xOffset, config.yOffset)
 end
 
 function LootDisplay:UpdateRowStyles()

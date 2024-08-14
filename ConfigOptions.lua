@@ -1,8 +1,26 @@
 local ConfigOptions = {}
 
+-- Enumerate available frames to anchor to
+local function EnumerateFrames()
+    local frames = {}
+    local framesToCheck = {
+        ["UIParent"] = "UIParent",
+        ["PlayerFrame"] = "PlayerFrame",
+        ["Minimap"] = "Minimap",
+        ["MainMenuBarBackpackButton"] = "BagBar"
+    }
+    for f, s in pairs(framesToCheck) do
+        if _G[f] then
+            frames[f] = s
+        end
+    end
+    return frames
+end
+
 G_RLF.defaults = {
     profile = {},
     global = {
+        relativePoint = "UIParent",
         anchorPoint = "BOTTOMLEFT",
         xOffset = 720,
         yOffset = 375,
@@ -52,6 +70,15 @@ G_RLF.options = {
                     type = "header",
                     name = "Positioning",
                     order = 1
+                },
+                relativeTo = {
+                    type = "select",
+                    name = "Anchor Relative To",
+                    desc = "Select a frame to anchor the loot feed to",
+                    get = "GetRelativeTo",
+                    set = "SetRelativeTo",
+                    values = EnumerateFrames(),
+                    order = 1.1
                 },
                 anchorPoint = {
                     type = "select",
@@ -184,6 +211,15 @@ G_RLF.options = {
         }
     }
 }
+
+function ConfigOptions:SetRelativeTo(info, value)
+    G_RLF.db.global.relativePoint = value
+    G_RLF.LootDisplay:UpdatePosition()
+end
+
+function ConfigOptions:GetRelativeTo(info)
+    return G_RLF.db.global.relativePoint
+end
 
 function ConfigOptions:SetRelativePosition(info, value)
     G_RLF.db.global.anchorPoint = value
