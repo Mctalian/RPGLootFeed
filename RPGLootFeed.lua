@@ -18,6 +18,9 @@ end
 
 local attempts = 0
 function RLF:CheckForLootAlertSystem()
+    if self:IsHooked(LootAlertSystem, "AddAlert") then
+        return
+    end
     if LootAlertSystem and LootAlertSystem.AddAlert then
         self:RawHook(LootAlertSystem, "AddAlert", "InterceptAddAlert", true)
     else
