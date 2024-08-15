@@ -2,22 +2,23 @@
 
 # Running this will allow your changes in WSL to be reflected and testable in the game
 # without manually moving files around.
-# You will still need to package up your changes into the .release/RPGLootFeed directory
+# You will still need to package up your changes into the .release directory
 # (using .release/local.sh in this repo)
+# NOTE: Any brand new files will need to be staged in git for .release/local.sh to see it.
 
 # This script only needs to be run one time and any subsequent local builds will be visible in
 # WoW after a /reload
 
-# To undo this, simply delete the RPGLootFeed link/folder in your WoW addons directory
-
-# Be sure to replace your WSL Distro (Debian) and your username (mctalian) in the following command
+# To undo this, simply delete this addon's link/folder in your WoW addons directory and
+# redownload / manually copy the addon.
 
 $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 
-Write-Host $scriptDirectory
+# Find the .toc file and extract the addon name
+$addonName = Get-ChildItem -Path $scriptDirectory -Filter *.toc | Select-Object -First 1 | ForEach-Object { $_.BaseName }
 
-$sourcePath = "$scriptDirectory\.release\RPGLootFeed"
-$destPath = "C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\RPGLootFeed"
+$sourcePath = "$scriptDirectory\.release\$addonName"
+$destPath = "C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\$addonName"
 
 Write-Host $sourcePath
 
