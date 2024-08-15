@@ -69,6 +69,11 @@ function RLF:CURRENCY_DISPLAY_UPDATE(eventName, currencyType, quantity, quantity
 end
 
 function RLF:CHAT_MSG_LOOT(eventName, msg)
+    local raidLoot = msg:match("HlootHistory:")
+    if raidLoot then
+        -- Ignore this message as it's a raid loot message
+        return
+    end
     -- This will not work if another addon is overriding formatting globals like LOOT_ITEM, LOOT_ITEM_MULTIPLE, etc.
     local notSelf = msg:match("receives")
     if notSelf ~= null then
