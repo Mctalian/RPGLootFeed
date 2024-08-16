@@ -194,8 +194,13 @@ rowBackground = function(row)
         row.background:ClearAllPoints()
     end
     row.background:SetTexture("Interface/Buttons/WHITE8x8")
-    row.background:SetGradient("HORIZONTAL", CreateColor(unpack(config.rowBackgroundGradientStart)),
-        CreateColor(unpack(config.rowBackgroundGradientEnd)))
+    local leftColor = CreateColor(unpack(config.rowBackgroundGradientStart))
+    local rightColor = CreateColor(unpack(config.rowBackgroundGradientEnd))
+    if G_RLF.db.global.leftAlign == false then
+        leftColor = CreateColor(unpack(config.rowBackgroundGradientEnd))
+        rightColor =  CreateColor(unpack(config.rowBackgroundGradientStart))
+    end
+    row.background:SetGradient("HORIZONTAL", leftColor, rightColor)
     row.background:SetAllPoints()
 end
 
@@ -206,7 +211,13 @@ rowIcon = function(row)
         row.icon:ClearAllPoints()
     end
     row.icon:SetSize(config.iconSize, config.iconSize)
-    row.icon:SetPoint("LEFT", config.iconSize / 4, 0)
+    local anchor = "LEFT"
+    local xOffset = config.iconSize / 4
+    if G_RLF.db.global.leftAlign == false then
+        anchor = "RIGHT"
+        xOffset = xOffset * -1
+    end
+    row.icon:SetPoint(anchor, xOffset, 0)
     row.icon:Show()
 end
 
@@ -218,7 +229,13 @@ rowMoneyIcon = function(row)
         row.icon:SetTexture(nil)
     end
     row.icon:SetSize(config.iconSize, config.iconSize)
-    row.icon:SetPoint("LEFT", config.iconSize / 4, 0)
+    local anchor = "LEFT"
+    local xOffset = config.iconSize / 4
+    if G_RLF.db.global.leftAlign == false then
+        anchor = "RIGHT"
+        xOffset = xOffset * -1
+    end
+    row.icon:SetPoint(anchor, xOffset, 0)
     row.icon:Hide()
 end
 
@@ -228,7 +245,11 @@ rowMoneyText = function(row)
     else
         row.amountText:ClearAllPoints()
     end
-    row.amountText:SetPoint("LEFT", row.icon, "LEFT", 0, 0)
+    local anchor = "LEFT"
+    if G_RLF.db.global.leftAlign == false then
+        anchor = "RIGHT"
+    end
+    row.amountText:SetPoint(anchor, row.icon, anchor, 0, 0)
 end
 
 rowAmountText = function(row)
@@ -237,7 +258,15 @@ rowAmountText = function(row)
     else
         row.amountText:ClearAllPoints()
     end
-    row.amountText:SetPoint("LEFT", row.icon, "RIGHT", config.iconSize / 2, 0)
+    local anchor = "LEFT"
+    local iconAnchor = "RIGHT"
+    local xOffset = config.iconSize / 2
+    if G_RLF.db.global.leftAlign == false then
+        anchor = "RIGHT"
+        iconAnchor = "LEFT"
+        xOffset = xOffset * -1
+    end
+    row.amountText:SetPoint(anchor, row.icon, iconAnchor, xOffset, 0)
 end
 
 rowFadeOutAnimation = function(row)

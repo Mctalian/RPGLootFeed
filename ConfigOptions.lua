@@ -22,6 +22,7 @@ G_RLF.defaults = {
     global = {
         relativePoint = "UIParent",
         anchorPoint = "BOTTOMLEFT",
+        leftAlign = true,
         xOffset = 720,
         yOffset = 375,
         feedWidth = 330,
@@ -121,10 +122,18 @@ G_RLF.options = {
                     set = "SetYOffset",
                     order = 4
                 },
-                sizing = {
+                rowFormat = {
                     type = "header",
-                    name = "Sizing",
+                    name = "Row Format",
                     order = 5
+                },
+                leftAlign = {
+                    type = "toggle",
+                    name = "Left Align",
+                    desc = "Left align row content (right align if unchecked)",
+                    get = "GetLeftAlign",
+                    set = "SetLeftAlign",
+                    order = 6,
                 },
                 feedWidth = {
                     type = "range",
@@ -134,7 +143,7 @@ G_RLF.options = {
                     max = 1000,
                     get = "GetFeedWidth",
                     set = "SetFeedWidth",
-                    order = 6
+                    order = 7
                 },
                 maxRows = {
                     type = "range",
@@ -146,7 +155,7 @@ G_RLF.options = {
                     bigStep = 5,
                     get = "GetMaxRows",
                     set = "SetMaxRows",
-                    order = 6
+                    order = 8
                 },
                 rowHeight = {
                     type = "range",
@@ -156,7 +165,7 @@ G_RLF.options = {
                     max = 100,
                     get = "GetRowHeight",
                     set = "SetRowHeight",
-                    order = 7
+                    order = 9
                 },
                 iconSize = {
                     type = "range",
@@ -166,7 +175,7 @@ G_RLF.options = {
                     max = 100,
                     get = "GetIconSize",
                     set = "SetIconSize",
-                    order = 8
+                    order = 10
                 },
                 rowPadding = {
                     type = "range",
@@ -176,12 +185,12 @@ G_RLF.options = {
                     max = 10,
                     get = "GetRowPadding",
                     set = "SetRowPadding",
-                    order = 9
+                    order = 11
                 },
                 timing = {
                     type = "header",
                     name = "Timing",
-                    order = 10
+                    order = 12
                 },
                 fadeOutDelay = {
                     type = "range",
@@ -191,30 +200,30 @@ G_RLF.options = {
                     max = 30,
                     get = "GetFadeOutDelay",
                     set = "SetFadeOutDelay",
-                    order = 11
+                    order = 13
                 },
                 styles = {
                     type = "header",
                     name = "Row Styling",
-                    order = 12
+                    order = 14
                 },
                 gradientStart = {
                     type = "color",
                     name = "Background Gradient start",
-                    desc = "The 'left' color of the row background gradient.",
+                    desc = "The start color of the row background gradient.",
                     hasAlpha = true,
                     get = "GetGradientStartColor",
                     set = "SetGradientStartColor",
-                    order = 13
+                    order = 15
                 },
                 gradientEnd = {
                     type = "color",
                     name = "Background Gradient end",
-                    desc = "The 'right' color of the row background gradient.",
+                    desc = "The end color of the row background gradient.",
                     hasAlpha = true,
                     get = "GetGradientEndColor",
                     set = "SetGradientEndColor",
-                    order = 14
+                    order = 16
                 }
             }
         },
@@ -336,7 +345,6 @@ function ConfigOptions:SetGradientEndColor(info, r, g, b, a)
     G_RLF.db.global.rowBackgroundGradientEnd = { r, g, b, a }
 end
 
-
 function ConfigOptions:SetFadeOutDelay(info, value)
     G_RLF.db.global.fadeOutDelay = value
     G_RLF.LootDisplay:UpdateFadeDelay()
@@ -352,6 +360,15 @@ end
 
 function ConfigOptions:GetDisableLootToast(info, value)
     return G_RLF.db.global.disableBlizzLootToasts
+end
+
+function ConfigOptions:SetLeftAlign(info, value)
+    G_RLF.db.global.leftAlign = value
+    G_RLF.LootDisplay:UpdateRowStyles()
+end
+
+function ConfigOptions:GetLeftAlign(info, value)
+    return G_RLF.db.global.leftAlign
 end
 
 function ConfigOptions:ToggleBoundingBox()
