@@ -10,6 +10,7 @@ function RLF:OnInitialize()
     self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
     self:RegisterEvent("CHAT_MSG_LOOT")
     self:RegisterEvent("CHAT_MSG_MONEY")
+    self:RegisterEvent("LOOT_READY")
     self:RegisterChatCommand("rlf", "SlashCommand")
     self:RegisterChatCommand("RLF", "SlashCommand")
     self:RegisterChatCommand("rpglootfeed", "SlashCommand")
@@ -54,7 +55,7 @@ end
 
 function RLF:CURRENCY_DISPLAY_UPDATE(eventName, currencyType, quantity, quantityChange, quantityGainSource,
     quantityLostSource)
-    if currencyType == nil or quantityChange == 0 then
+    if currencyType == nil or quantityChange <= 0 then
         return
     end
 
@@ -67,15 +68,16 @@ function RLF:CURRENCY_DISPLAY_UPDATE(eventName, currencyType, quantity, quantity
         quantityChange)
 end
 
-function RLF:CHAT_MSG_LOOT(eventName, msg)
+function RLF:CHAT_MSG_LOOT(eventName, ...)
+    local msg, _, _, _, _, _, _, _, _, _, _, guid = ...
     local raidLoot = msg:match("HlootHistory:")
     if raidLoot then
         -- Ignore this message as it's a raid loot message
         return
     end
     -- This will not work if another addon is overriding formatting globals like LOOT_ITEM, LOOT_ITEM_MULTIPLE, etc.
-    local notSelf = msg:match("receives")
-    if notSelf ~= null then
+    local self = guid == GetPlayerGuid()
+    if not self then
         return
     end
     local itemID = msg:match("Hitem:(%d+)")
@@ -86,24 +88,35 @@ function RLF:CHAT_MSG_LOOT(eventName, msg)
     end
 end
 
+function RLF:LOOT_READY(eventName)
+    -- Get current money to calculate the delta later
+    self.startingMoney = GetMoney()
+end
+
 function RLF:CHAT_MSG_MONEY(eventName, msg)
     local amountInCopper
-    -- Initialize default values
-    local gold, silver, copper = 0, 0, 0
+    -- Old method that doesn't work well with other locales
+    if self.startingMoney == nil then
+        -- Initialize default values
+        local gold, silver, copper = 0, 0, 0
 
-    -- Patterns to match optional sections
+        -- Patterns to match optional sections
         local goldPattern = "(%d+) " .. G_RLF.L["Gold"]
         local silverPattern = "(%d+) " .. G_RLF.L["Silver"]
         local copperPattern = "(%d+) " .. G_RLF.L["Copper"]
 
-    -- Find and convert matches to numbers if they exist
-    gold = tonumber(msg:match(goldPattern)) or gold
-    silver = tonumber(msg:match(silverPattern)) or silver
-    copper = tonumber(msg:match(copperPattern)) or copper
+        -- Find and convert matches to numbers if they exist
+        gold = tonumber(msg:match(goldPattern)) or gold
+        silver = tonumber(msg:match(silverPattern)) or silver
+        copper = tonumber(msg:match(copperPattern)) or copper
 
-    amountInCopper = (gold * 100 * 100)
-    amountInCopper = amountInCopper + (silver * 100)
-    amountInCopper = amountInCopper + copper
+        amountInCopper = (gold * 100 * 100)
+        amountInCopper = amountInCopper + (silver * 100)
+        amountInCopper = amountInCopper + copper
+    else
+        amountInCopper = GetMoney() - self.startingMoney
+        self.startingMoney = GetMoney()
+    end
     G_RLF.LootDisplay:ShowMoney(amountInCopper)
 end
 
