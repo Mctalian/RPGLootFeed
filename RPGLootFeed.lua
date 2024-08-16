@@ -1,9 +1,9 @@
 local addonName = G_RLF.addonName
-local dbName = G_RLF.dbName
 RLF = G_RLF.RLF
+G_RLF.L = LibStub("AceLocale-3.0"):GetLocale(G_RLF.localeName)
 
 function RLF:OnInitialize()
-    G_RLF.db = LibStub("AceDB-3.0"):New(dbName, G_RLF.defaults, true)
+    G_RLF.db = LibStub("AceDB-3.0"):New(G_RLF.dbName, G_RLF.defaults, true)
     LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
     G_RLF.LootDisplay:Initialize()
     self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -92,9 +92,9 @@ function RLF:CHAT_MSG_MONEY(eventName, msg)
     local gold, silver, copper = 0, 0, 0
 
     -- Patterns to match optional sections
-    local goldPattern = "(%d+) Gold"
-    local silverPattern = "(%d+) Silver"
-    local copperPattern = "(%d+) Copper"
+        local goldPattern = "(%d+) " .. G_RLF.L["Gold"]
+        local silverPattern = "(%d+) " .. G_RLF.L["Silver"]
+        local copperPattern = "(%d+) " .. G_RLF.L["Copper"]
 
     -- Find and convert matches to numbers if they exist
     gold = tonumber(msg:match(goldPattern)) or gold

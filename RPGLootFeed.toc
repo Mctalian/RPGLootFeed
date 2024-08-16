@@ -14,6 +14,9 @@
 embeds.xml
 
 AddonScope.lua
+
+locale/locales.xml
+
 DoubleLinkedList.lua
 ConfigOptions.lua
 TestMode.lua

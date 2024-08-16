@@ -2,9 +2,11 @@
 G_RLF = {}
 local addonName = "RPGLootFeed"
 local dbName = addonName .. "DB"
+local localeName = addonName .. "Locale"
 G_RLF.RLF = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 G_RLF.addonName = addonName
 G_RLF.dbName = dbName
+G_RLF.localeName = localeName
 
 function G_RLF:Print(...)
     G_RLF.RLF:Print(...)

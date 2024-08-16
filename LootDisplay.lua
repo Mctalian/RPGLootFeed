@@ -1,6 +1,7 @@
 local LootDisplay = {}
 
 -- Private method declaration
+local applyRowStyles
 local createDynamicPropertyTable
 local doesRowExist
 local getFrameHeight
@@ -8,6 +9,7 @@ local getNumberOfRows
 local getRow
 local getTextWidth
 local leaseRow
+local returnRow
 local rowAmountText
 local rowBackground
 local rowFadeOutAnimation
@@ -79,11 +81,7 @@ function LootDisplay:UpdateRowStyles()
     frame:SetSize(config.feedWidth, getFrameHeight())
 
     for row in rows:iterate() do
-        if row.copper ~= nil then
-            rowMoneyStyles(row)
-        else
-            rowStyles(row)
-        end
+        applyRowStyles(row)
     end
 end
 
@@ -155,8 +153,7 @@ function LootDisplay:HideLoot()
 
     while row do
         row.fadeOutAnimation:Stop()
-        row:Hide()
-        tinsert(rowFramePool, row)
+        returnRow(row)
         row = rows:shift()
     end
 end
@@ -257,8 +254,7 @@ rowFadeOutAnimation = function(row)
     row.fadeOutAnimation.fadeOutAlpha:SetDuration(1)
     row.fadeOutAnimation.fadeOutAlpha:SetStartDelay(config.fadeOutDelay)
     row.fadeOutAnimation.fadeOutAlpha:SetScript("OnFinished", function()
-        row:Hide()
-        tinsert(rowFramePool, row)
+        returnRow(row)
         rows:remove(row)
         updateRowPositions() -- Recalculate positions
     end)
@@ -319,11 +315,19 @@ rowStyles = function(row)
     rowFadeOutAnimation(row)
 end
 
+applyRowStyles = function(row)
+    if row.copper ~= nil then
+        rowMoneyStyles(row)
+    else
+        rowStyles(row)
+    end
+end
+
 updateRowPositions = function()
     local index = 0
     for row in rows:iterate() do
         if row:IsShown() then
-            rowStyles(row)
+            applyRowStyles(row)
             row:ClearAllPoints()
             row:SetPoint("BOTTOM", frame, "BOTTOM", 0, index * (config.rowHeight + config.padding))
             index = index + 1
@@ -414,5 +418,10 @@ leaseRow = function(key)
     end
 
     return row
+end
+
+returnRow = function(row)
+    row:Hide()
+    tinsert(rowFramePool, row)
 end
 
