@@ -31,6 +31,8 @@ G_RLF.defaults = {
         iconSize = 18,
         fadeOutDelay = 5,
         disableBlizzLootToasts = false,
+        rowBackgroundGradientStart = {0.1, 0.1, 0.1, 0.8}, -- Default to dark grey with 80% opacity
+        rowBackgroundGradientEnd = {0.1, 0.1, 0.1, 0}, -- Default to dark grey with 0% opacity
     }
 }
 
@@ -191,6 +193,29 @@ G_RLF.options = {
                     set = "SetFadeOutDelay",
                     order = 11
                 },
+                styles = {
+                    type = "header",
+                    name = "Row Styling",
+                    order = 12
+                },
+                gradientStart = {
+                    type = "color",
+                    name = "Background Gradient start",
+                    desc = "The 'left' color of the row background gradient.",
+                    hasAlpha = true,
+                    get = "GetGradientStartColor",
+                    set = "SetGradientStartColor",
+                    order = 13
+                },
+                gradientEnd = {
+                    type = "color",
+                    name = "Background Gradient end",
+                    desc = "The 'right' color of the row background gradient.",
+                    hasAlpha = true,
+                    get = "GetGradientEndColor",
+                    set = "SetGradientEndColor",
+                    order = 14
+                }
             }
         },
         blizz = {
@@ -292,6 +317,25 @@ end
 function ConfigOptions:GetRowPadding(info, value)
     return G_RLF.db.global.padding
 end
+
+function ConfigOptions:GetGradientStartColor(info, value)
+    local r, g, b, a = unpack(G_RLF.db.global.rowBackgroundGradientStart)
+    return r, g, b, a
+end
+
+function ConfigOptions:SetGradientStartColor(info, r, g, b, a)
+    G_RLF.db.global.rowBackgroundGradientStart = { r, g, b, a }
+end
+
+function ConfigOptions:GetGradientEndColor(info, value)
+    local r, g, b, a = unpack(G_RLF.db.global.rowBackgroundGradientEnd)
+    return r, g, b, a
+end
+
+function ConfigOptions:SetGradientEndColor(info, r, g, b, a)
+    G_RLF.db.global.rowBackgroundGradientEnd = { r, g, b, a }
+end
+
 
 function ConfigOptions:SetFadeOutDelay(info, value)
     G_RLF.db.global.fadeOutDelay = value

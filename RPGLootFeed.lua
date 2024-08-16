@@ -32,7 +32,6 @@ function RLF:CheckForLootAlertSystem()
             self:Print("LootAlertSystem:AddAlert was unavailable for > 30 seconds, Loot Toasts could not be disabled :(")
             self:Print("Please report this issue @ github: McTalian/RPGLootFeed")
         end
-        
     end
 end
 

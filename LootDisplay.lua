@@ -268,13 +268,13 @@ end
 rowHighlightBorder = function(row)
     if row.highlightBorder == nil then
         row.highlightBorder = row:CreateTexture(nil, "OVERLAY")
-        row.highlightBorder:SetTexture("Interface\\Buttons\\UI-ActionButton-Border")
+        row.highlightBorder:SetTexture("Interface\\COMMON\\WhiteIconFrame")
         row.highlightBorder:SetBlendMode("ADD")
         row.highlightBorder:SetAlpha(0) -- Start with it invisible
     end
 
-    row.highlightBorder:SetSize(config.feedWidth * 2, config.rowHeight * 2)
-    row.highlightBorder:SetPoint("LEFT", row, "LEFT", -config.feedWidth / 2, 0)
+    row.highlightBorder:SetSize(config.feedWidth * 1.1, config.rowHeight)
+    row.highlightBorder:SetPoint("LEFT", row, "LEFT", -config.feedWidth * 0.05, 0)
 
     -- Create the animation group
     if row.highlightAnimation == nil then
