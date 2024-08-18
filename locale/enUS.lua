@@ -82,3 +82,5 @@ L["Blizzard UI"] = true
 L["BlizzUIDesc"] = "Override behavior of Blizzard-related UI elements"
 L["Disable Loot Toasts"] = true
 L["DisableLootToastDesc"] = "The boxes that appear at the bottom of the screen when you loot special items"
+L["Enable Auto Loot"] = true
+L["EnableAutoLootDesc"] = "Set the default setting so that auto loot is enabled when logging into any character"

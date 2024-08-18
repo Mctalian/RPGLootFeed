@@ -32,6 +32,7 @@ G_RLF.defaults = {
         iconSize = 18,
         fadeOutDelay = 5,
         disableBlizzLootToasts = false,
+        enableAutoLoot = false,
         rowBackgroundGradientStart = {0.1, 0.1, 0.1, 0.8}, -- Default to dark grey with 80% opacity
         rowBackgroundGradientEnd = {0.1, 0.1, 0.1, 0}, -- Default to dark grey with 0% opacity
     }
@@ -240,6 +241,14 @@ G_RLF.options = {
                     get = "GetDisableLootToast",
                     set = "SetDisableLootToast",
                     order = 1
+                },
+                enableAutoLoot = {
+                    type = "toggle",
+                    name = G_RLF.L["Enable Auto Loot"],
+                    desc = G_RLF.L["EnableAutoLootDesc"],
+                    get = "GetEnableAutoLoot",
+                    set = "SetEnableAutoLoot",
+                    order = 1
                 }
             }
         }
@@ -360,6 +369,15 @@ end
 
 function ConfigOptions:GetDisableLootToast(info, value)
     return G_RLF.db.global.disableBlizzLootToasts
+end
+
+function ConfigOptions:GetEnableAutoLoot(info, value)
+    return G_RLF.db.global.enableAutoLoot
+end
+
+function ConfigOptions:SetEnableAutoLoot(info, value)
+    C_CVar.SetCVar("autoLootDefault", value and "1" or "0");
+    G_RLF.db.global.enableAutoLoot = value
 end
 
 function ConfigOptions:SetLeftAlign(info, value)
