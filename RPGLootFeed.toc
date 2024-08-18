@@ -14,11 +14,12 @@
 embeds.xml
 
 AddonScope.lua
+DynamicPropertyTable.lua
+DoubleLinkedList.lua
 
 locale/locales.xml
 
-DoubleLinkedList.lua
+RPGLootFeed.lua
 ConfigOptions.lua
 TestMode.lua
 LootDisplay.lua
-RPGLootFeed.lua

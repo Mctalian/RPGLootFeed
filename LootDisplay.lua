@@ -2,7 +2,6 @@ local LootDisplay = {}
 
 -- Private method declaration
 local applyRowStyles
-local createDynamicPropertyTable
 local doesRowExist
 local getFrameHeight
 local getNumberOfRows
@@ -47,7 +46,7 @@ local tempFontString = nil
 
 -- Public methods
 function LootDisplay:Initialize()
-    config = createDynamicPropertyTable(G_RLF.db.global, defaults)
+    config = DynamicPropertyTable(G_RLF.db.global, defaults)
 
     frame = CreateFrame("Frame", "LootDisplayFrame", UIParent)
     frame:SetSize(config.feedWidth, getFrameHeight())
@@ -159,32 +158,6 @@ function LootDisplay:HideLoot()
 end
 
 G_RLF.LootDisplay = LootDisplay
-
--- Private method definition
-createDynamicPropertyTable = function(globalTable, defaultsTable)
-    local proxy = {}
-
-    setmetatable(proxy, {
-        __index = function(_, key)
-            -- Check if the key exists in defaults, handle dynamically
-            if defaultsTable[key] ~= nil then
-                return globalTable[key] or defaultsTable[key]
-            else
-                return rawget(_, key)
-            end
-        end,
-        __newindex = function(_, key, value)
-            -- Update globalTable for dynamic properties
-            if defaultsTable[key] ~= nil then
-                globalTable[key] = value
-            else
-                rawset(_, key, value)
-            end
-        end
-    })
-
-    return proxy
-end
 
 rowBackground = function(row)
     -- Create row background

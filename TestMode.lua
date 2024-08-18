@@ -164,11 +164,11 @@ function TestMode:ToggleTestMode()
             self.testTimer:Cancel()
             self.testTimer = nil
         end
-        G_RLF:Print("Test Mode Disabled")
+        G_RLF:Print(G_RLF.L["Test Mode Disabled"])
     else
         -- Start test mode
         self.testMode = true
-        G_RLF:Print("Test Mode Enabled")
+        G_RLF:Print(G_RLF.L["Test Mode Enabled"])
         self.testTimer = C_Timer.NewTicker(1.5, function()
             self:GenerateRandomLoot()
         end)

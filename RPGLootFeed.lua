@@ -30,8 +30,8 @@ function RLF:CheckForLootAlertSystem()
             -- Keep checking until it's available
             self:ScheduleTimer("CheckForLootAlertSystem", 1)
         else
-            self:Print("LootAlertSystem:AddAlert was unavailable for > 30 seconds, Loot Toasts could not be disabled :(")
-            self:Print("Please report this issue @ github: McTalian/RPGLootFeed")
+            self:Print(G_RLF.L["AddLootAlertUnavailable"])
+            self:Print(G_RLF.L["Issues"])
         end
     end
 end
@@ -49,7 +49,7 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
     self:InitializeOptions()
     self:CheckForLootAlertSystem()
     if isLogin and isReload == false then
-        self:Print("Welcome! Use /rlf to view options.")
+        self:Print(G_RLF.L["Welcome"])
     end
 end
 
