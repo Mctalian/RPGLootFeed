@@ -50,6 +50,9 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
     self:CheckForLootAlertSystem()
     if isLogin and isReload == false then
         self:Print(G_RLF.L["Welcome"])
+        if G_RLF.db.global.enableAutoLoot then
+            C_CVar.SetCVar("autoLootDefault", "1")
+        end
     end
 end
 
