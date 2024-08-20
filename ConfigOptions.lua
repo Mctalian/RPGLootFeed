@@ -272,6 +272,35 @@ G_RLF.options = {
                     },
                     order = 4
                 },
+                chat = {
+                    type = "header",
+                    name = G_RLF.L["Chat"],
+                    order = 5
+                },
+                disableLootChatMessages = {
+                    type = "execute",
+                    name = G_RLF.L["Disable Loot Chat Messages"],
+                    desc = G_RLF.L["DisableLootChatMessagesDesc"],
+                    width = "double",
+                    func = "DisableLootChatMessages",
+                    order = 6
+                },
+                disableCurrencyChatMessages = {
+                    type = "execute",
+                    name = G_RLF.L["Disable Currency Chat Messages"],
+                    desc = G_RLF.L["DisableCurrencyChatMessagesDesc"],
+                    width = "double",
+                    func = "DisableCurrencyChatMessages",
+                    order = 7
+                },
+                disableMoneyChatMessages = {
+                    type = "execute",
+                    name = G_RLF.L["Disable Money Chat Messages"],
+                    desc = G_RLF.L["DisableMoneyChatMessagesDesc"],
+                    width = "double",
+                    func = "DisableMoneyChatMessages",
+                    order = 8
+                },
             }
         }
     }
@@ -432,3 +461,23 @@ function ConfigOptions:ClearRows()
     G_RLF.LootDisplay:HideLoot()
 end
 
+function ConfigOptions:DisableLootChatMessages()
+    ChatFrameUtil.ForEachChatFrame(function (frame)
+        ChatFrame_RemoveMessageGroup(frame, "LOOT")
+    end)
+    G_RLF:Print(G_RLF.L["Item Loot messages Disabled"])
+end
+
+function ConfigOptions:DisableCurrencyChatMessages()
+    ChatFrameUtil.ForEachChatFrame(function (frame)
+        ChatFrame_RemoveMessageGroup(frame, "CURRENCY")
+    end)
+    G_RLF:Print(G_RLF.L["Currency messages Disabled"])
+end
+
+function ConfigOptions:DisableMoneyChatMessages()
+    ChatFrameUtil.ForEachChatFrame(function (frame)
+        ChatFrame_RemoveMessageGroup(frame, "MONEY")
+    end)
+    G_RLF:Print(G_RLF.L["Money messages Disabled"])
+end

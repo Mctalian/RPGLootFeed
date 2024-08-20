@@ -7,6 +7,9 @@ L["BossBannerAlertUnavailable"] = "BossBanner:OnEvent was unavailable for > 30 s
 L["Issues"] = "Please report this issue @ github: McTalian/RPGLootFeed"
 L["Test Mode Enabled"] = true
 L["Test Mode Disabled"] = true
+L["Item Loot messages Disabled"] = true
+L["Currency messages Disabled"] = true
+L["Money messages Disabled"] = true
 
 -- CHAT_MSG_MONEY
 L["Gold"] = true
@@ -93,3 +96,10 @@ L["Disable All BossBanner"] = true
 L["Disable All BossBanner Loot"] = true
 L["Only Disable My BossBanner Loot"] = true
 L["Disable Party/Raid Loot"] = true
+L["Chat"] = true
+L["Disable Loot Chat Messages"] = true
+L["DisableLootChatMessagesDesc"] = "Disables Loot Chat Messages in all chat windows."
+L["Disable Currency Chat Messages"] = true
+L["DisableCurrencyChatMessagesDesc"] = "Disables Currency Chat Messages in all chat windows."
+L["Disable Money Chat Messages"] = true
+L["DisableMoneyChatMessagesDesc"] = "Disables Money Chat Messages in all chat windows."
