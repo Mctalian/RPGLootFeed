@@ -16,6 +16,9 @@ L["Gold"] = true
 L["Silver"] = true
 L["Copper"] = true
 
+-- Experience
+L["XP"] = true
+
 -- ConfigOptions
 L["Toggle Test Mode"] = true
 L["Clear rows"] = true

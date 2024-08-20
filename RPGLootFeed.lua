@@ -11,6 +11,7 @@ function RLF:OnInitialize()
     self:RegisterEvent("CHAT_MSG_LOOT")
     self:RegisterEvent("CHAT_MSG_MONEY")
     self:RegisterEvent("LOOT_READY")
+    self:RegisterEvent("PLAYER_XP_UPDATE")
     self:RegisterChatCommand("rlf", "SlashCommand")
     self:RegisterChatCommand("RLF", "SlashCommand")
     self:RegisterChatCommand("rpglootfeed", "SlashCommand")
@@ -86,11 +87,14 @@ function RLF:InterceptAddAlert(frame, ...)
     self.hooks[LootAlertSystem].AddAlert(frame, ...)
 end
 
-
+local currentXP, currentMaxXP, currentLevel
 function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
     self:InitializeOptions()
     self:CheckForLootAlertSystem()
     self:CheckForBossBanner()
+    currentXP = UnitXP("player")
+    currentMaxXP = UnitXPMax("player")
+    currentLevel = UnitLevel("player")
     if isLogin and isReload == false then
         self:Print(G_RLF.L["Welcome"])
         if G_RLF.db.global.enableAutoLoot then
@@ -164,6 +168,25 @@ function RLF:CHAT_MSG_MONEY(eventName, msg)
         self.startingMoney = GetMoney()
     end
     G_RLF.LootDisplay:ShowMoney(amountInCopper)
+end
+
+function RLF:PLAYER_XP_UPDATE(eventName, unitTarget)
+    if unitTarget == "player" then
+        local newLevel = UnitLevel(unitTarget)
+        local newCurrentXP = UnitXP(unitTarget)
+        local delta = 0
+        if newLevel > currentLevel then
+            delta = (currentMaxXP - currentXP) + newCurrentXP
+        else
+            delta = newCurrentXP - currentXP
+        end
+        currentXP = newCurrentXP
+        currentLevel = newLevel
+        currentMaxXP = UnitXPMax(unitTarget)
+        if delta > 0 then
+            G_RLF.LootDisplay:ShowXP(delta)
+        end
+    end
 end
 
 function RLF:InitializeOptions()

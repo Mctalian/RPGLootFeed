@@ -147,6 +147,36 @@ function LootDisplay:ShowMoney(copper)
     row.fadeOutAnimation:Play()
 end
 
+function LootDisplay:ShowXP(experience)
+    local key = "EXPERIENCE" -- Use ID as a unique key
+    local text
+
+    -- Check if the item or currency is already displayed
+    local row = getRow(key)
+    if row then
+        -- Update existing entry
+        row.experience = row.experience + experience
+        row.highlightAnimation:Stop()
+        row.highlightAnimation:Play()
+    else
+        row = leaseRow(key)
+        if (row == nil) then
+            return
+        end
+
+        -- Initialize row content
+        rowMoneyStyles(row)
+        row.experience = experience
+    end
+
+    text = "+" .. row.experience .. " " .. G_RLF.L["XP"]
+    row.amountText:SetText(text)
+    row.amountText:SetTextColor(1, 0, 1, 0.8)
+
+    row.fadeOutAnimation:Stop()
+    row.fadeOutAnimation:Play()
+end
+
 function LootDisplay:HideLoot()
     local row = rows:shift()
 
@@ -212,12 +242,18 @@ rowMoneyIcon = function(row)
     row.icon:Hide()
 end
 
+local defaultColor
 rowMoneyText = function(row)
     if row.amountText == nil then
         row.amountText = row:CreateFontString(nil, "ARTWORK", config.font)
+        if not defaultColor then
+            local r, g, b, a = row.amountText:GetTextColor()
+            defaultColor = { r, g, b, a }
+        end
     else
         row.amountText:ClearAllPoints()
     end
+    row.amountText:SetTextColor(unpack(defaultColor))
     local anchor = "LEFT"
     if G_RLF.db.global.leftAlign == false then
         anchor = "RIGHT"
@@ -228,9 +264,14 @@ end
 rowAmountText = function(row)
     if row.amountText == nil then
         row.amountText = row:CreateFontString(nil, "ARTWORK", config.font)
+        if not defaultColor then
+            local r, g, b, a = row.amountText:GetTextColor()
+            defaultColor = { r, g, b, a }
+        end
     else
         row.amountText:ClearAllPoints()
     end
+    row.amountText:SetTextColor(unpack(defaultColor))
     local anchor = "LEFT"
     local iconAnchor = "RIGHT"
     local xOffset = config.iconSize / 2
@@ -406,6 +447,7 @@ leaseRow = function(key)
         row.amount = nil
         row.copper = nil
         row.link = nil
+        row.experience = nil
     end
 
     rows:push(row)
