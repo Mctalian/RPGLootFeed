@@ -31,10 +31,11 @@ G_RLF.defaults = {
         padding = 2,
         iconSize = 18,
         fadeOutDelay = 5,
-        disableBlizzLootToasts = false,
-        enableAutoLoot = false,
         rowBackgroundGradientStart = {0.1, 0.1, 0.1, 0.8}, -- Default to dark grey with 80% opacity
         rowBackgroundGradientEnd = {0.1, 0.1, 0.1, 0}, -- Default to dark grey with 0% opacity
+        disableBlizzLootToasts = false,
+        enableAutoLoot = false,
+        bossBannerConfig = G_RLF.DisableBossBanner.ENABLED,
     }
 }
 
@@ -234,14 +235,6 @@ G_RLF.options = {
             desc = G_RLF.L["BlizzUIDesc"],
             order = 5,
             args = {
-                disableLootToast = {
-                    type = "toggle",
-                    name = G_RLF.L["Disable Loot Toasts"],
-                    desc = G_RLF.L["DisableLootToastDesc"],
-                    get = "GetDisableLootToast",
-                    set = "SetDisableLootToast",
-                    order = 1
-                },
                 enableAutoLoot = {
                     type = "toggle",
                     name = G_RLF.L["Enable Auto Loot"],
@@ -249,7 +242,36 @@ G_RLF.options = {
                     get = "GetEnableAutoLoot",
                     set = "SetEnableAutoLoot",
                     order = 1
-                }
+                },
+                alerts = {
+                    type = "header",
+                    name = G_RLF.L["Alerts"],
+                    order = 2
+                },
+                disableLootToast = {
+                    type = "toggle",
+                    name = G_RLF.L["Disable Loot Toasts"],
+                    desc = G_RLF.L["DisableLootToastDesc"],
+                    get = "GetDisableLootToast",
+                    set = "SetDisableLootToast",
+                    order = 3
+                },
+                bossBanner = {
+                    type = "select",
+                    name = G_RLF.L["Disable Boss Banner Elements"],
+                    desc = G_RLF.L["DisableBossBannerDesc"],
+                    get = "GetBossBannerConfig",
+                    set = "SetBossBannerConfig",
+                    width = "double",
+                    values = {
+                        [G_RLF.DisableBossBanner.ENABLED] = G_RLF.L["Do not disable BossBanner"],
+                        [G_RLF.DisableBossBanner.FULLY_DISABLE] = G_RLF.L["Disable All BossBanner"],
+                        [G_RLF.DisableBossBanner.DISABLE_LOOT] = G_RLF.L["Disable All BossBanner Loot"],
+                        [G_RLF.DisableBossBanner.DISABLE_MY_LOOT] = G_RLF.L["Only Disable My BossBanner Loot"],
+                        [G_RLF.DisableBossBanner.DISABLE_GROUP_LOOT] = G_RLF.L["Disable Party/Raid Loot"],
+                    },
+                    order = 4
+                },
             }
         }
     }
@@ -378,6 +400,15 @@ end
 function ConfigOptions:SetEnableAutoLoot(info, value)
     C_CVar.SetCVar("autoLootDefault", value and "1" or "0");
     G_RLF.db.global.enableAutoLoot = value
+end
+
+function ConfigOptions:SetBossBannerConfig(info, value)
+    G_RLF.db.global.bossBannerConfig = value
+    G_RLF:Print(G_RLF.db.global.bossBannerConfig)
+end
+
+function ConfigOptions:GetBossBannerConfig(info, value)
+    return G_RLF.db.global.bossBannerConfig
 end
 
 function ConfigOptions:SetLeftAlign(info, value)

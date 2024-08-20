@@ -17,7 +17,7 @@ function RLF:OnInitialize()
     self:RegisterChatCommand("rpgLootFeed", "SlashCommand")
 end
 
-local attempts = 0
+local lootAlertAttempts = 0
 function RLF:CheckForLootAlertSystem()
     if self:IsHooked(LootAlertSystem, "AddAlert") then
         return
@@ -25,8 +25,8 @@ function RLF:CheckForLootAlertSystem()
     if LootAlertSystem and LootAlertSystem.AddAlert then
         self:RawHook(LootAlertSystem, "AddAlert", "InterceptAddAlert", true)
     else
-        if attempts <= 30 then
-            attempts = attempts + 1
+        if lootAlertAttempts <= 30 then
+            lootAlertAttempts = lootAlertAttempts + 1
             -- Keep checking until it's available
             self:ScheduleTimer("CheckForLootAlertSystem", 1)
         else
@@ -34,6 +34,48 @@ function RLF:CheckForLootAlertSystem()
             self:Print(G_RLF.L["Issues"])
         end
     end
+end
+
+local bossBannerAttempts = 0
+function RLF:CheckForBossBanner()
+    if self:IsHooked(BossBanner, "OnEvent") then
+        return
+    end
+    if BossBanner and BossBanner.OnEvent then
+        self:RawHookScript(BossBanner, "OnEvent", "InterceptBossBannerAlert", true)
+    else
+        if bossBannerAttempts <= 30 then
+            bossBannerAttempts = bossBannerAttempts + 1
+            -- Keep checking until it's available
+            self:ScheduleTimer("CheckForBossBanner", 1)
+        else
+            self:Print(G_RLF.L["BossBannerAlertUnavailable"])
+            self:Print(G_RLF.L["Issues"])
+        end
+    end
+end
+
+function RLF:InterceptBossBannerAlert(s, event, ...)
+    if G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.FULLY_DISABLE then
+        return
+    end
+
+    if G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.DISABLE_LOOT and event == "ENCOUNTER_LOOT_RECEIVED" then
+        return
+    end
+
+    local _, _, _, _, playerName, _ = ...;
+    local myGuid = GetPlayerGuid()
+    local myName, _ = GetNameAndServerNameFromGUID(myGuid)
+    if G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.DISABLE_MY_LOOT and event == "ENCOUNTER_LOOT_RECEIVED" and playerName == myName then
+        return
+    end
+
+    if G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.DISABLE_GROUP_LOOT and event == "ENCOUNTER_LOOT_RECEIVED" and playerName ~= myName then
+        return
+    end
+    -- Call the original AddAlert function if not blocked
+    self.hooks[BossBanner].OnEvent(s, event, ...)
 end
 
 function RLF:InterceptAddAlert(frame, ...)
@@ -48,6 +90,7 @@ end
 function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
     self:InitializeOptions()
     self:CheckForLootAlertSystem()
+    self:CheckForBossBanner()
     if isLogin and isReload == false then
         self:Print(G_RLF.L["Welcome"])
         if G_RLF.db.global.enableAutoLoot then
@@ -79,8 +122,8 @@ function RLF:CHAT_MSG_LOOT(eventName, ...)
         return
     end
     -- This will not work if another addon is overriding formatting globals like LOOT_ITEM, LOOT_ITEM_MULTIPLE, etc.
-    local self = guid == GetPlayerGuid()
-    if not self then
+    local me = guid == GetPlayerGuid()
+    if not me then
         return
     end
     local itemID = msg:match("Hitem:(%d+)")

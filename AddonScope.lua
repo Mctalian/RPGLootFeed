@@ -7,6 +7,13 @@ G_RLF.RLF = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEv
 G_RLF.addonName = addonName
 G_RLF.dbName = dbName
 G_RLF.localeName = localeName
+G_RLF.DisableBossBanner = {
+    ENABLED = 0,
+    FULLY_DISABLE = 1,
+    DISABLE_LOOT = 2,
+    DISABLE_MY_LOOT = 3,
+    DISABLE_GROUP_LOOT = 4,
+}
 
 function G_RLF:Print(...)
     G_RLF.RLF:Print(...)
