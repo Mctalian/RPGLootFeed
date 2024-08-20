@@ -41,7 +41,7 @@ function RLF:CheckForBossBanner()
     if self:IsHooked(BossBanner, "OnEvent") then
         return
     end
-    if BossBanner and BossBanner.OnEvent then
+    if BossBanner then
         self:RawHookScript(BossBanner, "OnEvent", "InterceptBossBannerAlert", true)
     else
         if bossBannerAttempts <= 30 then
