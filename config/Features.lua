@@ -4,6 +4,7 @@ G_RLF.defaults.global.itemLootFeed = true
 G_RLF.defaults.global.currencyFeed = true
 G_RLF.defaults.global.moneyFeed = true
 G_RLF.defaults.global.xpFeed = true
+G_RLF.defaults.global.repFeed = true
 
 G_RLF.options.args.features = {
     type = "group",
@@ -47,6 +48,15 @@ G_RLF.options.args.features = {
             get = "GetXPStatus",
             set = "SetXPStatus",
             order = 4
+        },
+        enableRep = {
+            type = "toggle",
+            name = G_RLF.L["Enable Reputation in Feed"],
+            desc = G_RLF.L["EnableRepDesc"],
+            width = "double",
+            get = "GetRepStatus",
+            set = "SetRepStatus",
+            order = 4
         }
     }
 }
@@ -82,3 +92,11 @@ end
 function Features:SetXPStatus(info, value)
   G_RLF.db.global.xpFeed = value
 end
+
+function Features:GetRepStatus(info, value)
+    return G_RLF.db.global.repFeed
+  end
+  
+  function Features:SetRepStatus(info, value)
+    G_RLF.db.global.repFeed = value
+  end

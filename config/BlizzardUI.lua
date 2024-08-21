@@ -84,7 +84,15 @@ G_RLF.options.args.blizz = {
         width = "double",
         func = "DisableExperienceChatMessages",
         order = 9
-    },
+      },
+      disableRepChatMessages = {
+        type = "execute",
+        name = G_RLF.L["Disable Reputation Chat Messages"],
+        desc = G_RLF.L["DisableReputationChatMessagesDesc"],
+        width = "double",
+        func = "DisableReputationChatMessages",
+        order = 10
+      },
   }
 }
 
@@ -141,4 +149,11 @@ function BlizzardUI:DisableExperienceChatMessages()
       ChatFrame_RemoveMessageGroup(frame, "COMBAT_XP_GAIN")
   end)
   G_RLF:Print(G_RLF.L["XP messages Disabled"])
+end
+
+function BlizzardUI:DisableReputationChatMessages()
+  ChatFrameUtil.ForEachChatFrame(function (frame)
+    ChatFrame_RemoveMessageGroup(frame, "COMBAT_FACTION_CHANGE")
+end)
+G_RLF:Print(G_RLF.L["Rep messages Disabled"])
 end

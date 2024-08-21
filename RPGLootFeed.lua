@@ -107,6 +107,7 @@ function dump(o)
 
 local repData = {}
 function RLF:RefreshRepData()
+    C_Reputation.ExpandAllFactionHeaders()
     local numFactions = C_Reputation.GetNumFactions()
     if numFactions <= 0 then
         return
@@ -115,37 +116,31 @@ function RLF:RefreshRepData()
     for i = 1, numFactions do
         local factionData = C_Reputation.GetFactionDataByIndex(i)
         if not factionData.isHeader or factionData.isHeaderWithRep then
-            repData[factionData.factionID] = factionData.currentStanding
             if C_Reputation.IsFactionParagon(factionData.factionID) then
-                self:Print("Paragon " .. factionData.name .. " " .. factionData.currentStanding)
+                -- Need to support Paragon factions
+                local value, max = C_Reputation.GetFactionParagonInfo(factionData.factionID)
+                -- self:Print("Paragon " .. factionData.name .. " " .. value .. "/" .. max)
+            elseif C_Reputation.IsMajorFaction(factionData.factionID) then
+                -- Need to support Major factions
+                local majorFactionData = C_MajorFactions.GetMajorFactionData(factionData.factionID)
+                local level = majorFactionData.renownLevel
+                local rep = majorFactionData.renownReputationEarned
+                local max = majorFactionData.renownLevelThreshold
+                -- self:Print("Major " .. factionData.name .. " " .. level .. " (" .. rep .. "/" .. max .. ")")
+            else
+                repData[factionData.factionID] = factionData.currentStanding
             end
-            if C_Reputation.IsMajorFaction(factionData.factionID) then
-                self:Print("Major " .. factionData.name)
-                self:Print(dump(factionData))
-            end
-            -- self:Print(factionData.name .. " processed (" .. factionData.currentStanding .. "/" .. (factionData.currentReactionThreshold or factionData.nextReactionThreshold) .. ")")
         end
     end
 end
 
 function RLF:FindDelta()
-    -- local numFactionElements = C_Reputation.GetNumFactions()
-    -- local numFactions = 0
-    -- for i = 1, numFactionElements do
-    --     local factionData = C_Reputation.GetFactionDataByIndex(i)
-    --     if not factionData.isHeader then
-            
-    --     end
-    -- end
-    -- if numFactions > #repData then
-    --     for i = 1, numFactions do
-    --         local fac
-    --     end
-    -- end
-    for k, v in pairs(repData) do
-        local factionData = C_Reputation.GetFactionDataByID(k)
-        if factionData.currentStanding ~= v then
-            G_RLF.LootDisplay:ShowRep(factionData.currentStanding - v, factionData)
+    if G_RLF.db.global.repFeed then
+        for k, v in pairs(repData) do
+            local factionData = C_Reputation.GetFactionDataByID(k)
+            if factionData.currentStanding ~= v then
+                G_RLF.LootDisplay:ShowRep(factionData.currentStanding - v, factionData)
+            end
         end
     end
     self:RefreshRepData()
