@@ -105,6 +105,11 @@ end
 
 function RLF:CURRENCY_DISPLAY_UPDATE(eventName, currencyType, quantity, quantityChange, quantityGainSource,
     quantityLostSource)
+
+    if not G_RLF.db.global.currencyFeed then
+        return
+    end
+
     if currencyType == nil or quantityChange <= 0 then
         return
     end
@@ -119,6 +124,11 @@ function RLF:CURRENCY_DISPLAY_UPDATE(eventName, currencyType, quantity, quantity
 end
 
 function RLF:CHAT_MSG_LOOT(eventName, ...)
+
+    if not G_RLF.db.global.itemLootFeed then
+        return
+    end
+
     local msg, _, _, _, _, _, _, _, _, _, _, guid = ...
     local raidLoot = msg:match("HlootHistory:")
     if raidLoot then
@@ -144,6 +154,11 @@ function RLF:LOOT_READY(eventName)
 end
 
 function RLF:CHAT_MSG_MONEY(eventName, msg)
+
+    if not G_RLF.db.global.moneyFeed then
+        return
+    end
+
     local amountInCopper
     -- Old method that doesn't work well with other locales
     if self.startingMoney == nil then
@@ -171,6 +186,11 @@ function RLF:CHAT_MSG_MONEY(eventName, msg)
 end
 
 function RLF:PLAYER_XP_UPDATE(eventName, unitTarget)
+
+    if not G_RLF.db.global.xpFeed then
+        return
+    end
+
     if unitTarget == "player" then
         local newLevel = UnitLevel(unitTarget)
         local newCurrentXP = UnitXP(unitTarget)
