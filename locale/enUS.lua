@@ -85,6 +85,8 @@ L["Background Gradient Start"] = true
 L["GradientStartDesc"] = "The start color of the row background gradient."
 L["Background Gradient End"] = true
 L["GradientEndDesc"] = "The end color of the row background gradient."
+L["Font"] = true
+L["FontDesc"] = "The font object for the loot text."
 
 -- ConfigOptions - Timing Group
 L["Timing"] = true
