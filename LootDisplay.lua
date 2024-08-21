@@ -35,7 +35,7 @@ local defaults = {
     fadeOutDelay = 5,
     rowBackgroundGradientStart = {0.1, 0.1, 0.1, 0.8}, -- Default to dark grey with 80% opacity
     rowBackgroundGradientEnd = {0.1, 0.1, 0.1, 0}, -- Default to dark grey with 0% opacity
-    font = "GameFontNormalSmall"
+    font = "GameFontNormalSmall",
 }
 local config = nil
 local rows = G_RLF.list()
@@ -59,7 +59,7 @@ function LootDisplay:Initialize()
     boundingBox:SetAllPoints()
     boundingBox:Hide()
 
-    tempFontString = UIParent:CreateFontString(nil, "ARTWORK", config.font)
+    tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
     tempFontString:Hide() -- Prevent it from showing up
 end
 
@@ -245,7 +245,7 @@ end
 local defaultColor
 rowMoneyText = function(row)
     if row.amountText == nil then
-        row.amountText = row:CreateFontString(nil, "ARTWORK", config.font)
+        row.amountText = row:CreateFontString(nil, "ARTWORK")
         if not defaultColor then
             local r, g, b, a = row.amountText:GetTextColor()
             defaultColor = { r, g, b, a }
@@ -258,12 +258,13 @@ rowMoneyText = function(row)
     if G_RLF.db.global.leftAlign == false then
         anchor = "RIGHT"
     end
+    row.amountText:SetFontObject(config.font)
     row.amountText:SetPoint(anchor, row.icon, anchor, 0, 0)
 end
 
 rowAmountText = function(row)
     if row.amountText == nil then
-        row.amountText = row:CreateFontString(nil, "ARTWORK", config.font)
+        row.amountText = row:CreateFontString(nil, "ARTWORK")
         if not defaultColor then
             local r, g, b, a = row.amountText:GetTextColor()
             defaultColor = { r, g, b, a }
@@ -280,6 +281,7 @@ rowAmountText = function(row)
         iconAnchor = "LEFT"
         xOffset = xOffset * -1
     end
+    row.amountText:SetFontObject(config.font)
     row.amountText:SetPoint(anchor, row.icon, iconAnchor, xOffset, 0)
 end
 
@@ -400,6 +402,7 @@ getRow = function(key)
 end
 
 getTextWidth = function(text)
+    tempFontString:SetFontObject(config.font)
     tempFontString:SetText(text)
     local width = tempFontString:GetStringWidth()
     return width
