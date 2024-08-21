@@ -12,10 +12,15 @@ function RLF:OnInitialize()
     self:RegisterEvent("CHAT_MSG_MONEY")
     self:RegisterEvent("LOOT_READY")
     self:RegisterEvent("PLAYER_XP_UPDATE")
+    self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
     self:RegisterChatCommand("rlf", "SlashCommand")
     self:RegisterChatCommand("RLF", "SlashCommand")
     self:RegisterChatCommand("rpglootfeed", "SlashCommand")
     self:RegisterChatCommand("rpgLootFeed", "SlashCommand")
+end
+
+function RLF:CHAT_MSG_COMBAT_FACTION_CHANGE(event, text)
+    self:FindDelta()
 end
 
 local lootAlertAttempts = 0
@@ -87,11 +92,71 @@ function RLF:InterceptAddAlert(frame, ...)
     self.hooks[LootAlertSystem].AddAlert(frame, ...)
 end
 
+function dump(o)
+    if type(o) == 'table' then
+       local s = '{ '
+       for k,v in pairs(o) do
+          if type(k) ~= 'number' then k = '"'..k..'"' end
+          s = s .. '['..k..'] = ' .. dump(v) .. ','
+       end
+       return s .. '} '
+    else
+       return tostring(o)
+    end
+ end
+
+local repData = {}
+function RLF:RefreshRepData()
+    local numFactions = C_Reputation.GetNumFactions()
+    if numFactions <= 0 then
+        return
+    end
+
+    for i = 1, numFactions do
+        local factionData = C_Reputation.GetFactionDataByIndex(i)
+        if not factionData.isHeader or factionData.isHeaderWithRep then
+            repData[factionData.factionID] = factionData.currentStanding
+            if C_Reputation.IsFactionParagon(factionData.factionID) then
+                self:Print("Paragon " .. factionData.name .. " " .. factionData.currentStanding)
+            end
+            if C_Reputation.IsMajorFaction(factionData.factionID) then
+                self:Print("Major " .. factionData.name)
+                self:Print(dump(factionData))
+            end
+            -- self:Print(factionData.name .. " processed (" .. factionData.currentStanding .. "/" .. (factionData.currentReactionThreshold or factionData.nextReactionThreshold) .. ")")
+        end
+    end
+end
+
+function RLF:FindDelta()
+    -- local numFactionElements = C_Reputation.GetNumFactions()
+    -- local numFactions = 0
+    -- for i = 1, numFactionElements do
+    --     local factionData = C_Reputation.GetFactionDataByIndex(i)
+    --     if not factionData.isHeader then
+            
+    --     end
+    -- end
+    -- if numFactions > #repData then
+    --     for i = 1, numFactions do
+    --         local fac
+    --     end
+    -- end
+    for k, v in pairs(repData) do
+        local factionData = C_Reputation.GetFactionDataByID(k)
+        if factionData.currentStanding ~= v then
+            G_RLF.LootDisplay:ShowRep(factionData.currentStanding - v, factionData)
+        end
+    end
+    self:RefreshRepData()
+end
+
 local currentXP, currentMaxXP, currentLevel
 function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
     self:InitializeOptions()
     self:CheckForLootAlertSystem()
     self:CheckForBossBanner()
+    self:RefreshRepData()
     currentXP = UnitXP("player")
     currentMaxXP = UnitXPMax("player")
     currentLevel = UnitLevel("player")

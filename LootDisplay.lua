@@ -177,6 +177,42 @@ function LootDisplay:ShowXP(experience)
     row.fadeOutAnimation:Play()
 end
 
+function LootDisplay:ShowRep(rep, factionData)
+    local key = "REP_" .. factionData.factionID -- Use ID as a unique key
+    local text
+
+    -- Check if the item or currency is already displayed
+    local row = getRow(key)
+    if row then
+        -- Update existing entry
+        row.rep = row.rep + rep
+        row.highlightAnimation:Stop()
+        row.highlightAnimation:Play()
+    else
+        row = leaseRow(key)
+        if (row == nil) then
+            return
+        end
+
+        -- Initialize row content
+        rowMoneyStyles(row)
+        row.rep = rep
+    end
+    local sign = "+"
+    if rep < 0 then
+        sign = "-"
+    end
+    text = sign .. math.abs(row.rep) .. " " .. factionData.name
+    row.amountText:SetText(text)
+    local r = FACTION_BAR_COLORS[factionData.reaction].r;
+    local g = FACTION_BAR_COLORS[factionData.reaction].g;
+    local b = FACTION_BAR_COLORS[factionData.reaction].b;
+    row.amountText:SetTextColor(r, g, b, 1)
+
+    row.fadeOutAnimation:Stop()
+    row.fadeOutAnimation:Play()
+end
+
 function LootDisplay:HideLoot()
     local row = rows:shift()
 
@@ -253,7 +289,6 @@ rowMoneyText = function(row)
     else
         row.amountText:ClearAllPoints()
     end
-    row.amountText:SetTextColor(unpack(defaultColor))
     local anchor = "LEFT"
     if G_RLF.db.global.leftAlign == false then
         anchor = "RIGHT"
@@ -272,7 +307,6 @@ rowAmountText = function(row)
     else
         row.amountText:ClearAllPoints()
     end
-    row.amountText:SetTextColor(unpack(defaultColor))
     local anchor = "LEFT"
     local iconAnchor = "RIGHT"
     local xOffset = config.iconSize / 2
@@ -361,7 +395,7 @@ rowStyles = function(row)
 end
 
 applyRowStyles = function(row)
-    if row.copper ~= nil then
+    if row.copper ~= nil or row.experience ~= nil or row.rep ~= nil then
         rowMoneyStyles(row)
     else
         rowStyles(row)
@@ -451,6 +485,10 @@ leaseRow = function(key)
         row.copper = nil
         row.link = nil
         row.experience = nil
+        row.rep = nil
+        if row.amountText and defaultColor then
+            row.amountText:SetTextColor(unpack(defaultColor))
+        end
     end
 
     rows:push(row)
