@@ -20,13 +20,21 @@ function RLF:OnInitialize()
 end
 
 function RLF:SlashCommand(msg, editBox)
-    LibStub("AceConfigDialog-3.0"):Open(addonName)
+    if msg == "test" then
+        G_RLF.TestMode:ToggleTestMode()
+    elseif msg == "clear" then
+        G_RLF.LootDisplay:HideLoot()
+    else
+        LibStub("AceConfigDialog-3.0"):Open(addonName)
+    end
 end
 
 function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
-    self:InitializeOptions()
-    self:CheckForLootAlertSystem()
-    self:CheckForBossBanner()
+    if self.optionsFrame == nil then
+        self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName, addonName)
+    end
+    self:LootToastHook()
+    self:BossBannerHook()
     G_RLF.Rep:RefreshRepData()
     G_RLF.Xp:Snapshot()
     if isLogin and isReload == false then
@@ -59,79 +67,4 @@ end
 
 function RLF:PLAYER_XP_UPDATE(eventName, unitTarget)
     G_RLF.Xp:OnXpChange(unitTarget)
-end
-
-function RLF:InitializeOptions()
-    if self.optionsFrame == nil then
-        self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName, addonName)
-    end
-end
-
-local lootAlertAttempts = 0
-function RLF:CheckForLootAlertSystem()
-    if self:IsHooked(LootAlertSystem, "AddAlert") then
-        return
-    end
-    if LootAlertSystem and LootAlertSystem.AddAlert then
-        self:RawHook(LootAlertSystem, "AddAlert", "InterceptAddAlert", true)
-    else
-        if lootAlertAttempts <= 30 then
-            lootAlertAttempts = lootAlertAttempts + 1
-            -- Keep checking until it's available
-            self:ScheduleTimer("CheckForLootAlertSystem", 1)
-        else
-            self:Print(G_RLF.L["AddLootAlertUnavailable"])
-            self:Print(G_RLF.L["Issues"])
-        end
-    end
-end
-
-local bossBannerAttempts = 0
-function RLF:CheckForBossBanner()
-    if self:IsHooked(BossBanner, "OnEvent") then
-        return
-    end
-    if BossBanner then
-        self:RawHookScript(BossBanner, "OnEvent", "InterceptBossBannerAlert", true)
-    else
-        if bossBannerAttempts <= 30 then
-            bossBannerAttempts = bossBannerAttempts + 1
-            -- Keep checking until it's available
-            self:ScheduleTimer("CheckForBossBanner", 1)
-        else
-            self:Print(G_RLF.L["BossBannerAlertUnavailable"])
-            self:Print(G_RLF.L["Issues"])
-        end
-    end
-end
-
-function RLF:InterceptBossBannerAlert(s, event, ...)
-    if G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.FULLY_DISABLE then
-        return
-    end
-
-    if G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.DISABLE_LOOT and event == "ENCOUNTER_LOOT_RECEIVED" then
-        return
-    end
-
-    local _, _, _, _, playerName, _ = ...;
-    local myGuid = GetPlayerGuid()
-    local myName, _ = GetNameAndServerNameFromGUID(myGuid)
-    if G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.DISABLE_MY_LOOT and event == "ENCOUNTER_LOOT_RECEIVED" and playerName == myName then
-        return
-    end
-
-    if G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.DISABLE_GROUP_LOOT and event == "ENCOUNTER_LOOT_RECEIVED" and playerName ~= myName then
-        return
-    end
-    -- Call the original AddAlert function if not blocked
-    self.hooks[BossBanner].OnEvent(s, event, ...)
-end
-
-function RLF:InterceptAddAlert(frame, ...)
-    if G_RLF.db.global.disableBlizzLootToasts then
-        return
-    end
-    -- Call the original AddAlert function if not blocked
-    self.hooks[LootAlertSystem].AddAlert(frame, ...)
 end

@@ -21,6 +21,8 @@ locale/locales.xml
 
 Features/features.xml
 
+BlizzOverrides/overrides.xml
+
 RPGLootFeed.lua
 
 config/config.xml
