@@ -19,7 +19,11 @@ DoubleLinkedList.lua
 
 locale/locales.xml
 
+Features/features.xml
+
 RPGLootFeed.lua
-ConfigOptions.lua
+
+config/config.xml
+
 TestMode.lua
 LootDisplay.lua
