@@ -105,7 +105,8 @@ function dump(o)
     end
  end
 
-local repData = {}
+local repData, paragonRepData, majorRepData = {}
+local cachedFactionCount
 function RLF:RefreshRepData()
     C_Reputation.ExpandAllFactionHeaders()
     local numFactions = C_Reputation.GetNumFactions()
@@ -113,36 +114,92 @@ function RLF:RefreshRepData()
         return
     end
 
+    local count = 0
     for i = 1, numFactions do
         local factionData = C_Reputation.GetFactionDataByIndex(i)
         if not factionData.isHeader or factionData.isHeaderWithRep then
             if C_Reputation.IsFactionParagon(factionData.factionID) then
                 -- Need to support Paragon factions
                 local value, max = C_Reputation.GetFactionParagonInfo(factionData.factionID)
-                -- self:Print("Paragon " .. factionData.name .. " " .. value .. "/" .. max)
+                paragonRepData[factionData.factionID] = value
             elseif C_Reputation.IsMajorFaction(factionData.factionID) then
                 -- Need to support Major factions
                 local majorFactionData = C_MajorFactions.GetMajorFactionData(factionData.factionID)
                 local level = majorFactionData.renownLevel
                 local rep = majorFactionData.renownReputationEarned
                 local max = majorFactionData.renownLevelThreshold
-                -- self:Print("Major " .. factionData.name .. " " .. level .. " (" .. rep .. "/" .. max .. ")")
+                majorRepData[factionData.factionID] = { level, rep, max }
             else
                 repData[factionData.factionID] = factionData.currentStanding
             end
+            count = count + 1
         end
     end
+
+    cachedFactionCount = count
+end
+
+function RLF:CountRepFactions()
+    C_Reputation.ExpandAllFactionHeaders()
+    local numFactions = C_Reputation.GetNumFactions()
+    if numFactions <= 0 then
+        return
+    end
+
+    local count = 0
+    for i = 1, numFactions do
+        if not factionData.isHeader or factionData.isHeaderWithRep then
+            count = count + 1
+        end
+    end
+
+    return count
 end
 
 function RLF:FindDelta()
     if G_RLF.db.global.repFeed then
+        if self:CountRepFactions() ~= cachedFactionCount then
+            -- We likely got a new faction that we weren't tracking before
+            -- TODO: Implement logic
+        end
+        -- Normal rep factions
         for k, v in pairs(repData) do
             local factionData = C_Reputation.GetFactionDataByID(k)
             if factionData.currentStanding ~= v then
                 G_RLF.LootDisplay:ShowRep(factionData.currentStanding - v, factionData)
             end
         end
+        -- Paragon facions
+        for k, v in pairs(paragonRepData) do
+            local value, max = C_Reputation.GetFactionParagonInfo(k)
+            if value ~= v then
+                -- Not thoroughly tested
+                if v == max then
+                    -- We were at paragon cap, then the reward was obtained, so we started back at 0
+                    G_RLF.LootDisplay:ShowRep(value, factionData)
+                else
+                    G_RLF.LootDisplay:ShowRep(value - v, factionData)
+                end
+            end
+        end
+        -- Major factions
+        for k, v in pairs(majorRepData) do
+            local majorFactionData = C_Reputation.GetMajorFactionData(k)
+            local level = majorFactionData.renownLevel
+            local rep = majorFactionData.renownReputationEarned
+            local max = majorFactionData.renownLevelThreshold
+            local oldLevel, oldRep, oldMax = unpack(v)
+            -- Not thoroughly tested
+            if oldLevel == level then
+                if rep ~= oldRep then
+                    G_RLF.LootDisplay:ShowRep(rep - oldRep, factionData)
+                end
+            else
+                G_RLF.LootDisplay:ShowRep(oldMax - oldRep + rep, factionData)
+            end
+        end
     end
+
     self:RefreshRepData()
 end
 

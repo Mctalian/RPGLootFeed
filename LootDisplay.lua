@@ -204,9 +204,17 @@ function LootDisplay:ShowRep(rep, factionData)
     end
     text = sign .. math.abs(row.rep) .. " " .. factionData.name
     row.amountText:SetText(text)
-    local r = FACTION_BAR_COLORS[factionData.reaction].r;
-    local g = FACTION_BAR_COLORS[factionData.reaction].g;
-    local b = FACTION_BAR_COLORS[factionData.reaction].b;
+    local r, g, b
+    if factionData.reaction and not C_Reputation.IsFactionParagon(factionData.factionID) and not
+        C_Reputation.IsMajorFaction(factionData.factionID) then
+        r = FACTION_BAR_COLORS[factionData.reaction].r;
+        g = FACTION_BAR_COLORS[factionData.reaction].g;
+        b = FACTION_BAR_COLORS[factionData.reaction].b;
+    else
+        r = 0.26
+        g = 1
+        b = 1
+    end
     row.amountText:SetTextColor(r, g, b, 1)
 
     row.fadeOutAnimation:Stop()
