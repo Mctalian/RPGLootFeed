@@ -11,6 +11,7 @@ L["Item Loot messages Disabled"] = true
 L["Currency messages Disabled"] = true
 L["Money messages Disabled"] = true
 L["XP messages Disabled"] = true
+L["Rep messages Disabled"] = true
 
 -- CHAT_MSG_MONEY
 L["Gold"] = true
@@ -36,6 +37,8 @@ L["Enable Money in Feed"] = true
 L["EnableMoneyDesc"] = "Show money, like Gold, Silver, Copper, in the Loot Feed"
 L["Enable Experience in Feed"] = true
 L["EnableXPDesc"] = "Show experience gains in the Loot Feed"
+L["Enable Reputation in Feed"] = true
+L["EnableRepDesc"] = "Show reputation gains in the Loot Feed"
 
 -- ConfigOptions - Positioning Group
 L["Toggle Test Mode"] = true
@@ -118,3 +121,5 @@ L["Disable Money Chat Messages"] = true
 L["DisableMoneyChatMessagesDesc"] = "Disables Money Chat Messages in all chat windows."
 L["Disable Experience Chat Messages"] = true
 L["DisableExperienceChatMessagesDesc"] = "Disables Experience Chat Messages in all chat windows."
+L["Disable Reputation Chat Messages"] = true
+L["DisableReputationChatMessagesDesc"] = "Disables Reputation Chat Messages in all chat windows."
