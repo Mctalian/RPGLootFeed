@@ -68,6 +68,14 @@ L["X Offset"] = true
 L["XOffsetDesc"] = "Adjust the loot feed left (negative) or right (positive)"
 L["Y Offset"] = true
 L["YOffsetDesc"] = "Adjust the loot feed down (negative) or up (positive)"
+L["Frame Strata"] = true
+L["FrameStrataDesc"] = "Adjust the strata (screen depth, z-index, etc.) of the loot feed frame"
+L["Background"] = true
+L["Low"] = true
+L["Medium"] = true
+L["High"] = true
+L["Dialog"] = true
+L["Tooltip"] = true
 
 -- ConfigOptions - Sizing Group
 L["Sizing"] = true
