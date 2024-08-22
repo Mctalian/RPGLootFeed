@@ -116,7 +116,6 @@ end
 
 function BlizzardUI:SetBossBannerConfig(info, value)
   G_RLF.db.global.bossBannerConfig = value
-  G_RLF:Print(G_RLF.db.global.bossBannerConfig)
 end
 
 function BlizzardUI:GetBossBannerConfig(info, value)

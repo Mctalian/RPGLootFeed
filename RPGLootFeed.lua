@@ -105,7 +105,9 @@ function dump(o)
     end
  end
 
-local repData, paragonRepData, majorRepData = {}
+local repData = {}
+local paragonRepData = {}
+local majorRepData = {}
 local cachedFactionCount
 function RLF:RefreshRepData()
     C_Reputation.ExpandAllFactionHeaders()
@@ -148,6 +150,7 @@ function RLF:CountRepFactions()
 
     local count = 0
     for i = 1, numFactions do
+        local factionData = C_Reputation.GetFactionDataByIndex(i)
         if not factionData.isHeader or factionData.isHeaderWithRep then
             count = count + 1
         end
@@ -161,6 +164,7 @@ function RLF:FindDelta()
         if self:CountRepFactions() ~= cachedFactionCount then
             -- We likely got a new faction that we weren't tracking before
             -- TODO: Implement logic
+            self:Print("New faction detected!")
         end
         -- Normal rep factions
         for k, v in pairs(repData) do
@@ -184,7 +188,7 @@ function RLF:FindDelta()
         end
         -- Major factions
         for k, v in pairs(majorRepData) do
-            local majorFactionData = C_Reputation.GetMajorFactionData(k)
+            local majorFactionData = C_MajorFactions.GetMajorFactionData(k)
             local level = majorFactionData.renownLevel
             local rep = majorFactionData.renownReputationEarned
             local max = majorFactionData.renownLevelThreshold
