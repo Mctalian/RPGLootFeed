@@ -19,6 +19,8 @@ DoubleLinkedList.lua
 
 locale/locales.xml
 
+Features/features.xml
+
 RPGLootFeed.lua
 
 config/config.xml
