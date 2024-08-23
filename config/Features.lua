@@ -1,6 +1,16 @@
 local Features = {}
 
 G_RLF.defaults.global.itemLootFeed = true
+G_RLF.defaults.global.itemQualityFilter = {
+    [Enum.ItemQuality.Poor] = true,
+    [Enum.ItemQuality.Common] = true,
+    [Enum.ItemQuality.Uncommon] = true,
+    [Enum.ItemQuality.Rare] = true,
+    [Enum.ItemQuality.Epic] = true,
+    [Enum.ItemQuality.Legendary] = true,
+    [Enum.ItemQuality.Artifact] = true,
+    [Enum.ItemQuality.Heirloom] = true,
+}
 G_RLF.defaults.global.currencyFeed = true
 G_RLF.defaults.global.tooltip = true
 G_RLF.defaults.global.tooltipOnShift = false
@@ -23,6 +33,34 @@ G_RLF.options.args.features = {
             get = "GetItemLootStatus",
             set = "SetItemLootStatus",
             order = 1
+        },
+        itemLootConfig = {
+            type = "group",
+            disabled = "ItemLootDisabled",
+            name = G_RLF.L["Item Loot Config"],
+            inline = true,
+            order = 1.1,
+            args = {
+                itemQualityFilter = {
+                    type = "multiselect",
+                    name = G_RLF.L["Item Quality Filter"],
+                    desc = G_RLF.L["ItemQualityFilterDesc"],
+                    values = {
+                        [Enum.ItemQuality.Poor] = "Poor",
+                        [Enum.ItemQuality.Common] = "Common",
+                        [Enum.ItemQuality.Uncommon] = "Uncommon",
+                        [Enum.ItemQuality.Rare] = "Rare",
+                        [Enum.ItemQuality.Epic] = "Epic",
+                        [Enum.ItemQuality.Legendary] = "Legendary",
+                        [Enum.ItemQuality.Artifact] = "Artifact",
+                        [Enum.ItemQuality.Heirloom] = "Heirloom",
+                    },
+                    width = "double",
+                    get = "GetItemQualityFilter",
+                    set = "SetItemQualityFilter",
+                    order = 1
+                }
+            }
         },
         enableCurrency = {
             type = "toggle",
@@ -96,6 +134,18 @@ end
 
 function Features:SetItemLootStatus(info, value)
     G_RLF.db.global.itemLootFeed = value
+end
+
+function Features:ItemLootDisabled()
+    return not G_RLF.db.global.itemLootFeed
+end
+
+function Features:GetItemQualityFilter(info, quality)
+    return G_RLF.db.global.itemQualityFilter[quality]
+end
+
+function Features:SetItemQualityFilter(info, quality, value)
+    G_RLF.db.global.itemQualityFilter[quality] = value
 end
 
 function Features:GetCurrencyStatus(info, value)

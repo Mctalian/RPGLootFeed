@@ -19,7 +19,10 @@ function ItemLoot:OnItemLooted(...)
   local itemID = msg:match("Hitem:(%d+)")
   if itemID ~= nil then
       local amount = msg:match("r ?x(%d+)") or 1
-      local _, itemLink, _, _, _, _, _, _, _, itemTexture = C_Item.GetItemInfo(itemID)
+      local _, itemLink, itemQuality, _, _, _, _, _, _, itemTexture = C_Item.GetItemInfo(itemID)
+      if not G_RLF.db.global.itemQualityFilter[itemQuality] then
+        return
+      end
       G_RLF.LootDisplay:ShowLoot(itemID, itemLink, itemTexture, amount)
   end
 end
