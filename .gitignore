@@ -42,6 +42,8 @@ luac.out
 .release/*
 !.release/local.sh
 
+.scripts/.output
+
 /luarocks
 /lua
 /lua_modules
