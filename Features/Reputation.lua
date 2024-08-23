@@ -84,6 +84,7 @@ function Rep:FindDelta()
       end
       -- Paragon facions
       for k, v in pairs(paragonRepData) do
+          local factionData = C_Reputation.GetFactionDataByID(k)
           local value, max = C_Reputation.GetFactionParagonInfo(k)
           if value ~= v then
               -- Not thoroughly tested
@@ -97,6 +98,7 @@ function Rep:FindDelta()
       end
       -- Major factions
       for k, v in pairs(majorRepData) do
+          local factionData = C_Reputation.GetFactionDataByID(k)
           local majorFactionData = C_MajorFactions.GetMajorFactionData(k)
           local level = majorFactionData.renownLevel
           local rep = majorFactionData.renownReputationEarned
