@@ -25,6 +25,7 @@ local updateRowPositions
 local defaults = {
     anchorPoint = "BOTTOMLEFT",
     relativePoint = UIParent,
+    frameStrata = "MEDIUM",
     xOffset = 720,
     yOffset = 375,
     feedWidth = 330,
@@ -52,6 +53,8 @@ function LootDisplay:Initialize()
     frame:SetSize(config.feedWidth, getFrameHeight())
     frame:SetPoint(config.anchorPoint, _G[config.relativePoint], config.xOffset, config.yOffset)
 
+    frame:SetFrameStrata(config.frameStrata) -- Set the frame strata here
+
     frame:SetClipsChildren(true) -- Enable clipping of child elements
 
     boundingBox = frame:CreateTexture(nil, "BACKGROUND")
@@ -74,6 +77,12 @@ end
 function LootDisplay:UpdatePosition()
     frame:ClearAllPoints()
     frame:SetPoint(config.anchorPoint, _G[config.relativePoint], config.xOffset, config.yOffset)
+end
+
+function LootDisplay:UpdateStrata()
+    if frame then
+        frame:SetFrameStrata(config.frameStrata)
+    end
 end
 
 function LootDisplay:UpdateRowStyles()
@@ -100,6 +109,10 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
         row.amount = row.amount + amountLooted
         row.highlightAnimation:Stop()
         row.highlightAnimation:Play()
+        if row.fadeOutAnimation:IsPlaying() then
+            row.fadeOutAnimation:Stop()
+            row.fadeOutAnimation:Play()
+        end
     else
         row = leaseRow(key)
         if (row == nil) then
@@ -112,10 +125,34 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
         row.amount = amountLooted
         local extraWidth = getTextWidth(" x" .. row.amount)
         row.link = truncateItemLink(link, extraWidth)
+        row.fadeOutAnimation:Stop()
+        row.fadeOutAnimation:Play()
     end
     row.amountText:SetText(row.link .. " x" .. row.amount)
-    row.fadeOutAnimation:Stop()
-    row.fadeOutAnimation:Play()
+    -- Add Tooltip
+    row.amountText:SetScript("OnEnter", function()
+        row.fadeOutAnimation:Stop()
+        row.highlightAnimation:Stop()
+        row.highlightBorder:SetAlpha(0)
+        if not G_RLF.db.global.tooltip then
+            return
+        end
+        if G_RLF.db.global.tooltipOnShift and not IsShiftKeyDown() then
+            return
+        end
+        local inCombat = UnitAffectingCombat("player")
+        if inCombat then
+            GameTooltip:Hide()
+            return
+        end
+        GameTooltip:SetOwner(row.amountText, "ANCHOR_RIGHT")
+        GameTooltip:SetHyperlink(row.link)  -- Use the item's link to show the tooltip
+        GameTooltip:Show()
+    end)
+    row.amountText:SetScript("OnLeave", function()
+        row.fadeOutAnimation:Play()
+        GameTooltip:Hide()
+    end)
 end
 
 function LootDisplay:ShowMoney(copper)
@@ -494,8 +531,21 @@ leaseRow = function(key)
         row.link = nil
         row.experience = nil
         row.rep = nil
-        if row.amountText and defaultColor then
-            row.amountText:SetTextColor(unpack(defaultColor))
+        if row.highlightBorder then
+            row.highlightBorder:SetAlpha(0)
+        end
+        if row.fadeOutAnimation then
+            row.fadeOutAnimation:Stop()
+        end
+        if row.highlightAnimation then
+            row.highlightAnimation:Stop()
+        end
+        if row.amountText then
+            row.amountText:SetScript("OnEnter", nil)
+            row.amountText:SetScript("OnLeave", nil)
+            if defaultColor then
+                row.amountText:SetTextColor(unpack(defaultColor))
+            end
         end
     end
 
