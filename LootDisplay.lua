@@ -25,6 +25,7 @@ local updateRowPositions
 local defaults = {
     anchorPoint = "BOTTOMLEFT",
     relativePoint = UIParent,
+    frameStrata = "MEDIUM",
     xOffset = 720,
     yOffset = 375,
     feedWidth = 330,
@@ -52,6 +53,8 @@ function LootDisplay:Initialize()
     frame:SetSize(config.feedWidth, getFrameHeight())
     frame:SetPoint(config.anchorPoint, _G[config.relativePoint], config.xOffset, config.yOffset)
 
+    frame:SetFrameStrata(config.frameStrata) -- Set the frame strata here
+
     frame:SetClipsChildren(true) -- Enable clipping of child elements
 
     boundingBox = frame:CreateTexture(nil, "BACKGROUND")
@@ -74,6 +77,12 @@ end
 function LootDisplay:UpdatePosition()
     frame:ClearAllPoints()
     frame:SetPoint(config.anchorPoint, _G[config.relativePoint], config.xOffset, config.yOffset)
+end
+
+function LootDisplay:UpdateStrata()
+    if frame then
+        frame:SetFrameStrata(config.frameStrata)
+    end
 end
 
 function LootDisplay:UpdateRowStyles()

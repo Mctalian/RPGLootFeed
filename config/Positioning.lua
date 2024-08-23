@@ -4,6 +4,7 @@ G_RLF.defaults.global.relativePoint = "UIParent"
 G_RLF.defaults.global.anchorPoint = "BOTTOMLEFT"
 G_RLF.defaults.global.xOffset = 720
 G_RLF.defaults.global.yOffset = 375
+G_RLF.defaults.global.frameStrata = "MEDIUM" -- Default frame strata
 
 -- Enumerate available frames to anchor to
 local function EnumerateFrames()
@@ -77,6 +78,22 @@ G_RLF.options.args.positioning = {
           set = "SetYOffset",
           order = 4
       },
+      frameStrata = {
+          type = "select",
+          name = G_RLF.L["Frame Strata"],
+          desc = G_RLF.L["FrameStrataDesc"],
+          get = "GetFrameStrata",
+          set = "SetFrameStrata",
+          values = {
+              ["BACKGROUND"] = G_RLF.L["Background"],
+              ["LOW"] = G_RLF.L["Low"],
+              ["MEDIUM"] = G_RLF.L["Medium"],
+              ["HIGH"] = G_RLF.L["High"],
+              ["DIALOG"] = G_RLF.L["Dialog"],
+              ["TOOLTIP"] = G_RLF.L["Tooltip"]
+          },
+          order = 5
+      }
   },
 }
 
@@ -114,4 +131,13 @@ end
 
 function Positioning:GetYOffset(info)
   return G_RLF.db.global.yOffset
+end
+
+function Positioning:SetFrameStrata(info, value)
+  G_RLF.db.global.frameStrata = value
+  G_RLF.LootDisplay:UpdateStrata()
+end
+
+function Positioning:GetFrameStrata(info)
+  return G_RLF.db.global.frameStrata
 end
