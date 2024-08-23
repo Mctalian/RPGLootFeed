@@ -16,14 +16,14 @@ function ItemLoot:OnItemLooted(...)
   if not me then
       return
   end
-  local itemID = msg:match("Hitem:(%d+)")
-  if itemID ~= nil then
+  local itemLink = msg:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
+  if itemLink then
       local amount = msg:match("r ?x(%d+)") or 1
-      local _, itemLink, itemQuality, _, _, _, _, _, _, itemTexture = C_Item.GetItemInfo(itemID)
+      local _, _, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent = C_Item.GetItemInfo(itemLink)
       if not G_RLF.db.global.itemQualityFilter[itemQuality] then
         return
       end
-      G_RLF.LootDisplay:ShowLoot(itemID, itemLink, itemTexture, amount)
+      G_RLF.LootDisplay:ShowLoot(itemLink, itemLink, itemTexture, amount)
   end
 end
 
