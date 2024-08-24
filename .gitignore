@@ -44,6 +44,8 @@ luac.out
 
 .scripts/.output
 
+.venv
+
 /luarocks
 /lua
 /lua_modules

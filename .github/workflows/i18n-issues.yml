@@ -1,0 +1,31 @@
+name: Translation Issue Updates
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  check_translations:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install Python dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run translation check script
+      run: python .scripts/missing_translation_check.py
+
+    - name: Create or Update Issues
+      run: python .scripts/create_or_update_i18n_issues.py
+      env:
+        GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
