@@ -16,7 +16,7 @@ def load_lua_file(lua_file):
     with open(lua_file, 'r') as file:
         for line in file:
             # Use regex to capture the key and value correctly
-            match = re.match(r'L\["(.+)"\] = "?(.*)"?', line.strip())
+            match = re.match(r'L\["(.+)"\]\s*=\s*(true|"[^"]*")', line.strip())
             if match:
                 key = match[1]
                 value = match[2]
@@ -32,7 +32,7 @@ def compare_translations(reference_dict, target_dict, locale):
     for key, value in reference_dict.items():
         if key not in target_dict:
             # If the reference value is True, use the key as the value
-            enUS_value = key if value.lower() == 'true' else value
+            enUS_value = key if value.lower() == 'true' else value.strip('"')
             missing_keys.append(f"| {key} | {enUS_value} |")
     
     # Check for extra keys in the target dictionary
@@ -81,7 +81,6 @@ def main():
     has_extra_keys = False
     
     # Compare each locale with the reference
-    i = 1
     for locale_file in locale_files:
         if locale_file != reference_file:
             target_dict = load_lua_file(f"{locale_dir}/{locale_file}")
@@ -96,12 +95,10 @@ def main():
                 
             if extra_keys:
                 # Print extra keys to console and set flag
-                print(f"Extra translation keys in {locale_file}:")
+                print(f"\n\nERROR: Extra translation keys in {locale_file}:")
                 for key in extra_keys:
                     print(f"  {key}")
                 has_extra_keys = True
-            if i == 1:
-                exit(0)
     
     # Exit with non-zero code if extra keys were found
     if has_extra_keys:
