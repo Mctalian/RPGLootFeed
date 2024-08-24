@@ -1,0 +1,28 @@
+name: PR Translation Check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check_translations:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.x'
+
+    - name: Install Python dependencies
+      run: pip install -r requirements.txt
+
+    - name: Run translation check script
+      run: python .scripts/missing_translation_check.py
+
+    - name: Check for Hard-coded strings
+      run: python .scripts/hardcode_string_check.py
