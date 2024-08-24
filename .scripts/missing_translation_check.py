@@ -1,5 +1,6 @@
 import os
 import re
+import textwrap
 import xml.etree.ElementTree as ET
 
 # Step 1: Parse locales.xml to extract Lua file names
@@ -46,10 +47,23 @@ def compare_translations(reference_dict, target_dict, locale):
         markdown_report += "| Missing Key | enUS Value |\n"
         markdown_report += "|-------------|------------|\n"
         markdown_report += "\n".join(missing_keys)
-        markdown_report += "\n\nPlease provide one or more of these values in a Pull Request or a Comment on this issue:\n\n"
-        markdown_report += "```\n"
-        markdown_report += "\n".join([f'L["{key.split("|")[1].strip()}"] = ""' for key in missing_keys])
-        markdown_report += "\n```\n"
+        markdown_report += f"\n\n_You can even make changes for [this file](https://github.com/Mctalian/RPGLootFeed/edit/main/locale/{locale}) and open a PR directly in your browser_\n\n"
+
+        translation_stub = "\n".join([f'L["{key.split("|")[1].strip()}"] = ""' for key in missing_keys])
+        details_section = textwrap.dedent(
+f"""
+
+<details>
+    <summary>Please provide one or more of these values in a Pull Request or a Comment on this issue</summary>
+
+```
+{translation_stub}
+```
+</details>
+
+""")
+        markdown_report += details_section
+
     else:
         markdown_report = None
     
