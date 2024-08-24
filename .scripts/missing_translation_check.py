@@ -48,7 +48,7 @@ def compare_translations(reference_dict, target_dict, locale):
         markdown_report += "\n".join(missing_keys)
         markdown_report += "\n\nPlease provide one or more of these values in a Pull Request or a Comment on this issue:\n\n"
         markdown_report += "```\n"
-        markdown_report += "\n".join([f'L["{key.split()[1]}"] = ""' for key in missing_keys])
+        markdown_report += "\n".join([f'L["{key.split("|")[1].strip()}"] = ""' for key in missing_keys])
         markdown_report += "\n```\n"
     else:
         markdown_report = None
@@ -81,6 +81,7 @@ def main():
     has_extra_keys = False
     
     # Compare each locale with the reference
+    i = 1
     for locale_file in locale_files:
         if locale_file != reference_file:
             target_dict = load_lua_file(f"{locale_dir}/{locale_file}")
@@ -99,6 +100,8 @@ def main():
                 for key in extra_keys:
                     print(f"  {key}")
                 has_extra_keys = True
+            if i == 1:
+                exit(0)
     
     # Exit with non-zero code if extra keys were found
     if has_extra_keys:
