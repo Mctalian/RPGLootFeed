@@ -15,7 +15,9 @@ describe("Currency module", function()
       }
 
       _G.C_CurrencyInfo = {
-        GetCurrencyInfo = function() end,
+        GetCurrencyInfo = function()
+          print("Original")
+        end,
         GetCurrencyLink = function()
             return "|c12345678|Hcurrency:123|r"
         end
@@ -62,7 +64,10 @@ end)
 
   it("does not show loot if the currency info cannot be found", function()
       _G.G_RLF.db.global.currencyFeed = true
-      _G.C_CurrencyInfo.GetCurrencyInfo = function() return nil end
+      _G.C_CurrencyInfo.GetCurrencyInfo = function()
+          print("nilled")
+          return nil
+      end
 
       _G.G_RLF.Currency:OnUpdate(123, 1, 1)
 
@@ -71,7 +76,9 @@ end)
 
   it("shows loot if the currency info is valid", function()
       _G.G_RLF.db.global.currencyFeed = true
+      mockCurrencyInfo.GetCurrencyInfo:revert()
       _G.C_CurrencyInfo.GetCurrencyInfo = function()
+          print("Overridden")
           return {
             currencyID = 123,
             iconFileID = 123456
