@@ -1,4 +1,4 @@
-name: PR Translation Check
+name: PR Checks
 
 on:
   pull_request:
@@ -41,4 +41,9 @@ jobs:
       run: luarocks make --local rpglootfeed-1-1.rockspec
 
     - name: Run Tests
-      run: make test
+      run: make test-ci
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: luacov-html
+        path: luacov-html/
