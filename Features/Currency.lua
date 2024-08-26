@@ -16,7 +16,7 @@ function Currency:OnUpdate(...)
       return
   end
 
-  G_RLF.LootDisplay:ShowLoot(info.currencyID, G_RLF:GetCurrencyLink(info.currencyID, info.name), info.iconFileID,
+  G_RLF.LootDisplay:ShowLoot(info.currencyID, C_CurrencyInfo.GetCurrencyLink(currencyType), info.iconFileID,
       quantityChange)
 end
 

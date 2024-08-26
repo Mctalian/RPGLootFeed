@@ -4,6 +4,7 @@ all_checks: venv_up hardcode_string_check missing_translation_check
 
 # Variables
 PYTHON := python3
+ROCKSBIN := $(HOME)/.luarocks/bin
 
 # Target for running the hardcoded string checker
 hardcode_string_check:
@@ -15,3 +16,6 @@ missing_translation_check:
 
 venv_up:
 	@if [ ! -d ".venv" ]; then $(PYTHON) -m venv ./.venv; fi
+
+test:
+	@rm -rf luacov-html && $(ROCKSBIN)/busted --coverage && $(ROCKSBIN)/luacov 
