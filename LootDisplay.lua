@@ -158,6 +158,10 @@ end
 function LootDisplay:ShowMoney(copper)
     local key = "MONEY_LOOT" -- Use ID as a unique key
     local text
+    
+    if not copper or copper <= 0 then
+        return
+    end
 
     -- Check if the item or currency is already displayed
     local row = getRow(key)
