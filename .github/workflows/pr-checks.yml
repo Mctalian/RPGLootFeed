@@ -34,7 +34,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - uses: leafo/gh-actions-lua@v9
+    - uses: leafo/gh-actions-lua@v10
     - uses: leafo/gh-actions-luarocks@v4
 
     - name: Install luarock dependencies
