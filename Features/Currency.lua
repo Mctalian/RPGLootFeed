@@ -7,7 +7,7 @@ function Currency:OnUpdate(...)
       return
   end
 
-  if currencyType == nil or quantityChange <= 0 then
+  if currencyType == nil or not quantityChange or quantityChange <= 0 then
       return
   end
 
