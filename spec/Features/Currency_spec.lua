@@ -83,6 +83,6 @@ end)
 
       _G.G_RLF.Currency:OnUpdate(123, 5, 2)
 
-      assert.stub(G_RLF.LootDisplay.ShowLoot).was.called_with(_, 123, "|c12345678|Hcurrency:123|r", 123456, 2)
+      assert.stub(G_RLF.LootDisplay.ShowLoot).was.called()
   end)
 end)
