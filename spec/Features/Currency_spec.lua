@@ -69,6 +69,21 @@ end)
       assert.stub(mockLootDisplay.ShowLoot).was.not_called()
   end)
 
+  it("does not show loot if the currency has an empty description", function()
+      _G.G_RLF.db.global.currencyFeed = true
+      _G.C_CurrencyInfo.GetCurrencyInfo = function()
+          return {
+            currencyID = 123,
+            description = "",
+            iconFileID = 123456
+          }
+        end
+
+      _G.G_RLF.Currency:OnUpdate(123, 5, 2)
+
+      assert.stub(mockLootDisplay.ShowLoot).was.not_called()
+  end)
+
   -- it("shows loot if the currency info is valid", function()
   --     _G.G_RLF.db.global.currencyFeed = true
   --     _G.C_CurrencyInfo.GetCurrencyInfo = function()
