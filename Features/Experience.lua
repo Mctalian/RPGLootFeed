@@ -18,6 +18,10 @@ function Xp:OnXpChange(unitTarget)
       local newLevel = UnitLevel(unitTarget)
       local newCurrentXP = UnitXP(unitTarget)
       local delta = 0
+      if newLevel == nil then
+        return
+      end
+      currentLevel = currentLevel or newLevel
       if newLevel > currentLevel then
           delta = (currentMaxXP - currentXP) + newCurrentXP
       else
