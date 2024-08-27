@@ -18,7 +18,7 @@ venv_up:
 	@if [ ! -d ".venv" ]; then $(PYTHON) -m venv ./.venv; fi
 
 test:
-	@rm -rf luacov-html && $(ROCKSBIN)/busted --coverage && $(ROCKSBIN)/luacov 
+	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage && $(ROCKSBIN)/luacov 
 
 test-ci:
-	@rm -rf luacov-html && $(ROCKSBIN)/busted --coverage -o=TAP && $(ROCKSBIN)/luacov
+	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage -o=TAP && $(ROCKSBIN)/luacov

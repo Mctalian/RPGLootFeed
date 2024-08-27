@@ -14,22 +14,24 @@ function Rep:RefreshRepData()
     local count = 0
     for i = 1, numFactions do
         local factionData = C_Reputation.GetFactionDataByIndex(i)
-        if not factionData.isHeader or factionData.isHeaderWithRep then
-            if C_Reputation.IsFactionParagon(factionData.factionID) then
-                -- Need to support Paragon factions
-                local value, max = C_Reputation.GetFactionParagonInfo(factionData.factionID)
-                paragonRepData[factionData.factionID] = value
-            elseif C_Reputation.IsMajorFaction(factionData.factionID) then
-                -- Need to support Major factions
-                local majorFactionData = C_MajorFactions.GetMajorFactionData(factionData.factionID)
-                local level = majorFactionData.renownLevel
-                local rep = majorFactionData.renownReputationEarned
-                local max = majorFactionData.renownLevelThreshold
-                majorRepData[factionData.factionID] = {level, rep, max}
-            else
-                repData[factionData.factionID] = factionData.currentStanding
+        if factionData ~= nil then
+            if not factionData.isHeader or factionData.isHeaderWithRep then
+                if C_Reputation.IsFactionParagon(factionData.factionID) then
+                    -- Need to support Paragon factions
+                    local value, max = C_Reputation.GetFactionParagonInfo(factionData.factionID)
+                    paragonRepData[factionData.factionID] = value
+                elseif C_Reputation.IsMajorFaction(factionData.factionID) then
+                    -- Need to support Major factions
+                    local majorFactionData = C_MajorFactions.GetMajorFactionData(factionData.factionID)
+                    local level = majorFactionData.renownLevel
+                    local rep = majorFactionData.renownReputationEarned
+                    local max = majorFactionData.renownLevelThreshold
+                    majorRepData[factionData.factionID] = {level, rep, max}
+                else
+                    repData[factionData.factionID] = factionData.currentStanding
+                end
+                count = count + 1
             end
-            count = count + 1
         end
     end
 
@@ -46,23 +48,26 @@ function Rep:AddAnyNewFactions()
 
     for i = 1, numFactions do
         local factionData = C_Reputation.GetFactionDataByIndex(i)
-        if not factionData.isHeader or factionData.isHeaderWithRep then
-            local factionData = C_Reputation.GetFactionDataByIndex(i)
-            local fId = factionData.factionID
-            if C_Reputation.IsFactionParagon(fId) then
-                if not paragonRepData[fId] then
-                    paragonRepData[fId] = 0
-                end
-            elseif C_Reputation.IsMajorFaction(fId) then
-                if not majorRepData[fId] then
-                    local mfd = C_MajorFactions.GetMajorFactionData(fId)
-                    local level = mfd.renownLevel
-                    local max = mfd.renownLevelThreshold
-                    majorRepData[fId] = {level, 0, max}
-                end
-            else
-                if not repData[fId] then
-                    repData[fId] = 0
+        if factionData ~= nil then
+
+            if not factionData.isHeader or factionData.isHeaderWithRep then
+                local factionData = C_Reputation.GetFactionDataByIndex(i)
+                local fId = factionData.factionID
+                if C_Reputation.IsFactionParagon(fId) then
+                    if not paragonRepData[fId] then
+                        paragonRepData[fId] = 0
+                    end
+                elseif C_Reputation.IsMajorFaction(fId) then
+                    if not majorRepData[fId] then
+                        local mfd = C_MajorFactions.GetMajorFactionData(fId)
+                        local level = mfd.renownLevel
+                        local max = mfd.renownLevelThreshold
+                        majorRepData[fId] = {level, 0, max}
+                    end
+                else
+                    if not repData[fId] then
+                        repData[fId] = 0
+                    end
                 end
             end
         end
