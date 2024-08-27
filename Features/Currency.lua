@@ -12,7 +12,7 @@ function Currency:OnUpdate(...)
   end
 
   local info = C_CurrencyInfo.GetCurrencyInfo(currencyType)
-  if info == nil or not info.description then
+  if info == nil or info.description == "" then
       return
   end
 
