@@ -14,11 +14,9 @@ externals:
 enable-nolib-creation: yes
 
 ignore:
-  - lua_modules/
   - *_spec.lua
   - *.ps1
   - *.md
   - *.rockspec
-  - lua
-  - luarocks
+  - requirements.txt
 

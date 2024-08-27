@@ -46,7 +46,4 @@ luac.out
 
 .venv
 
-/luarocks
-/lua
-/lua_modules
-/.luarocks
+luacov-html

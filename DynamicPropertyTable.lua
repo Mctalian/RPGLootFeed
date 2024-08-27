@@ -5,7 +5,12 @@ function DynamicPropertyTable(globalTable, defaultsTable)
       __index = function(_, key)
           -- Check if the key exists in defaults, handle dynamically
           if defaultsTable[key] ~= nil then
-              return globalTable[key] or defaultsTable[key]
+            local globalValue = globalTable[key]
+            if globalValue ~= nil then
+                return globalValue
+            else
+                return defaultsTable[key]
+            end
           else
               return rawget(_, key)
           end

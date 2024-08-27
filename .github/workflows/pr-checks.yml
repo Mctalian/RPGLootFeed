@@ -1,4 +1,4 @@
-name: PR Translation Check
+name: PR Checks
 
 on:
   pull_request:
@@ -11,7 +11,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -26,3 +26,24 @@ jobs:
 
     - name: Check for Hard-coded strings
       run: python .scripts/hardcode_string_check.py
+
+  run_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - uses: leafo/gh-actions-lua@v10
+    - uses: leafo/gh-actions-luarocks@v4
+
+    - name: Install luarock dependencies
+      run: luarocks make --local rpglootfeed-1-1.rockspec
+
+    - name: Run Tests
+      run: make test-ci
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: luacov-html
+        path: luacov-html/

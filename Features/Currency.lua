@@ -7,7 +7,7 @@ function Currency:OnUpdate(...)
       return
   end
 
-  if currencyType == nil or quantityChange <= 0 then
+  if currencyType == nil or not quantityChange or quantityChange <= 0 then
       return
   end
 
@@ -16,7 +16,7 @@ function Currency:OnUpdate(...)
       return
   end
 
-  G_RLF.LootDisplay:ShowLoot(info.currencyID, G_RLF:GetCurrencyLink(info.currencyID, info.name), info.iconFileID,
+  G_RLF.LootDisplay:ShowLoot(info.currencyID, C_CurrencyInfo.GetCurrencyLink(currencyType), info.iconFileID,
       quantityChange)
 end
 
