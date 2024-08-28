@@ -10,40 +10,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.x'
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
 
-    - name: Install Python dependencies
-      run: pip install -r requirements.txt
+      - name: Install Python dependencies
+        run: pip install -r requirements.txt
 
-    - name: Run translation check script
-      run: python .scripts/missing_translation_check.py
+      - name: Run translation check script
+        run: python .scripts/missing_translation_check.py
 
-    - name: Check for Hard-coded strings
-      run: python .scripts/hardcode_string_check.py
+      - name: Check for Hard-coded strings
+        run: python .scripts/hardcode_string_check.py
 
   run_tests:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - uses: leafo/gh-actions-lua@v10
-    - uses: leafo/gh-actions-luarocks@v4
+      - uses: leafo/gh-actions-lua@v10
+      - uses: leafo/gh-actions-luarocks@v4
 
-    - name: Install luarock dependencies
-      run: luarocks make --local rpglootfeed-1-1.rockspec
+      - name: Install luarock dependencies
+        run: luarocks make --local rpglootfeed-1-1.rockspec
 
-    - name: Run Tests
-      run: make test-ci
+      - name: Run Tests
+        run: make test-ci
 
-    - uses: actions/upload-artifact@v4
-      with:
-        name: luacov-html
-        path: luacov-html/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luacov-html
+          path: luacov-html/

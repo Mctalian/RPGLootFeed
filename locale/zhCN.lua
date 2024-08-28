@@ -1,5 +1,7 @@
 local L = LibStub("AceLocale-3.0"):NewLocale(G_RLF.localeName, "zhCN")
-if not L then return end
+if not L then
+	return
+end
 
 -- 聊天窗口打印
 L["Welcome"] = "欢迎！使用/rlf来查看选项。"
