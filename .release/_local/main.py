@@ -11,7 +11,11 @@ from .print_utils import (
     set_super_verbose,
     set_verbose,
 )
-from .repository_setup import determine_releasedir, determine_topdir
+from .repository_setup import (
+    determine_releasedir,
+    determine_repository_type,
+    determine_topdir,
+)
 
 
 def main():
@@ -81,8 +85,10 @@ def main():
 
     determine_topdir()
     determine_releasedir()
+    determine_repository_type()
     print(f"Top-level directory: {config.top_directory}")
     print(f"Release directory: {config.release_directory}")
+    print(f"Detected VCS: {config.repository_type}")
 
     # Determine the pkgmeta file
     config.pkgmeta_file = determine_pkgmeta_file()
