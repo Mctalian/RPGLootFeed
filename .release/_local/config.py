@@ -20,6 +20,7 @@ class Config:
         self.game_version = None
         self.pkgmeta_file = None
         self.package_name_label = None
+        self.repository_type = None
 
     def update_from_args(self, args):
         self.verbose = args.v
