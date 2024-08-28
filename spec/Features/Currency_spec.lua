@@ -86,17 +86,18 @@ describe("Currency module", function()
 		assert.stub(mockLootDisplay.ShowLoot).was.not_called()
 	end)
 
-	-- it("shows loot if the currency info is valid", function()
-	--     _G.G_RLF.db.global.currencyFeed = true
-	--     _G.C_CurrencyInfo.GetCurrencyInfo = function()
-	--         return {
-	--           currencyID = 123,
-	--           iconFileID = 123456
-	--         }
-	--       end
+	it("shows loot if the currency info is valid", function()
+		_G.G_RLF.db.global.currencyFeed = true
+		_G.C_CurrencyInfo.GetCurrencyInfo = function()
+			return {
+				currencyID = 123,
+				description = "An awesome currency",
+				iconFileID = 123456,
+			}
+		end
 
-	--     _G.G_RLF.Currency:OnUpdate(123, 5, 2)
+		_G.G_RLF.Currency:OnUpdate(123, 5, 2)
 
-	--     assert.stub(mockLootDisplay.ShowLoot).was.called_with(_, 123, "|c12345678|Hcurrency:123|r", 123456, 2)
-	-- end)
+		assert.stub(mockLootDisplay.ShowLoot).was.called_with(_, 123, "|c12345678|Hcurrency:123|r", 123456, 2)
+	end)
 end)
