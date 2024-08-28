@@ -41,9 +41,11 @@ luac.out
 
 .release/*
 !.release/local.sh
+!.release/local
 
 .scripts/.output
 
 .venv
+__pycache__
 
 luacov-html

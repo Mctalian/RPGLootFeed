@@ -37,6 +37,16 @@ lint:
     - shfmt@3.6.0
     - trufflehog@3.81.9
     - yamllint@1.35.1
+    - no-invalid-prints
+  definitions:
+    - name: no-invalid-prints
+      files: [lua]
+      runtime: python
+      commands:
+        - name: lint
+          output: sarif
+          run: python3 ${workspace}/.scripts/check_for_invalid_prints.py ${target}
+          success_codes: [0, 1]
 actions:
   enabled:
     - trunk-announce

@@ -1486,7 +1486,7 @@ if [ -n "$project_version" ]; then
 fi
 if [ -n "$previous_version" ]; then
 	echo -n "  Previous version: "
-	print_red: "$previous_version"
+	print_red "$previous_version"
 fi
 (
 	if [[ -n $game_type ]]; then
