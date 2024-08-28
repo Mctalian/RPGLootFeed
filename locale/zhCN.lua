@@ -1,5 +1,7 @@
 local L = LibStub("AceLocale-3.0"):NewLocale(G_RLF.localeName, "zhCN")
-if not L then return end
+if not L then
+	return
+end
 
 -- 聊天窗口打印
 L["Welcome"] = "欢迎！使用/rlf来查看选项。"
@@ -107,7 +109,8 @@ L["Enable Auto Loot"] = "启用自动拾取"
 L["EnableAutoLootDesc"] = "设置默认设置，以便在登录任何角色时自动拾取处于启用状态"
 L["Alerts"] = "警报"
 L["Disable Boss Banner Elements"] = "禁用Boss Banner元素"
-L["DisableBossBannerDesc"] = "覆盖Boss Banner。完全隐藏它，只隐藏战利品部分，或者只隐藏你的战利品或你的队伍的战利品。"
+L["DisableBossBannerDesc"] =
+	"覆盖Boss Banner。完全隐藏它，只隐藏战利品部分，或者只隐藏你的战利品或你的队伍的战利品。"
 L["Do not disable BossBanner"] = "不禁用BossBanner"
 L["Disable All BossBanner"] = "禁用所有BossBanner"
 L["Disable All BossBanner Loot"] = "禁用所有BossBanner战利品"

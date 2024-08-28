@@ -1,10 +1,14 @@
 local L = LibStub("AceLocale-3.0"):NewLocale(G_RLF.localeName, "frFR")
-if not L then return end
+if not L then
+	return
+end
 
 -- Chat Window Printing
 L["Welcome"] = "Bienvenue! Utilisez /rlf pour accéder aux options."
-L["AddLootAlertUnavailable"] = "LootAlertSystem:AddAlert était indisponible pendant > 30 secondes, les notifications de loot n'ont pas pu être désactivés :("
-L["BossBannerAlertUnavailable"] = "BossBanner:OnEvent était indisponible pendant > 30 secondes, les éléments de bannière de boss n'ont pas pu être désactivés :("
+L["AddLootAlertUnavailable"] =
+	"LootAlertSystem:AddAlert était indisponible pendant > 30 secondes, les notifications de loot n'ont pas pu être désactivés :("
+L["BossBannerAlertUnavailable"] =
+	"BossBanner:OnEvent était indisponible pendant > 30 secondes, les éléments de bannière de boss n'ont pas pu être désactivés :("
 L["Issues"] = "Merci de rapporter le problème @ github: McTalian/RPGLootFeed."
 L["Test Mode Enabled"] = "Mode Test activé"
 L["Test Mode Disabled"] = "Mode Test désactivé"
@@ -25,7 +29,8 @@ L["Positioning"] = "Positionnement"
 L["Anchor Relative To"] = "Ancrer par rapport à"
 L["RelativeToDesc"] = "Sélectionnez un cadre auquel ancrer le loot feed."
 L["Anchor Point"] = "Point d'ancrage"
-L["AnchorPointDesc"] = "Où sur l'écran baser la position du loot feed (influence également la direction de redimensionnement)."
+L["AnchorPointDesc"] =
+	"Où sur l'écran baser la position du loot feed (influence également la direction de redimensionnement)."
 L["Top Left"] = "Haut à gauche"
 L["Top Right"] = "Haut à droite"
 L["Bottom Left"] = "Bas à gauche"
@@ -44,7 +49,8 @@ L["Positioning"] = "Positionnement"
 L["Anchor Relative To"] = "Ancrer par rapport à"
 L["RelativeToDesc"] = "Sélectionnez un cadre auquel ancrer le loot feed."
 L["Anchor Point"] = "Point d'ancrage"
-L["AnchorPointDesc"] = "Où sur l'écran baser la position du loot feed (influence également la direction de redimensionnement)."
+L["AnchorPointDesc"] =
+	"Où sur l'écran baser la position du loot feed (influence également la direction de redimensionnement)."
 L["Top Left"] = "Haut à gauche"
 L["Top Right"] = "Haut à droite"
 L["Bottom Left"] = "Bas à gauche"
@@ -86,7 +92,8 @@ L["Enable Auto Loot"] = "Activer le loot automatique"
 L["EnableAutoLootDesc"] = "Règle le paramètre d'auto loot par défaut pour tous les personnages"
 L["Alerts"] = "Alertes"
 L["Disable Boss Banner Elements"] = "Désactiver les éléments de la bannière de boss"
-L["DisableBossBannerDesc"] = "Remplace la bannière de boss. La masque complètement, masque seulement la partie loot, ou masque seulement vos loots ou ceux de votre groupe."
+L["DisableBossBannerDesc"] =
+	"Remplace la bannière de boss. La masque complètement, masque seulement la partie loot, ou masque seulement vos loots ou ceux de votre groupe."
 L["Do not disable BossBanner"] = "Ne pas désactiver la bannière de boss"
 L["Disable All BossBanner"] = "Désactiver toutes les bannières de boss"
 L["Disable All BossBanner Loot"] = "Désactiver tous les loots de la bannière de boss"
