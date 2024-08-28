@@ -37,7 +37,11 @@ def check_hardcoded_strings(file_content, filename):
 
 
 # Function to recursively scan directories for .lua files
-def scan_directory(directory, ignore_files=[], ignore_dirs=[]):
+def scan_directory(directory, ignore_files=None, ignore_dirs=None):
+    if ignore_files is None:
+        ignore_files = []
+    if ignore_dirs is None:
+        ignore_dirs = []
     all_issues = []
 
     for root, dirs, files in os.walk(directory):

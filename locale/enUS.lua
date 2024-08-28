@@ -2,10 +2,8 @@ local L = LibStub("AceLocale-3.0"):NewLocale(G_RLF.localeName, "enUS", true)
 
 -- Chat Window Printing
 L["Welcome"] = "Welcome! Use /rlf to view options."
-L["AddLootAlertUnavailable"] =
-	"LootAlertSystem:AddAlert was unavailable for > 30 seconds, Loot Toasts could not be disabled :("
-L["BossBannerAlertUnavailable"] =
-	"BossBanner:OnEvent was unavailable for > 30 seconds, Boss Banner elements could not be disabled :("
+L["AddLootAlertUnavailable"] = "LootAlertSystem:AddAlert was unavailable for > 30 seconds, Loot Toasts could not be disabled :("
+L["BossBannerAlertUnavailable"] = "BossBanner:OnEvent was unavailable for > 30 seconds, Boss Banner elements could not be disabled :("
 L["Issues"] = "Please report this issue @ github: McTalian/RPGLootFeed"
 L["Test Mode Enabled"] = true
 L["Test Mode Disabled"] = true
@@ -98,11 +96,11 @@ L["FeedWidthDesc"] = "The width of the loot feed parent frame"
 L["Maximum Rows to Display"] = true
 L["MaxRowsDesc"] = "The maximum number of loot items to display in the feed"
 L["Loot Item Height"] = true
-L["RowHeightDesc"] = 'The height of each item "row" in the loot feed'
+L["RowHeightDesc"] = "The height of each item 'row' in the loot feed"
 L["Loot Item Icon Size"] = true
-L["IconSizeDesc"] = 'The size of the icons in each item "row" in the loot feed'
+L["IconSizeDesc"] = "The size of the icons in each item 'row' in the loot feed"
 L["Loot Item Padding"] = true
-L["RowPaddingDesc"] = 'The amount of space between item "rows" in the loot feed'
+L["RowPaddingDesc"] = "The amount of space between item 'rows' in the loot feed"
 
 -- ConfigOptions - Styling Group
 L["Styling"] = true
@@ -132,8 +130,7 @@ L["Enable Auto Loot"] = true
 L["EnableAutoLootDesc"] = "Set the default setting so that auto loot is enabled when logging into any character"
 L["Alerts"] = true
 L["Disable Boss Banner Elements"] = true
-L["DisableBossBannerDesc"] =
-	"Override the Boss Banner. Completely hide it, only hide the loot portion, or only hide your loot or your party's loot."
+L["DisableBossBannerDesc"] = "Override the Boss Banner. Completely hide it, only hide the loot portion, or only hide your loot or your party's loot."
 L["Do not disable BossBanner"] = true
 L["Disable All BossBanner"] = true
 L["Disable All BossBanner Loot"] = true

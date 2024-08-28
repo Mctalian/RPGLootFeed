@@ -49,10 +49,17 @@ def compare_translations(reference_dict, target_dict, locale):
 
     # Create markdown output for missing keys
     if missing_keys:
-        markdown_report = f"# Missing Translations for {locale}\n\n"
+        markdown_report = f"# Translation Status for {locale}\n\n"
+        markdown_report += f"Translation progress: {(1 - (len(missing_keys) / len(reference_dict))) * 100:.1f}%\n\n"
+        markdown_report += f"Missing translations: {len(missing_keys)}\n\n"
+        markdown_report += "<details>\n"
+        markdown_report += (
+            "    <summary>Missing Keys and their enUS values</summary>\n\n"
+        )
         markdown_report += "| Missing Key | enUS Value |\n"
         markdown_report += "|-------------|------------|\n"
         markdown_report += "\n".join(missing_keys)
+        markdown_report += "\n</details>\n\n"
         markdown_report += f"\n\n_You can even make changes for [this file](https://github.com/Mctalian/RPGLootFeed/edit/main/locale/{locale}) and open a PR directly in your browser_\n\n"
 
         translation_stub = "\n".join(
