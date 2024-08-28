@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+permissions:
+  actions: write
+  issues: write
+
 jobs:
   check_translations:
     runs-on: ubuntu-latest
@@ -16,7 +20,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: "3.x"
+          python-version: 3.x
 
       - name: Install Python dependencies
         run: pip install -r requirements.txt
