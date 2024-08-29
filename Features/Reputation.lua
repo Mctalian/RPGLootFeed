@@ -1,4 +1,4 @@
-local Rep = {}
+local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0")
 
 local repData = {}
 local paragonRepData = {}
@@ -6,6 +6,29 @@ local majorRepData = {}
 local cachedFactionCount
 local showLegacyReps
 local firstNilIndex = 1
+
+function Rep:OnInitialize()
+	if G_RLF.db.global.repFeed then
+		self:Enable()
+	else
+		self:Disable()
+	end
+end
+
+function Rep:OnDisable()
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	self:UnregisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
+	self:UnregisterEvent("MAJOR_FACTION_RENOWN_LEVEL_CHANGED")
+end
+
+function Rep:OnEnable()
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
+	self:RegisterEvent("MAJOR_FACTION_RENOWN_LEVEL_CHANGED")
+	if showLegacyReps == nil then
+		self:SnapShot()
+	end
+end
 
 local function initializeParagonFaction(fId)
 	if not paragonRepData[fId] then
@@ -85,7 +108,11 @@ local function addAnyNewFactions()
 	firstNilIndex = i
 end
 
-function Rep:Snapshot()
+function Rep:PLAYER_ENTERING_WORLD()
+	self:SnapShot()
+end
+
+function Rep:SnapShot()
 	showLegacyReps = C_Reputation.AreLegacyReputationsShown()
 	local count = 0
 	local i = 1
@@ -154,11 +181,13 @@ function Rep:FindDelta()
 	end
 end
 
-function Rep:OnChangeMajorFactionRenownLevel(mfID, newLevel, oldLevel)
+function Rep:MAJOR_FACTION_RENOWN_LEVEL_CHANGED(_, mfID, newLevel, oldLevel)
 	addAnyNewFactions()
 	initializeMajorFaction(mfID)
 
 	handleMajorFactionRepChange(mfID, newLevel)
 end
 
-G_RLF.Rep = Rep
+function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE()
+	self:FindDelta()
+end

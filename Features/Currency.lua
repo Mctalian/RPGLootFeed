@@ -1,6 +1,22 @@
-local Currency = {}
+local Currency = G_RLF.RLF:NewModule("Currency", "AceEvent-3.0")
 
-function Currency:OnUpdate(...)
+function Currency:OnInitialize()
+	if G_RLF.db.global.currencyFeed then
+		self:Enable()
+	else
+		self:Disable()
+	end
+end
+
+function Currency:OnDisable()
+	self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE")
+end
+
+function Currency:OnEnable()
+	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
+end
+
+function Currency:CURRENCY_DISPLAY_UPDATE(_, ...)
 	local currencyType, _quantity, quantityChange, _quantityGainSource, _quantityLostSource = ...
 
 	if not G_RLF.db.global.currencyFeed then
@@ -23,5 +39,3 @@ function Currency:OnUpdate(...)
 		quantityChange
 	)
 end
-
-G_RLF.Currency = Currency

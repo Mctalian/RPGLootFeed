@@ -7,13 +7,6 @@ function RLF:OnInitialize()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
 	G_RLF.LootDisplay:Initialize()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
-	self:RegisterEvent("CHAT_MSG_LOOT")
-	self:RegisterEvent("CHAT_MSG_MONEY")
-	self:RegisterEvent("LOOT_READY")
-	self:RegisterEvent("PLAYER_XP_UPDATE")
-	self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
-	self:RegisterEvent("MAJOR_FACTION_RENOWN_LEVEL_CHANGED")
 	self:RegisterChatCommand("rlf", "SlashCommand")
 	self:RegisterChatCommand("RLF", "SlashCommand")
 	self:RegisterChatCommand("rpglootfeed", "SlashCommand")
@@ -36,40 +29,10 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 	end
 	self:LootToastHook()
 	self:BossBannerHook()
-	G_RLF.Rep:Snapshot()
-	G_RLF.Xp:Snapshot()
 	if isLogin and isReload == false then
 		self:Print(G_RLF.L["Welcome"])
 		if G_RLF.db.global.enableAutoLoot then
 			C_CVar.SetCVar("autoLootDefault", "1")
 		end
 	end
-end
-
-function RLF:CHAT_MSG_COMBAT_FACTION_CHANGE(event, text)
-	G_RLF.Rep:FindDelta()
-end
-
-function RLF:CURRENCY_DISPLAY_UPDATE(eventName, ...)
-	G_RLF.Currency:OnUpdate(...)
-end
-
-function RLF:CHAT_MSG_LOOT(eventName, ...)
-	G_RLF.Loot:OnItemLooted(...)
-end
-
-function RLF:LOOT_READY(eventName)
-	G_RLF.Money:Snapshot()
-end
-
-function RLF:CHAT_MSG_MONEY(eventName, msg)
-	G_RLF.Money:OnMoneyLooted(msg)
-end
-
-function RLF:PLAYER_XP_UPDATE(eventName, unitTarget)
-	G_RLF.Xp:OnXpChange(unitTarget)
-end
-
-function RLF:MAJOR_FACTION_RENOWN_LEVEL_CHANGED(_, ...)
-	G_RLF.Rep:OnChangeMajorFactionRenownLevel(...)
 end

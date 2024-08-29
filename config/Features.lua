@@ -134,6 +134,11 @@ end
 
 function Features:SetItemLootStatus(info, value)
 	G_RLF.db.global.itemLootFeed = value
+	if value then
+		G_RLF.RLF:EnableModule("ItemLoot")
+	else
+		G_RLF.RLF:DisableModule("ItemLoot")
+	end
 end
 
 function Features:ItemLootDisabled()
@@ -154,6 +159,11 @@ end
 
 function Features:SetCurrencyStatus(info, value)
 	G_RLF.db.global.currencyFeed = value
+	if value then
+		G_RLF.RLF:EnableModule("Currency")
+	else
+		G_RLF.RLF:DisableModule("Currency")
+	end
 end
 
 function Features:GetTooltipStatus(info, value)
@@ -182,6 +192,11 @@ end
 
 function Features:SetMoneyStatus(info, value)
 	G_RLF.db.global.moneyFeed = value
+	if value then
+		G_RLF.RLF:EnableModule("Money")
+	else
+		G_RLF.RLF:DisableModule("Money")
+	end
 end
 
 function Features:GetXPStatus(info, value)
@@ -190,6 +205,11 @@ end
 
 function Features:SetXPStatus(info, value)
 	G_RLF.db.global.xpFeed = value
+	if value then
+		G_RLF.RLF:EnableModule("Experience")
+	else
+		G_RLF.RLF:DisableModule("Experience")
+	end
 end
 
 function Features:GetRepStatus(info, value)
@@ -198,4 +218,9 @@ end
 
 function Features:SetRepStatus(info, value)
 	G_RLF.db.global.repFeed = value
+	if value then
+		G_RLF.RLF:EnableModule("Reputation")
+	else
+		G_RLF.RLF:DisableModule("Reputation")
+	end
 end
