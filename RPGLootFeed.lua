@@ -13,6 +13,7 @@ function RLF:OnInitialize()
 	self:RegisterEvent("LOOT_READY")
 	self:RegisterEvent("PLAYER_XP_UPDATE")
 	self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
+	self:RegisterEvent("MAJOR_FACTION_RENOWN_LEVEL_CHANGED")
 	self:RegisterChatCommand("rlf", "SlashCommand")
 	self:RegisterChatCommand("RLF", "SlashCommand")
 	self:RegisterChatCommand("rpglootfeed", "SlashCommand")
@@ -35,7 +36,7 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 	end
 	self:LootToastHook()
 	self:BossBannerHook()
-	G_RLF.Rep:RefreshRepData()
+	G_RLF.Rep:Snapshot()
 	G_RLF.Xp:Snapshot()
 	if isLogin and isReload == false then
 		self:Print(G_RLF.L["Welcome"])
@@ -67,4 +68,8 @@ end
 
 function RLF:PLAYER_XP_UPDATE(eventName, unitTarget)
 	G_RLF.Xp:OnXpChange(unitTarget)
+end
+
+function RLF:MAJOR_FACTION_RENOWN_LEVEL_CHANGED(_, ...)
+	G_RLF.Rep:OnChangeMajorFactionRenownLevel(...)
 end

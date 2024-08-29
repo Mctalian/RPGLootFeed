@@ -1,4 +1,4 @@
-name: Translation Issue Updates
+name: Main Checks
 
 on:
   push:
@@ -10,7 +10,7 @@ permissions:
   issues: write
 
 jobs:
-  check_translations:
+  i18n_translations:
     runs-on: ubuntu-latest
 
     steps:
@@ -32,3 +32,24 @@ jobs:
         run: python .scripts/create_or_update_i18n_issues.py
         env:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+
+  run_tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - uses: leafo/gh-actions-lua@v10
+      - uses: leafo/gh-actions-luarocks@v4
+
+      - name: Install luarock dependencies
+        run: luarocks make --local rpglootfeed-1-1.rockspec
+
+      - name: Run Tests
+        run: make test-ci
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: luacov-html
+          path: luacov-html/
