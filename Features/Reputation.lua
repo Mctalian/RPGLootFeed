@@ -4,7 +4,89 @@ local repData = {}
 local paragonRepData = {}
 local majorRepData = {}
 local cachedFactionCount
+local showLegacyReps
+local firstNilIndex = 1
+
+local function initializeParagonFaction(fId)
+	if not paragonRepData[fId] then
+		paragonRepData[fId] = 0
+	end
+end
+
+local function initializeMajorFaction(fId, mfd)
+	if not majorRepData[fId] then
+		local level = mfd.renownLevel
+		local max = mfd.renownLevelThreshold
+		majorRepData[fId] = { level, 0, max }
+	end
+end
+
+local function initializeNormalFaction(fId)
+	if not repData[fId] then
+		repData[fId] = 0
+	end
+end
+
+local function initializeRepFaction(fId)
+	if C_Reputation.IsFactionParagon(fId) then
+		initializeParagonFaction(fId)
+	elseif C_Reputation.IsMajorFaction(fId) then
+		local mfd = C_MajorFactions.GetMajorFactionData(fId)
+		initializeMajorFaction(fId, mfd)
+	else
+		initializeNormalFaction(fId)
+	end
+end
+
+local function handleMajorFactionRepChange(id, level)
+	local factionData = C_Reputation.GetFactionDataByID(id)
+	local majorFactionData = C_MajorFactions.GetMajorFactionData(id)
+	local level = level or C_MajorFactions.GetCurrentRenownLevel(id)
+	local rep = majorFactionData.renownReputationEarned
+	local max = majorFactionData.renownLevelThreshold
+	local oldLevel, oldRep, oldMax = unpack(majorRepData[id])
+
+	if rep > oldRep then
+		G_RLF.LootDisplay:ShowRep(rep - oldRep, factionData)
+	elseif rep < oldRep then
+		G_RLF.LootDisplay:ShowRep(oldMax - oldRep + rep, factionData)
+	elseif rep == oldRep and level > oldLevel then
+		G_RLF.LootDisplay:ShowRep(oldMax - oldRep + rep, factionData)
+	end
+	majorRepData[id] = { level, rep, max }
+end
+
+local function factionListHasNotChanged()
+	return C_Reputation.GetFactionDataByIndex(firstNilIndex) == nil -- if a new index hasn't been added
+		and firstNilIndex > 1 -- we had at least 1 faction before
+		and C_Reputation.GetFactionDataByIndex(firstNilIndex - 1) -- the previous faction is still not nil
+		and showLegacyReps == C_Reputation.AreLegacyReputationsShown() -- Showing Legacy Reputations hasn't changed
+end
+
+local function addAnyNewFactions()
+	if factionListHasNotChanged() then
+		-- No new factions, skipping
+		return
+	end
+
+	showLegacyReps = C_Reputation.AreLegacyReputationsShown()
+
+	local i = 1
+	local factionData = C_Reputation.GetFactionDataByIndex(i)
+	while factionData ~= nil do
+		if not factionData.isHeader or factionData.isHeaderWithRep then
+			local fId = factionData.factionID
+			initializeRepFaction(fId)
+		end
+		i = i + 1
+		factionData = C_Reputation.GetFactionDataByIndex(i)
+	end
+
+	firstNilIndex = i
+end
+
 function Rep:Snapshot()
+	showLegacyReps = C_Reputation.AreLegacyReputationsShown()
 	local count = 0
 	local i = 1
 	local factionData = C_Reputation.GetFactionDataByIndex(i)
@@ -30,40 +112,12 @@ function Rep:Snapshot()
 		factionData = C_Reputation.GetFactionDataByIndex(i)
 	end
 
+	firstNilIndex = i
 	cachedFactionCount = count
 end
 
-function Rep:AddAnyNewFactions()
-	local i = 1
-	local factionData = C_Reputation.GetFactionDataByIndex(i)
-	while factionData ~= nil do
-		if not factionData.isHeader or factionData.isHeaderWithRep then
-			local factionData = C_Reputation.GetFactionDataByIndex(i)
-			local fId = factionData.factionID
-			if C_Reputation.IsFactionParagon(fId) then
-				if not paragonRepData[fId] then
-					paragonRepData[fId] = 0
-				end
-			elseif C_Reputation.IsMajorFaction(fId) then
-				if not majorRepData[fId] then
-					local mfd = C_MajorFactions.GetMajorFactionData(fId)
-					local level = mfd.renownLevel
-					local max = mfd.renownLevelThreshold
-					majorRepData[fId] = { level, 0, max }
-				end
-			else
-				if not repData[fId] then
-					repData[fId] = 0
-				end
-			end
-		end
-		i = i + 1
-		factionData = C_Reputation.GetFactionDataByIndex(i)
-	end
-end
-
 function Rep:FindDelta()
-	Rep:AddAnyNewFactions()
+	addAnyNewFactions()
 
 	if G_RLF.db.global.repFeed then
 		-- Normal rep factions
@@ -91,30 +145,19 @@ function Rep:FindDelta()
 		end
 		-- Major factions
 		for k, v in pairs(majorRepData) do
-			handleMajorFactionRepChange(k)
+			-- Delay in case the rep change caused a level up,
+			-- the level up event should take precedent.
+			C_Timer.After(0.5, function()
+				handleMajorFactionRepChange(k)
+			end)
 		end
 	end
 end
 
-function handleMajorFactionRepChange(id, level)
-	local factionData = C_Reputation.GetFactionDataByID(id)
-	local majorFactionData = C_MajorFactions.GetMajorFactionData(id)
-	local level = level or C_MajorFactions.GetCurrentRenownLevel(id)
-	local rep = majorFactionData.renownReputationEarned
-	local max = majorFactionData.renownLevelThreshold
-	local oldLevel, oldRep, oldMax = unpack(majorRepData[id])
-
-	if rep > oldRep then
-		G_RLF.LootDisplay:ShowRep(rep - oldRep, factionData)
-	elseif rep < oldRep then
-		G_RLF.LootDisplay:ShowRep(oldMax - oldRep + rep, factionData)
-	elseif rep == oldRep and level > oldLevel then
-		G_RLF.LootDisplay:ShowRep(oldMax - oldRep + rep, factionData)
-	end
-	majorRepData[id] = { level, rep, max }
-end
-
 function Rep:OnChangeMajorFactionRenownLevel(mfID, newLevel, oldLevel)
+	addAnyNewFactions()
+	initializeMajorFaction(mfID)
+
 	handleMajorFactionRepChange(mfID, newLevel)
 end
 
