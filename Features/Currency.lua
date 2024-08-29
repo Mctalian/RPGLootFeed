@@ -19,10 +19,6 @@ end
 function Currency:CURRENCY_DISPLAY_UPDATE(_, ...)
 	local currencyType, _quantity, quantityChange, _quantityGainSource, _quantityLostSource = ...
 
-	if not G_RLF.db.global.currencyFeed then
-		return
-	end
-
 	if currencyType == nil or not quantityChange or quantityChange <= 0 then
 		return
 	end
@@ -39,3 +35,5 @@ function Currency:CURRENCY_DISPLAY_UPDATE(_, ...)
 		quantityChange
 	)
 end
+
+return Currency

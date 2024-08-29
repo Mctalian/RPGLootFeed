@@ -1,6 +1,7 @@
 describe("Experience module", function()
 	local mockLootDisplay
 	local _ = match._
+	local XpModule
 
 	before_each(function()
 		-- Define the global G_RLF
@@ -10,6 +11,11 @@ describe("Experience module", function()
 			},
 			LootDisplay = {
 				ShowXP = function() end,
+			},
+			RLF = {
+				NewModule = function()
+					return {}
+				end,
 			},
 		}
 		_G.UnitLevel = function()
@@ -24,21 +30,13 @@ describe("Experience module", function()
 
 		mockLootDisplay = mock(_G.G_RLF.LootDisplay, true)
 		-- Load the list module before each test
-		dofile("Features/Experience.lua")
-	end)
-
-	it("does not run if the feature is disabled", function()
-		_G.G_RLF.db.global.xpFeed = false
-
-		_G.G_RLF.Xp:OnXpChange("player")
-
-		assert.stub(mockLootDisplay.ShowXP).was.not_called()
+		XpModule = dofile("Features/Experience.lua")
 	end)
 
 	it("does not show xp if the unit target is not player", function()
 		_G.G_RLF.db.global.xpFeed = true
 
-		_G.G_RLF.Xp:OnXpChange("target")
+		XpModule:PLAYER_XP_UPDATE(_, "target")
 
 		assert.stub(mockLootDisplay.ShowXP).was.not_called()
 	end)
@@ -46,9 +44,9 @@ describe("Experience module", function()
 	it("does not show xp if the calculated delta is 0", function()
 		_G.G_RLF.db.global.xpFeed = true
 
-		_G.G_RLF.Xp:Snapshot()
+		XpModule:PLAYER_ENTERING_WORLD()
 
-		_G.G_RLF.Xp:OnXpChange("player")
+		XpModule:PLAYER_XP_UPDATE(_, "player")
 
 		assert.stub(mockLootDisplay.ShowXP).was.not_called()
 	end)
@@ -56,7 +54,7 @@ describe("Experience module", function()
 	it("does not show xp if the calculated delta is 0", function()
 		_G.G_RLF.db.global.xpFeed = true
 
-		_G.G_RLF.Xp:Snapshot()
+		XpModule:PLAYER_ENTERING_WORLD()
 
 		_G.UnitLevel = function()
 			return 3
@@ -65,7 +63,7 @@ describe("Experience module", function()
 			return 100
 		end
 
-		_G.G_RLF.Xp:OnXpChange("player")
+		XpModule:PLAYER_XP_UPDATE(_, "player")
 
 		assert.stub(mockLootDisplay.ShowXP).was.called_with(_, 50)
 	end)

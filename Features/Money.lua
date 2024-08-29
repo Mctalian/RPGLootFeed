@@ -58,3 +58,5 @@ oldMethod = function(msg)
 
 	return amountInCopper
 end
+
+return Money

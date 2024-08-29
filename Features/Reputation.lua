@@ -191,3 +191,5 @@ end
 function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE()
 	self:FindDelta()
 end
+
+return Rep

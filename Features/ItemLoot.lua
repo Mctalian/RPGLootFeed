@@ -74,3 +74,5 @@ function ItemLoot:CHAT_MSG_LOOT(_, ...)
 		G_RLF.LootDisplay:ShowLoot(itemLink, itemLink, itemTexture, amount)
 	end
 end
+
+return ItemLoot

@@ -54,3 +54,5 @@ function Xp:PLAYER_XP_UPDATE(_, unitTarget)
 		end
 	end
 end
+
+return Xp
