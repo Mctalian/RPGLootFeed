@@ -2,6 +2,7 @@ describe("Currency module", function()
 	local mockLootDisplay
 	local mockCurrencyInfo
 	local _ = match._
+	local CurrencyModule
 
 	before_each(function()
 		-- Define the global G_RLF
@@ -11,6 +12,11 @@ describe("Currency module", function()
 			},
 			LootDisplay = {
 				ShowLoot = function() end,
+			},
+			RLF = {
+				NewModule = function()
+					return {}
+				end,
 			},
 		}
 
@@ -25,21 +31,13 @@ describe("Currency module", function()
 		mockCurrencyInfo = mock(_G.C_CurrencyInfo)
 
 		-- Load the list module before each test
-		dofile("Features/Currency.lua")
-	end)
-
-	it("does not run if the feature is disabled", function()
-		_G.G_RLF.db.global.currencyFeed = false
-
-		_G.G_RLF.Currency:OnUpdate(123, 1, 1)
-
-		assert.stub(mockLootDisplay.ShowLoot).was.not_called()
+		CurrencyModule = dofile("Features/Currency.lua")
 	end)
 
 	it("does not show loot if the currency type is nil", function()
 		_G.G_RLF.db.global.currencyFeed = true
 
-		_G.G_RLF.Currency:OnUpdate(nil)
+		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, nil)
 
 		assert.stub(mockLootDisplay.ShowLoot).was.not_called()
 	end)
@@ -47,7 +45,7 @@ describe("Currency module", function()
 	it("does not show loot if the quantityChange is nil", function()
 		_G.G_RLF.db.global.currencyFeed = true
 
-		_G.G_RLF.Currency:OnUpdate(123, nil, nil)
+		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, nil, nil)
 
 		assert.stub(mockLootDisplay.ShowLoot).was.not_called()
 	end)
@@ -55,7 +53,7 @@ describe("Currency module", function()
 	it("does not show loot if the quantityChange is lte 0", function()
 		_G.G_RLF.db.global.currencyFeed = true
 
-		_G.G_RLF.Currency:OnUpdate(123, nil, -1)
+		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, nil, -1)
 
 		assert.stub(mockLootDisplay.ShowLoot).was.not_called()
 	end)
@@ -66,7 +64,7 @@ describe("Currency module", function()
 			return nil
 		end
 
-		_G.G_RLF.Currency:OnUpdate(123, 1, 1)
+		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, 1, 1)
 
 		assert.stub(mockLootDisplay.ShowLoot).was.not_called()
 	end)
@@ -81,7 +79,7 @@ describe("Currency module", function()
 			}
 		end
 
-		_G.G_RLF.Currency:OnUpdate(123, 5, 2)
+		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, 5, 2)
 
 		assert.stub(mockLootDisplay.ShowLoot).was.not_called()
 	end)
@@ -96,7 +94,7 @@ describe("Currency module", function()
 			}
 		end
 
-		_G.G_RLF.Currency:OnUpdate(123, 5, 2)
+		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, 5, 2)
 
 		assert.stub(mockLootDisplay.ShowLoot).was.called_with(_, 123, "|c12345678|Hcurrency:123|r", 123456, 2)
 	end)

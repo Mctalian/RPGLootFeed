@@ -1,18 +1,38 @@
-local Xp = {}
+local Xp = G_RLF.RLF:NewModule("Experience", "AceEvent-3.0")
 
 local currentXP, currentMaxXP, currentLevel
-
-function Xp:Snapshot()
+local function initXpValues()
 	currentXP = UnitXP("player")
 	currentMaxXP = UnitXPMax("player")
 	currentLevel = UnitLevel("player")
 end
 
-function Xp:OnXpChange(unitTarget)
-	if not G_RLF.db.global.xpFeed then
-		return
+function Xp:OnInitialize()
+	if G_RLF.db.global.xpFeed then
+		self:Enable()
+	else
+		self:Disable()
 	end
+end
 
+function Xp:OnDisable()
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	self:UnregisterEvent("PLAYER_XP_UPDATE")
+end
+
+function Xp:OnEnable()
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_XP_UPDATE")
+	if currentXP == nil then
+		initXpValues()
+	end
+end
+
+function Xp:PLAYER_ENTERING_WORLD()
+	initXpValues()
+end
+
+function Xp:PLAYER_XP_UPDATE(_, unitTarget)
 	if unitTarget == "player" then
 		local newLevel = UnitLevel(unitTarget)
 		local newCurrentXP = UnitXP(unitTarget)
@@ -35,4 +55,4 @@ function Xp:OnXpChange(unitTarget)
 	end
 end
 
-G_RLF.Xp = Xp
+return Xp
