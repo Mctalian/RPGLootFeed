@@ -8,6 +8,7 @@ G_RLF.RLF:SetDefaultModuleState(true)
 G_RLF.addonName = addonName
 G_RLF.dbName = dbName
 G_RLF.localeName = localeName
+G_RLF.addonVersion = "@project-version@"
 G_RLF.DisableBossBanner = {
 	ENABLED = 0,
 	FULLY_DISABLE = 1,
@@ -18,6 +19,23 @@ G_RLF.DisableBossBanner = {
 
 function G_RLF:Print(...)
 	G_RLF.RLF:Print(...)
+end
+
+local xpcall = xpcall
+
+local function errorhandler(err)
+	local suffix = "\n\n==== Addon Info " .. G_RLF.addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
+
+	return geterrorhandler()(err .. suffix)
+end
+
+function G_RLF:fn(func, ...)
+	-- we check to see if the func is passed is actually a function here and don't error when it isn't
+	-- this safecall is used for optional functions like OnInitialize OnEnable etc. When they are not
+	-- present execution should continue without hinderance
+	if type(func) == "function" then
+		return xpcall(func, errorhandler, ...)
+	end
 end
 
 function G_RLF:GetCurrencyLink(currencyID, name)
