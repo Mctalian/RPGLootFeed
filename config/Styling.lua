@@ -1,6 +1,7 @@
 local Styling = {}
 
 G_RLF.defaults.global.leftAlign = true
+G_RLF.defaults.global.growUp = true
 G_RLF.defaults.global.rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 } -- Default to dark grey with 80% opacity
 G_RLF.defaults.global.rowBackgroundGradientEnd = { 0.1, 0.1, 0.1, 0 } -- Default to dark grey with 0% opacity
 G_RLF.defaults.global.font = "GameFontNormalSmall"
@@ -21,6 +22,15 @@ G_RLF.options.args.styles = {
 			set = "SetLeftAlign",
 			order = 1,
 		},
+		growUp = {
+			type = "toggle",
+			name = G_RLF.L["Grow Up"],
+			desc = G_RLF.L["GrowUpDesc"],
+			width = "double",
+			get = "GetGrowUp",
+			set = "SetGrowUp",
+			order = 2,
+		},
 		gradientStart = {
 			type = "color",
 			name = G_RLF.L["Background Gradient Start"],
@@ -28,7 +38,7 @@ G_RLF.options.args.styles = {
 			hasAlpha = true,
 			get = "GetGradientStartColor",
 			set = "SetGradientStartColor",
-			order = 2,
+			order = 3,
 		},
 		gradientEnd = {
 			type = "color",
@@ -37,7 +47,7 @@ G_RLF.options.args.styles = {
 			hasAlpha = true,
 			get = "GetGradientEndColor",
 			set = "SetGradientEndColor",
-			order = 3,
+			order = 4,
 		},
 		font = {
 			type = "select",
@@ -47,7 +57,7 @@ G_RLF.options.args.styles = {
 			values = "GetFonts",
 			get = "GetRowFont",
 			set = "SetRowFont",
-			order = 4,
+			order = 5,
 		},
 	},
 }
@@ -96,6 +106,15 @@ end
 
 function Styling:GetLeftAlign(info, value)
 	return G_RLF.db.global.leftAlign
+end
+
+function Styling:GetGrowUp(info, value)
+	return G_RLF.db.global.growUp
+end
+
+function Styling:SetGrowUp(info, value)
+	G_RLF.db.global.growUp = value
+	G_RLF.LootDisplay:UpdateRowPositions()
 end
 
 function Styling:SetRowFont(info, value)
