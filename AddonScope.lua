@@ -30,9 +30,7 @@ local function errorhandler(err)
 end
 
 function G_RLF:fn(func, ...)
-	-- we check to see if the func is passed is actually a function here and don't error when it isn't
-	-- this safecall is used for optional functions like OnInitialize OnEnable etc. When they are not
-	-- present execution should continue without hinderance
+	-- Borrowed from AceAddon-3.0
 	if type(func) == "function" then
 		return xpcall(func, errorhandler, ...)
 	end
