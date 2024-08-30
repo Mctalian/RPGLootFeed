@@ -14,7 +14,9 @@ externals:
 enable-nolib-creation: yes
 
 ignore:
-  - *_spec.lua
+  - spec/*
+  - Makefile
+  - trunk
   - *.ps1
   - *.md
   - *.rockspec

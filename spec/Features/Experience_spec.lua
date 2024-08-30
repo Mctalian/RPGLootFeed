@@ -1,34 +1,12 @@
+local common_stubs = require("spec/common_stubs")
+
 describe("Experience module", function()
-	local mockLootDisplay
 	local _ = match._
 	local XpModule
 
 	before_each(function()
-		-- Define the global G_RLF
-		_G.G_RLF = {
-			db = {
-				global = {},
-			},
-			LootDisplay = {
-				ShowXP = function() end,
-			},
-			RLF = {
-				NewModule = function()
-					return {}
-				end,
-			},
-		}
-		_G.UnitLevel = function()
-			return 2
-		end
-		_G.UnitXP = function()
-			return 10
-		end
-		_G.UnitXPMax = function()
-			return 50
-		end
-
-		mockLootDisplay = mock(_G.G_RLF.LootDisplay, true)
+		common_stubs.setup_G_RLF(spy)
+		common_stubs.stub_Unit_Funcs()
 		-- Load the list module before each test
 		XpModule = dofile("Features/Experience.lua")
 	end)
@@ -38,7 +16,7 @@ describe("Experience module", function()
 
 		XpModule:PLAYER_XP_UPDATE(_, "target")
 
-		assert.stub(mockLootDisplay.ShowXP).was.not_called()
+		assert.stub(_G.G_RLF.LootDisplay.ShowXP).was_not_called()
 	end)
 
 	it("does not show xp if the calculated delta is 0", function()
@@ -48,7 +26,7 @@ describe("Experience module", function()
 
 		XpModule:PLAYER_XP_UPDATE(_, "player")
 
-		assert.stub(mockLootDisplay.ShowXP).was.not_called()
+		assert.stub(_G.G_RLF.LootDisplay.ShowXP).was_not_called()
 	end)
 
 	it("does not show xp if the calculated delta is 0", function()
@@ -65,6 +43,6 @@ describe("Experience module", function()
 
 		XpModule:PLAYER_XP_UPDATE(_, "player")
 
-		assert.stub(mockLootDisplay.ShowXP).was.called_with(_, 50)
+		assert.stub(_G.G_RLF.LootDisplay.ShowXP).was_called_with(_, 50)
 	end)
 end)

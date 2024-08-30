@@ -1,15 +1,10 @@
+local common_stubs = require("spec/common_stubs")
+
 describe("Money module", function()
 	local MoneyModule
 
 	before_each(function()
-		-- Define the global G_RLF
-		_G.G_RLF = {
-			RLF = {
-				NewModule = function()
-					return {}
-				end,
-			},
-		}
+		common_stubs.setup_G_RLF(spy)
 		-- Load the list module before each test
 		MoneyModule = dofile("Features/Money.lua")
 	end)

@@ -26,7 +26,7 @@ function Money:LOOT_READY()
 	startingMoney = GetMoney()
 end
 
-function Money:CHAT_MSG_MONEY(_, msg)
+local function showMoneyLoot(msg)
 	local amountInCopper
 	if startingMoney == nil then
 		-- Old method that doesn't work well with locales that are missing translation
@@ -36,6 +36,10 @@ function Money:CHAT_MSG_MONEY(_, msg)
 	end
 	startingMoney = GetMoney()
 	G_RLF.LootDisplay:ShowMoney(amountInCopper)
+end
+
+function Money:CHAT_MSG_MONEY(_, msg)
+	G_RLF:fn(showMoneyLoot, msg)
 end
 
 oldMethod = function(msg)

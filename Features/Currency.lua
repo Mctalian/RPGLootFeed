@@ -28,12 +28,14 @@ function Currency:CURRENCY_DISPLAY_UPDATE(_, ...)
 		return
 	end
 
-	G_RLF.LootDisplay:ShowLoot(
-		info.currencyID,
-		C_CurrencyInfo.GetCurrencyLink(currencyType),
-		info.iconFileID,
-		quantityChange
-	)
+	G_RLF:fn(function()
+		G_RLF.LootDisplay:ShowLoot(
+			info.currencyID,
+			C_CurrencyInfo.GetCurrencyLink(currencyType),
+			info.iconFileID,
+			quantityChange
+		)
+	end)
 end
 
 return Currency

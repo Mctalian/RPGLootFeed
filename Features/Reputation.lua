@@ -15,6 +15,37 @@ function Rep:OnInitialize()
 	end
 end
 
+local function snapshot()
+	showLegacyReps = C_Reputation.AreLegacyReputationsShown()
+	local count = 0
+	local i = 1
+	local factionData = C_Reputation.GetFactionDataByIndex(i)
+	while factionData ~= nil do
+		if not factionData.isHeader or factionData.isHeaderWithRep then
+			if C_Reputation.IsFactionParagon(factionData.factionID) then
+				-- Need to support Paragon factions
+				local value, max = C_Reputation.GetFactionParagonInfo(factionData.factionID)
+				paragonRepData[factionData.factionID] = value
+			elseif C_Reputation.IsMajorFaction(factionData.factionID) then
+				-- Need to support Major factions
+				local majorFactionData = C_MajorFactions.GetMajorFactionData(factionData.factionID)
+				local level = majorFactionData.renownLevel
+				local rep = majorFactionData.renownReputationEarned
+				local max = majorFactionData.renownLevelThreshold
+				majorRepData[factionData.factionID] = { level, rep, max }
+			else
+				repData[factionData.factionID] = factionData.currentStanding
+			end
+			count = count + 1
+		end
+		i = i + 1
+		factionData = C_Reputation.GetFactionDataByIndex(i)
+	end
+
+	firstNilIndex = i
+	cachedFactionCount = count
+end
+
 function Rep:OnDisable()
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
@@ -26,7 +57,7 @@ function Rep:OnEnable()
 	self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
 	self:RegisterEvent("MAJOR_FACTION_RENOWN_LEVEL_CHANGED")
 	if showLegacyReps == nil then
-		self:SnapShot()
+		snapshot()
 	end
 end
 
@@ -109,41 +140,10 @@ local function addAnyNewFactions()
 end
 
 function Rep:PLAYER_ENTERING_WORLD()
-	self:SnapShot()
+	G_RLF:fn(snapshot)
 end
 
-function Rep:SnapShot()
-	showLegacyReps = C_Reputation.AreLegacyReputationsShown()
-	local count = 0
-	local i = 1
-	local factionData = C_Reputation.GetFactionDataByIndex(i)
-	while factionData ~= nil do
-		if not factionData.isHeader or factionData.isHeaderWithRep then
-			if C_Reputation.IsFactionParagon(factionData.factionID) then
-				-- Need to support Paragon factions
-				local value, max = C_Reputation.GetFactionParagonInfo(factionData.factionID)
-				paragonRepData[factionData.factionID] = value
-			elseif C_Reputation.IsMajorFaction(factionData.factionID) then
-				-- Need to support Major factions
-				local majorFactionData = C_MajorFactions.GetMajorFactionData(factionData.factionID)
-				local level = majorFactionData.renownLevel
-				local rep = majorFactionData.renownReputationEarned
-				local max = majorFactionData.renownLevelThreshold
-				majorRepData[factionData.factionID] = { level, rep, max }
-			else
-				repData[factionData.factionID] = factionData.currentStanding
-			end
-			count = count + 1
-		end
-		i = i + 1
-		factionData = C_Reputation.GetFactionDataByIndex(i)
-	end
-
-	firstNilIndex = i
-	cachedFactionCount = count
-end
-
-function Rep:FindDelta()
+local function findDelta()
 	addAnyNewFactions()
 
 	if G_RLF.db.global.repFeed then
@@ -182,14 +182,14 @@ function Rep:FindDelta()
 end
 
 function Rep:MAJOR_FACTION_RENOWN_LEVEL_CHANGED(_, mfID, newLevel, oldLevel)
-	addAnyNewFactions()
-	initializeMajorFaction(mfID)
+	G_RLF:fn(addAnyNewFactions)
+	G_RLF:fn(initializeMajorFaction, mfID)
 
-	handleMajorFactionRepChange(mfID, newLevel)
+	G_RLF:fn(handleMajorFactionRepChange, mfID, newLevel)
 end
 
 function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE()
-	self:FindDelta()
+	G_RLF:fn(findDelta)
 end
 
 return Rep

@@ -24,35 +24,37 @@ function Xp:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_XP_UPDATE")
 	if currentXP == nil then
-		initXpValues()
+		G_RLF:fn(initXpValues)
 	end
 end
 
 function Xp:PLAYER_ENTERING_WORLD()
-	initXpValues()
+	G_RLF:fn(initXpValues)
 end
 
 function Xp:PLAYER_XP_UPDATE(_, unitTarget)
-	if unitTarget == "player" then
-		local newLevel = UnitLevel(unitTarget)
-		local newCurrentXP = UnitXP(unitTarget)
-		local delta = 0
-		if newLevel == nil then
-			return
+	G_RLF:fn(function()
+		if unitTarget == "player" then
+			local newLevel = UnitLevel(unitTarget)
+			local newCurrentXP = UnitXP(unitTarget)
+			local delta = 0
+			if newLevel == nil then
+				return
+			end
+			currentLevel = currentLevel or newLevel
+			if newLevel > currentLevel then
+				delta = (currentMaxXP - currentXP) + newCurrentXP
+			else
+				delta = newCurrentXP - currentXP
+			end
+			currentXP = newCurrentXP
+			currentLevel = newLevel
+			currentMaxXP = UnitXPMax(unitTarget)
+			if delta > 0 then
+				G_RLF.LootDisplay:ShowXP(delta)
+			end
 		end
-		currentLevel = currentLevel or newLevel
-		if newLevel > currentLevel then
-			delta = (currentMaxXP - currentXP) + newCurrentXP
-		else
-			delta = newCurrentXP - currentXP
-		end
-		currentXP = newCurrentXP
-		currentLevel = newLevel
-		currentMaxXP = UnitXPMax(unitTarget)
-		if delta > 0 then
-			G_RLF.LootDisplay:ShowXP(delta)
-		end
-	end
+	end)
 end
 
 return Xp

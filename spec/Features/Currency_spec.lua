@@ -1,34 +1,12 @@
+local common_stubs = require("spec/common_stubs")
+
 describe("Currency module", function()
-	local mockLootDisplay
-	local mockCurrencyInfo
 	local _ = match._
 	local CurrencyModule
 
 	before_each(function()
-		-- Define the global G_RLF
-		_G.G_RLF = {
-			db = {
-				global = {},
-			},
-			LootDisplay = {
-				ShowLoot = function() end,
-			},
-			RLF = {
-				NewModule = function()
-					return {}
-				end,
-			},
-		}
-
-		_G.C_CurrencyInfo = {
-			GetCurrencyInfo = function() end,
-			GetCurrencyLink = function()
-				return "|c12345678|Hcurrency:123|r"
-			end,
-		}
-
-		mockLootDisplay = mock(_G.G_RLF.LootDisplay, true)
-		mockCurrencyInfo = mock(_G.C_CurrencyInfo)
+		common_stubs.setup_G_RLF(spy)
+		common_stubs.stub_C_CurrencyInfo()
 
 		-- Load the list module before each test
 		CurrencyModule = dofile("Features/Currency.lua")
@@ -39,7 +17,7 @@ describe("Currency module", function()
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, nil)
 
-		assert.stub(mockLootDisplay.ShowLoot).was.not_called()
+		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.not_called()
 	end)
 
 	it("does not show loot if the quantityChange is nil", function()
@@ -47,7 +25,7 @@ describe("Currency module", function()
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, nil, nil)
 
-		assert.stub(mockLootDisplay.ShowLoot).was.not_called()
+		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.not_called()
 	end)
 
 	it("does not show loot if the quantityChange is lte 0", function()
@@ -55,7 +33,7 @@ describe("Currency module", function()
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, nil, -1)
 
-		assert.stub(mockLootDisplay.ShowLoot).was.not_called()
+		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.not_called()
 	end)
 
 	it("does not show loot if the currency info cannot be found", function()
@@ -66,7 +44,7 @@ describe("Currency module", function()
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, 1, 1)
 
-		assert.stub(mockLootDisplay.ShowLoot).was.not_called()
+		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.not_called()
 	end)
 
 	it("does not show loot if the currency has an empty description", function()
@@ -81,7 +59,7 @@ describe("Currency module", function()
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, 5, 2)
 
-		assert.stub(mockLootDisplay.ShowLoot).was.not_called()
+		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.not_called()
 	end)
 
 	it("shows loot if the currency info is valid", function()
@@ -96,6 +74,6 @@ describe("Currency module", function()
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, 5, 2)
 
-		assert.stub(mockLootDisplay.ShowLoot).was.called_with(_, 123, "|c12345678|Hcurrency:123|r", 123456, 2)
+		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.called_with(_, 123, "|c12345678|Hcurrency:123|r", 123456, 2)
 	end)
 end)
