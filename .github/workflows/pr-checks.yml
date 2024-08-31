@@ -77,7 +77,7 @@ jobs:
         with:
           script: |
             const commentIdentifier = "### Packaged ZIP files"; // Unique phrase to identify the comment
-            const link = `[Zips of this PR](${{ steps.upload-zips.artifact-url }}`;
+            const link = `[Zips of this PR](${{ steps.upload-zips.output.artifact-url }})`;
             const lastUpdated = new Date().toLocaleString('en-US', { timeZone: 'UTC', hour12: true });
             const commentBody = `${link}\n\nLast Updated: ${lastUpdated} (UTC)`;
 
