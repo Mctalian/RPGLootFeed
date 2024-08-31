@@ -75,11 +75,33 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
+            const commentIdentifier = "### Packaged ZIP files"; // Unique phrase to identify the comment
             const link = `[Zips of this PR](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)`;
-            const commentBody = `${link}`;
-            github.rest.issues.createComment({
+            const lastUpdated = new Date().toLocaleString('en-US', { timeZone: 'UTC', hour12: true });
+            const commentBody = `${link}\n\nLast Updated: ${lastUpdated} (UTC)`;
+
+            const { data: comments } = await github.rest.issues.listComments({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: commentBody
             });
+
+            const existingComment = comments.find(comment => comment.body.includes(commentIdentifier));
+
+            if (existingComment) {
+              // Update the existing comment
+              await github.rest.issues.updateComment({
+                comment_id: existingComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `${commentIdentifier}\n${commentBody}`
+              });
+            } else {
+              // Create a new comment
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: `${commentIdentifier}\n${commentBody}`
+              });
+            }
