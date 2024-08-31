@@ -8,7 +8,7 @@ G_RLF.RLF:SetDefaultModuleState(true)
 G_RLF.addonName = addonName
 G_RLF.dbName = dbName
 G_RLF.localeName = localeName
-G_RLF.addonVersion = "@project-version@"
+G_RLF.addonVersion = "@project-version@-@project-revision@-@project-abbreviated-hash@"
 G_RLF.DisableBossBanner = {
 	ENABLED = 0,
 	FULLY_DISABLE = 1,
@@ -25,6 +25,7 @@ local xpcall = xpcall
 
 local function errorhandler(err)
 	local suffix = "\n\n==== Addon Info " .. G_RLF.addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
+	suffix = suffix .. G_RLF.L["Issues"] .. "\n\n"
 
 	return geterrorhandler()(err .. suffix)
 end
