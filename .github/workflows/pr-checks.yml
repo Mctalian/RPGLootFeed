@@ -69,20 +69,37 @@ jobs:
           args: -d
           pandoc: "false"
 
-      - uses: actions/upload-artifact@v4
-        id: upload-zips
+      - name: Capture Filenames
+        id: capture-filenames
+        run: |
+          FILE1=$(ls .release/RPGLootFeed-*-nolib.zip)
+          FILE2=$(ls .release/RPGLootFeed-*.zip | grep -v 'nolib')
+          echo "FILE1=$FILE1" >> $GITHUB_ENV
+          echo "FILE2=$FILE2" >> $GITHUB_ENV
+
+      - name: Upload RPGLootFeed ZIP
+        uses: actions/upload-artifact@v4
+        id: upload-zips-standard
         with:
-          name: pr-zips
-          path: .release/*.zip
+          name: $(basename ${{ env.FILE2 }})
+          path: ${{ env.FILE2 }}
+
+      - name: Upload RPGLootFeed Nolib ZIP
+        uses: actions/upload-artifact@v4
+        id: upload-zips-nolib
+        with:
+          name: $(basename ${{ env.FILE1 }})
+          path: ${{ env.FILE1 }}
 
       - name: Post PR comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const commentIdentifier = "### Packaged ZIP files"; // Unique phrase to identify the comment
-            const link = `[Zips of this PR](${{ steps.upload-zips.outputs.artifact-url }})`;
+            const linkStandard = `[RPGLootFeed ZIP (with libs)](${{ steps['upload-zips-standard'].outputs.artifact-url }})`;
+            const linkNolib = `[RPGLootFeed ZIP (nolib)](${{ steps['upload-zips-nolib'].outputs.artifact-url }})`;
             const lastUpdated = new Date().toLocaleString('en-US', { timeZone: 'UTC', hour12: true });
-            const commentBody = `${link}\n\nLast Updated: ${lastUpdated} (UTC)`;
+            const commentBody = `${linkStandard}\n${linkNolib}\n\nLast Updated: ${lastUpdated} (UTC)`;
 
             const { data: comments } = await github.rest.issues.listComments({
               issue_number: context.issue.number,
