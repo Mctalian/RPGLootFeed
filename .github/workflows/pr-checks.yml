@@ -74,7 +74,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const link = `[Zips of this PR](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)`).join('\n');
+            const link = `[Zips of this PR](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)`;
             const commentBody = `${link}`;
             github.rest.issues.createComment({
               issue_number: context.issue.number,
