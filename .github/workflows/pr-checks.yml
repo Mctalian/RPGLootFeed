@@ -76,7 +76,7 @@ jobs:
         with:
           script: |
             const commentIdentifier = "### Packaged ZIP files"; // Unique phrase to identify the comment
-            const link = `[Zips of this PR](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)`;
+            const link = `[Zips of this PR](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}?pr=${{ github.event.number }})`;
             const lastUpdated = new Date().toLocaleString('en-US', { timeZone: 'UTC', hour12: true });
             const commentBody = `${link}\n\nLast Updated: ${lastUpdated} (UTC)`;
 
