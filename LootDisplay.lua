@@ -79,6 +79,10 @@ function LootDisplay:UpdatePosition()
 	frame:SetPoint(config.anchorPoint, _G[config.relativePoint], config.xOffset, config.yOffset)
 end
 
+function LootDisplay:UpdateRowPositions()
+	updateRowPositions()
+end
+
 function LootDisplay:UpdateStrata()
 	if frame then
 		frame:SetFrameStrata(config.frameStrata)
@@ -460,7 +464,13 @@ updateRowPositions = function()
 		if row:IsShown() then
 			applyRowStyles(row)
 			row:ClearAllPoints()
-			row:SetPoint("BOTTOM", frame, "BOTTOM", 0, index * (config.rowHeight + config.padding))
+			local vertDir = "BOTTOM"
+			local yOffset = index * (config.rowHeight + config.padding)
+			if not G_RLF.db.global.growUp then
+				vertDir = "TOP"
+				yOffset = yOffset * -1
+			end
+			row:SetPoint(vertDir, frame, vertDir, 0, yOffset)
 			index = index + 1
 		end
 	end
@@ -562,7 +572,11 @@ leaseRow = function(key)
 
 	-- Position the new row at the bottom of the frame
 	if getNumberOfRows() == 1 then
-		row:SetPoint("BOTTOM", frame, "BOTTOM")
+		local vertDir = "BOTTOM"
+		if not G_RLF.db.global.growUp then
+			vertDir = "TOP"
+		end
+		row:SetPoint(vertDir, frame, vertDir)
 	else
 		updateRowPositions()
 	end
