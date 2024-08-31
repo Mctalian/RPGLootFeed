@@ -35,7 +35,3 @@ function G_RLF:fn(func, ...)
 		return xpcall(func, errorhandler, ...)
 	end
 end
-
-function G_RLF:GetCurrencyLink(currencyID, name)
-	return string.format("|cffffffff|Hcurrency:%d|h[%s]|h|r", currencyID, name)
-end
