@@ -69,3 +69,16 @@ jobs:
         with:
           name: pr-zips
           path: .release/*.zip
+
+      - name: Post PR comment
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const link = `[Zips of this PR](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts)`).join('\n');
+            const commentBody = `${link}`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: commentBody
+            });
