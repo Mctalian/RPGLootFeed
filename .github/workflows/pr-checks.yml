@@ -92,7 +92,7 @@ jobs:
           path: ${{ env.FILE1 }}
 
       - name: Post PR comment
-        uses: actions/github-script@v8
+        uses: actions/github-script@v7
         with:
           script: |
             const commentIdentifier = "### Packaged ZIP files"; // Unique phrase to identify the comment
