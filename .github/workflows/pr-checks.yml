@@ -81,14 +81,14 @@ jobs:
         uses: actions/upload-artifact@v4
         id: upload-zips-standard
         with:
-          name: $(basename ${{ env.FILE2 }})
+          name: pr-pkg
           path: ${{ env.FILE2 }}
 
       - name: Upload RPGLootFeed Nolib ZIP
         uses: actions/upload-artifact@v4
         id: upload-zips-nolib
         with:
-          name: $(basename ${{ env.FILE1 }})
+          name: pr-pkg-nolib
           path: ${{ env.FILE1 }}
 
       - name: Post PR comment
