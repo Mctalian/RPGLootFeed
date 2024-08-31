@@ -1,5 +1,8 @@
 local LootDisplay = {}
 
+local Masque = LibStub and LibStub("Masque", true)
+local iconGroup = Masque and Masque:Group(G_RLF.addonName)
+
 -- Private method declaration
 local applyRowStyles
 local doesRowExist
@@ -125,7 +128,18 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
 
 		-- Initialize row content
 		rowStyles(row)
-		row.icon:SetTexture(icon)
+		if Masque and iconGroup then
+			local found = string.find(link, "item:")
+			if found then
+				row.icon:SetItem(link)
+			else
+				local quality = C_CurrencyInfo.GetCurrencyInfo(id).quality
+				row.icon:SetItemButtonTexture(icon)
+				row.icon:SetItemButtonQuality(quality, link)
+			end
+		else
+			row.icon:SetTexture(icon)
+		end
 		row.amount = amountLooted
 		local extraWidth = getTextWidth(" x" .. row.amount)
 		row.link = truncateItemLink(link, extraWidth)
@@ -301,7 +315,11 @@ end
 
 rowIcon = function(row)
 	if row.icon == nil then
-		row.icon = row:CreateTexture(nil, "ARTWORK")
+		if Masque and iconGroup then
+			row.icon = CreateFrame("ItemButton", nil, row)
+		else
+			row.icon = row:CreateTexture(nil, "ARTWORK")
+		end
 	else
 		row.icon:ClearAllPoints()
 	end
@@ -312,16 +330,23 @@ rowIcon = function(row)
 		anchor = "RIGHT"
 		xOffset = xOffset * -1
 	end
+	if Masque and iconGroup then
+		iconGroup:AddButton(row.icon)
+	end
 	row.icon:SetPoint(anchor, xOffset, 0)
 	row.icon:Show()
 end
 
 rowMoneyIcon = function(row)
 	if row.icon == nil then
-		row.icon = row:CreateTexture(nil, "ARTWORK")
+		if Masque and iconGroup then
+			row.icon = CreateFrame("ItemButton", nil, row)
+			iconGroup:AddButton(row.icon)
+		else
+			row.icon = row:CreateTexture(nil, "ARTWORK")
+		end
 	else
 		row.icon:ClearAllPoints()
-		row.icon:SetTexture(nil)
 	end
 	row.icon:SetSize(config.iconSize, config.iconSize)
 	local anchor = "LEFT"
