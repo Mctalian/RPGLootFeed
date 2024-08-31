@@ -481,6 +481,9 @@ applyRowStyles = function(row)
 	else
 		rowStyles(row)
 	end
+	if iconGroup then
+		iconGroup:ReSkin(row.icon)
+	end
 end
 
 updateRowPositions = function()
