@@ -1,4 +1,5 @@
 local addonName = G_RLF.addonName
+local acd = LibStub("AceConfigDialog-3.0")
 RLF = G_RLF.RLF
 G_RLF.L = LibStub("AceLocale-3.0"):GetLocale(G_RLF.localeName)
 
@@ -6,6 +7,7 @@ function RLF:OnInitialize()
 	G_RLF.db = LibStub("AceDB-3.0"):New(G_RLF.dbName, G_RLF.defaults, true)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
 	G_RLF.LootDisplay:Initialize()
+	self:Hook(acd, "Open", "OnOptionsOpen")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterChatCommand("rlf", "SlashCommand")
 	self:RegisterChatCommand("RLF", "SlashCommand")
@@ -19,13 +21,13 @@ function RLF:SlashCommand(msg, editBox)
 	elseif msg == "clear" then
 		G_RLF.LootDisplay:HideLoot()
 	else
-		LibStub("AceConfigDialog-3.0"):Open(addonName)
+		acd:Open(addonName)
 	end
 end
 
 function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 	if self.optionsFrame == nil then
-		self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName, addonName)
+		self.optionsFrame = acd:AddToBlizOptions(addonName, addonName)
 	end
 	self:LootToastHook()
 	self:BossBannerHook()
@@ -35,4 +37,28 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 			C_CVar.SetCVar("autoLootDefault", "1")
 		end
 	end
+end
+
+local optionsFrame
+local isOpen = false
+function RLF:OnOptionsOpen(...)
+	local _, name, container, path = ...
+	if name == addonName and not isOpen then
+		isOpen = true
+		G_RLF.LootDisplay:SetBoundingBoxVisibility(true)
+		self:ScheduleTimer(function()
+			optionsFrame = acd.OpenFrames[name]
+			if self:IsHooked(optionsFrame, "Hide") then
+				self:Unhook(optionsFrame, "Hide")
+			end
+			self:Hook(optionsFrame, "Hide", "OnOptionsClose", true)
+		end, 0.25)
+	end
+end
+
+function RLF:OnOptionsClose(...)
+	isOpen = false
+	G_RLF.LootDisplay:SetBoundingBoxVisibility(false)
+	self:Unhook(optionsFrame, "Hide")
+	optionsFrame = nil
 end
