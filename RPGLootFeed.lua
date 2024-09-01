@@ -13,24 +13,37 @@ function RLF:OnInitialize()
 	self:RegisterChatCommand("RLF", "SlashCommand")
 	self:RegisterChatCommand("rpglootfeed", "SlashCommand")
 	self:RegisterChatCommand("rpgLootFeed", "SlashCommand")
+
+	if EditModeManagerFrame then
+		EventRegistry:RegisterCallback("EditMode.Enter", function()
+			G_RLF.LootDisplay:SetBoundingBoxVisibility(true)
+		end)
+		EventRegistry:RegisterCallback("EditMode.Exit", function()
+			G_RLF.LootDisplay:SetBoundingBoxVisibility(false)
+		end)
+	end
 end
 
 function RLF:SlashCommand(msg, editBox)
-	if msg == "test" then
-		G_RLF.TestMode:ToggleTestMode()
-	elseif msg == "clear" then
-		G_RLF.LootDisplay:HideLoot()
-	else
-		acd:Open(addonName)
-	end
+	G_RLF:fn(function()
+		if msg == "test" then
+			G_RLF.TestMode:ToggleTestMode()
+		elseif msg == "clear" then
+			G_RLF.LootDisplay:HideLoot()
+		else
+			acd:Open(addonName)
+		end
+	end)
 end
 
 function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 	if self.optionsFrame == nil then
 		self.optionsFrame = acd:AddToBlizOptions(addonName, addonName)
 	end
-	self:LootToastHook()
-	self:BossBannerHook()
+	G_RLF:fn(function()
+		self:LootToastHook()
+		self:BossBannerHook()
+	end)
 	if isLogin and isReload == false then
 		self:Print(G_RLF.L["Welcome"])
 		if G_RLF.db.global.enableAutoLoot then
@@ -43,22 +56,31 @@ local optionsFrame
 local isOpen = false
 function RLF:OnOptionsOpen(...)
 	local _, name, container, path = ...
-	if name == addonName and not isOpen then
-		isOpen = true
-		G_RLF.LootDisplay:SetBoundingBoxVisibility(true)
-		self:ScheduleTimer(function()
-			optionsFrame = acd.OpenFrames[name]
-			if self:IsHooked(optionsFrame, "Hide") then
-				self:Unhook(optionsFrame, "Hide")
-			end
-			self:Hook(optionsFrame, "Hide", "OnOptionsClose", true)
-		end, 0.25)
-	end
+	G_RLF:fn(function()
+		if container then
+			return
+		end
+		if name == addonName and not isOpen then
+			isOpen = true
+			G_RLF.LootDisplay:SetBoundingBoxVisibility(true)
+			self:ScheduleTimer(function()
+				optionsFrame = acd.OpenFrames[name]
+				if self:IsHooked(optionsFrame, "Hide") then
+					self:Unhook(optionsFrame, "Hide")
+				end
+				if optionsFrame and optionsFrame.Hide then
+					self:Hook(optionsFrame, "Hide", "OnOptionsClose", true)
+				end
+			end, 0.25)
+		end
+	end)
 end
 
 function RLF:OnOptionsClose(...)
-	isOpen = false
-	G_RLF.LootDisplay:SetBoundingBoxVisibility(false)
-	self:Unhook(optionsFrame, "Hide")
-	optionsFrame = nil
+	G_RLF:fn(function()
+		isOpen = false
+		G_RLF.LootDisplay:SetBoundingBoxVisibility(false)
+		self:Unhook(optionsFrame, "Hide")
+		optionsFrame = nil
+	end)
 end

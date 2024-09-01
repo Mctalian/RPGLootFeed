@@ -631,7 +631,7 @@ configureTestArea = function()
 	if not boundingBox.instructionText then
 		boundingBox.instructionText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 		boundingBox.instructionText:SetPoint("CENTER", frame, "CENTER")
-		boundingBox.instructionText:SetText("Drag to Move")
+		boundingBox.instructionText:SetText(G_RLF.addonName .. "\n" .. G_RLF.L["Drag to Move"])
 		boundingBox.instructionText:SetTextColor(1, 1, 1)
 		boundingBox.instructionText:Hide()
 	end

@@ -61,6 +61,7 @@ L["Toggle Test Mode"] = true
 L["Clear rows"] = true
 L["Toggle Area"] = true
 L["Positioning"] = true
+L["Drag to Move"] = true
 L["PositioningDesc"] = "Position and anchor the loot feed."
 L["Anchor Relative To"] = true
 L["RelativeToDesc"] = "Select a frame to anchor the loot feed to"
