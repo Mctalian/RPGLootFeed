@@ -43,6 +43,9 @@ local optionsFrame
 local isOpen = false
 function RLF:OnOptionsOpen(...)
 	local _, name, container, path = ...
+	if container then
+		return
+	end
 	if name == addonName and not isOpen then
 		isOpen = true
 		G_RLF.LootDisplay:SetBoundingBoxVisibility(true)
@@ -51,7 +54,9 @@ function RLF:OnOptionsOpen(...)
 			if self:IsHooked(optionsFrame, "Hide") then
 				self:Unhook(optionsFrame, "Hide")
 			end
-			self:Hook(optionsFrame, "Hide", "OnOptionsClose", true)
+			if optionsFrame and optionsFrame.Hide then
+				self:Hook(optionsFrame, "Hide", "OnOptionsClose", true)
+			end
 		end, 0.25)
 	end
 end
