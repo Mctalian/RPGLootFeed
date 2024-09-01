@@ -1,7 +1,17 @@
 TestMode = {}
 
+local function idExistsInTable(id, table)
+	for _, item in pairs(table) do
+		if item.id == id then
+			return true
+		end
+	end
+	return false
+end
+
 -- Initial test items with color variables
 local testItemIds = {
+	50818,
 	2589,
 	2592,
 	1515,
@@ -16,14 +26,20 @@ local testItemIds = {
 }
 
 local testItems = {}
-for _, id in pairs(testItemIds) do
-	local _, _, _, _, icon = C_Item.GetItemInfoInstant(id)
-	local _, link = C_Item.GetItemInfo(id)
-	table.insert(testItems, {
-		id = id,
-		link = link,
-		icon = icon,
-	})
+local function initializeTestItems()
+	for _, id in pairs(testItemIds) do
+		if not idExistsInTable(id, testItems) then
+			local _, link = C_Item.GetItemInfo(id)
+			local icon = C_Item.GetItemIconByID(id)
+			if link and icon then
+				table.insert(testItems, {
+					id = id,
+					link = link,
+					icon = icon,
+				})
+			end
+		end
+	end
 end
 
 local testCurrencyIds = {
@@ -45,16 +61,30 @@ local testCurrencyIds = {
 }
 
 local testCurrencies = {}
-for _, id in pairs(testCurrencyIds) do
-	local info = C_CurrencyInfo.GetCurrencyInfo(id)
-	table.insert(testCurrencies, {
-		id = info.currencyID,
-		link = C_CurrencyInfo.GetCurrencyLink(id),
-		icon = info.iconFileID,
-	})
+local function initializeTestCurrencies()
+	for _, id in pairs(testCurrencyIds) do
+		if not idExistsInTable(id, testCurrencies) then
+			local info = C_CurrencyInfo.GetCurrencyInfo(id)
+			local link = C_CurrencyInfo.GetCurrencyLink(id)
+			if info and link and info.currencyID and info.iconFileID then
+				table.insert(testCurrencies, {
+					id = info.currencyID,
+					link = link,
+					icon = info.iconFileID,
+				})
+			end
+		end
+	end
 end
 
 local function generateRandomLoot()
+	if #testItems ~= #testItemIds then
+		initializeTestItems()
+	end
+
+	if #testCurrencies ~= #testCurrencyIds then
+		initializeTestCurrencies()
+	end
 	-- Randomly decide whether to generate an item or currency
 	local rng = math.random()
 	if rng < 0.8 then
@@ -92,5 +122,8 @@ function TestMode:ToggleTestMode()
 		end)
 	end
 end
+
+G_RLF:fn(initializeTestItems)
+G_RLF:fn(initializeTestCurrencies)
 
 G_RLF.TestMode = TestMode
