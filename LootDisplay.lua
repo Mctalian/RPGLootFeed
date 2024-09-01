@@ -4,6 +4,7 @@ local Masque = LibStub and LibStub("Masque", true)
 local iconGroup = Masque and Masque:Group(G_RLF.addonName)
 
 -- Private method declaration
+local configureFeedFrame
 local applyRowStyles
 local doesRowExist
 local getFrameHeight
@@ -21,6 +22,10 @@ local rowMoneyIcon
 local rowMoneyStyles
 local rowMoneyText
 local rowStyles
+local configureTestArea
+local createArrowsTestArea
+local showTestArea
+local hideTestArea
 local truncateItemLink
 local updateRowPositions
 
@@ -52,29 +57,25 @@ local tempFontString = nil
 function LootDisplay:Initialize()
 	config = DynamicPropertyTable(G_RLF.db.global, defaults)
 
-	frame = CreateFrame("Frame", "LootDisplayFrame", UIParent)
-	frame:SetSize(config.feedWidth, getFrameHeight())
-	frame:SetPoint(config.anchorPoint, _G[config.relativePoint], config.xOffset, config.yOffset)
+	configureFeedFrame()
 
-	frame:SetFrameStrata(config.frameStrata) -- Set the frame strata here
-
-	frame:SetClipsChildren(true) -- Enable clipping of child elements
-
-	boundingBox = frame:CreateTexture(nil, "BACKGROUND")
-	boundingBox:SetColorTexture(1, 0, 0, 0.5) -- Red with 50% opacity
-	boundingBox:SetAllPoints()
-	boundingBox:Hide()
+	configureTestArea()
+	createArrowsTestArea()
 
 	tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
 	tempFontString:Hide() -- Prevent it from showing up
 end
 
-function LootDisplay:ToggleBoundingBox()
-	if boundingBox:IsShown() then
-		boundingBox:Hide()
+function LootDisplay:SetBoundingBoxVisibility(show)
+	if show then
+		showTestArea()
 	else
-		boundingBox:Show()
+		hideTestArea()
 	end
+end
+
+function LootDisplay:ToggleBoundingBox()
+	self:SetBoundingBoxVisibility(not boundingBox:IsVisible())
 end
 
 function LootDisplay:UpdatePosition()
@@ -294,6 +295,34 @@ function LootDisplay:HideLoot()
 end
 
 G_RLF.LootDisplay = LootDisplay
+
+configureFeedFrame = function()
+	frame = CreateFrame("Frame", "LootDisplayFrame", UIParent)
+	frame:SetSize(config.feedWidth, getFrameHeight())
+	frame:SetPoint(config.anchorPoint, _G[config.relativePoint], config.xOffset, config.yOffset)
+
+	frame:SetFrameStrata(config.frameStrata) -- Set the frame strata here
+
+	frame:SetClipsChildren(true) -- Enable clipping of child elements
+
+	frame:SetClampedToScreen(true)
+	frame:RegisterForDrag("LeftButton")
+	frame:SetScript("OnDragStart", frame.StartMoving)
+	frame:SetScript("OnDragStop", function(self)
+		self:StopMovingOrSizing()
+
+		-- Save the new position
+		local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
+		G_RLF.db.global.anchorPoint = point
+		G_RLF.db.global.relativePoint = relativeTo or -1
+		G_RLF.db.global.xOffset = xOfs
+		G_RLF.db.global.yOffset = yOfs
+
+		-- Update the frame position
+		G_RLF.LootDisplay:UpdatePosition()
+		LibStub("AceConfigRegistry-3.0"):NotifyChange(G_RLF.addonName)
+	end)
+end
 
 rowBackground = function(row)
 	-- Create row background
@@ -557,6 +586,75 @@ truncateItemLink = function(itemLink, extraWidth)
 	end
 
 	return linkStart .. itemName .. linkEnd
+end
+
+local function createArrow(f, direction)
+	local arrow = f:CreateTexture(nil, "OVERLAY")
+	arrow:SetSize(16, 16) -- Example size, adjust as needed
+	arrow:SetTexture("Interface\\Buttons\\Arrow-Up-Up") -- Using a built-in texture
+
+	if direction == "UP" then
+		arrow:SetPoint("TOP", f, "TOP", 0, -20)
+		arrow:SetRotation(0)
+	elseif direction == "DOWN" then
+		arrow:SetPoint("BOTTOM", f, "BOTTOM", 0, 20)
+		arrow:SetRotation(math.pi) -- Rotate 180 degrees
+	elseif direction == "LEFT" then
+		arrow:SetPoint("LEFT", f, "LEFT", 20, 0)
+		arrow:SetRotation(math.pi * 0.5) -- Rotate 270 degrees
+	elseif direction == "RIGHT" then
+		arrow:SetPoint("RIGHT", f, "RIGHT", -20, 0)
+		arrow:SetRotation(math.pi * 1.5) -- Rotate 90 degrees
+	end
+
+	arrow:Hide()
+
+	return arrow
+end
+
+createArrowsTestArea = function()
+	if not frame.arrows then
+		frame.arrows = {
+			createArrow(frame, "UP"),
+			createArrow(frame, "DOWN"),
+			createArrow(frame, "LEFT"),
+			createArrow(frame, "RIGHT"),
+		}
+	end
+end
+
+configureTestArea = function()
+	boundingBox = frame:CreateTexture(nil, "BACKGROUND")
+	boundingBox:SetColorTexture(1, 0, 0, 0.5) -- Red with 50% opacity
+	boundingBox:SetAllPoints()
+	boundingBox:Hide()
+	if not boundingBox.instructionText then
+		boundingBox.instructionText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+		boundingBox.instructionText:SetPoint("CENTER", frame, "CENTER")
+		boundingBox.instructionText:SetText("Drag to Move")
+		boundingBox.instructionText:SetTextColor(1, 1, 1)
+		boundingBox.instructionText:Hide()
+	end
+end
+
+showTestArea = function()
+	boundingBox:Show()
+	frame:SetMovable(true)
+	frame:EnableMouse(true)
+	boundingBox.instructionText:Show()
+	for i, a in ipairs(frame.arrows) do
+		a:Show()
+	end
+end
+
+hideTestArea = function()
+	boundingBox:Hide()
+	frame:SetMovable(false)
+	frame:EnableMouse(false)
+	boundingBox.instructionText:Hide()
+	for i, a in ipairs(frame.arrows) do
+		a:Hide()
+	end
 end
 
 leaseRow = function(key)

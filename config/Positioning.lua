@@ -8,7 +8,9 @@ G_RLF.defaults.global.frameStrata = "MEDIUM" -- Default frame strata
 
 -- Enumerate available frames to anchor to
 local function EnumerateFrames()
-	local frames = {}
+	local frames = {
+		[-1] = "Screen",
+	}
 	local framesToCheck = {
 		["UIParent"] = "UIParent",
 		["PlayerFrame"] = "PlayerFrame",
