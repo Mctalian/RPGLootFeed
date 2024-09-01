@@ -5,7 +5,7 @@
 ## Notes: A non-intrusive way to see what you just looted.|n|n|cffFFC700Slash command: /rlf, /rpgLootFeed|r
 ## SavedVariables: RPGLootFeedDB
 ## IconTexture: Interface/AddOns/RPGLootFeed/Icons/logo
-## OptionalDeps: Ace3
+## OptionalDeps: Ace3, Masque
 ## X-GitHub: https://github.com/Mctalian/RPGLootFeed
 ## X-Curse-Project-ID: 1082791
 ## X-WoWI-ID: 26799
