@@ -1,4 +1,4 @@
-local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0")
+local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0")
 
 local repData = {}
 local paragonRepData = {}
@@ -140,7 +140,9 @@ local function addAnyNewFactions()
 end
 
 function Rep:PLAYER_ENTERING_WORLD()
-	G_RLF:fn(snapshot)
+	self:ScheduleTimer(function()
+		G_RLF:fn(snapshot)
+	end, 1)
 end
 
 local function findDelta()
