@@ -9,13 +9,13 @@ G_RLF.defaults.global.frameStrata = "MEDIUM" -- Default frame strata
 -- Enumerate available frames to anchor to
 local function EnumerateFrames()
 	local frames = {
-		[-1] = "Screen",
+		[-1] = G_RLF.L["Screen"],
 	}
 	local framesToCheck = {
-		["UIParent"] = "UIParent",
-		["PlayerFrame"] = "PlayerFrame",
-		["Minimap"] = "Minimap",
-		["MainMenuBarBackpackButton"] = "BagBar",
+		["UIParent"] = G_RLF.L["UIParent"],
+		["PlayerFrame"] = G_RLF.L["PlayerFrame"],
+		["Minimap"] = G_RLF.L["Minimap"],
+		["MainMenuBarBackpackButton"] = G_RLF.L["BagBar"],
 	}
 	for f, s in pairs(framesToCheck) do
 		if _G[f] then

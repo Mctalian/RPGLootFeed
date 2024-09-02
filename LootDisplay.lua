@@ -237,8 +237,8 @@ function LootDisplay:ShowXP(experience)
 	row.fadeOutAnimation:Play()
 end
 
-function LootDisplay:ShowRep(rep, factionData)
-	local key = "REP_" .. factionData.factionID -- Use ID as a unique key
+function LootDisplay:ShowRep(rep, factionName)
+	local key = "REP_" .. factionName -- Use ID as a unique key
 	local text
 
 	-- Check if the item or currency is already displayed
@@ -262,22 +262,24 @@ function LootDisplay:ShowRep(rep, factionData)
 	if rep < 0 then
 		sign = "-"
 	end
-	text = sign .. math.abs(row.rep) .. " " .. factionData.name
+	text = sign .. math.abs(row.rep) .. " " .. factionName
 	row.amountText:SetText(text)
 	local r, g, b
-	if
-		factionData.reaction
-		and not C_Reputation.IsFactionParagon(factionData.factionID)
-		and not C_Reputation.IsMajorFaction(factionData.factionID)
-	then
-		r = FACTION_BAR_COLORS[factionData.reaction].r
-		g = FACTION_BAR_COLORS[factionData.reaction].g
-		b = FACTION_BAR_COLORS[factionData.reaction].b
-	else
-		r = 0.26
-		g = 1
-		b = 1
-	end
+	-- We'll have to revisit the rep colors now that we're not
+	-- snapshotting reputation data
+	-- if
+	-- 	factionData.reaction
+	-- 	and not C_Reputation.IsFactionParagon(factionData.factionID)
+	-- 	and not C_Reputation.IsMajorFaction(factionData.factionID)
+	-- then
+	-- 	r = FACTION_BAR_COLORS[factionData.reaction].r
+	-- 	g = FACTION_BAR_COLORS[factionData.reaction].g
+	-- 	b = FACTION_BAR_COLORS[factionData.reaction].b
+	-- else
+	r = 0.5
+	g = 0.5
+	b = 1
+	-- end
 	row.amountText:SetTextColor(r, g, b, 1)
 
 	row.fadeOutAnimation:Stop()
