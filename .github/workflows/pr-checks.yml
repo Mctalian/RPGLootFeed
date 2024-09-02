@@ -60,25 +60,25 @@ jobs:
 
     steps:
       - name: Checkout code
-        if: IS_FORK == false
+        if: env.IS_FORK == false
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           fetch-depth: 0
 
       - name: Checkout code (fork)
-        if: IS_FORK == true
+        if: env.IS_FORK == true
         uses: actions/checkout@v4
 
       - name: Package
-        if: IS_FORK == false
+        if: env.IS_FORK == false
         uses: BigWigsMods/packager@v2
         with:
           args: -d
           pandoc: "false"
 
       - name: Package (fork)
-        if: IS_FORK == true
+        if: env.IS_FORK == true
         uses: BigWigsMods/packager@v2
         with:
           args: -d -n {package-name}-pr${{github.event.number}}-{nolib}{classic}
