@@ -90,20 +90,10 @@ local decreasePatterns = precomputePatternSegments({
 
 function Rep:OnDisable()
 	self:UnregisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 function Rep:OnEnable()
 	self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-end
-
-function Rep:PLAYER_ENTERING_WORLD()
-	G_RLF:fn(function()
-		G_RLF.db.global.factionMaps = G_RLF.db.global.factionMaps or {}
-		G_RLF.db.global.factionMaps[locale] = G_RLF.db.global.factionMaps[locale] or {}
-		buildFactionLocaleMap()
-	end)
 end
 
 function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(_, message)
