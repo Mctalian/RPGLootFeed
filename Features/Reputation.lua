@@ -3,6 +3,8 @@ local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0")
 local locale
 function Rep:OnInitialize()
 	locale = GetLocale()
+	G_RLF.db.global.factionMaps = G_RLF.db.global.factionMaps or {}
+	G_RLF.db.global.factionMaps[locale] = G_RLF.db.global.factionMaps[locale] or {}
 	if G_RLF.db.global.repFeed then
 		self:Enable()
 	else
@@ -108,8 +110,6 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(_, message)
 		local r, g, b, color
 		if G_RLF.db.global.factionMaps[locale][faction] == nil then
 			-- attempt to find the missing faction's ID
-			local startIndex = lastIndex
-			local endIndex = lastIndex + initialMaxRepIndexes
 			buildFactionLocaleMap(faction)
 		end
 
@@ -120,7 +120,7 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(_, message)
 			elseif C_Reputation.IsFactionParagon(fId) then
 				color = FACTION_GREEN_COLOR
 			else
-				local factionData = C_Reputation:GetFactionDataByID(fId)
+				local factionData = C_Reputation.GetFactionDataByID(fId)
 				if factionData.reaction then
 					color = FACTION_BAR_COLORS[factionData.reaction]
 				end
