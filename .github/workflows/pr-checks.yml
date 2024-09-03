@@ -1,7 +1,7 @@
 name: PR Checks
 
 on:
-  pull_request_target:
+  pull_request:
     branches:
       - main
       - v*.*.x
@@ -107,6 +107,7 @@ jobs:
           path: ${{ env.FILE1 }}
 
       - name: Post PR comment
+        if: env.IS_FORK == 'false'
         uses: actions/github-script@v7
         with:
           script: |
