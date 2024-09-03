@@ -115,8 +115,10 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
 	if row then
 		-- Update existing entry
 		row.amount = row.amount + amountLooted
-		row.highlightAnimation:Stop()
-		row.highlightAnimation:Play()
+		if not G_RLF.db.global.disableRowHighlight then
+			row.highlightAnimation:Stop()
+			row.highlightAnimation:Play()
+		end
 		if row.fadeOutAnimation:IsPlaying() then
 			row.fadeOutAnimation:Stop()
 			row.fadeOutAnimation:Play()
