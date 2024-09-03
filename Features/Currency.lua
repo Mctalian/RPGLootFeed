@@ -24,7 +24,7 @@ function Currency:CURRENCY_DISPLAY_UPDATE(_, ...)
 	end
 
 	local info = C_CurrencyInfo.GetCurrencyInfo(currencyType)
-	if info == nil or info.description == "" then
+	if info == nil or info.description == "" or info.iconFileID == nil then
 		return
 	end
 
