@@ -678,9 +678,9 @@ leaseRow = function(key)
 			end
 		end
 	end
+	row.key = key
 
 	rows:push(row)
-	row.key = key
 	row:Show()
 
 	-- Position the new row at the bottom of the frame
