@@ -14,6 +14,7 @@
 embeds.xml
 
 AddonScope.lua
+Logger.lua
 DynamicPropertyTable.lua
 DoubleLinkedList.lua
 

@@ -23,12 +23,14 @@ local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 --   ["INVTYPE_RANGEDRIGHT"] = INVSLOT_RANGED, -- Ranged weapons
 -- }
 
+local logger
 function ItemLoot:OnInitialize()
 	if G_RLF.db.global.itemLootFeed then
 		self:Enable()
 	else
 		self:Disable()
 	end
+	logger = G_RLF.RLF:GetModule("Logger")
 end
 
 function ItemLoot:OnDisable()
@@ -44,6 +46,7 @@ local function showItemLoot(msg, itemLink)
 	local _, _, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent =
 		C_Item.GetItemInfo(itemLink)
 	if not G_RLF.db.global.itemQualityFilter[itemQuality] then
+		logger:Info("Item Ignored by quality", G_RLF.addonName, "ItemLoot", "", msg, amount)
 		return
 	end
 	local itemId = itemLink:match("Hitem:(%d+)")
@@ -67,13 +70,18 @@ function ItemLoot:CHAT_MSG_LOOT(_, ...)
 	local raidLoot = msg:match("HlootHistory:")
 	if raidLoot then
 		-- Ignore this message as it's a raid loot message
+		logger:Info("Raid Loot Ignored", "WOWEVENT", "ItemLoot", "", msg)
 		return
 	end
 
 	local me = guid == GetPlayerGuid()
 	if not me then
+		logger:Info("Group Member Loot Ignored", "WOWEVENT", "ItemLoot", "", msg)
 		return
 	end
+
+	logger:Info("Self Loot Chat Event", "WOWEVENT", "ItemLoot", "", msg)
+
 	local itemLink = msg:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
 	if itemLink then
 		G_RLF:fn(showItemLoot, msg, itemLink)

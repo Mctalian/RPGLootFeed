@@ -30,6 +30,8 @@ function RLF:SlashCommand(msg, editBox)
 			G_RLF.TestMode:ToggleTestMode()
 		elseif msg == "clear" then
 			G_RLF.LootDisplay:HideLoot()
+		elseif msg == "log" then
+			self:GetModule("Logger"):Show()
 		else
 			acd:Open(addonName)
 		end

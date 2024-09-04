@@ -77,6 +77,8 @@ local function initializeTestCurrencies()
 	end
 end
 
+local ItemLoot, Currency, Xp, Rep, Money
+local playerGuid = GetPlayerGuid()
 local function generateRandomLoot()
 	if #testItems ~= #testItemIds then
 		initializeTestItems()
@@ -91,7 +93,15 @@ local function generateRandomLoot()
 		-- Generate random item
 		local item = testItems[math.random(#testItems)]
 		local amountLooted = math.random(1, 5)
-		G_RLF.LootDisplay:ShowLoot(item.id, item.link, item.icon, amountLooted)
+		-- Choose the appropriate format based on the quantity
+		local lootMessage
+		if amountLooted > 1 then
+			lootMessage = format(LOOT_ITEM_SELF_MULTIPLE, item.link, amountLooted)
+		else
+			lootMessage = format(LOOT_ITEM_SELF, item.link)
+		end
+		-- Call the CHAT_MSG_LOOT event handler directly
+		ItemLoot:CHAT_MSG_LOOT(nil, lootMessage, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, playerGuid)
 		if rng < 0.1 then
 			local copper = math.random(1, 100000000)
 			G_RLF.LootDisplay:ShowMoney(copper)
@@ -100,11 +110,21 @@ local function generateRandomLoot()
 		-- Generate random currency
 		local currency = testCurrencies[math.random(#testCurrencies)]
 		local amountLooted = math.random(1, 500)
-		G_RLF.LootDisplay:ShowLoot(currency.id, currency.link, currency.icon, amountLooted)
+		Currency:CURRENCY_DISPLAY_UPDATE(nil, currency.id, nil, amountLooted)
 	end
 end
 
+local logger
 function TestMode:ToggleTestMode()
+	if not (ItemLoot and Currency and Money and Xp and Rep) then
+		ItemLoot = G_RLF.RLF:GetModule("ItemLoot")
+		Currency = G_RLF.RLF:GetModule("Currency")
+		Money = G_RLF.RLF:GetModule("Money")
+		Xp = G_RLF.RLF:GetModule("Experience")
+		Rep = G_RLF.RLF:GetModule("Reputation")
+		logger = G_RLF.RLF:GetModule("Logger")
+	end
+
 	if self.testMode then
 		-- Stop test mode
 		self.testMode = false

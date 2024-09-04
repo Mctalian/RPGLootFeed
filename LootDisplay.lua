@@ -54,6 +54,8 @@ local boundingBox = nil
 local tempFontString = nil
 
 -- Public methods
+local logger
+
 function LootDisplay:Initialize()
 	config = DynamicPropertyTable(G_RLF.db.global, defaults)
 
@@ -64,6 +66,8 @@ function LootDisplay:Initialize()
 
 	tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
 	tempFontString:Hide() -- Prevent it from showing up
+
+	logger = G_RLF.RLF:GetModule("Logger")
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)
@@ -150,6 +154,8 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
 		row.fadeOutAnimation:Play()
 	end
 	row.amountText:SetText(row.link .. " x" .. row.amount)
+
+	logger:Info("Item Loot Shown", G_RLF.addonName, "ItemLoot", key, row.link, row.amount, new)
 	-- Add Tooltip
 	row.amountText:SetScript("OnEnter", function()
 		row.fadeOutAnimation:Stop()
