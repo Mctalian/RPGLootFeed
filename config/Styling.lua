@@ -4,6 +4,7 @@ G_RLF.defaults.global.leftAlign = true
 G_RLF.defaults.global.growUp = true
 G_RLF.defaults.global.rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 } -- Default to dark grey with 80% opacity
 G_RLF.defaults.global.rowBackgroundGradientEnd = { 0.1, 0.1, 0.1, 0 } -- Default to dark grey with 0% opacity
+G_RLF.defaults.global.disableRowHighlight = false
 G_RLF.defaults.global.font = "GameFontNormalSmall"
 
 G_RLF.options.args.styles = {
@@ -49,6 +50,15 @@ G_RLF.options.args.styles = {
 			set = "SetGradientEndColor",
 			order = 4,
 		},
+		rowHighlight = {
+			type = "toggle",
+			name = G_RLF.L["Disable Row Highlight"],
+			desc = G_RLF.L["DisableRowHighlightDesc"],
+			width = "double",
+			get = "GetRowHighlight",
+			set = "SetRowHighlight",
+			order = 5,
+		},
 		font = {
 			type = "select",
 			name = G_RLF.L["Font"],
@@ -57,7 +67,7 @@ G_RLF.options.args.styles = {
 			values = "GetFonts",
 			get = "GetRowFont",
 			set = "SetRowFont",
-			order = 5,
+			order = 6,
 		},
 	},
 }
@@ -115,6 +125,14 @@ end
 function Styling:SetGrowUp(info, value)
 	G_RLF.db.global.growUp = value
 	G_RLF.LootDisplay:UpdateRowPositions()
+end
+
+function Styling:GetRowHighlight(info, value)
+	return G_RLF.db.global.disableRowHighlight
+end
+
+function Styling:SetRowHighlight(info, value)
+	G_RLF.db.global.disableRowHighlight = value
 end
 
 function Styling:SetRowFont(info, value)

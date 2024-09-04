@@ -120,6 +120,8 @@ L["Background Gradient Start"] = true
 L["GradientStartDesc"] = "The start color of the row background gradient."
 L["Background Gradient End"] = true
 L["GradientEndDesc"] = "The end color of the row background gradient."
+L["Disable Row Highlight"] = true
+L["DisableRowHighlightDesc"] = "If checked, don't highlight a row when you loot the same item again and the quanity is updated."
 L["Font"] = true
 L["FontDesc"] = "The font object for the loot text."
 
