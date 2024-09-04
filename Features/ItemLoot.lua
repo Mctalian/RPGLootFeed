@@ -46,6 +46,7 @@ local function showItemLoot(msg, itemLink)
 	if not G_RLF.db.global.itemQualityFilter[itemQuality] then
 		return
 	end
+	local itemId = itemLink:match("Hitem:(%d+)")
 	-- if G_RLF.db.global.onlyBetterThanEquipped and itemEquipLoc then
 	--   local equippedLink = GetInventoryItemLink("player", equipLocToSlotID[itemEquipLoc])
 	--   if equippedLink then
@@ -58,7 +59,7 @@ local function showItemLoot(msg, itemLink)
 	--   end
 
 	-- end
-	G_RLF.LootDisplay:ShowLoot(itemLink, itemLink, itemTexture, amount)
+	G_RLF.LootDisplay:ShowLoot(itemId, itemLink, itemTexture, amount)
 end
 
 function ItemLoot:CHAT_MSG_LOOT(_, ...)
