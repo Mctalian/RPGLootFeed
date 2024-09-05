@@ -82,7 +82,7 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 
 	local itemLink = msg:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
 	if itemLink then
-		G_RLF:fn(showItemLoot, msg, itemLink)
+		self:fn(showItemLoot, msg, itemLink)
 	end
 end
 

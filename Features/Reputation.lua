@@ -100,7 +100,7 @@ end
 
 function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 	self:getLogger():Info(eventName .. " " .. message, "WOWEVENT", self.moduleName)
-	G_RLF:fn(function()
+	self:fn(function()
 		local faction, repChange = extractFactionAndRep(message, increasePatterns)
 		if not faction then
 			faction, repChange = extractFactionAndRep(message, decreasePatterns)

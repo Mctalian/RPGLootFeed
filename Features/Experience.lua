@@ -24,18 +24,18 @@ function Xp:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_XP_UPDATE")
 	if currentXP == nil then
-		G_RLF:fn(initXpValues)
+		self:fn(initXpValues)
 	end
 end
 
 function Xp:PLAYER_ENTERING_WORLD(eventName)
 	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName)
-	G_RLF:fn(initXpValues)
+	self:fn(initXpValues)
 end
 
 function Xp:PLAYER_XP_UPDATE(eventName, unitTarget)
 	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, unitTarget)
-	G_RLF:fn(function()
+	self:fn(function()
 		if unitTarget == "player" then
 			local newLevel = UnitLevel(unitTarget)
 			local newCurrentXP = UnitXP(unitTarget)

@@ -1,6 +1,5 @@
 local Money = G_RLF.RLF:NewModule("Money", "AceEvent-3.0")
 
-local oldMethod
 local startingMoney
 
 function Money:OnInitialize()
@@ -12,58 +11,30 @@ function Money:OnInitialize()
 end
 
 function Money:OnDisable()
-	self:UnregisterEvent("LOOT_READY")
-	self:UnregisterEvent("CHAT_MSG_MONEY")
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	self:UnregisterEvent("PLAYER_MONEY")
 end
 
 function Money:OnEnable()
-	self:RegisterEvent("LOOT_READY")
-	self:RegisterEvent("CHAT_MSG_MONEY")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_MONEY")
+	startingMoney = GetMoney()
 end
 
-function Money:LOOT_READY(eventName)
+function Money:PLAYER_ENTERING_WORLD(eventName)
 	-- Get current money to calculate the delta later
 	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName)
 	startingMoney = GetMoney()
 end
 
-local function showMoneyLoot(msg)
-	local amountInCopper
-	if startingMoney == nil then
-		-- Old method that doesn't work well with locales that are missing translation
-		amountInCopper = oldMethod(msg)
-		self:getLogger():Debug("Old money method", G_RLF.addonName, self.moduleName)
-	else
-		amountInCopper = GetMoney() - startingMoney
-	end
-	startingMoney = GetMoney()
-	G_RLF.LootDisplay:ShowLoot("Money", amountInCopper)
-end
-
-function Money:CHAT_MSG_MONEY(eventName, msg)
+function Money:PLAYER_MONEY(eventName)
 	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName)
-	G_RLF:fn(showMoneyLoot, msg)
-end
-
-oldMethod = function(msg)
-	-- Initialize default values
-	local gold, silver, copper = 0, 0, 0
-
-	-- Patterns to match optional sections
-	local goldPattern = "(%d+) " .. G_RLF.L["Gold"]
-	local silverPattern = "(%d+) " .. G_RLF.L["Silver"]
-	local copperPattern = "(%d+) " .. G_RLF.L["Copper"]
-
-	-- Find and convert matches to numbers if they exist
-	gold = tonumber(msg:match(goldPattern)) or gold
-	silver = tonumber(msg:match(silverPattern)) or silver
-	copper = tonumber(msg:match(copperPattern)) or copper
-
-	local amountInCopper = (gold * 100 * 100)
-	amountInCopper = amountInCopper + (silver * 100)
-	amountInCopper = amountInCopper + copper
-
-	return amountInCopper
+	self:fn(function()
+		local newMoney = GetMoney()
+		local amountInCopper = newMoney - startingMoney
+		startingMoney = newMoney
+		G_RLF.LootDisplay:ShowLoot("Money", amountInCopper)
+	end)
 end
 
 return Money

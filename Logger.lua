@@ -141,7 +141,9 @@ local function initializeFrame()
 end
 
 getLogger = function()
-	return G_RLF.db.global.logger.logs[G_RLF.db.global.logger.sessionsLogged]
+	if G_RLF.db then
+		return G_RLF.db.global.logger.logs[G_RLF.db.global.logger.sessionsLogged]
+	end
 end
 
 function Logger:OnInitialize()
@@ -225,26 +227,32 @@ local function getId(logEntry)
 	return format(" [%s]", logEntry.id)
 end
 
+local function formatLogEntry(logEntry)
+	return format(
+		"[%s] %s: %s%s%s%s%s\n",
+		getTimestamp(logEntry),
+		getLevel(logEntry),
+		getType(logEntry),
+		getContent(logEntry),
+		getAmount(logEntry),
+		isUpdatedRow(logEntry),
+		getId(logEntry)
+	)
+end
+
 updateContent = function()
 	local text = ""
 
 	local function addText(logEntry)
-		text = format(
-			"[%s] %s: %s%s%s%s%s\n",
-			getTimestamp(logEntry),
-			getLevel(logEntry),
-			getType(logEntry),
-			getContent(logEntry),
-			getAmount(logEntry),
-			isUpdatedRow(logEntry),
-			getId(logEntry)
-		) .. text
+		text = formatLogEntry(logEntry) .. text
 	end
 
 	for i, logEntry in ipairs(getLogger()) do
 		if eventSource[logEntry.source] then
 			if eventLevel[logEntry.level] then
-				addText(logEntry)
+				if eventType[logEntry.type] then
+					addText(logEntry)
+				end
 			end
 		end
 	end
@@ -265,7 +273,7 @@ local function addLogEntry(level, message, source, type, id, content, amount, is
 	}
 	local logTable = getLogger()
 	if not logTable then
-		error("Log Table not ready")
+		-- error("Log Table not ready")
 		return
 	end
 	table.insert(logTable, entry)
@@ -288,6 +296,24 @@ end
 
 function Logger:Error(message, source, type, id, content, amount, isNew)
 	addLogEntry(error, message, source, type, id, content, amount, isNew)
+end
+
+function Logger:Trace(type, traceSize)
+	local trace = ""
+	traceSize = traceSize or 10
+	local count = 0
+	local logs = getLogger()
+	for i = #logs, 1, -1 do
+		if logs[i].type == type then
+			count = count + 1
+			trace = trace .. formatLogEntry(logs[i])
+		end
+		if count >= traceSize then
+			break
+		end
+	end
+
+	return trace
 end
 
 function Logger:Show()

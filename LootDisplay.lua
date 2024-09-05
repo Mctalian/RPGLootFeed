@@ -46,6 +46,7 @@ local defaults = {
 	rowBackgroundGradientEnd = { 0.1, 0.1, 0.1, 0 }, -- Default to dark grey with 0% opacity
 	font = "GameFontNormalSmall",
 }
+local defaultColor
 local config = nil
 local rows = G_RLF.list()
 local rowFramePool = {}
@@ -209,7 +210,7 @@ function LootDisplay:ShowMoney(copper)
 	local key = "MONEY_LOOT" -- Use ID as a unique key
 	local text
 
-	if not copper or copper <= 0 then
+	if not copper then
 		return
 	end
 
@@ -233,8 +234,15 @@ function LootDisplay:ShowMoney(copper)
 		row.copper = copper
 	end
 
-	text = C_CurrencyInfo.GetCoinTextureString(row.copper)
-	row.amountText:SetText(text)
+	text = C_CurrencyInfo.GetCoinTextureString(math.abs(row.copper))
+	local sign = "+"
+	if row.copper < 0 then
+		row.amountText:SetTextColor(1, 0, 0, 0.8)
+		sign = "-"
+	else
+		row.amountText:SetTextColor(unpack(defaultColor))
+	end
+	row.amountText:SetText(sign .. " " .. text)
 
 	local amountLogText = row.copper
 	if not new then
@@ -425,7 +433,6 @@ rowMoneyIcon = function(row)
 	row.icon:Hide()
 end
 
-local defaultColor
 rowMoneyText = function(row)
 	if row.amountText == nil then
 		row.amountText = row:CreateFontString(nil, "ARTWORK")
