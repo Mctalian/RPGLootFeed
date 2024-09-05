@@ -30,7 +30,6 @@ function ItemLoot:OnInitialize()
 	else
 		self:Disable()
 	end
-	logger = G_RLF.RLF:GetModule("Logger")
 end
 
 function ItemLoot:OnDisable()
@@ -46,7 +45,7 @@ local function showItemLoot(msg, itemLink)
 	local _, _, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent =
 		C_Item.GetItemInfo(itemLink)
 	if not G_RLF.db.global.itemQualityFilter[itemQuality] then
-		logger:Info("Item Ignored by quality", G_RLF.addonName, "ItemLoot", "", msg, amount)
+		self:getLogger():Debug("Item Ignored by quality", G_RLF.addonName, "ItemLoot", "", msg, amount)
 		return
 	end
 	local itemId = itemLink:match("Hitem:(%d+)")
@@ -62,25 +61,24 @@ local function showItemLoot(msg, itemLink)
 	--   end
 
 	-- end
-	G_RLF.LootDisplay:ShowLoot(itemId, itemLink, itemTexture, amount)
+	G_RLF.LootDisplay:ShowLoot("ItemLoot", itemId, itemLink, itemTexture, amount)
 end
 
-function ItemLoot:CHAT_MSG_LOOT(_, ...)
+function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 	local msg, _, _, _, _, _, _, _, _, _, _, guid = ...
 	local raidLoot = msg:match("HlootHistory:")
+	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, nil, eventName .. " " .. msg)
 	if raidLoot then
 		-- Ignore this message as it's a raid loot message
-		logger:Info("Raid Loot Ignored", "WOWEVENT", "ItemLoot", "", msg)
+		self:getLogger():Debug("Raid Loot Ignored", "WOWEVENT", "ItemLoot", "", msg)
 		return
 	end
 
 	local me = guid == GetPlayerGuid()
 	if not me then
-		logger:Info("Group Member Loot Ignored", "WOWEVENT", "ItemLoot", "", msg)
+		self:getLogger():Debug("Group Member Loot Ignored", "WOWEVENT", "ItemLoot", "", msg)
 		return
 	end
-
-	logger:Info("Self Loot Chat Event", "WOWEVENT", "ItemLoot", "", msg)
 
 	local itemLink = msg:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
 	if itemLink then

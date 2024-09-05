@@ -1,5 +1,7 @@
 TestMode = {}
 
+local logger
+
 local function idExistsInTable(id, table)
 	for _, item in pairs(table) do
 		if item.id == id then
@@ -10,20 +12,7 @@ local function idExistsInTable(id, table)
 end
 
 -- Initial test items with color variables
-local testItemIds = {
-	50818,
-	2589,
-	2592,
-	1515,
-	730,
-	19019,
-	128507,
-	132842,
-	23538,
-	11754,
-	128827,
-	219325,
-}
+local testItemIds = { 50818, 2589, 2592, 1515, 730, 19019, 128507, 132842, 23538, 11754, 128827, 219325 }
 
 local testItems = {}
 local function initializeTestItems()
@@ -42,23 +31,7 @@ local function initializeTestItems()
 	end
 end
 
-local testCurrencyIds = {
-	2245,
-	1191,
-	1828,
-	1792,
-	1755,
-	1580,
-	1273,
-	1166,
-	515,
-	241,
-	1813,
-	2778,
-	3089,
-	1101,
-	1704,
-}
+local testCurrencyIds = { 2245, 1191, 1828, 1792, 1755, 1580, 1273, 1166, 515, 241, 1813, 2778, 3089, 1101, 1704 }
 
 local testCurrencies = {}
 local function initializeTestCurrencies()
@@ -77,8 +50,12 @@ local function initializeTestCurrencies()
 	end
 end
 
-local ItemLoot, Currency, Xp, Rep, Money
-local playerGuid = GetPlayerGuid()
+local testFactions = {
+	"Undercity",
+	"Thunder Bluff",
+	"Orgrimmar",
+}
+
 local function generateRandomLoot()
 	if #testItems ~= #testItemIds then
 		initializeTestItems()
@@ -88,43 +65,45 @@ local function generateRandomLoot()
 		initializeTestCurrencies()
 	end
 	-- Randomly decide whether to generate an item or currency
-	local rng = math.random()
-	if rng < 0.8 then
-		-- Generate random item
-		local item = testItems[math.random(#testItems)]
-		local amountLooted = math.random(1, 5)
-		-- Choose the appropriate format based on the quantity
-		local lootMessage
-		if amountLooted > 1 then
-			lootMessage = format(LOOT_ITEM_SELF_MULTIPLE, item.link, amountLooted)
-		else
-			lootMessage = format(LOOT_ITEM_SELF, item.link)
+	local numberOfRowsToGenerate = math.random(1, 5)
+	for i = 1, numberOfRowsToGenerate do
+		local rng = math.random()
+
+		if rng >= 0.8 then
+			local experienceGained = math.random(100, 10000)
+			G_RLF.LootDisplay:ShowLoot("Experience", experienceGained)
 		end
-		-- Call the CHAT_MSG_LOOT event handler directly
-		ItemLoot:CHAT_MSG_LOOT(nil, lootMessage, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, playerGuid)
-		if rng < 0.1 then
+
+		if rng <= 0.2 then
 			local copper = math.random(1, 100000000)
-			G_RLF.LootDisplay:ShowMoney(copper)
+			G_RLF.LootDisplay:ShowLoot("Money", copper)
 		end
-	else
-		-- Generate random currency
-		local currency = testCurrencies[math.random(#testCurrencies)]
-		local amountLooted = math.random(1, 500)
-		Currency:CURRENCY_DISPLAY_UPDATE(nil, currency.id, nil, amountLooted)
+
+		-- 50% chance to show items
+		if rng > 0.2 and rng <= 0.7 then
+			local item = testItems[math.random(#testItems)]
+			local amountLooted = math.random(1, 5)
+			G_RLF.LootDisplay:ShowLoot("ItemLoot", item.id, item.link, item.icon, amountLooted)
+
+			-- 15% chance to show currency
+		elseif rng > 0.7 and rng <= 0.85 then
+			local currency = testCurrencies[math.random(#testCurrencies)]
+			local amountLooted = math.random(1, 500)
+			G_RLF.LootDisplay:ShowLoot("Currency", currency.id, currency.link, currency.icon, amountLooted)
+
+			-- 10% chance to show reputation (least frequent)
+		elseif rng > 0.85 then
+			local reputationGained = math.random(10, 100)
+			local factionName = testFactions[math.random(#testFactions)]
+			G_RLF.LootDisplay:ShowLoot("Reputation", reputationGained, factionName)
+		end
 	end
 end
 
-local logger
 function TestMode:ToggleTestMode()
-	if not (ItemLoot and Currency and Money and Xp and Rep) then
-		ItemLoot = G_RLF.RLF:GetModule("ItemLoot")
-		Currency = G_RLF.RLF:GetModule("Currency")
-		Money = G_RLF.RLF:GetModule("Money")
-		Xp = G_RLF.RLF:GetModule("Experience")
-		Rep = G_RLF.RLF:GetModule("Reputation")
+	if not logger then
 		logger = G_RLF.RLF:GetModule("Logger")
 	end
-
 	if self.testMode then
 		-- Stop test mode
 		self.testMode = false
@@ -133,10 +112,12 @@ function TestMode:ToggleTestMode()
 			self.testTimer = nil
 		end
 		G_RLF:Print(G_RLF.L["Test Mode Disabled"])
+		logger:Debug("Test Mode Disabled", G_RLF.addonName, "TestMode")
 	else
 		-- Start test mode
 		self.testMode = true
 		G_RLF:Print(G_RLF.L["Test Mode Enabled"])
+		logger:Debug("Test Mode Enabled", G_RLF.addonName, "TestMode")
 		self.testTimer = C_Timer.NewTicker(1.5, function()
 			G_RLF:fn(generateRandomLoot)
 		end)

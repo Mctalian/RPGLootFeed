@@ -98,7 +98,8 @@ function Rep:OnEnable()
 	self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
 end
 
-function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(_, message)
+function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
+	self:getLogger():Info(eventName .. " " .. message, "WOWEVENT", self.moduleName)
 	G_RLF:fn(function()
 		local faction, repChange = extractFactionAndRep(message, increasePatterns)
 		if not faction then
@@ -110,6 +111,7 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(_, message)
 		local r, g, b, color
 		if G_RLF.db.global.factionMaps[locale][faction] == nil then
 			-- attempt to find the missing faction's ID
+			self:getLogger():Debug(faction .. " not cached for " .. locale, G_RLF.addonName, self.moduleName)
 			buildFactionLocaleMap(faction)
 		end
 
@@ -132,7 +134,16 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(_, message)
 		end
 
 		if faction and repChange then
-			G_RLF.LootDisplay:ShowRep(repChange, faction, r, g, b)
+			G_RLF.LootDisplay:ShowLoot("Reputation", repChange, faction, r, g, b)
+		else
+			self:getLogger():Warn(
+				"Could not determine faction and/or rep change",
+				G_RLF.addonName,
+				self.moduleName,
+				faction,
+				nil,
+				repChange
+			)
 		end
 	end)
 end

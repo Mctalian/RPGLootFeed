@@ -21,8 +21,9 @@ function Money:OnEnable()
 	self:RegisterEvent("CHAT_MSG_MONEY")
 end
 
-function Money:LOOT_READY()
+function Money:LOOT_READY(eventName)
 	-- Get current money to calculate the delta later
+	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName)
 	startingMoney = GetMoney()
 end
 
@@ -31,14 +32,16 @@ local function showMoneyLoot(msg)
 	if startingMoney == nil then
 		-- Old method that doesn't work well with locales that are missing translation
 		amountInCopper = oldMethod(msg)
+		self:getLogger():Debug("Old money method", G_RLF.addonName, self.moduleName)
 	else
 		amountInCopper = GetMoney() - startingMoney
 	end
 	startingMoney = GetMoney()
-	G_RLF.LootDisplay:ShowMoney(amountInCopper)
+	G_RLF.LootDisplay:ShowLoot("Money", amountInCopper)
 end
 
-function Money:CHAT_MSG_MONEY(_, msg)
+function Money:CHAT_MSG_MONEY(eventName, msg)
+	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName)
 	G_RLF:fn(showMoneyLoot, msg)
 end
 

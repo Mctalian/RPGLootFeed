@@ -111,13 +111,28 @@ function LootDisplay:UpdateFadeDelay()
 	end
 end
 
-function LootDisplay:ShowLoot(id, link, icon, amountLooted)
-	local key = tostring(id) -- Use ID as a unique key
+function LootDisplay:ShowLoot(type, ...)
+	if type == "Currency" or type == "ItemLoot" then
+		self:ShowLinks(...)
+	elseif type == "Money" then
+		self:ShowMoney(...)
+	elseif type == "Experience" then
+		self:ShowXP(...)
+	elseif type == "Reputation" then
+		self:ShowRep(...)
+	end
+end
 
+function LootDisplay:ShowLinks(id, link, icon, amountLooted)
+	local key = tostring(id) -- Use ID as a unique key
+	local new = true
+	local isItem = true
 	-- Check if the item or currency is already displayed
 	local row = getRow(key)
+	isItem = string.find(link, "item:") ~= nil
 	if row then
 		-- Update existing entry
+		new = false
 		row.amount = row.amount + amountLooted
 		if not G_RLF.db.global.disableRowHighlight then
 			row.highlightAnimation:Stop()
@@ -136,8 +151,7 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
 		-- Initialize row content
 		rowStyles(row)
 		if Masque and iconGroup then
-			local found = string.find(link, "item:")
-			if found then
+			if isItem then
 				row.icon:SetItem(link)
 			else
 				local quality = C_CurrencyInfo.GetCurrencyInfo(id).quality
@@ -154,8 +168,17 @@ function LootDisplay:ShowLoot(id, link, icon, amountLooted)
 		row.fadeOutAnimation:Play()
 	end
 	row.amountText:SetText(row.link .. " x" .. row.amount)
-
-	logger:Info("Item Loot Shown", G_RLF.addonName, "ItemLoot", key, row.link, row.amount, new)
+	local amountLogText = row.amount
+	if not new then
+		amountLogText = format("%d (+%d)", row.amount, amountLooted)
+	end
+	local messageLogText = "Item Loot Shown"
+	local logType = "ItemLoot"
+	if not isItem then
+		messageLogText = "Currency Loot Shown"
+		logType = "Currency"
+	end
+	logger:Info(messageLogText, G_RLF.addonName, logType, key, row.link, amountLogText, new)
 	-- Add Tooltip
 	row.amountText:SetScript("OnEnter", function()
 		row.fadeOutAnimation:Stop()
@@ -192,8 +215,10 @@ function LootDisplay:ShowMoney(copper)
 
 	-- Check if the item or currency is already displayed
 	local row = getRow(key)
+	local new = true
 	if row then
 		-- Update existing entry
+		new = false
 		row.copper = row.copper + copper
 		row.highlightAnimation:Stop()
 		row.highlightAnimation:Play()
@@ -211,6 +236,14 @@ function LootDisplay:ShowMoney(copper)
 	text = C_CurrencyInfo.GetCoinTextureString(row.copper)
 	row.amountText:SetText(text)
 
+	local amountLogText = row.copper
+	if not new then
+		amountLogText = format("%s (+%s)", row.copper, copper)
+	end
+	local messageLogText = "Money Shown"
+	local logType = "Money"
+	logger:Info(messageLogText, G_RLF.addonName, logType, key, text, amountLogText, new)
+
 	row.fadeOutAnimation:Stop()
 	row.fadeOutAnimation:Play()
 end
@@ -221,8 +254,10 @@ function LootDisplay:ShowXP(experience)
 
 	-- Check if the item or currency is already displayed
 	local row = getRow(key)
+	local new = true
 	if row then
 		-- Update existing entry
+		new = false
 		row.experience = row.experience + experience
 		row.highlightAnimation:Stop()
 		row.highlightAnimation:Play()
@@ -240,6 +275,13 @@ function LootDisplay:ShowXP(experience)
 	text = "+" .. row.experience .. " " .. G_RLF.L["XP"]
 	row.amountText:SetText(text)
 	row.amountText:SetTextColor(1, 0, 1, 0.8)
+	local amountLogText = row.experience
+	if not new then
+		amountLogText = format("%s (+%s)", row.experience, experience)
+	end
+	local messageLogText = "XP Shown"
+	local logType = "Experience"
+	logger:Info(messageLogText, G_RLF.addonName, logType, key, text, amountLogText, new)
 
 	row.fadeOutAnimation:Stop()
 	row.fadeOutAnimation:Play()
