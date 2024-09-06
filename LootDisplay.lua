@@ -1,9 +1,11 @@
-local LootDisplay = {}
+local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
 
 local Masque = LibStub and LibStub("Masque", true)
 local iconGroup = Masque and Masque:Group(G_RLF.addonName)
 
 -- Private method declaration
+local processRow
+local processFromQueue
 local configureFeedFrame
 local applyRowStyles
 local doesRowExist
@@ -18,9 +20,6 @@ local rowBackground
 local rowFadeOutAnimation
 local rowHighlightBorder
 local rowIcon
-local rowMoneyIcon
-local rowMoneyStyles
-local rowMoneyText
 local rowStyles
 local configureTestArea
 local createArrowsTestArea
@@ -57,7 +56,7 @@ local tempFontString = nil
 -- Public methods
 local logger
 
-function LootDisplay:Initialize()
+function LootDisplay:OnInitialize()
 	config = DynamicPropertyTable(G_RLF.db.global, defaults)
 
 	configureFeedFrame()
@@ -67,8 +66,7 @@ function LootDisplay:Initialize()
 
 	tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
 	tempFontString:Hide() -- Prevent it from showing up
-
-	logger = G_RLF.RLF:GetModule("Logger")
+	self:RegisterBucketMessage("RLF_LootDisplay_RowReturned", 0.2, processFromQueue)
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)
@@ -113,14 +111,183 @@ function LootDisplay:UpdateFadeDelay()
 end
 
 function LootDisplay:ShowLoot(type, ...)
+	local key, textFn, isLink, icon, quantity, quality, r, g, b, a
+	isLink = false
+	local logType = type
 	if type == "Currency" or type == "ItemLoot" then
-		self:ShowLinks(...)
+		isLink = true
+		local t, k
+		k, t, icon, quantity = ...
+		key = tostring(k)
+		textFn = function(existingQuantity, truncatedLink)
+			if not truncatedLink then
+				return t
+			end
+			return truncatedLink .. " x" .. ((existingQuantity or 0) + quantity)
+		end
+		if type == "Currency" then
+			quality = C_CurrencyInfo.GetCurrencyInfo(k).quality
+		end
 	elseif type == "Money" then
-		self:ShowMoney(...)
+		key = "MONEY_LOOT"
+		quantity = ...
+		if not quantity then
+			return
+		end
+		textFn = function(existingCopper)
+			return C_CurrencyInfo.GetCoinTextureString(math.abs((existingCopper or 0) + quantity))
+		end
 	elseif type == "Experience" then
-		self:ShowXP(...)
+		key = "EXPERIENCE"
+		quantity = ...
+		r, g, b, a = 1, 0, 1, 0.8
+		textFn = function(existingXP)
+			return "+" .. ((existingXP or 0) + quantity) .. " " .. G_RLF.L["XP"]
+		end
 	elseif type == "Reputation" then
-		self:ShowRep(...)
+		local factionName, rL, gL, bL
+		quantity, factionName, rL, gL, bL = ...
+		r, g, b = rL or 0.5, gL or 0.5, bL or 1
+		a = 1
+		key = "REP_" .. factionName
+		textFn = function(existingRep)
+			local sign = "+"
+			local rep = (existingRep or 0) + quantity
+			if rep < 0 then
+				sign = "-"
+			end
+			return sign .. math.abs(rep) .. " " .. factionName
+		end
+	else
+		self:getLogger():Error("Unknown type? " .. type, G_RLF.addonName, type)
+	end
+	processRow(key, textFn, icon, quantity, quality, r, g, b, a, logType)
+end
+
+function dump(o)
+	if type(o) == "table" then
+		local s = "{ "
+		for k, v in pairs(o) do
+			if type(k) ~= "number" then
+				k = '"' .. k .. '"'
+			end
+			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
+		end
+		return s .. "} "
+	else
+		return tostring(o)
+	end
+end
+
+local overflowQueue = {}
+processRow = function(...)
+	local key, textFn, icon, quantity, quality, r, g, b, a, logType = ...
+	local isLink = not not icon
+	local new = true
+	local text
+
+	local rD, gD, bD, aD = unpack(defaultColor or { 1, 1, 1, 1 })
+
+	local row = getRow(key)
+	if row then
+		-- Update existing entry
+		new = false
+		row.meta = { ... }
+		text = textFn(row.amount, row.link)
+		row.amount = row.amount + quantity
+		if not G_RLF.db.global.disableRowHighlight then
+			row.highlightAnimation:Stop()
+			row.highlightAnimation:Play()
+		end
+		if row.fadeOutAnimation:IsPlaying() then
+			row.fadeOutAnimation:Stop()
+			row.fadeOutAnimation:Play()
+		end
+	else
+		-- New row
+		row = leaseRow(key)
+		if row == nil then
+			tinsert(overflowQueue, { ... })
+			return
+		end
+
+		row.meta = { ... }
+		row.amount = quantity
+		rowStyles(row, icon)
+		if isLink then
+			local extraWidth = getTextWidth(" x" .. row.amount)
+			row.link = truncateItemLink(textFn(), extraWidth)
+			text = textFn(quantity, row.link)
+
+			if icon then
+				if Masque and iconGroup then
+					if logType == "ItemLoot" then
+						row.icon:SetItem(row.link)
+					else
+						local quality = C_CurrencyInfo.GetCurrencyInfo(key).quality
+						row.icon:SetItemButtonTexture(icon)
+						row.icon:SetItemButtonQuality(quality, row.link)
+					end
+				else
+					row.icon:SetTexture(icon)
+				end
+			end
+			-- Add Tooltip
+			row.amountText:SetScript("OnEnter", function()
+				row.fadeOutAnimation:Stop()
+				row.highlightAnimation:Stop()
+				row.highlightBorder:SetAlpha(0)
+				if not G_RLF.db.global.tooltip then
+					return
+				end
+				if G_RLF.db.global.tooltipOnShift and not IsShiftKeyDown() then
+					return
+				end
+				local inCombat = UnitAffectingCombat("player")
+				if inCombat then
+					GameTooltip:Hide()
+					return
+				end
+				GameTooltip:SetOwner(row.amountText, "ANCHOR_RIGHT")
+				GameTooltip:SetHyperlink(row.link) -- Use the item's link to show the tooltip
+				GameTooltip:Show()
+			end)
+			row.amountText:SetScript("OnLeave", function()
+				row.fadeOutAnimation:Play()
+				GameTooltip:Hide()
+			end)
+		else
+			text = textFn()
+		end
+	end
+	row.amountText:SetText(text)
+	if r == nil and g == nil and b == nil and row.amount ~= nil and row.amount < 0 then
+		r, g, b, a = 1, 0, 0, 0.8
+	else
+		r, g, b, a = r or rD, g or gD, b or bD, a or aD
+	end
+	row.amountText:SetTextColor(r, g, b, a)
+	local amountLogText = row.amount
+	if not new then
+		amountLogText = format("%s (+%s)", row.amount, quantity)
+	end
+	LootDisplay:getLogger():Info(logType .. " Shown", G_RLF.addonName, logType, key, text, amountLogText, new)
+	row.fadeOutAnimation:Stop()
+	row.fadeOutAnimation:Play()
+end
+
+processFromQueue = function()
+	local snapshotQueueSize = #overflowQueue
+	if snapshotQueueSize > 0 then
+		-- error("Test")
+		local rowsToProcess = math.min(snapshotQueueSize, config.maxRows)
+		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from overflow queue", G_RLF.addonName)
+		for i = 1, math.min(snapshotQueueSize, config.maxRows) do
+			-- Get the first set of args from the queue
+			local args = tremove(overflowQueue, 1) -- Remove and return the first element
+			-- Call processRow with the unpacked arguments
+			processRow(unpack(args))
+		end
 	end
 end
 
@@ -171,7 +338,7 @@ function LootDisplay:ShowLinks(id, link, icon, amountLooted)
 	row.amountText:SetText(row.link .. " x" .. row.amount)
 	local amountLogText = row.amount
 	if not new then
-		amountLogText = format("%d (+%d)", row.amount, amountLooted)
+		amountLogText = format("%s (+%s)", row.amount, amountLooted)
 	end
 	local messageLogText = "Item Loot Shown"
 	local logType = "ItemLoot"
@@ -179,7 +346,7 @@ function LootDisplay:ShowLinks(id, link, icon, amountLooted)
 		messageLogText = "Currency Loot Shown"
 		logType = "Currency"
 	end
-	logger:Info(messageLogText, G_RLF.addonName, logType, key, row.link, amountLogText, new)
+	self:getLogger():Info(messageLogText, G_RLF.addonName, logType, key, row.link, amountLogText, new)
 	-- Add Tooltip
 	row.amountText:SetScript("OnEnter", function()
 		row.fadeOutAnimation:Stop()
@@ -250,7 +417,7 @@ function LootDisplay:ShowMoney(copper)
 	end
 	local messageLogText = "Money Shown"
 	local logType = "Money"
-	logger:Info(messageLogText, G_RLF.addonName, logType, key, text, amountLogText, new)
+	self:getLogger():Info(messageLogText, G_RLF.addonName, logType, key, text, amountLogText, new)
 
 	row.fadeOutAnimation:Stop()
 	row.fadeOutAnimation:Play()
@@ -289,7 +456,7 @@ function LootDisplay:ShowXP(experience)
 	end
 	local messageLogText = "XP Shown"
 	local logType = "Experience"
-	logger:Info(messageLogText, G_RLF.addonName, logType, key, text, amountLogText, new)
+	self:getLogger():Info(messageLogText, G_RLF.addonName, logType, key, text, amountLogText, new)
 
 	row.fadeOutAnimation:Stop()
 	row.fadeOutAnimation:Play()
@@ -411,47 +578,7 @@ rowIcon = function(row)
 	row.icon:Show()
 end
 
-rowMoneyIcon = function(row)
-	if row.icon == nil then
-		if Masque and iconGroup then
-			row.icon = CreateFrame("ItemButton", nil, row)
-			iconGroup:AddButton(row.icon)
-		else
-			row.icon = row:CreateTexture(nil, "ARTWORK")
-		end
-	else
-		row.icon:ClearAllPoints()
-	end
-	row.icon:SetSize(config.iconSize, config.iconSize)
-	local anchor = "LEFT"
-	local xOffset = config.iconSize / 4
-	if G_RLF.db.global.leftAlign == false then
-		anchor = "RIGHT"
-		xOffset = xOffset * -1
-	end
-	row.icon:SetPoint(anchor, xOffset, 0)
-	row.icon:Hide()
-end
-
-rowMoneyText = function(row)
-	if row.amountText == nil then
-		row.amountText = row:CreateFontString(nil, "ARTWORK")
-		if not defaultColor then
-			local r, g, b, a = row.amountText:GetTextColor()
-			defaultColor = { r, g, b, a }
-		end
-	else
-		row.amountText:ClearAllPoints()
-	end
-	local anchor = "LEFT"
-	if G_RLF.db.global.leftAlign == false then
-		anchor = "RIGHT"
-	end
-	row.amountText:SetFontObject(config.font)
-	row.amountText:SetPoint(anchor, row.icon, anchor, 0, 0)
-end
-
-rowAmountText = function(row)
+rowAmountText = function(row, icon)
 	if row.amountText == nil then
 		row.amountText = row:CreateFontString(nil, "ARTWORK")
 		if not defaultColor then
@@ -470,7 +597,11 @@ rowAmountText = function(row)
 		xOffset = xOffset * -1
 	end
 	row.amountText:SetFontObject(config.font)
-	row.amountText:SetPoint(anchor, row.icon, iconAnchor, xOffset, 0)
+	if icon then
+		row.amountText:SetPoint(anchor, row.icon, iconAnchor, xOffset, 0)
+	else
+		row.amountText:SetPoint(anchor, row.icon, anchor, 0, 0)
+	end
 end
 
 rowFadeOutAnimation = function(row)
@@ -528,33 +659,21 @@ rowHighlightBorder = function(row)
 	end
 end
 
-rowMoneyStyles = function(row)
+rowStyles = function(row, icon)
 	row:SetSize(config.feedWidth, config.rowHeight)
-
-	rowBackground(row)
-	rowMoneyIcon(row)
-	rowHighlightBorder(row)
-	rowMoneyText(row)
-	rowFadeOutAnimation(row)
-end
-
-rowStyles = function(row)
-	row:SetSize(config.feedWidth, config.rowHeight)
-
 	rowBackground(row)
 	rowIcon(row)
+	if not icon then
+		row.icon:Hide()
+	end
 	rowHighlightBorder(row)
-	rowAmountText(row)
+	rowAmountText(row, icon)
 	rowFadeOutAnimation(row)
 end
 
-applyRowStyles = function(row)
-	if row.copper ~= nil or row.experience ~= nil or row.rep ~= nil then
-		rowMoneyStyles(row)
-	else
-		rowStyles(row)
-	end
-	if iconGroup then
+applyRowStyles = function(row, icon)
+	rowStyles(row, icon)
+	if icon and iconGroup then
 		iconGroup:ReSkin(row.icon)
 	end
 end
@@ -563,7 +682,12 @@ updateRowPositions = function()
 	local index = 0
 	for row in rows:iterate() do
 		if row:IsShown() then
-			applyRowStyles(row)
+			local icon
+			if row.meta then
+				local _, _, ic = unpack(row.meta)
+				icon = ic
+			end
+			applyRowStyles(row, icon)
 			row:ClearAllPoints()
 			local vertDir = "BOTTOM"
 			local yOffset = index * (config.rowHeight + config.padding)
@@ -642,13 +766,13 @@ local function createArrow(f, direction)
 		arrow:SetRotation(0)
 	elseif direction == "DOWN" then
 		arrow:SetPoint("BOTTOM", f, "BOTTOM", 0, 20)
-		arrow:SetRotation(math.pi) -- Rotate 180 degrees
+		arrow:SetRotation(math.pi)
 	elseif direction == "LEFT" then
 		arrow:SetPoint("LEFT", f, "LEFT", 20, 0)
-		arrow:SetRotation(math.pi * 0.5) -- Rotate 270 degrees
+		arrow:SetRotation(math.pi * 0.5)
 	elseif direction == "RIGHT" then
 		arrow:SetPoint("RIGHT", f, "RIGHT", -20, 0)
-		arrow:SetRotation(math.pi * 1.5) -- Rotate 90 degrees
+		arrow:SetRotation(math.pi * 1.5)
 	end
 
 	arrow:Hide()
@@ -714,10 +838,8 @@ leaseRow = function(key)
 		row = tremove(rowFramePool)
 		row:ClearAllPoints()
 		row.amount = nil
-		row.copper = nil
 		row.link = nil
-		row.experience = nil
-		row.rep = nil
+		row.meta = nil
 		if row.highlightBorder then
 			row.highlightBorder:SetAlpha(0)
 		end
@@ -757,4 +879,5 @@ end
 returnRow = function(row)
 	row:Hide()
 	tinsert(rowFramePool, row)
+	LootDisplay:SendMessage("RLF_LootDisplay_RowReturned")
 end

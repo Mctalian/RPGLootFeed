@@ -2,7 +2,12 @@ local ConfigOptions = {}
 
 G_RLF.defaults = {
 	profile = {},
-	global = {},
+	global = {
+		logger = {
+			sessionsLogged = 0,
+			logs = {},
+		},
+	},
 }
 
 G_RLF.options = {

@@ -1,12 +1,10 @@
 local addonName = G_RLF.addonName
 local acd = LibStub("AceConfigDialog-3.0")
 RLF = G_RLF.RLF
-G_RLF.L = LibStub("AceLocale-3.0"):GetLocale(G_RLF.localeName)
 
 function RLF:OnInitialize()
 	G_RLF.db = LibStub("AceDB-3.0"):New(G_RLF.dbName, G_RLF.defaults, true)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
-	G_RLF.LootDisplay:Initialize()
 	self:Hook(acd, "Open", "OnOptionsOpen")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterChatCommand("rlf", "SlashCommand")

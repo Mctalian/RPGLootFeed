@@ -141,7 +141,7 @@ local function initializeFrame()
 end
 
 getLogger = function()
-	if G_RLF.db then
+	if G_RLF.db.global.logger ~= nil and G_RLF.db.global.logger.sessionsLogged > 0 then
 		return G_RLF.db.global.logger.logs[G_RLF.db.global.logger.sessionsLogged]
 	end
 end
@@ -152,7 +152,6 @@ end
 
 function Logger:PLAYER_ENTERING_WORLD(_, isLogin, isReload)
 	if isLogin then
-		G_RLF.db.global.logger = G_RLF.db.global.logger or defaults
 		G_RLF.db.global.logger.sessionsLogged = (G_RLF.db.global.logger.sessionsLogged or 0) + 1
 		G_RLF.db.global.logger.logs = G_RLF.db.global.logger.logs or {}
 		G_RLF.db.global.logger.logs[G_RLF.db.global.logger.sessionsLogged] = {}
@@ -189,6 +188,15 @@ local function getType(logEntry)
 
 	-- Return an empty string for "General" and the corresponding value for others
 	return typeColors[type] or ""
+end
+
+local function getSource(logEntry)
+	local source = logEntry.source
+	local sourceStrings = {
+		[G_RLF.addonName] = "(RLF)",
+		[WOWEVENT] = "(WOW)",
+	}
+	return sourceStrings[source] or ""
 end
 
 local function getTimestamp(logEntry)
@@ -229,9 +237,10 @@ end
 
 local function formatLogEntry(logEntry)
 	return format(
-		"[%s] %s: %s%s%s%s%s\n",
+		"[%s]%s%s%s:%s%s%s%s\n",
 		getTimestamp(logEntry),
 		getLevel(logEntry),
+		getSource(logEntry),
 		getType(logEntry),
 		getContent(logEntry),
 		getAmount(logEntry),
@@ -250,7 +259,7 @@ updateContent = function()
 	for i, logEntry in ipairs(getLogger()) do
 		if eventSource[logEntry.source] then
 			if eventLevel[logEntry.level] then
-				if eventType[logEntry.type] then
+				if eventType[logEntry.type] or logEntry.type == "General" then
 					addText(logEntry)
 				end
 			end

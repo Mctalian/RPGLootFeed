@@ -70,13 +70,13 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, nil, eventName .. " " .. msg)
 	if raidLoot then
 		-- Ignore this message as it's a raid loot message
-		self:getLogger():Debug("Raid Loot Ignored", "WOWEVENT", "ItemLoot", "", msg)
+		self:getLogger():Debug("Raid Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
 		return
 	end
 
 	local me = guid == GetPlayerGuid()
 	if not me then
-		self:getLogger():Debug("Group Member Loot Ignored", "WOWEVENT", "ItemLoot", "", msg)
+		self:getLogger():Debug("Group Member Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
 		return
 	end
 
