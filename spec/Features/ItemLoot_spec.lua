@@ -7,7 +7,7 @@ describe("ItemLoot module", function()
 		-- Define the global G_RLF
 		common_stubs.setup_G_RLF(spy)
 		-- Load the list module before each test
-		LootModule = dofile("Features/ItemLoot.lua")
+		LootModule = require("Features/ItemLoot")
 	end)
 
 	it("LootModule is not nil", function()

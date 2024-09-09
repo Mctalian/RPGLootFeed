@@ -8,9 +8,9 @@ describe("List module", function()
 
 	before_each(function()
 		-- Define the global G_RLF
-		_G.G_RLF = {}
+		_G.G_RLF = _G.G_RLF or {}
 		-- Load the list module before each test
-		dofile("DoubleLinkedList.lua")
+		require("DoubleLinkedList")
 
 		list = _G.G_RLF.list
 	end)

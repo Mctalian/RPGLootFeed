@@ -3,6 +3,7 @@ local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0")
 local locale
 function Rep:OnInitialize()
 	locale = GetLocale()
+	-- TODO: Move this to db defaults
 	G_RLF.db.global.factionMaps = G_RLF.db.global.factionMaps or {}
 	G_RLF.db.global.factionMaps[locale] = G_RLF.db.global.factionMaps[locale] or {}
 	if G_RLF.db.global.repFeed then
@@ -53,7 +54,12 @@ local function extractFactionAndRep(message, patterns)
 				local postMatchStart, postMatchEnd = string.find(msgLoop, postPattern, midMatchEnd, true)
 				if postMatchStart then
 					local faction = msgLoop:sub(1, midMatchStart - 1)
-					local rep = msgLoop:sub(midMatchEnd + 1, postMatchStart - 1)
+					local rep
+					if midMatchEnd == postMatchStart then
+						rep = msgLoop:sub(midMatchEnd + 1)
+					else
+						rep = msgLoop:sub(midMatchEnd + 1, postMatchStart - 1)
+					end
 					return faction, tonumber(rep)
 				end
 			end
@@ -98,8 +104,9 @@ function Rep:OnEnable()
 	self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
 end
 
-function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(_, message)
-	G_RLF:fn(function()
+function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
+	self:getLogger():Info(eventName .. " " .. message, "WOWEVENT", self.moduleName)
+	return self:fn(function()
 		local faction, repChange = extractFactionAndRep(message, increasePatterns)
 		if not faction then
 			faction, repChange = extractFactionAndRep(message, decreasePatterns)
@@ -107,9 +114,21 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(_, message)
 				repChange = -repChange
 			end
 		end
+		if not faction or not repChange then
+			self:getLogger():Error(
+				"Could not determine faction and/or rep change from message",
+				G_RLF.addonName,
+				self.moduleName,
+				faction,
+				nil,
+				repChange
+			)
+			return
+		end
 		local r, g, b, color
 		if G_RLF.db.global.factionMaps[locale][faction] == nil then
 			-- attempt to find the missing faction's ID
+			self:getLogger():Debug(faction .. " not cached for " .. locale, G_RLF.addonName, self.moduleName)
 			buildFactionLocaleMap(faction)
 		end
 
@@ -125,15 +144,15 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(_, message)
 					color = FACTION_BAR_COLORS[factionData.reaction]
 				end
 			end
+		else
+			self:getLogger():Warn(faction .. " is STILL not cached for " .. locale, G_RLF.addonName, self.moduleName)
 		end
 
 		if color then
 			r, g, b = color.r, color.g, color.b
 		end
 
-		if faction and repChange then
-			G_RLF.LootDisplay:ShowRep(repChange, faction, r, g, b)
-		end
+		G_RLF.LootDisplay:ShowLoot(self.moduleName, repChange, faction, r, g, b)
 	end)
 end
 

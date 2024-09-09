@@ -9,7 +9,7 @@ describe("Currency module", function()
 		common_stubs.stub_C_CurrencyInfo()
 
 		-- Load the list module before each test
-		CurrencyModule = dofile("Features/Currency.lua")
+		CurrencyModule = require("Features/Currency")
 	end)
 
 	it("does not show loot if the currency type is nil", function()
@@ -74,6 +74,9 @@ describe("Currency module", function()
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, 5, 2)
 
-		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.called_with(_, 123, "|c12345678|Hcurrency:123|r", 123456, 2)
+		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.called()
+		assert
+			.stub(_G.G_RLF.LootDisplay.ShowLoot).was
+			.called_with(_, "Currency", 123, "|c12345678|Hcurrency:123|r", 123456, 2)
 	end)
 end)

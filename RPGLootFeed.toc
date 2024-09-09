@@ -19,13 +19,12 @@ DoubleLinkedList.lua
 
 locale/locales.xml
 
-Features/features.xml
-
 BlizzOverrides/overrides.xml
 
-RPGLootFeed.lua
-
 config/config.xml
+RPGLootFeed.lua
+Logger.lua
 
+Features/features.xml
 TestMode.lua
 LootDisplay.lua
