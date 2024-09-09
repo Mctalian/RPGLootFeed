@@ -135,7 +135,12 @@ function LootDisplay:ShowLoot(type, ...)
 			return
 		end
 		textFn = function(existingCopper)
-			return C_CurrencyInfo.GetCoinTextureString(math.abs((existingCopper or 0) + quantity))
+			local sign = ""
+			local total = (existingCopper or 0) + quantity
+			if total < 0 then
+				sign = "-"
+			end
+			return sign .. C_CurrencyInfo.GetCoinTextureString(math.abs(total))
 		end
 	elseif type == "Experience" then
 		key = "EXPERIENCE"

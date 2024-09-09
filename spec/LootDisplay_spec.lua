@@ -1,14 +1,15 @@
+local common_stubs = require("spec.common_stubs")
+
 describe("LootDisplay module", function()
+	local LootDisplayModule
 	before_each(function()
 		-- Define the global G_RLF
-		_G.G_RLF = {
-			list = function() end,
-		}
+		common_stubs.setup_G_RLF(spy)
 		-- Load the list module before each test
-		require("LootDisplay")
+		LootDisplayModule = require("LootDisplay")
 	end)
 
-	it("TODO", function()
-		assert.are.equal(true, true)
+	it("creates the module", function()
+		assert.is_not_nil(LootDisplayModule)
 	end)
 end)

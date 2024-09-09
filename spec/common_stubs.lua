@@ -27,6 +27,9 @@ function common_stubs.setup_G_RLF(spy)
 		LootDisplay = {
 			ShowLoot = function() end,
 		},
+		list = function()
+			return {}
+		end,
 		RLF = {
 			NewModule = function(_, name, libs)
 				return {
