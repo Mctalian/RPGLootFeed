@@ -4,6 +4,8 @@ import re
 
 # Function to check if a file or directory should be ignored
 def should_ignore(path, ignore_files, ignore_dirs):
+    if os.path.basename(path) in ignore_dirs:
+        return True
     for dir in ignore_dirs:
         if path.startswith(f"./{dir}/"):
             return True
@@ -65,8 +67,19 @@ def scan_directory(directory, ignore_files=None, ignore_dirs=None):
 
 
 def main():
-    ignore_files = ["TestMode.lua"]
-    ignore_dirs = [".git", ".scripts", ".release", "locale"]
+    ignore_files = []
+    ignore_dirs = [
+        ".git",
+        ".github",
+        ".release",
+        ".scripts",
+        ".trunk",
+        ".venv",
+        "Icons",
+        "locale",
+        "luacov-html",
+        "spec",
+    ]
 
     # Scan the current directory
     issues = scan_directory(".", ignore_files, ignore_dirs)
