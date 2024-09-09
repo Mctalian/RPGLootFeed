@@ -90,6 +90,7 @@ def compare_translations(reference_dict, target_dict, locale):
 def main():
     locale_dir = "locale"
     output_directory = ".scripts/.output"
+    ignored_files = ["main.lua"]
 
     # Create output_directory if it doesn't exist
     if not os.path.exists(output_directory):
@@ -113,6 +114,8 @@ def main():
 
     # Compare each locale with the reference
     for locale_file in locale_files:
+        if locale_file in ignored_files:
+            continue
         if locale_file != reference_file:
             target_dict = load_lua_file(f"{locale_dir}/{locale_file}")
             markdown_report, extra_keys = compare_translations(
