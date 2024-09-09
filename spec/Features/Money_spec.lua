@@ -5,8 +5,9 @@ describe("Money module", function()
 
 	before_each(function()
 		common_stubs.setup_G_RLF(spy)
+		common_stubs.stub_Money_Funcs()
 		-- Load the list module before each test
-		MoneyModule = dofile("Features/Money.lua")
+		MoneyModule = require("Features/Money")
 	end)
 
 	it("MoneyModule is not nil", function()

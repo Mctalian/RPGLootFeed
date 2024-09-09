@@ -5,12 +5,13 @@ describe("AddonScope module", function()
 				NewAddon = function()
 					return {
 						SetDefaultModuleState = function() end,
+						SetDefaultModulePrototype = function() end,
 					}
 				end,
 			}
 		end
 		-- Load the list module before each test
-		dofile("AddonScope.lua")
+		require("AddonScope")
 	end)
 
 	it("TODO", function()
