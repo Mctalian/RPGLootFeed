@@ -66,7 +66,7 @@ function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
 
 	self:fn(function()
 		G_RLF.LootDisplay:ShowLoot(
-			"Currency",
+			self.moduleName,
 			info.currencyID,
 			C_CurrencyInfo.GetCurrencyLink(currencyType),
 			info.iconFileID,

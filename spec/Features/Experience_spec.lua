@@ -8,15 +8,15 @@ describe("Experience module", function()
 		common_stubs.setup_G_RLF(spy)
 		common_stubs.stub_Unit_Funcs()
 		-- Load the list module before each test
-		XpModule = dofile("Features/Experience.lua")
+		XpModule = require("Features/Experience")
 	end)
 
 	it("does not show xp if the unit target is not player", function()
 		_G.G_RLF.db.global.xpFeed = true
 
-		XpModule:PLAYER_XP_UPDATE(_, "target")
+		XpModule:PLAYER_XP_UPDATE("PLAYER_XP_UPDATE", "target")
 
-		assert.stub(_G.G_RLF.LootDisplay.ShowXP).was_not_called()
+		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was_not_called()
 	end)
 
 	it("does not show xp if the calculated delta is 0", function()
@@ -24,9 +24,9 @@ describe("Experience module", function()
 
 		XpModule:PLAYER_ENTERING_WORLD()
 
-		XpModule:PLAYER_XP_UPDATE(_, "player")
+		XpModule:PLAYER_XP_UPDATE("PLAYER_XP_UPDATE", "player")
 
-		assert.stub(_G.G_RLF.LootDisplay.ShowXP).was_not_called()
+		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was_not_called()
 	end)
 
 	it("does not show xp if the calculated delta is 0", function()
@@ -41,8 +41,9 @@ describe("Experience module", function()
 			return 100
 		end
 
-		XpModule:PLAYER_XP_UPDATE(_, "player")
+		XpModule:PLAYER_XP_UPDATE("PLAYER_XP_UPDATE", "player")
 
-		assert.stub(_G.G_RLF.LootDisplay.ShowXP).was_called_with(_, 50)
+		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.called()
+		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.called_with(_, "Experience", 50)
 	end)
 end)

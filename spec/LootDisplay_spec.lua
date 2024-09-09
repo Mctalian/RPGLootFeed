@@ -5,7 +5,7 @@ describe("LootDisplay module", function()
 			list = function() end,
 		}
 		-- Load the list module before each test
-		dofile("LootDisplay.lua")
+		require("LootDisplay")
 	end)
 
 	it("TODO", function()

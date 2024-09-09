@@ -10,7 +10,7 @@ describe("RPGLootFeed module", function()
 			RLF = {},
 		}
 		-- Load the list module before each test
-		dofile("RPGLootFeed.lua")
+		require("RPGLootFeed")
 	end)
 
 	it("TODO", function()

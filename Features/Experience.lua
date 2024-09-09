@@ -54,7 +54,7 @@ function Xp:PLAYER_XP_UPDATE(eventName, unitTarget)
 			currentLevel = newLevel
 			currentMaxXP = UnitXPMax(unitTarget)
 			if delta > 0 then
-				G_RLF.LootDisplay:ShowLoot("Experience", delta)
+				G_RLF.LootDisplay:ShowLoot(self.moduleName, delta)
 			else
 				self:getLogger()
 					:Warn(eventName .. " fired but delta was not positive", G_RLF.addonName, self.moduleName)

@@ -11,19 +11,11 @@ function Money:OnInitialize()
 end
 
 function Money:OnDisable()
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_MONEY")
 end
 
 function Money:OnEnable()
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_MONEY")
-	startingMoney = GetMoney()
-end
-
-function Money:PLAYER_ENTERING_WORLD(eventName)
-	-- Get current money to calculate the delta later
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName)
 	startingMoney = GetMoney()
 end
 
