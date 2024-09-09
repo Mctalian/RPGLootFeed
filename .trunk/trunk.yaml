@@ -21,6 +21,9 @@ lint:
     - linters: [stylua]
       paths:
         - locale/**
+    - linters: [no-invalid-prints]
+      paths:
+        - spec/**
   enabled:
     - stylua@0.20.0
     - actionlint@1.7.1
