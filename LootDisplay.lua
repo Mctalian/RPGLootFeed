@@ -207,7 +207,7 @@ processRow = function(...)
 		if isLink then
 			local extraWidth = getTextWidth(" x" .. row.amount)
 			row.link = truncateItemLink(textFn(), extraWidth)
-			text = textFn(quantity, row.link)
+			text = textFn(0, row.link)
 
 			if icon then
 				if Masque and iconGroup then

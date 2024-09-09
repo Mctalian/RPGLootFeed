@@ -41,7 +41,7 @@ function ItemLoot:OnEnable()
 end
 
 local function showItemLoot(msg, itemLink)
-	local amount = msg:match("r ?x(%d+)") or 1
+	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
 	local _, _, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent =
 		C_Item.GetItemInfo(itemLink)
 	if not G_RLF.db.global.itemQualityFilter[itemQuality] then
