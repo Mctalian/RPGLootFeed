@@ -36,6 +36,7 @@ function RLF:SlashCommand(msg, editBox)
 	end)
 end
 
+local currentVersion = "@project-version@"
 function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 	if self.optionsFrame == nil then
 		self.optionsFrame = acd:AddToBlizOptions(addonName, addonName)
@@ -44,8 +45,10 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 		self:LootToastHook()
 		self:BossBannerHook()
 	end)
-	if isLogin and isReload == false then
-		self:Print(G_RLF.L["Welcome"])
+	local isNewVersion = currentVersion ~= G_RLF.db.global.lastVersionLoaded
+	if isLogin and isReload == false and isNewVersion then
+		G_RLF.db.global.lastVersionLoaded = currentVersion
+		self:Print(G_RLF.L["Welcome"] .. " (" .. currentVersion .. ")")
 		if G_RLF.db.global.enableAutoLoot then
 			C_CVar.SetCVar("autoLootDefault", "1")
 		end
