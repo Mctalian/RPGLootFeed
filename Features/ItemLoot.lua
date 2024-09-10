@@ -45,7 +45,7 @@ local function showItemLoot(msg, itemLink)
 	local _, _, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent =
 		C_Item.GetItemInfo(itemLink)
 	if not G_RLF.db.global.itemQualityFilter[itemQuality] then
-		ItemLoot:getLogger():Debug("Item Ignored by quality", G_RLF.addonName, "ItemLoot", "", msg, amount)
+		ItemLoot:getLogger():Debug("Item Ignored by quality", G_RLF.addonName, "ItemLoot", "", nil, amount)
 		return
 	end
 	local itemId = itemLink:match("Hitem:(%d+)")
