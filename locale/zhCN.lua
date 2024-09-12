@@ -159,3 +159,5 @@ L["UIParent"] = true
 L["PlayerFrame"] = "玩家框架"
 L["Minimap"] = "小地图"
 L["BagBar"] = "背包栏"
+L["Disable Row Highlight"] = "禁用行高亮"
+L["DisableRowHighlightDesc"] = "如果选中，当你再次拾取相同的物品并且数量更新时，不再高亮显示该行。"
