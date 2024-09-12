@@ -7,6 +7,7 @@ G_RLF.defaults = {
 			sessionsLogged = 0,
 			logs = {},
 		},
+		lastVersionLoaded = "v1.0.0",
 	},
 }
 
