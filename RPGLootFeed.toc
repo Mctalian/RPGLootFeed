@@ -27,4 +27,6 @@ Logger.lua
 
 Features/features.xml
 TestMode.lua
+LootDisplayFrame.xml
+LootDisplayRowTemplate.xml
 LootDisplay.lua

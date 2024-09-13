@@ -21,10 +21,6 @@ local rowFadeOutAnimation
 local rowHighlightBorder
 local rowIcon
 local rowStyles
-local configureTestArea
-local createArrowsTestArea
-local showTestArea
-local hideTestArea
 local truncateItemLink
 local updateRowPositions
 
@@ -59,10 +55,7 @@ local logger
 function LootDisplay:OnInitialize()
 	config = DynamicPropertyTable(G_RLF.db.global, defaults)
 
-	configureFeedFrame()
-
-	configureTestArea()
-	createArrowsTestArea()
+	frame = LootDisplayFrame
 
 	tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
 	tempFontString:Hide() -- Prevent it from showing up
@@ -71,9 +64,9 @@ end
 
 function LootDisplay:SetBoundingBoxVisibility(show)
 	if show then
-		showTestArea()
+		frame:ShowTestArea()
 	else
-		hideTestArea()
+		frame:HideTestArea()
 	end
 end
 
@@ -218,6 +211,7 @@ processRow = function(...)
 						row.icon:SetItemButtonTexture(icon)
 						row.icon:SetItemButtonQuality(quality, row.link)
 					end
+					iconGroup:ReSkin(row.icon)
 				else
 					row.icon:SetTexture(icon)
 				end
@@ -294,15 +288,13 @@ end
 G_RLF.LootDisplay = LootDisplay
 
 configureFeedFrame = function()
-	frame = CreateFrame("Frame", "LootDisplayFrame", UIParent)
+	frame = LootDisplayFrame
 	frame:SetSize(config.feedWidth, getFrameHeight())
 	frame:SetPoint(config.anchorPoint, _G[config.relativePoint], config.xOffset, config.yOffset)
 
 	frame:SetFrameStrata(config.frameStrata) -- Set the frame strata here
 
 	frame:SetClipsChildren(true) -- Enable clipping of child elements
-
-	frame:SetClampedToScreen(true)
 	frame:RegisterForDrag("LeftButton")
 	frame:SetScript("OnDragStart", frame.StartMoving)
 	frame:SetScript("OnDragStop", function(self)
@@ -322,57 +314,26 @@ configureFeedFrame = function()
 end
 
 rowBackground = function(row)
-	-- Create row background
-	if row.background == nil then
-		row.background = row:CreateTexture(nil, "BACKGROUND")
-	else
-		row.background:ClearAllPoints()
-	end
-	row.background:SetTexture("Interface/Buttons/WHITE8x8")
 	local leftColor = CreateColor(unpack(config.rowBackgroundGradientStart))
 	local rightColor = CreateColor(unpack(config.rowBackgroundGradientEnd))
-	if G_RLF.db.global.leftAlign == false then
-		leftColor = CreateColor(unpack(config.rowBackgroundGradientEnd))
-		rightColor = CreateColor(unpack(config.rowBackgroundGradientStart))
+	if not G_RLF.db.global.leftAlign then
+		leftColor, rightColor = rightColor, leftColor
 	end
-	row.background:SetGradient("HORIZONTAL", leftColor, rightColor)
-	row.background:SetAllPoints()
+	row.Background:SetGradient("HORIZONTAL", leftColor, rightColor)
 end
 
-rowIcon = function(row)
-	if row.icon == nil then
-		if Masque and iconGroup then
-			row.icon = CreateFrame("ItemButton", nil, row)
-		else
-			row.icon = row:CreateTexture(nil, "ARTWORK")
-		end
-	else
-		row.icon:ClearAllPoints()
+rowIcon = function(row, icon)
+	row.Icon:SetSize(config.iconSize, config.iconSize)
+	local anchor, xOffset = "LEFT", config.iconSize / 4
+	if not G_RLF.db.global.leftAlign then
+		anchor, xOffset = "RIGHT", -xOffset
 	end
-	row.icon:SetSize(config.iconSize, config.iconSize)
-	local anchor = "LEFT"
-	local xOffset = config.iconSize / 4
-	if G_RLF.db.global.leftAlign == false then
-		anchor = "RIGHT"
-		xOffset = xOffset * -1
-	end
-	if Masque and iconGroup then
-		iconGroup:AddButton(row.icon)
-	end
-	row.icon:SetPoint(anchor, xOffset, 0)
-	row.icon:Show()
+	row.Icon:SetPoint(anchor, xOffset, 0)
+	row.Icon:SetShown(icon ~= nil)
 end
 
 rowAmountText = function(row, icon)
-	if row.amountText == nil then
-		row.amountText = row:CreateFontString(nil, "ARTWORK")
-		if not defaultColor then
-			local r, g, b, a = row.amountText:GetTextColor()
-			defaultColor = { r, g, b, a }
-		end
-	else
-		row.amountText:ClearAllPoints()
-	end
+	row.AmountText:SetFontObject(config.font)
 	local anchor = "LEFT"
 	local iconAnchor = "RIGHT"
 	local xOffset = config.iconSize / 2
@@ -381,78 +342,55 @@ rowAmountText = function(row, icon)
 		iconAnchor = "LEFT"
 		xOffset = xOffset * -1
 	end
-	row.amountText:SetFontObject(config.font)
 	if icon then
-		row.amountText:SetPoint(anchor, row.icon, iconAnchor, xOffset, 0)
+		row.AmountText:SetPoint(anchor, row.icon, iconAnchor, xOffset, 0)
 	else
-		row.amountText:SetPoint(anchor, row.icon, anchor, 0, 0)
+		row.AmountText:SetPoint(anchor, row.icon, anchor, 0, 0)
+	end
+	-- Adjust the text position dynamically based on leftAlign or other conditions
+end
+
+rowHighlightBorder = function(row)
+	row.HighlightBorder:SetSize(config.feedWidth * 1.1, config.rowHeight)
+	row.HighlightBorder:SetAlpha(0) -- Start invisible
+
+	if not row.HighlightAnimation then
+		row.HighlightAnimation = row.HighlightBorder:CreateAnimationGroup()
+		local fadeIn = row.HighlightAnimation:CreateAnimation("Alpha")
+		fadeIn:SetFromAlpha(0)
+		fadeIn:SetToAlpha(1)
+		fadeIn:SetDuration(0.2)
+
+		local fadeOut = row.HighlightAnimation:CreateAnimation("Alpha")
+		fadeOut:SetFromAlpha(1)
+		fadeOut:SetToAlpha(0)
+		fadeOut:SetDuration(0.2)
+		fadeOut:SetStartDelay(0.3)
 	end
 end
 
 rowFadeOutAnimation = function(row)
-	if row.fadeOutAnimation == nil then
-		row.fadeOutAnimation = row:CreateAnimationGroup()
-	end
-
-	if row.fadeOutAnimation.fadeOutAlpha == nil then
-		row.fadeOutAnimation.fadeOutAlpha = row.fadeOutAnimation:CreateAnimation("Alpha")
-	end
-
-	row.fadeOutAnimation.fadeOutAlpha:SetFromAlpha(1)
-	row.fadeOutAnimation.fadeOutAlpha:SetToAlpha(0)
-	row.fadeOutAnimation.fadeOutAlpha:SetDuration(1)
-	row.fadeOutAnimation.fadeOutAlpha:SetStartDelay(config.fadeOutDelay)
-	row.fadeOutAnimation.fadeOutAlpha:SetScript("OnFinished", function()
-		returnRow(row)
-		rows:remove(row)
-		updateRowPositions() -- Recalculate positions
-	end)
-end
-
--- Function to create and handle the highlight border
-rowHighlightBorder = function(row)
-	if row.highlightBorder == nil then
-		row.highlightBorder = row:CreateTexture(nil, "OVERLAY")
-		row.highlightBorder:SetTexture("Interface\\COMMON\\WhiteIconFrame")
-		row.highlightBorder:SetBlendMode("ADD")
-		row.highlightBorder:SetAlpha(0) -- Start with it invisible
-	end
-
-	row.highlightBorder:SetSize(config.feedWidth * 1.1, config.rowHeight)
-	row.highlightBorder:SetPoint("LEFT", row, "LEFT", -config.feedWidth * 0.05, 0)
-
-	-- Create the animation group
-	if row.highlightAnimation == nil then
-		row.highlightAnimation = row.highlightBorder:CreateAnimationGroup()
-	end
-
-	if row.highlightAnimation.fadeInAlpha == nil then
-		-- Fade in animation
-		row.highlightAnimation.fadeInAlpha = row.highlightAnimation:CreateAnimation("Alpha")
-		row.highlightAnimation.fadeInAlpha:SetFromAlpha(0)
-		row.highlightAnimation.fadeInAlpha:SetToAlpha(1)
-		row.highlightAnimation.fadeInAlpha:SetDuration(0.2)
-	end
-
-	if row.highlightAnimation.fadeOutAlpha == nil then
-		-- Fade out animation
-		row.highlightAnimation.fadeOutAlpha = row.highlightAnimation:CreateAnimation("Alpha")
-		row.highlightAnimation.fadeOutAlpha:SetFromAlpha(1)
-		row.highlightAnimation.fadeOutAlpha:SetToAlpha(0)
-		row.highlightAnimation.fadeOutAlpha:SetDuration(0.2)
-		row.highlightAnimation.fadeOutAlpha:SetStartDelay(0.3)
+	if not row.FadeOutAnimation then
+		row.FadeOutAnimation = row:CreateAnimationGroup()
+		local fadeOut = row.FadeOutAnimation:CreateAnimation("Alpha")
+		fadeOut:SetFromAlpha(1)
+		fadeOut:SetToAlpha(0)
+		fadeOut:SetDuration(1)
+		fadeOut:SetStartDelay(config.fadeOutDelay)
+		fadeOut:SetScript("OnFinished", function()
+			returnRow(row)
+			rows:remove(row)
+			updateRowPositions()
+		end)
 	end
 end
 
 rowStyles = function(row, icon)
 	row:SetSize(config.feedWidth, config.rowHeight)
 	rowBackground(row)
-	rowIcon(row)
-	if not icon then
-		row.icon:Hide()
-	end
-	rowHighlightBorder(row)
+	rowIcon(row, icon)
 	rowAmountText(row, icon)
+	rowHighlightBorder(row)
 	rowFadeOutAnimation(row)
 end
 
@@ -541,75 +479,6 @@ truncateItemLink = function(itemLink, extraWidth)
 	return linkStart .. itemName .. linkEnd
 end
 
-local function createArrow(f, direction)
-	local arrow = f:CreateTexture(nil, "OVERLAY")
-	arrow:SetSize(16, 16) -- Example size, adjust as needed
-	arrow:SetTexture("Interface\\Buttons\\Arrow-Up-Up") -- Using a built-in texture
-
-	if direction == "UP" then
-		arrow:SetPoint("TOP", f, "TOP", 0, -20)
-		arrow:SetRotation(0)
-	elseif direction == "DOWN" then
-		arrow:SetPoint("BOTTOM", f, "BOTTOM", 0, 20)
-		arrow:SetRotation(math.pi)
-	elseif direction == "LEFT" then
-		arrow:SetPoint("LEFT", f, "LEFT", 20, 0)
-		arrow:SetRotation(math.pi * 0.5)
-	elseif direction == "RIGHT" then
-		arrow:SetPoint("RIGHT", f, "RIGHT", -20, 0)
-		arrow:SetRotation(math.pi * 1.5)
-	end
-
-	arrow:Hide()
-
-	return arrow
-end
-
-createArrowsTestArea = function()
-	if not frame.arrows then
-		frame.arrows = {
-			createArrow(frame, "UP"),
-			createArrow(frame, "DOWN"),
-			createArrow(frame, "LEFT"),
-			createArrow(frame, "RIGHT"),
-		}
-	end
-end
-
-configureTestArea = function()
-	boundingBox = frame:CreateTexture(nil, "BACKGROUND")
-	boundingBox:SetColorTexture(1, 0, 0, 0.5) -- Red with 50% opacity
-	boundingBox:SetAllPoints()
-	boundingBox:Hide()
-	if not boundingBox.instructionText then
-		boundingBox.instructionText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
-		boundingBox.instructionText:SetPoint("CENTER", frame, "CENTER")
-		boundingBox.instructionText:SetText(G_RLF.addonName .. "\n" .. G_RLF.L["Drag to Move"])
-		boundingBox.instructionText:SetTextColor(1, 1, 1)
-		boundingBox.instructionText:Hide()
-	end
-end
-
-showTestArea = function()
-	boundingBox:Show()
-	frame:SetMovable(true)
-	frame:EnableMouse(true)
-	boundingBox.instructionText:Show()
-	for i, a in ipairs(frame.arrows) do
-		a:Show()
-	end
-end
-
-hideTestArea = function()
-	boundingBox:Hide()
-	frame:SetMovable(false)
-	frame:EnableMouse(false)
-	boundingBox.instructionText:Hide()
-	for i, a in ipairs(frame.arrows) do
-		a:Hide()
-	end
-end
-
 leaseRow = function(key)
 	if getNumberOfRows() >= config.maxRows then
 		-- Skip this, we've already allocated too much
@@ -617,42 +486,42 @@ leaseRow = function(key)
 	end
 	local row
 	if #rowFramePool == 0 then
-		-- Create a new row
-		row = CreateFrame("Frame", nil, frame)
+		-- Create a new row from the XML template
+		row = CreateFrame("Frame", nil, frame, "LootDisplayRowTemplate")
+		row.Background = _G[row:GetName() .. "Background"] -- Tie background here
 	else
+		-- Reuse an existing row from the pool
 		row = tremove(rowFramePool)
 		row:ClearAllPoints()
+
+		-- Reset row-specific data
 		row.amount = nil
 		row.link = nil
 		row.meta = nil
-		if row.highlightBorder then
-			row.highlightBorder:SetAlpha(0)
-		end
-		if row.fadeOutAnimation then
-			row.fadeOutAnimation:Stop()
-		end
-		if row.highlightAnimation then
-			row.highlightAnimation:Stop()
-		end
-		if row.amountText then
-			row.amountText:SetScript("OnEnter", nil)
-			row.amountText:SetScript("OnLeave", nil)
-			if defaultColor then
-				row.amountText:SetTextColor(unpack(defaultColor))
-			end
+
+		-- Reset UI elements that were part of the template
+		row.HighlightBorder:SetAlpha(0)
+		row.FadeOutAnimation:Stop()
+		row.HighlightAnimation:Stop()
+
+		-- Reset amount text behavior
+		row.AmountText:SetScript("OnEnter", nil)
+		row.AmountText:SetScript("OnLeave", nil)
+		if defaultColor then
+			row.AmountText:SetTextColor(unpack(defaultColor))
 		end
 	end
+
+	-- Assign the key to the row
 	row.key = key
 
+	-- Add the row to the rows list and show it
 	rows:push(row)
 	row:Show()
 
-	-- Position the new row at the bottom of the frame
+	-- Position the new row at the bottom (or top if growing up)
 	if getNumberOfRows() == 1 then
-		local vertDir = "BOTTOM"
-		if not G_RLF.db.global.growUp then
-			vertDir = "TOP"
-		end
+		local vertDir = G_RLF.db.global.growUp and "TOP" or "BOTTOM"
 		row:SetPoint(vertDir, frame, vertDir)
 	else
 		updateRowPositions()
