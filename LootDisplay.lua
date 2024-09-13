@@ -14,36 +14,15 @@ local truncateItemLink
 local updateRowPositions
 
 -- Private variable declaration
-local defaults = {
-	anchorPoint = "BOTTOMLEFT",
-	relativePoint = UIParent,
-	frameStrata = "MEDIUM",
-	xOffset = 720,
-	yOffset = 375,
-	feedWidth = 330,
-	maxRows = 10,
-	rowHeight = 22,
-	padding = 2,
-	iconSize = 18,
-	fadeOutDelay = 5,
-	rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 }, -- Default to dark grey with 80% opacity
-	rowBackgroundGradientEnd = { 0.1, 0.1, 0.1, 0 }, -- Default to dark grey with 0% opacity
-	font = "GameFontNormalSmall",
-}
-local defaultColor
-local config = nil
 local rows = G_RLF.list()
 local rowFramePool = {}
 local frame = nil
-local boundingBox = nil
 local tempFontString = nil
 
 -- Public methods
 local logger
 
 function LootDisplay:OnInitialize()
-	config = DynamicPropertyTable(G_RLF.db.global, defaults)
-
 	frame = LootDisplayFrame
 	frame:Load()
 
@@ -62,12 +41,17 @@ function LootDisplay:SetBoundingBoxVisibility(show)
 end
 
 function LootDisplay:ToggleBoundingBox()
-	self:SetBoundingBoxVisibility(not boundingBox:IsVisible())
+	self:SetBoundingBoxVisibility(not frame.BoundingBox:IsVisible())
 end
 
 function LootDisplay:UpdatePosition()
 	frame:ClearAllPoints()
-	frame:SetPoint(config.anchorPoint, _G[config.relativePoint], config.xOffset, config.yOffset)
+	frame:SetPoint(
+		G_RLF.db.globals.anchorPoint,
+		_G[G_RLF.db.globals.relativePoint],
+		G_RLF.db.globals.xOffset,
+		G_RLF.db.globals.yOffset
+	)
 end
 
 function LootDisplay:UpdateRowPositions()
@@ -76,7 +60,7 @@ end
 
 function LootDisplay:UpdateStrata()
 	if frame then
-		frame:SetFrameStrata(config.frameStrata)
+		frame:SetFrameStrata(G_RLF.db.globals.frameStrata)
 	end
 end
 
@@ -160,8 +144,6 @@ processRow = function(...)
 	local new = true
 	local text
 
-	local rD, gD, bD, aD = unpack(defaultColor or { 1, 1, 1, 1 })
-
 	local row = getRow(key)
 	if row then
 		-- Update existing entry
@@ -212,9 +194,9 @@ processFromQueue = function()
 	local snapshotQueueSize = #overflowQueue
 	if snapshotQueueSize > 0 then
 		-- error("Test")
-		local rowsToProcess = math.min(snapshotQueueSize, config.maxRows)
+		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.globals.maxRows)
 		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from overflow queue", G_RLF.addonName)
-		for i = 1, math.min(snapshotQueueSize, config.maxRows) do
+		for i = 1, rowsToProcess do
 			-- Get the first set of args from the queue
 			local args = tremove(overflowQueue, 1) -- Remove and return the first element
 			-- Call processRow with the unpacked arguments
@@ -242,7 +224,7 @@ updateRowPositions = function()
 			row:UpdateStyles()
 			row:ClearAllPoints()
 			local vertDir = "BOTTOM"
-			local yOffset = index * (config.rowHeight + config.padding)
+			local yOffset = index * (G_RLF.db.globals.rowHeight + G_RLF.db.globals.padding)
 			if not G_RLF.db.global.growUp then
 				vertDir = "TOP"
 				yOffset = yOffset * -1
@@ -271,7 +253,7 @@ getRow = function(key)
 end
 
 getTextWidth = function(text)
-	tempFontString:SetFontObject(config.font)
+	tempFontString:SetFontObject(G_RLF.db.globals.font)
 	tempFontString:SetText(text)
 	local width = tempFontString:GetStringWidth()
 	return width
@@ -287,7 +269,11 @@ truncateItemLink = function(itemLink, extraWidth)
 	local linkStart = string.sub(originalLink, 0, begIndex - 1)
 	local linkEnd = string.sub(originalLink, endIndex + 1)
 
-	local maxWidth = config.feedWidth - config.iconSize - (config.iconSize / 4) - (config.iconSize / 2) - extraWidth
+	local maxWidth = G_RLF.db.globals.feedWidth
+		- G_RLF.db.globals.iconSize
+		- (G_RLF.db.globals.iconSize / 4)
+		- (G_RLF.db.globals.iconSize / 2)
+		- extraWidth
 
 	-- Calculate the width of the item name plus the link start and end
 	local itemNameWidth = getTextWidth("[" .. itemName .. "]")
@@ -305,7 +291,7 @@ truncateItemLink = function(itemLink, extraWidth)
 end
 
 leaseRow = function(key)
-	if getNumberOfRows() >= config.maxRows then
+	if getNumberOfRows() >= G_RLF.db.globals.maxRows then
 		-- Skip this, we've already allocated too much
 		return nil
 	end
@@ -316,7 +302,7 @@ leaseRow = function(key)
 	else
 		-- Reuse an existing row from the pool
 		row = tremove(rowFramePool)
-		row:Reset(defaultColor)
+		row:Reset()
 	end
 
 	-- Assign the key to the row

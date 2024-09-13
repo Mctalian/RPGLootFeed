@@ -93,8 +93,8 @@ local function rowStyles(row)
 	rowFadeOutAnimation(row)
 end
 
-local defaultColor
-function LootDisplayRowMixin:Reset(defColor)
+local defaultColor = { 1, 1, 1, 1 }
+function LootDisplayRowMixin:Reset()
 	self:ClearAllPoints()
 
 	-- Reset row-specific data
@@ -113,13 +113,7 @@ function LootDisplayRowMixin:Reset(defColor)
 	self.AmountText:SetScript("OnEnter", nil)
 	self.AmountText:SetScript("OnLeave", nil)
 
-	if defColor and not defaultColor then
-		defaultColor = defColor
-	end
-
-	if defaultColor then
-		self.AmountText:SetTextColor(unpack(defaultColor))
-	end
+	self.AmountText:SetTextColor(unpack(defaultColor))
 end
 
 function LootDisplayRowMixin:UpdateStyles()
@@ -172,14 +166,16 @@ function LootDisplayRowMixin:SetupTooltip()
 end
 
 function LootDisplayRowMixin:ShowText(text, r, g, b, a)
-	local rD, gD, bD, aD = unpack(defaultColor or { 1, 1, 1, 1 })
+	if a == nil then
+		a = 1
+	end
 
 	self.AmountText:SetText(text)
 
 	if r == nil and g == nil and b == nil and self.amount ~= nil and self.amount < 0 then
 		r, g, b, a = 1, 0, 0, 0.8
-	else
-		r, g, b, a = r or rD, g or gD, b or bD, a or aD
+	elseif r == nil or g == nil or b == nil then
+		r, g, b, a = unpack(defaultColor)
 	end
 
 	self.AmountText:SetTextColor(r, g, b, a)
