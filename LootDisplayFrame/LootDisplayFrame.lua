@@ -45,10 +45,12 @@ local function configureTestArea(self)
 
 	self.InstructionText:SetText(G_RLF.addonName .. "\n" .. G_RLF.L["Drag to Move"]) -- Set localized text
 	self.InstructionText:Hide() -- Hide initially
+
+	createArrowsTestArea(self)
 end
 
-function LootDisplayFrameMixin:OnLoad()
-	self:SetSize(G_RLF.db.global.feedWidth, getFrameHeight())
+function LootDisplayFrameMixin:Load()
+	self:UpdateSize()
 	self:SetPoint(
 		G_RLF.db.global.anchorPoint,
 		_G[G_RLF.db.global.relativePoint],
@@ -59,6 +61,10 @@ function LootDisplayFrameMixin:OnLoad()
 	self:SetFrameStrata(G_RLF.db.global.frameStrata) -- Set the frame strata here
 
 	configureTestArea(self)
+end
+
+function LootDisplayFrameMixin:UpdateSize()
+	self:SetSize(G_RLF.db.global.feedWidth, getFrameHeight())
 end
 
 function LootDisplayFrameMixin:OnDragStop()

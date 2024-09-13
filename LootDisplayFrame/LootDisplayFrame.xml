@@ -83,7 +83,6 @@
             </Layer>
         </Layers>
         <Scripts>
-            <OnLoad method="OnLoad"/>
             <OnDragStart method="StartMoving"/>
             <OnDragStop method="OnDragStop"/>
         </Scripts>

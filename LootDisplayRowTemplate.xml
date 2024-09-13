@@ -1,59 +1,33 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-    <Frame name="LootDisplayRowTemplate" virtual="true">
-        <Size>
-            <AbsDimension x="400" y="32" /> <!-- Placeholder size, will be set dynamically in Lua -->
-        </Size>
-
+    <Script file="LootDisplayRow.lua"/>
+    <Frame name="LootDisplayRowTemplate" virtual="true" mixin="LootDisplayRowMixin">
         <Layers>
             <!-- Background Layer -->
             <Layer level="BACKGROUND">
-                <Texture name="$parentBackground" file="Interface/Buttons/WHITE8x8">
+                <Texture parentKey="Background" file="Interface/Buttons/WHITE8x8">
                     <Anchors>
                         <Anchor point="TOPLEFT" />
                         <Anchor point="BOTTOMRIGHT" />
-                    </Anchors>
-                </Texture>
-            </Layer>
-
-            <!-- Icon Layer -->
-            <Layer level="ARTWORK">
-                <Texture name="$parentIcon" file="Interface/ICONS/INV_Misc_QuestionMark">
-                    <Size>
-                        <AbsDimension x="32" y="32" /> <!-- Placeholder size, will be set dynamically in Lua -->
-                    </Size>
-                    <Anchors>
-                        <Anchor point="LEFT">
-                            <Offset>
-                                <AbsDimension x="8" y="0" />
-                            </Offset>
-                        </Anchor>
                     </Anchors>
                 </Texture>
             </Layer>
 
             <!-- Amount Text Layer -->
             <Layer level="ARTWORK">
-                <FontString name="$parentAmountText" inherits="GameFontNormal" justifyH="LEFT">
-                    <Anchors>
-                        <Anchor point="RIGHT">
-                            <Offset>
-                                <AbsDimension x="-8" y="0" />
-                            </Offset>
-                        </Anchor>
-                    </Anchors>
-                </FontString>
+                <FontString parentKey="AmountText" inherits="GameFontNormal" justifyH="LEFT" />
             </Layer>
 
             <!-- Highlight Border Layer -->
             <Layer level="OVERLAY">
-                <Texture name="$parentHighlightBorder" file="Interface\\COMMON\\WhiteIconFrame" alphaMode="ADD">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" />
-                        <Anchor point="BOTTOMRIGHT" />
-                    </Anchors>
-                </Texture>
+                <Texture parentKey="HighlightBorder" file="Interface\\COMMON\\WhiteIconFrame" alphaMode="ADD" />
             </Layer>
         </Layers>
+        <Frames>
+          <ItemButton parentKey="Icon" />
+        </Frames>
+        <Scripts>
+          <OnHide method="OnHide"/>
+        </Scripts>
     </Frame>
 </Ui>
