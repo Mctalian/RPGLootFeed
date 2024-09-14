@@ -21,7 +21,9 @@ function LootDisplay:OnInitialize()
 	tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
 	tempFontString:Hide() -- Prevent it from showing up
 	self:RegisterBucketMessage("RLF_LootDisplay_RowReturned", 0.2, processFromQueue)
-	self:RegisterMessage("RLF_RowHidden", frame.ReturnRow)
+	self:RegisterMessage("RLF_RowHidden", function(_, row)
+		frame:ReleaseRow(row)
+	end)
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)

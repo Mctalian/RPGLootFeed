@@ -51,22 +51,81 @@ local function rowAmountText(row, icon)
 	-- Adjust the text position dynamically based on leftAlign or other conditions
 end
 
+local function updateBorderPositions(row)
+	-- Adjust the Top border
+	row.TopBorder:ClearAllPoints()
+	row.TopBorder:SetWidth(row:GetWidth())
+	row.TopBorder:SetHeight(4)
+	row.TopBorder:SetTexCoord(0, 1, 1, 0)
+	row.TopBorder:SetPoint("TOPLEFT", row, "TOPLEFT", 0, 2)
+	row.TopBorder:SetPoint("TOPRIGHT", row, "TOPRIGHT", 0, 2)
+
+	-- Adjust the Left border
+	row.LeftBorder:ClearAllPoints()
+	row.LeftBorder:SetHeight(row:GetHeight())
+	row.LeftBorder:SetWidth(4)
+	row.LeftBorder:SetTexCoord(1, 0, 0, 1)
+	row.LeftBorder:SetPoint("TOPLEFT", row, "TOPLEFT", -2, 0)
+	row.LeftBorder:SetPoint("BOTTOMLEFT", row, "BOTTOMLEFT", -2, 0)
+
+	-- Adjust the Bottom border
+	row.BottomBorder:ClearAllPoints()
+	row.BottomBorder:SetWidth(row:GetWidth())
+	row.BottomBorder:SetHeight(4)
+	row.BottomBorder:SetTexCoord(0, 1, 0, 1)
+	row.BottomBorder:SetPoint("BOTTOMLEFT", row, "BOTTOMLEFT", 0, -2)
+	row.BottomBorder:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", 0, -2)
+
+	-- Adjust the Right border
+	row.RightBorder:ClearAllPoints()
+	row.RightBorder:SetHeight(row:GetHeight())
+	row.RightBorder:SetWidth(4)
+	row.RightBorder:SetTexCoord(0, 1, 0, 1)
+	row.RightBorder:SetPoint("TOPRIGHT", row, "TOPRIGHT", 2, 0)
+	row.RightBorder:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", 2, 0)
+end
+
 local function rowHighlightBorder(row)
-	row.HighlightBorder:SetSize(G_RLF.db.global.feedWidth * 1.1, G_RLF.db.global.rowHeight)
-	row.HighlightBorder:SetAlpha(0) -- Start invisible
-
 	if not row.HighlightAnimation then
-		row.HighlightAnimation = row.HighlightBorder:CreateAnimationGroup()
-		local fadeIn = row.HighlightAnimation:CreateAnimation("Alpha")
-		fadeIn:SetFromAlpha(0)
-		fadeIn:SetToAlpha(1)
-		fadeIn:SetDuration(0.2)
+		local borders = {
+			row.TopBorder,
+			row.RightBorder,
+			row.BottomBorder,
+			row.LeftBorder,
+		}
 
-		local fadeOut = row.HighlightAnimation:CreateAnimation("Alpha")
-		fadeOut:SetFromAlpha(1)
-		fadeOut:SetToAlpha(0)
-		fadeOut:SetDuration(0.2)
-		fadeOut:SetStartDelay(0.3)
+		for _, b in ipairs(borders) do
+			if not b.HighlightAnimation then
+				b.HighlightAnimation = b:CreateAnimationGroup()
+				local fadeIn = b.HighlightAnimation:CreateAnimation("Alpha")
+				fadeIn:SetFromAlpha(0)
+				fadeIn:SetToAlpha(1)
+				fadeIn:SetDuration(0.2)
+
+				local fadeOut = b.HighlightAnimation:CreateAnimation("Alpha")
+				fadeOut:SetFromAlpha(1)
+				fadeOut:SetToAlpha(0)
+				fadeOut:SetDuration(0.2)
+				fadeOut:SetStartDelay(0.3)
+			end
+		end
+
+		row.HighlightAnimation = {}
+
+		function row.HighlightAnimation:Stop()
+			row.TopBorder.HighlightAnimation:Stop()
+			row.RightBorder.HighlightAnimation:Stop()
+			row.BottomBorder.HighlightAnimation:Stop()
+			row.LeftBorder.HighlightAnimation:Stop()
+		end
+
+		function row.HighlightAnimation:Play()
+			updateBorderPositions(row)
+			row.TopBorder.HighlightAnimation:Play()
+			row.RightBorder.HighlightAnimation:Play()
+			row.BottomBorder.HighlightAnimation:Play()
+			row.LeftBorder.HighlightAnimation:Play()
+		end
 	end
 end
 
@@ -105,7 +164,10 @@ function LootDisplayRowMixin:Reset()
 	self.meta = nil
 
 	-- Reset UI elements that were part of the template
-	self.HighlightBorder:SetAlpha(0)
+	self.TopBorder:SetAlpha(0)
+	self.RightBorder:SetAlpha(0)
+	self.BottomBorder:SetAlpha(0)
+	self.LeftBorder:SetAlpha(0)
 	self.FadeOutAnimation:Stop()
 	self.HighlightAnimation:Stop()
 
@@ -143,7 +205,7 @@ function LootDisplayRowMixin:SetupTooltip()
 	self.AmountText:SetScript("OnEnter", function()
 		self.FadeOutAnimation:Stop()
 		self.HighlightAnimation:Stop()
-		self.HighlightBorder:SetAlpha(0)
+		self:ResetHighlightBorder()
 		if not G_RLF.db.global.tooltip then
 			return
 		end
@@ -205,4 +267,11 @@ end
 
 function LootDisplayRowMixin:OnHide()
 	ae:SendMessage("RLF_RowHidden", self)
+end
+
+function LootDisplayRowMixin:ResetHighlightBorder()
+	self.TopBorder:SetAlpha(0)
+	self.RightBorder:SetAlpha(0)
+	self.BottomBorder:SetAlpha(0)
+	self.LeftBorder:SetAlpha(0)
 end

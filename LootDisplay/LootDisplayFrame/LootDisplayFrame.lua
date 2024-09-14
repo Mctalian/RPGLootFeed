@@ -1,6 +1,7 @@
 LootDisplayFrameMixin = {}
 
 local acr = LibStub("AceConfigRegistry-3.0")
+local ae = LibStub("AceEvent-3.0")
 
 local rows = G_RLF.list()
 local rowFramePool = {}
@@ -183,18 +184,17 @@ function LootDisplayFrameMixin:LeaseRow(key)
 	return row
 end
 
-function LootDisplayFrameMixin:ReleaseRow(_, row)
+function LootDisplayFrameMixin:ReleaseRow(row)
 	rows:remove(row)
 	self:UpdateRowPositions()
 	tinsert(rowFramePool, row)
-	LootDisplay:SendMessage("RLF_LootDisplay_RowReturned")
+	ae:SendMessage("RLF_LootDisplay_RowReturned")
 end
 
 function LootDisplayFrameMixin:UpdateRowPositions()
 	local index = 0
 	for row in rows:iterate() do
 		if row:IsShown() then
-			row:UpdateStyles()
 			row:ClearAllPoints()
 			local vertDir = "BOTTOM"
 			local yOffset = index * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding)
@@ -203,6 +203,7 @@ function LootDisplayFrameMixin:UpdateRowPositions()
 				yOffset = yOffset * -1
 			end
 			row:SetPoint(vertDir, self, vertDir, 0, yOffset)
+			row:UpdateStyles()
 			index = index + 1
 		end
 	end

@@ -1,6 +1,6 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-    <Script file="LootDisplayRow.lua"/>
+    <Script file="LootDisplayRow.lua" />
     <Frame name="LootDisplayRowTemplate" virtual="true" mixin="LootDisplayRowMixin">
         <Layers>
             <!-- Background Layer -->
@@ -20,14 +20,44 @@
 
             <!-- Highlight Border Layer -->
             <Layer level="OVERLAY">
-                <Texture parentKey="HighlightBorder" file="Interface\\COMMON\\WhiteIconFrame" alphaMode="ADD" />
+                <Texture name="$parentTopBorder" file="Interface/COMMON/ThinBorder2-Top"
+                    parentKey="TopBorder" horizTile="true" alpha="0">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="TOPRIGHT" />
+                    </Anchors>
+                </Texture>
+
+                <Texture name="$parentLeftBorder" file="Interface/COMMON/ThinBorder2-Left"
+                    parentKey="LeftBorder" vertTile="true" alpha="0">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMLEFT" />
+                    </Anchors>
+                </Texture>
+
+                <Texture name="$parentBottomBorder" file="Interface/COMMON/ThinBorder2-Top"
+                    parentKey="BottomBorder" horizTile="true" alpha="0">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                    </Anchors>
+                </Texture>
+
+                <Texture name="$parentRightBorder" file="Interface/COMMON/ThinBorder2-Left"
+                    parentKey="RightBorder" vertTile="true" alpha="0">
+                    <Anchors>
+                        <Anchor point="TOPRIGHT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                    </Anchors>
+                </Texture>
             </Layer>
         </Layers>
         <Frames>
-          <ItemButton parentKey="Icon" />
+            <ItemButton parentKey="Icon" />
         </Frames>
         <Scripts>
-          <OnHide method="OnHide"/>
+            <OnHide method="OnHide" />
         </Scripts>
     </Frame>
 </Ui>
