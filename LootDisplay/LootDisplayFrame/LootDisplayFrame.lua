@@ -2,8 +2,19 @@ LootDisplayFrameMixin = {}
 
 local acr = LibStub("AceConfigRegistry-3.0")
 
+local rows = G_RLF.list()
+local rowFramePool = {}
+
 local function getFrameHeight()
 	return G_RLF.db.global.maxRows * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding) - G_RLF.db.global.padding
+end
+
+local function getNumberOfRows()
+	local n = 0
+	for row in rows:iterate() do
+		n = n + 1
+	end
+	return n
 end
 
 local function configureArrowRotation(arrow, direction)
@@ -43,6 +54,8 @@ end
 local function configureTestArea(self)
 	self.BoundingBox:Hide() -- Hide initially
 
+	self:MakeUnmovable()
+
 	self.InstructionText:SetText(G_RLF.addonName .. "\n" .. G_RLF.L["Drag to Move"]) -- Set localized text
 	self.InstructionText:Hide() -- Hide initially
 
@@ -63,8 +76,28 @@ function LootDisplayFrameMixin:Load()
 	configureTestArea(self)
 end
 
+function LootDisplayFrameMixin:ClearFeed()
+	local row = rows:shift()
+
+	while row do
+		row.FadeOutAnimation:Stop()
+		row:Hide()
+		row = rows:shift()
+	end
+end
+
 function LootDisplayFrameMixin:UpdateSize()
 	self:SetSize(G_RLF.db.global.feedWidth, getFrameHeight())
+
+	for row in rows:iterate() do
+		row:UpdateStyles()
+	end
+end
+
+function LootDisplayFrameMixin:UpdateFadeDelay()
+	for row in rows:iterate() do
+		row:UpdateFadeoutDelay()
+	end
 end
 
 function LootDisplayFrameMixin:OnDragStop()
@@ -84,6 +117,7 @@ end
 
 function LootDisplayFrameMixin:ShowTestArea()
 	self.BoundingBox:Show()
+	self:RegisterForDrag("LeftButton")
 	self:SetMovable(true)
 	self:EnableMouse(true)
 	self.InstructionText:Show()
@@ -94,10 +128,82 @@ end
 
 function LootDisplayFrameMixin:HideTestArea()
 	self.BoundingBox:Hide()
-	self:SetMovable(false)
-	self:EnableMouse(false)
-	self.BoundingBox.instructionText:Hide()
+	self:MakeUnmovable()
+	self.InstructionText:Hide()
 	for i, a in ipairs(self.arrows) do
 		a:Hide()
+	end
+end
+
+function LootDisplayFrameMixin:MakeUnmovable()
+	self:SetMovable(false)
+	self:EnableMouse(false)
+	self:RegisterForDrag("")
+end
+
+function LootDisplayFrameMixin:GetRow(key)
+	for row in rows:iterate() do
+		if row.key == key then
+			return row
+		end
+	end
+	return nil
+end
+
+function LootDisplayFrameMixin:LeaseRow(key)
+	if getNumberOfRows() >= G_RLF.db.global.maxRows then
+		-- Skip this, we've already allocated too much
+		return nil
+	end
+	local row
+	if #rowFramePool == 0 then
+		-- Create a new row from the XML template
+		row = CreateFrame("Frame", nil, self, "LootDisplayRowTemplate")
+	else
+		-- Reuse an existing row from the pool
+		row = tremove(rowFramePool)
+		row:Reset()
+	end
+
+	-- Assign the key to the row
+	row.key = key
+
+	-- Add the row to the rows list and show it
+	rows:push(row)
+	row:Show()
+
+	-- Position the new row at the bottom (or top if growing up)
+	if getNumberOfRows() == 1 then
+		local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
+		row:SetPoint(vertDir, self, vertDir)
+	else
+		self:UpdateRowPositions()
+	end
+
+	return row
+end
+
+function LootDisplayFrameMixin:ReleaseRow(_, row)
+	rows:remove(row)
+	self:UpdateRowPositions()
+	tinsert(rowFramePool, row)
+	LootDisplay:SendMessage("RLF_LootDisplay_RowReturned")
+end
+
+function LootDisplayFrameMixin:UpdateRowPositions()
+	local index = 0
+	for row in rows:iterate() do
+		if row:IsShown() then
+			row:UpdateStyles()
+			row:ClearAllPoints()
+			local vertDir = "BOTTOM"
+			local yOffset = index * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding)
+			if not G_RLF.db.global.growUp then
+				vertDir = "TOP"
+				yOffset = yOffset * -1
+			end
+			row:SetPoint(vertDir, self, vertDir, 0, yOffset)
+			index = index + 1
+		end
 	end
 end

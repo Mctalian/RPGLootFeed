@@ -4,18 +4,10 @@ local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEven
 local processRow
 local processFromQueue
 local doesRowExist
-local getNumberOfRows
-local getRow
 local getTextWidth
-local leaseRow
-local returnRow
-local returnRows
 local truncateItemLink
-local updateRowPositions
 
 -- Private variable declaration
-local rows = G_RLF.list()
-local rowFramePool = {}
 local frame = nil
 local tempFontString = nil
 
@@ -29,7 +21,7 @@ function LootDisplay:OnInitialize()
 	tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
 	tempFontString:Hide() -- Prevent it from showing up
 	self:RegisterBucketMessage("RLF_LootDisplay_RowReturned", 0.2, processFromQueue)
-	self:RegisterMessage("RLF_RowHidden", returnRow)
+	self:RegisterMessage("RLF_RowHidden", frame.ReturnRow)
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)
@@ -47,35 +39,29 @@ end
 function LootDisplay:UpdatePosition()
 	frame:ClearAllPoints()
 	frame:SetPoint(
-		G_RLF.db.globals.anchorPoint,
-		_G[G_RLF.db.globals.relativePoint],
-		G_RLF.db.globals.xOffset,
-		G_RLF.db.globals.yOffset
+		G_RLF.db.global.anchorPoint,
+		_G[G_RLF.db.global.relativePoint],
+		G_RLF.db.global.xOffset,
+		G_RLF.db.global.yOffset
 	)
 end
 
 function LootDisplay:UpdateRowPositions()
-	updateRowPositions()
+	frame:UpdateRowPositions()
 end
 
 function LootDisplay:UpdateStrata()
 	if frame then
-		frame:SetFrameStrata(G_RLF.db.globals.frameStrata)
+		frame:SetFrameStrata(G_RLF.db.global.frameStrata)
 	end
 end
 
 function LootDisplay:UpdateRowStyles()
 	frame:UpdateSize()
-
-	for row in rows:iterate() do
-		row:UpdateStyles()
-	end
 end
 
 function LootDisplay:UpdateFadeDelay()
-	for row in rows:iterate() do
-		row:UpdateFadeoutDelay()
-	end
+	frame:UpdateFadeDelay()
 end
 
 function LootDisplay:ShowLoot(type, ...)
@@ -144,7 +130,7 @@ processRow = function(...)
 	local new = true
 	local text
 
-	local row = getRow(key)
+	local row = frame:GetRow(key)
 	if row then
 		-- Update existing entry
 		new = false
@@ -155,7 +141,7 @@ processRow = function(...)
 		row:UpdateQuantity()
 	else
 		-- New row
-		row = leaseRow(key)
+		row = frame:LeaseRow(key)
 		if row == nil then
 			tinsert(overflowQueue, { ... })
 			return
@@ -194,7 +180,7 @@ processFromQueue = function()
 	local snapshotQueueSize = #overflowQueue
 	if snapshotQueueSize > 0 then
 		-- error("Test")
-		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.globals.maxRows)
+		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.maxRows)
 		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from overflow queue", G_RLF.addonName)
 		for i = 1, rowsToProcess do
 			-- Get the first set of args from the queue
@@ -206,54 +192,13 @@ processFromQueue = function()
 end
 
 function LootDisplay:HideLoot()
-	local row = rows:shift()
-
-	while row do
-		row.FadeOutAnimation:Stop()
-		row:Hide()
-		row = rows:shift()
-	end
+	frame:ClearFeed()
 end
 
 G_RLF.LootDisplay = LootDisplay
 
-updateRowPositions = function()
-	local index = 0
-	for row in rows:iterate() do
-		if row:IsShown() then
-			row:UpdateStyles()
-			row:ClearAllPoints()
-			local vertDir = "BOTTOM"
-			local yOffset = index * (G_RLF.db.globals.rowHeight + G_RLF.db.globals.padding)
-			if not G_RLF.db.global.growUp then
-				vertDir = "TOP"
-				yOffset = yOffset * -1
-			end
-			row:SetPoint(vertDir, frame, vertDir, 0, yOffset)
-			index = index + 1
-		end
-	end
-end
-
-getNumberOfRows = function()
-	local n = 0
-	for row in rows:iterate() do
-		n = n + 1
-	end
-	return n
-end
-
-getRow = function(key)
-	for row in rows:iterate() do
-		if row.key == key then
-			return row
-		end
-	end
-	return nil
-end
-
 getTextWidth = function(text)
-	tempFontString:SetFontObject(G_RLF.db.globals.font)
+	tempFontString:SetFontObject(G_RLF.db.global.font)
 	tempFontString:SetText(text)
 	local width = tempFontString:GetStringWidth()
 	return width
@@ -269,10 +214,10 @@ truncateItemLink = function(itemLink, extraWidth)
 	local linkStart = string.sub(originalLink, 0, begIndex - 1)
 	local linkEnd = string.sub(originalLink, endIndex + 1)
 
-	local maxWidth = G_RLF.db.globals.feedWidth
-		- G_RLF.db.globals.iconSize
-		- (G_RLF.db.globals.iconSize / 4)
-		- (G_RLF.db.globals.iconSize / 2)
+	local maxWidth = G_RLF.db.global.feedWidth
+		- G_RLF.db.global.iconSize
+		- (G_RLF.db.global.iconSize / 4)
+		- (G_RLF.db.global.iconSize / 2)
 		- extraWidth
 
 	-- Calculate the width of the item name plus the link start and end
@@ -288,42 +233,4 @@ truncateItemLink = function(itemLink, extraWidth)
 	end
 
 	return linkStart .. itemName .. linkEnd
-end
-
-leaseRow = function(key)
-	if getNumberOfRows() >= G_RLF.db.globals.maxRows then
-		-- Skip this, we've already allocated too much
-		return nil
-	end
-	local row
-	if #rowFramePool == 0 then
-		-- Create a new row from the XML template
-		row = CreateFrame("Frame", nil, frame, "LootDisplayRowTemplate")
-	else
-		-- Reuse an existing row from the pool
-		row = tremove(rowFramePool)
-		row:Reset()
-	end
-
-	-- Assign the key to the row
-	row.key = key
-
-	-- Add the row to the rows list and show it
-	rows:push(row)
-	row:Show()
-
-	-- Position the new row at the bottom (or top if growing up)
-	if getNumberOfRows() == 1 then
-		local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
-		row:SetPoint(vertDir, frame, vertDir)
-	else
-		updateRowPositions()
-	end
-
-	return row
-end
-
-returnRow = function(_, row)
-	tinsert(rowFramePool, row)
-	LootDisplay:SendMessage("RLF_LootDisplay_RowReturned")
 end

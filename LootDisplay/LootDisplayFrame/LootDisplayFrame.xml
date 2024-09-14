@@ -1,6 +1,6 @@
 ﻿<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
 	<Script file="LootDisplayFrame.lua"/>
-    <Frame name="LootDisplayFrame" mixin="LootDisplayFrameMixin" parent="UIParent" enableMouse="false" movable="false" clampedToScreen="true" registerForDrag="LeftButton" clipChildren="true">
+    <Frame name="LootDisplayFrame" mixin="LootDisplayFrameMixin" parent="UIParent" clampedToScreen="true" clipChildren="true">
         <Layers>
             <!-- Background layer for bounding box -->
             <Layer level="BACKGROUND">
@@ -87,4 +87,5 @@
             <OnDragStop method="OnDragStop"/>
         </Scripts>
     </Frame>
+    <Include file="LootDisplayRow/LootDisplayRowTemplate.xml" />
 </Ui>
