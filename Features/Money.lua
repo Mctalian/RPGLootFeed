@@ -41,10 +41,17 @@ end
 
 function Money:OnDisable()
 	self:UnregisterEvent("PLAYER_MONEY")
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 function Money:OnEnable()
 	self:RegisterEvent("PLAYER_MONEY")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	startingMoney = GetMoney()
+end
+
+function Money:PLAYER_ENTERING_WORLD(eventName)
+	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName)
 	startingMoney = GetMoney()
 end
 
