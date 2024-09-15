@@ -1,4 +1,4 @@
-describe("AddonScope module", function()
+describe("Core module", function()
 	before_each(function()
 		_G.LibStub = function()
 			return {
@@ -11,7 +11,7 @@ describe("AddonScope module", function()
 			}
 		end
 		-- Load the list module before each test
-		require("AddonScope")
+		require("Core")
 	end)
 
 	it("TODO", function()
