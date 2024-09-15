@@ -1,4 +1,33 @@
+local addonName, ns = ...
+
 local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0")
+
+Rep.Element = {}
+
+function Rep.Element:new(...)
+	ns.InitializeLootDisplayProperties(self)
+
+	self.type = "Reputation"
+	self.IsEnabled = function()
+		return Rep:IsEnabled()
+	end
+
+	local factionName, rL, gL, bL
+	self.quantity, factionName, rL, gL, bL = ...
+	self.r, self.g, self.b = rL or 0.5, gL or 0.5, bL or 1
+	self.a = 1
+	self.key = "REP_" .. factionName
+	self.textFn = function(existingRep)
+		local sign = "+"
+		local rep = (existingRep or 0) + self.quantity
+		if rep < 0 then
+			sign = "-"
+		end
+		return sign .. math.abs(rep) .. " " .. factionName
+	end
+
+	return self
+end
 
 local locale
 function Rep:OnInitialize()
@@ -152,7 +181,8 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 			r, g, b = color.r, color.g, color.b
 		end
 
-		G_RLF.LootDisplay:ShowLoot(self.moduleName, repChange, faction, r, g, b)
+		local e = self.Element:new(repChange, faction, r, g, b)
+		e:Show()
 	end)
 end
 

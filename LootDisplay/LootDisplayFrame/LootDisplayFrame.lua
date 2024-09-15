@@ -78,12 +78,13 @@ function LootDisplayFrameMixin:Load()
 end
 
 function LootDisplayFrameMixin:ClearFeed()
-	local row = rows:shift()
+	local row = rows.last
 
 	while row do
-		row.FadeOutAnimation:Stop()
-		row:Hide()
-		row = rows:shift()
+		local oldRow = row
+		row = row._prev
+		oldRow.FadeOutAnimation:Stop()
+		oldRow:Hide()
 	end
 end
 

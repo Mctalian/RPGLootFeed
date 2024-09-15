@@ -132,15 +132,18 @@ end
 local function rowFadeOutAnimation(row)
 	if not row.FadeOutAnimation then
 		row.FadeOutAnimation = row:CreateAnimationGroup()
-		local fadeOut = row.FadeOutAnimation:CreateAnimation("Alpha")
-		fadeOut:SetFromAlpha(1)
-		fadeOut:SetToAlpha(0)
-		fadeOut:SetDuration(1)
-		fadeOut:SetStartDelay(G_RLF.db.global.fadeOutDelay)
-		fadeOut:SetScript("OnFinished", function()
-			row:Hide()
-		end)
 	end
+	if not row.FadeOutAnimation.fadeOut then
+		row.FadeOutAnimation.fadeOut = row.FadeOutAnimation:CreateAnimation("Alpha")
+	end
+
+	row.FadeOutAnimation.fadeOut:SetFromAlpha(1)
+	row.FadeOutAnimation.fadeOut:SetToAlpha(0)
+	row.FadeOutAnimation.fadeOut:SetDuration(1)
+	row.FadeOutAnimation.fadeOut:SetStartDelay(G_RLF.db.global.fadeOutDelay)
+	row.FadeOutAnimation.fadeOut:SetScript("OnFinished", function()
+		row:Hide()
+	end)
 end
 
 local function rowStyles(row)
@@ -161,7 +164,6 @@ function LootDisplayRowMixin:Reset()
 	self.amount = nil
 	self.icon = nil
 	self.link = nil
-	self.meta = nil
 
 	-- Reset UI elements that were part of the template
 	self.TopBorder:SetAlpha(0)

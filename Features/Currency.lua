@@ -1,4 +1,33 @@
+local addonName, ns = ...
+
 local Currency = G_RLF.RLF:NewModule("Currency", "AceEvent-3.0")
+
+Currency.Element = {}
+
+function Currency.Element:new(...)
+	ns.InitializeLootDisplayProperties(self)
+
+	self.type = "Currency"
+	self.IsEnabled = function()
+		return Currency:IsEnabled()
+	end
+
+	self.isLink = true
+
+	local t
+	self.key, t, self.icon, self.quantity = ...
+
+	self.textFn = function(existingQuantity, truncatedLink)
+		if not truncatedLink then
+			return t
+		end
+		return truncatedLink .. " x" .. ((existingQuantity or 0) + self.quantity)
+	end
+
+	self.quality = C_CurrencyInfo.GetCurrencyInfo(self.key).quality
+
+	return self
+end
 
 local hiddenCurrencies
 
@@ -65,13 +94,13 @@ function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
 	end
 
 	self:fn(function()
-		G_RLF.LootDisplay:ShowLoot(
-			self.moduleName,
+		local e = self.Element:new(
 			info.currencyID,
 			C_CurrencyInfo.GetCurrencyLink(currencyType),
 			info.iconFileID,
 			quantityChange
 		)
+		e:Show()
 	end)
 end
 

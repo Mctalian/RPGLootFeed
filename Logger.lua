@@ -179,11 +179,11 @@ end
 local function getType(logEntry)
 	local type = logEntry.type
 	local typeColors = {
-		[ItemLoot] = "|cFF00FF00[ITEM]|r ", -- Green for item loot
-		[Currency] = "|cFFFFD700[CURR]|r ", -- Gold for currency
-		[Money] = "|cFFC0C0C0[GOLD]|r ", -- Silver/Gray for money
-		[Reputation] = "|cFF1E90FF[REPU]|r ", -- Blue for reputation
-		[Experience] = "|cFF9932CC[EXPR]|r ", -- Purple for experience
+		[ItemLoot] = "|cFF00FF00[ITEM]|r", -- Green for item loot
+		[Currency] = "|cFFFFD700[CURR]|r", -- Gold for currency
+		[Money] = "|cFFC0C0C0[GOLD]|r", -- Silver/Gray for money
+		[Reputation] = "|cFF1E90FF[REPU]|r", -- Blue for reputation
+		[Experience] = "|cFF9932CC[EXPR]|r", -- Purple for experience
 	}
 
 	-- Return an empty string for "General" and the corresponding value for others
@@ -218,7 +218,7 @@ local function getAmount(logEntry)
 	if logEntry.amount == "" then
 		return ""
 	end
-	return format(" x%s", logEntry.amount)
+	return format(" (tot: %s)", logEntry.amount)
 end
 
 local function isUpdatedRow(logEntry)
@@ -237,7 +237,7 @@ end
 
 local function formatLogEntry(logEntry)
 	return format(
-		"[%s]%s%s%s:%s%s%s%s\n",
+		"[%s]%s%s%s: %s%s%s%s\n",
 		getTimestamp(logEntry),
 		getLevel(logEntry),
 		getSource(logEntry),

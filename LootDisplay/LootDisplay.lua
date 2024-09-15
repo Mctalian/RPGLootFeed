@@ -3,7 +3,6 @@ local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEven
 -- Private method declaration
 local processRow
 local processFromQueue
-local doesRowExist
 local getTextWidth
 local truncateItemLink
 
@@ -66,69 +65,30 @@ function LootDisplay:UpdateFadeDelay()
 	frame:UpdateFadeDelay()
 end
 
-function LootDisplay:ShowLoot(type, ...)
-	local key, textFn, isLink, icon, quantity, quality, r, g, b, a
-	isLink = false
-	local logType = type
-	if type == "Currency" or type == "ItemLoot" then
-		isLink = true
-		local t, k
-		k, t, icon, quantity = ...
-		key = tostring(k)
-		textFn = function(existingQuantity, truncatedLink)
-			if not truncatedLink then
-				return t
-			end
-			return truncatedLink .. " x" .. ((existingQuantity or 0) + quantity)
-		end
-		if type == "Currency" then
-			quality = C_CurrencyInfo.GetCurrencyInfo(k).quality
-		end
-	elseif type == "Money" then
-		key = "MONEY_LOOT"
-		quantity = ...
-		if not quantity then
-			return
-		end
-		textFn = function(existingCopper)
-			local sign = ""
-			local total = (existingCopper or 0) + quantity
-			if total < 0 then
-				sign = "-"
-			end
-			return sign .. C_CurrencyInfo.GetCoinTextureString(math.abs(total))
-		end
-	elseif type == "Experience" then
-		key = "EXPERIENCE"
-		quantity = ...
-		r, g, b, a = 1, 0, 1, 0.8
-		textFn = function(existingXP)
-			return "+" .. ((existingXP or 0) + quantity) .. " " .. G_RLF.L["XP"]
-		end
-	elseif type == "Reputation" then
-		local factionName, rL, gL, bL
-		quantity, factionName, rL, gL, bL = ...
-		r, g, b = rL or 0.5, gL or 0.5, bL or 1
-		a = 1
-		key = "REP_" .. factionName
-		textFn = function(existingRep)
-			local sign = "+"
-			local rep = (existingRep or 0) + quantity
-			if rep < 0 then
-				sign = "-"
-			end
-			return sign .. math.abs(rep) .. " " .. factionName
-		end
-	else
-		self:getLogger():Error("Unknown type? " .. type, G_RLF.addonName, type)
+function LootDisplay:ShowLoot(element)
+	if type(element) ~= "table" then
+		error("Expected arg to ShowLoot to be a table")
 	end
-	processRow(key, textFn, icon, quantity, quality, r, g, b, a, logType)
+
+	local e = element
+	processRow(e)
 end
 
 local overflowQueue = {}
-processRow = function(...)
-	local key, textFn, icon, quantity, quality, r, g, b, a, logType = ...
-	local isLink = not not icon
+processRow = function(element)
+	if not element:IsEnabled() then
+		return
+	end
+
+	local key = element.key
+	local textFn = element.textFn
+	local icon = element.icon
+	local quantity = element.quantity
+	local quality = element.quality
+	local r, g, b, a = element.r, element.g, element.b, element.a
+	local logFn = element.logFn
+	local isLink = element.isLink
+
 	local new = true
 	local text
 
@@ -136,7 +96,6 @@ processRow = function(...)
 	if row then
 		-- Update existing entry
 		new = false
-		row.meta = { ... }
 		text = textFn(row.amount, row.link)
 		row.amount = row.amount + quantity
 
@@ -145,11 +104,10 @@ processRow = function(...)
 		-- New row
 		row = frame:LeaseRow(key)
 		if row == nil then
-			tinsert(overflowQueue, { ... })
+			tinsert(overflowQueue, element)
 			return
 		end
 
-		row.meta = { ... }
 		row.amount = quantity
 
 		if isLink then
@@ -169,11 +127,7 @@ processRow = function(...)
 
 	row:ShowText(text, r, g, b, a)
 
-	local amountLogText = row.amount
-	if not new then
-		amountLogText = format("%s (+%s)", row.amount, quantity)
-	end
-	LootDisplay:getLogger():Info(logType .. " Shown", G_RLF.addonName, logType, key, text, amountLogText, new)
+	logFn(text, row.amount, new)
 
 	row:ResetFadeOut()
 end
@@ -185,15 +139,23 @@ processFromQueue = function()
 		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.maxRows)
 		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from overflow queue", G_RLF.addonName)
 		for i = 1, rowsToProcess do
-			-- Get the first set of args from the queue
-			local args = tremove(overflowQueue, 1) -- Remove and return the first element
-			-- Call processRow with the unpacked arguments
-			processRow(unpack(args))
+			-- Get the first element from the queue
+			local e = tremove(overflowQueue, 1) -- Remove and return the first element
+			-- Call processRow with the element
+			processRow(e)
 		end
 	end
 end
 
+local function emptyQueue()
+	local queueSize = #overflowQueue
+	for i = 1, queueSize do
+		tremove(overflowQueue, 1)
+	end
+end
+
 function LootDisplay:HideLoot()
+	emptyQueue()
 	frame:ClearFeed()
 end
 

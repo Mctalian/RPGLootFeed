@@ -1,4 +1,26 @@
+local addonName, ns = ...
+
 local Xp = G_RLF.RLF:NewModule("Experience", "AceEvent-3.0")
+
+Xp.Element = {}
+
+function Xp.Element:new(...)
+	ns.InitializeLootDisplayProperties(self)
+
+	self.type = "Experience"
+	self.IsEnabled = function()
+		return Xp:IsEnabled()
+	end
+
+	self.key = "EXPERIENCE"
+	self.quantity = ...
+	self.r, self.g, self.b, self.a = 1, 0, 1, 0.8
+	self.textFn = function(existingXP)
+		return "+" .. ((existingXP or 0) + self.quantity) .. " " .. G_RLF.L["XP"]
+	end
+
+	return self
+end
 
 local currentXP, currentMaxXP, currentLevel
 local function initXpValues()
@@ -54,7 +76,8 @@ function Xp:PLAYER_XP_UPDATE(eventName, unitTarget)
 			currentLevel = newLevel
 			currentMaxXP = UnitXPMax(unitTarget)
 			if delta > 0 then
-				G_RLF.LootDisplay:ShowLoot(self.moduleName, delta)
+				local e = self.Element:new(delta)
+				e:Show()
 			else
 				self:getLogger()
 					:Warn(eventName .. " fired but delta was not positive", G_RLF.addonName, self.moduleName)
