@@ -1,0 +1,91 @@
+﻿<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+	<Script file="LootDisplayFrame.lua"/>
+    <Frame name="LootDisplayFrame" mixin="LootDisplayFrameMixin" parent="UIParent" clampedToScreen="true" clipChildren="true">
+        <Layers>
+            <!-- Background layer for bounding box -->
+            <Layer level="BACKGROUND">
+                <Texture parentKey="BoundingBox" setAllPoints="true">
+                    <Color r="1" g="0" b="0" a="0.5" /> <!-- Red with 50% opacity -->
+                </Texture>
+            </Layer>
+
+            <!-- Overlay layer for instruction text -->
+            <Layer level="OVERLAY">
+                <FontString parentKey="InstructionText" inherits="GameFontNormal" justifyH="CENTER">
+                    <Anchors>
+                        <Anchor point="CENTER">
+                            <Offset>
+                                <AbsDimension x="0" y="0" />
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <Color r="1" g="1" b="1" /> <!-- White color -->
+                </FontString>
+            </Layer>
+
+            <!-- Overlay layer for arrows -->
+            <Layer level="OVERLAY">
+                <!-- Arrow UP -->
+                <Texture parentKey="ArrowUp" file="Interface\Buttons\Arrow-Up-Up">
+                    <Size>
+                        <AbsDimension x="16" y="16"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOP">
+                            <Offset>
+                                <AbsDimension x="0" y="-20"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+
+                <!-- Arrow DOWN -->
+                <Texture parentKey="ArrowDown" file="Interface\Buttons\Arrow-Up-Up">
+                    <Size>
+                        <AbsDimension x="16" y="16"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="BOTTOM">
+                            <Offset>
+                                <AbsDimension x="0" y="20"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+
+                <!-- Arrow LEFT -->
+                <Texture parentKey="ArrowLeft" file="Interface\Buttons\Arrow-Up-Up">
+                    <Size>
+                        <AbsDimension x="16" y="16"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT">
+                            <Offset>
+                                <AbsDimension x="20" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+
+                <!-- Arrow RIGHT -->
+                <Texture parentKey="ArrowRight" file="Interface\Buttons\Arrow-Up-Up">
+                    <Size>
+                        <AbsDimension x="16" y="16"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="RIGHT">
+                            <Offset>
+                                <AbsDimension x="-20" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Scripts>
+            <OnDragStart method="StartMoving"/>
+            <OnDragStop method="OnDragStop"/>
+        </Scripts>
+    </Frame>
+    <Include file="LootDisplayRow/LootDisplayRowTemplate.xml" />
+</Ui>

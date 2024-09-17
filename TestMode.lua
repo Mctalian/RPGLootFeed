@@ -71,31 +71,41 @@ local function generateRandomLoot()
 
 		if rng >= 0.8 then
 			local experienceGained = math.random(100, 10000)
-			G_RLF.LootDisplay:ShowLoot("Experience", experienceGained)
+			local module = G_RLF.RLF:GetModule("Experience")
+			local e = module.Element:new(experienceGained)
+			e:Show()
 		end
 
 		if rng <= 0.2 then
 			local copper = math.random(1, 100000000)
-			G_RLF.LootDisplay:ShowLoot("Money", copper)
+			local module = G_RLF.RLF:GetModule("Money")
+			local e = module.Element:new(copper)
+			e:Show()
 		end
 
 		-- 50% chance to show items
 		if rng > 0.2 and rng <= 0.7 then
 			local item = testItems[math.random(#testItems)]
 			local amountLooted = math.random(1, 5)
-			G_RLF.LootDisplay:ShowLoot("ItemLoot", item.id, item.link, item.icon, amountLooted)
+			local module = G_RLF.RLF:GetModule("ItemLoot")
+			local e = module.Element:new(item.id, item.link, item.icon, amountLooted)
+			e:Show()
 
 			-- 15% chance to show currency
 		elseif rng > 0.7 and rng <= 0.85 then
 			local currency = testCurrencies[math.random(#testCurrencies)]
 			local amountLooted = math.random(1, 500)
-			G_RLF.LootDisplay:ShowLoot("Currency", currency.id, currency.link, currency.icon, amountLooted)
+			local module = G_RLF.RLF:GetModule("Currency")
+			local e = module.Element:new(currency.id, currency.link, currency.icon, amountLooted)
+			e:Show()
 
 			-- 10% chance to show reputation (least frequent)
 		elseif rng > 0.85 then
 			local reputationGained = math.random(10, 100)
 			local factionName = testFactions[math.random(#testFactions)]
-			G_RLF.LootDisplay:ShowLoot("Reputation", reputationGained, factionName)
+			local module = G_RLF.RLF:GetModule("Reputation")
+			local e = module.Element:new(reputationGained, factionName)
+			e:Show()
 		end
 	end
 end
