@@ -3387,9 +3387,9 @@ if [[ -z $skip_upload && -n $archive && -s $archive ]]; then
 	fi
 fi
 
-if [[ $LOCAL_FLAG == true ]]; then
-	if [ -f "$wowi_changelog" ]; then
-		rm -f "$wowi_changelog" 2>/dev/null
+if [[ ${LOCAL_FLAG} == true ]]; then
+	if [[ -f ${wowi_changelog} ]]; then
+		rm -f "${wowi_changelog}" 2>/dev/null
 	fi
 fi
 

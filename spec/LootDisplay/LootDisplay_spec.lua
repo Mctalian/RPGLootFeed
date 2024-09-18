@@ -5,6 +5,7 @@ describe("LootDisplay module", function()
 	before_each(function()
 		-- Define the global G_RLF
 		common_stubs.setup_G_RLF(spy)
+		_G.LibStub = function() end
 		-- Load the list module before each test
 		LootDisplayModule = require("LootDisplay.LootDisplay")
 	end)
