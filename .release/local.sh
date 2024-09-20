@@ -879,6 +879,10 @@ else
 	file_type="alpha"
 fi
 
+if [[ ${LOCAL_FLAG} == true ]]; then
+	file_type="alpha"
+fi
+
 # Add some GitHub Actions outputs
 if [[ -n $GITHUB_ACTIONS ]]; then
 	# shellcheck disable=SC2129

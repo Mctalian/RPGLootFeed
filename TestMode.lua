@@ -137,4 +137,35 @@ end
 G_RLF:fn(initializeTestItems)
 G_RLF:fn(initializeTestCurrencies)
 
+--@alpha@
+local function assertEqual(actual, expected, testName)
+	if actual == expected then
+		print(testName .. " passed")
+	else
+		print(testName .. " failed: expected " .. tostring(expected) .. ", got " .. tostring(actual))
+	end
+end
+
+local function testWoWGlobals()
+	assertEqual(type(EventRegistry), "table", "Global: EventRegistry")
+	assertEqual(type(C_CVar), "table", "Global: C_CVar")
+	assertEqual(type(C_CVar.SetCVar), "function", "Global C_CVar.SetCVar")
+	local value, defaultValue, isStoredServerAccount, isStoredServerCharacter, isLockedFromUser, isSecure, isReadonly =
+		C_CVar:GetCVarInfo("autoLootDefault")
+	assertEqual(value ~= nil, true, "Global: C_CVar.GetCVarInfo autoLootDefault value")
+	assertEqual(defaultValue ~= nil, true, "Global: C_CVar.GetCVarInfo autoLootDefault defaultValue")
+	assertEqual(isStoredServerAccount ~= nil, true, "Global: C_CVar.GetCVarInfo autoLootDefault isStoredServerAccount")
+	assertEqual(
+		isStoredServerCharacter ~= nil,
+		true,
+		"Global: C_CVar.GetCVarInfo autoLootDefault isStoredServerCharacter"
+	)
+	assertEqual(isLockedFromUser ~= nil, true, "Global: C_CVar.GetCVarInfo autoLootDefault isLockedFromUser")
+	assertEqual(isSecure ~= nil, true, "Global: C_CVar.GetCVarInfo autoLootDefault isSecure")
+	assertEqual(isReadonly ~= nil, true, "Global: C_CVar.GetCVarInfo autoLootDefault isReadonly")
+	-- Add more global checks as needed for your addon
+end
+
+--@end-alpha@
+
 G_RLF.TestMode = TestMode
