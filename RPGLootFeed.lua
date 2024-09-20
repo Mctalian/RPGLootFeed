@@ -1,10 +1,12 @@
 local addonName = G_RLF.addonName
 local acd = LibStub("AceConfigDialog-3.0")
+local lsm = LibStub("LibSharedMedia-3.0")
 RLF = G_RLF.RLF
 
 function RLF:OnInitialize()
 	G_RLF.db = LibStub("AceDB-3.0"):New(G_RLF.dbName, G_RLF.defaults, true)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
+	lsm:Register(lsm.MediaType.FONT, "BAR SADY Regular", "Interface\\AddOns\\RPGLootFeed\\Fonts\\BAR_SADY_Variable.ttf")
 	self:Hook(acd, "Open", "OnOptionsOpen")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterChatCommand("rlf", "SlashCommand")

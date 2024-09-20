@@ -122,8 +122,16 @@ L["Background Gradient End"] = true
 L["GradientEndDesc"] = "The end color of the row background gradient."
 L["Disable Row Highlight"] = true
 L["DisableRowHighlightDesc"] = "If checked, don't highlight a row when you loot the same item again and the quanity is updated."
+L["Use Font Objects"] = true
+L["UseFontObjectsDesc"] = "If checked, use a font object to determine font face and font size."
 L["Font"] = true
 L["FontDesc"] = "The font object for the loot text."
+L["Custom Fonts"] = true
+L["CustomFontsDesc"] = "Customize the font face, font sizing, and font flags to personalize the loot feed."
+L["Font Face"] = true
+L["FontFaceDesc"] = "The style of the text that will show in the loot feed."
+L["Font Size"] = true
+L["FontSizeDesc"] = "The size of the loot feed text in \"points\"."
 
 -- ConfigOptions - Timing Group
 L["Timing"] = true

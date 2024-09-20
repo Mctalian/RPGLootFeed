@@ -1,6 +1,7 @@
 LootDisplayRowMixin = {}
 
 local ae = LibStub("AceEvent-3.0")
+local lsm = LibStub("LibSharedMedia-3.0")
 
 local Masque = LibStub and LibStub("Masque", true)
 local iconGroup = Masque and Masque:Group(G_RLF.addonName)
@@ -34,7 +35,12 @@ local function rowIcon(row, icon)
 end
 
 local function rowAmountText(row, icon)
-	row.AmountText:SetFontObject(G_RLF.db.global.font)
+	if G_RLF.db.global.useFontObjects or not G_RLF.db.global.fontFace then
+		row.AmountText:SetFontObject(G_RLF.db.global.font)
+	else
+		local fontPath = lsm:Fetch(lsm.MediaType.FONT, G_RLF.db.global.fontFace)
+		row.AmountText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
+	end
 	local anchor = "LEFT"
 	local iconAnchor = "RIGHT"
 	local xOffset = G_RLF.db.global.iconSize / 2

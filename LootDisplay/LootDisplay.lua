@@ -1,5 +1,7 @@
 local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
 
+local lsm = LibStub("LibSharedMedia-3.0")
+
 -- Private method declaration
 local processRow
 local processFromQueue
@@ -162,7 +164,12 @@ end
 G_RLF.LootDisplay = LootDisplay
 
 getTextWidth = function(text)
-	tempFontString:SetFontObject(G_RLF.db.global.font)
+	if G_RLF.db.global.useFontObjects or not G_RLF.db.global.fontFace then
+		tempFontString:SetFontObject(G_RLF.db.global.font)
+	else
+		local fontPath = lsm:Fetch(lsm.MediaType.FONT, G_RLF.db.global.fontFace)
+		tempFontString:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
+	end
 	tempFontString:SetText(text)
 	local width = tempFontString:GetStringWidth()
 	return width
