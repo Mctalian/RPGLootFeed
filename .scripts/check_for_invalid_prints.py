@@ -10,6 +10,13 @@ def check_print_statements(file_path):
         lines = file.readlines()
 
     for line_number, line in enumerate(lines, start=1):
+        # Strip leading and trailing whitespaces for proper comparison
+        stripped_line = line.strip()
+
+        # Ignore lines that start with a Lua comment
+        if stripped_line.startswith("--"):
+            continue
+
         match = re.search(r"\bprint\b", line)
         if match:
             column_number = match.start() + 1
