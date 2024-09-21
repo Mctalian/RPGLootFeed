@@ -60,7 +60,7 @@ function ItemLoot.Element:new(...)
 				"ItemLoot",
 				"",
 				nil,
-				amount
+				self.quantity
 			)
 			return false
 		end
