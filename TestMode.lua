@@ -138,6 +138,7 @@ G_RLF:fn(initializeTestItems)
 G_RLF:fn(initializeTestCurrencies)
 
 --@alpha@
+-- trunk-ignore-begin(no-invalid-prints/invalid-print)
 local tests = {}
 local prints = ""
 local successCount = 0
@@ -317,6 +318,7 @@ function TestMode:SmokeTest()
 	end
 end
 
+-- trunk-ignore-end(no-invalid-prints/invalid-print)
 --@end-alpha@
 
 G_RLF.TestMode = TestMode
