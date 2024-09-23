@@ -254,7 +254,7 @@ local function runTestSafely(testFunction, testName)
 	assertEqual(success, true, testName)
 end
 
-local function testLootDisplay()
+local function beforeEach()
 	if #testItems ~= #testItemIds then
 		initializeTestItems()
 	end
@@ -262,25 +262,32 @@ local function testLootDisplay()
 	if #testCurrencies ~= #testCurrencyIds then
 		initializeTestCurrencies()
 	end
+end
 
+local function testLootDisplay()
+	beforeEach()
 	local module, e, testObj, amountLooted
 	module = G_RLF.RLF:GetModule("Experience")
 	e = module.Element:new(1337)
 	runTestSafely(e.Show, "LootDisplay: Experience")
+	beforeEach()
 	module = G_RLF.RLF:GetModule("Money")
 	e = module.Element:new(12345)
 	runTestSafely(e.Show, "LootDisplay: Money")
+	beforeEach()
 	module = G_RLF.RLF:GetModule("ItemLoot")
 	testObj = testItems[2]
 	amountLooted = 1
 	e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted)
 	runTestSafely(e.Show, "LootDisplay: Item")
 	runTestSafely(e.Show, "LootDisplay: Item Quantity Update")
+	beforeEach()
 	module = G_RLF.RLF:GetModule("Currency")
 	testObj = testCurrencies[2]
 	e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted)
 	runTestSafely(e.Show, "LootDisplay: Currency")
 	runTestSafely(e.Show, "LootDisplay: Currency Quantity Update")
+	beforeEach()
 	module = G_RLF.RLF:GetModule("Reputation")
 	testObj = testFactions[2]
 	amountLooted = 664
@@ -294,7 +301,9 @@ function TestMode:SmokeTest()
 	prints = ""
 	successCount = 0
 	failureCount = 0
+	beforeEach()
 	testWoWGlobals()
+	beforeEach()
 	testLootDisplay()
 
 	print(G_RLF.addonName .. " Smoke Test")

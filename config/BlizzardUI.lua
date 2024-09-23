@@ -2,6 +2,7 @@ local BlizzardUI = {}
 
 G_RLF.defaults.global.enableAutoLoot = false
 G_RLF.defaults.global.disableBlizzLootToasts = false
+G_RLF.defaults.global.disableBlizzMoneyAlerts = false
 G_RLF.defaults.global.bossBannerConfig = G_RLF.DisableBossBanner.ENABLED
 
 G_RLF.options.args.blizz = {
@@ -32,6 +33,14 @@ G_RLF.options.args.blizz = {
 			set = "SetDisableLootToast",
 			order = 3,
 		},
+		disableMoneyAlert = {
+			type = "toggle",
+			name = G_RLF.L["Disable Money Alerts"],
+			desc = G_RLF.L["DisableMoneyAlertsDesc"],
+			get = "GetDisableMoneyAlerts",
+			set = "SetDisableMoneyAlerts",
+			order = 4,
+		},
 		bossBanner = {
 			type = "select",
 			name = G_RLF.L["Disable Boss Banner Elements"],
@@ -46,12 +55,12 @@ G_RLF.options.args.blizz = {
 				[G_RLF.DisableBossBanner.DISABLE_MY_LOOT] = G_RLF.L["Only Disable My BossBanner Loot"],
 				[G_RLF.DisableBossBanner.DISABLE_GROUP_LOOT] = G_RLF.L["Disable Party/Raid Loot"],
 			},
-			order = 4,
+			order = 5,
 		},
 		chat = {
 			type = "header",
 			name = G_RLF.L["Chat"],
-			order = 5,
+			order = 6,
 		},
 		disableLootChatMessages = {
 			type = "execute",
@@ -59,7 +68,7 @@ G_RLF.options.args.blizz = {
 			desc = G_RLF.L["DisableLootChatMessagesDesc"],
 			width = "double",
 			func = "DisableLootChatMessages",
-			order = 6,
+			order = 7,
 		},
 		disableCurrencyChatMessages = {
 			type = "execute",
@@ -67,7 +76,7 @@ G_RLF.options.args.blizz = {
 			desc = G_RLF.L["DisableCurrencyChatMessagesDesc"],
 			width = "double",
 			func = "DisableCurrencyChatMessages",
-			order = 7,
+			order = 8,
 		},
 		disableMoneyChatMessages = {
 			type = "execute",
@@ -75,7 +84,7 @@ G_RLF.options.args.blizz = {
 			desc = G_RLF.L["DisableMoneyChatMessagesDesc"],
 			width = "double",
 			func = "DisableMoneyChatMessages",
-			order = 8,
+			order = 9,
 		},
 		disableXpChatMessages = {
 			type = "execute",
@@ -83,7 +92,7 @@ G_RLF.options.args.blizz = {
 			desc = G_RLF.L["DisableExperienceChatMessagesDesc"],
 			width = "double",
 			func = "DisableExperienceChatMessages",
-			order = 9,
+			order = 10,
 		},
 		disableRepChatMessages = {
 			type = "execute",
@@ -91,7 +100,7 @@ G_RLF.options.args.blizz = {
 			desc = G_RLF.L["DisableReputationChatMessagesDesc"],
 			width = "double",
 			func = "DisableReputationChatMessages",
-			order = 10,
+			order = 11,
 		},
 	},
 }
@@ -102,6 +111,14 @@ end
 
 function BlizzardUI:GetDisableLootToast(info, value)
 	return G_RLF.db.global.disableBlizzLootToasts
+end
+
+function BlizzardUI:GetDisableMoneyAlerts(info, value)
+	return G_RLF.db.global.disableBlizzMoneyAlerts
+end
+
+function BlizzardUI:SetDisableMoneyAlerts(info, value)
+	G_RLF.db.global.disableBlizzMoneyAlerts = value
 end
 
 function BlizzardUI:GetEnableAutoLoot(info, value)
