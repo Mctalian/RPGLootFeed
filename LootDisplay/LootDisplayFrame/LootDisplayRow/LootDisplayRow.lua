@@ -43,12 +43,15 @@ local function rowAmountText(row, icon)
 	end
 	local anchor = "LEFT"
 	local iconAnchor = "RIGHT"
+	row.AmountText:SetJustifyH("LEFT")
 	local xOffset = G_RLF.db.global.iconSize / 2
-	if G_RLF.db.global.leftAlign == false then
+	if not G_RLF.db.global.leftAlign then
 		anchor = "RIGHT"
 		iconAnchor = "LEFT"
 		xOffset = xOffset * -1
+		row.AmountText:SetJustifyH("RIGHT")
 	end
+	row.AmountText:ClearAllPoints()
 	if icon then
 		row.AmountText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
 	else
