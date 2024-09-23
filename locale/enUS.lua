@@ -3,6 +3,7 @@ local L = LibStub("AceLocale-3.0"):NewLocale(G_RLF.localeName, "enUS", true)
 -- Chat Window Printing
 L["Welcome"] = "Welcome! Use /rlf to view options."
 L["AddLootAlertUnavailable"] = "LootAlertSystem:AddAlert was unavailable for > 30 seconds, Loot Toasts could not be disabled :("
+L["AddMoneyAlertUnavailable"] = "MoneyAlertSystem:AddAlert was unavailable for > 30 seconds, Money Alerts could not be disabled :("
 L["BossBannerAlertUnavailable"] = "BossBanner:OnEvent was unavailable for > 30 seconds, Boss Banner elements could not be disabled :("
 L["Issues"] = "Please report this issue @ github: McTalian/RPGLootFeed"
 L["Test Mode Enabled"] = true
@@ -144,6 +145,8 @@ L["Blizzard UI"] = true
 L["BlizzUIDesc"] = "Override behavior of Blizzard-related UI elements"
 L["Disable Loot Toasts"] = true
 L["DisableLootToastDesc"] = "The boxes that appear at the bottom of the screen when you loot special items"
+L["Disable Money Alerts"] = true
+L["DisableMoneyAlertsDesc"] = "The boxes that appear at the bottom of the screen when you receive money, for example world quest rewards"
 L["Enable Auto Loot"] = true
 L["EnableAutoLootDesc"] = "Set the default setting so that auto loot is enabled when logging into any character"
 L["Alerts"] = true
