@@ -1,3 +1,5 @@
+local addonName, ns = ...
+
 local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 
 -- local equipLocToSlotID = {
@@ -23,6 +25,71 @@ local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 --   ["INVTYPE_RANGEDRIGHT"] = INVSLOT_RANGED, -- Ranged weapons
 -- }
 
+ItemLoot.Element = {}
+
+local function itemQualityName(enumValue)
+	for k, v in pairs(Enum.ItemQuality) do
+		if v == enumValue then
+			return k
+		end
+	end
+	return nil
+end
+
+function ItemLoot.Element:new(...)
+	ns.InitializeLootDisplayProperties(self)
+
+	self.type = "ItemLoot"
+	self.IsEnabled = function()
+		return ItemLoot:IsEnabled()
+	end
+
+	self.isLink = true
+
+	local t
+	self.key, t, self.icon, self.quantity = ...
+
+	self.isPassingFilter = function()
+		local itemName, _, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent =
+			C_Item.GetItemInfo(t)
+
+		if not G_RLF.db.global.itemQualityFilter[itemQuality] then
+			self:getLogger():Debug(
+				itemName .. " ignored by quality: " .. itemQualityName(itemQuality),
+				G_RLF.addonName,
+				"ItemLoot",
+				"",
+				nil,
+				self.quantity
+			)
+			return false
+		end
+
+		-- if G_RLF.db.global.onlyBetterThanEquipped and itemEquipLoc then
+		--   local equippedLink = GetInventoryItemLink("player", equipLocToSlotID[itemEquipLoc])
+		--   if equippedLink then
+		--     local _, _, _, equippediLvl, _, _, equippedSubType = C_Item.GetItemInfo(equippedLink)
+		--     if equippediLvl > itemLevel then
+		--         return
+		--     elseif equippedSubType ~= itemSubType then
+		--         return
+		--     end
+		--   end
+		-- end
+
+		return true
+	end
+
+	self.textFn = function(existingQuantity, truncatedLink)
+		if not truncatedLink then
+			return t
+		end
+		return truncatedLink .. " x" .. ((existingQuantity or 0) + self.quantity)
+	end
+
+	return self
+end
+
 local logger
 function ItemLoot:OnInitialize()
 	if G_RLF.db.global.itemLootFeed then
@@ -44,24 +111,11 @@ local function showItemLoot(msg, itemLink)
 	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
 	local _, _, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent =
 		C_Item.GetItemInfo(itemLink)
-	if not G_RLF.db.global.itemQualityFilter[itemQuality] then
-		ItemLoot:getLogger():Debug("Item Ignored by quality", G_RLF.addonName, "ItemLoot", "", nil, amount)
-		return
-	end
-	local itemId = itemLink:match("Hitem:(%d+)")
-	-- if G_RLF.db.global.onlyBetterThanEquipped and itemEquipLoc then
-	--   local equippedLink = GetInventoryItemLink("player", equipLocToSlotID[itemEquipLoc])
-	--   if equippedLink then
-	--     local _, _, _, equippediLvl, _, _, equippedSubType = C_Item.GetItemInfo(equippedLink)
-	--     if equippediLvl > itemLevel then
-	--         return
-	--     elseif equippedSubType ~= itemSubType then
-	--         return
-	--     end
-	--   end
 
-	-- end
-	G_RLF.LootDisplay:ShowLoot("ItemLoot", itemId, itemLink, itemTexture, amount)
+	local itemId = itemLink:match("Hitem:(%d+)")
+
+	local e = ItemLoot.Element:new(itemId, itemLink, itemTexture, amount)
+	e:Show()
 end
 
 function ItemLoot:CHAT_MSG_LOOT(eventName, ...)

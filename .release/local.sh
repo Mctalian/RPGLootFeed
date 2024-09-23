@@ -879,6 +879,10 @@ else
 	file_type="alpha"
 fi
 
+if [[ ${LOCAL_FLAG} == true ]]; then
+	file_type="alpha"
+fi
+
 # Add some GitHub Actions outputs
 if [[ -n $GITHUB_ACTIONS ]]; then
 	# shellcheck disable=SC2129
@@ -3384,6 +3388,12 @@ if [[ -z $skip_upload && -n $archive && -s $archive ]]; then
 		upload_wowinterface || exit_code=1
 		upload_wago || exit_code=1
 		upload_github || exit_code=1
+	fi
+fi
+
+if [[ ${LOCAL_FLAG} == true ]]; then
+	if [[ -f ${wowi_changelog} ]]; then
+		rm -f "${wowi_changelog}" 2>/dev/null
 	fi
 fi
 

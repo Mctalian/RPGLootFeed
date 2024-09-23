@@ -13,7 +13,7 @@
 
 embeds.xml
 
-AddonScope.lua
+Core.lua
 DynamicPropertyTable.lua
 DoubleLinkedList.lua
 
@@ -27,4 +27,4 @@ Logger.lua
 
 Features/features.xml
 TestMode.lua
-LootDisplay.lua
+LootDisplay/LootDisplay.xml

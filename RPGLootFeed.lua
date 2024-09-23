@@ -1,10 +1,12 @@
 local addonName = G_RLF.addonName
 local acd = LibStub("AceConfigDialog-3.0")
+local lsm = LibStub("LibSharedMedia-3.0")
 RLF = G_RLF.RLF
 
 function RLF:OnInitialize()
 	G_RLF.db = LibStub("AceDB-3.0"):New(G_RLF.dbName, G_RLF.defaults, true)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
+	lsm:Register(lsm.MediaType.FONT, "BAR SADY Regular", "Interface\\AddOns\\RPGLootFeed\\Fonts\\BAR_SADY_Variable.ttf")
 	self:Hook(acd, "Open", "OnOptionsOpen")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterChatCommand("rlf", "SlashCommand")
@@ -42,8 +44,9 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 		self.optionsFrame = acd:AddToBlizOptions(addonName, addonName)
 	end
 	G_RLF:fn(function()
-		self:LootToastHook()
 		self:BossBannerHook()
+		self:LootToastHook()
+		self:MoneyAlertHook()
 	end)
 	local isNewVersion = currentVersion ~= G_RLF.db.global.lastVersionLoaded
 	if isLogin and isReload == false and isNewVersion then
@@ -53,6 +56,9 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 			C_CVar.SetCVar("autoLootDefault", "1")
 		end
 	end
+	--@alpha@
+	G_RLF.TestMode:SmokeTest()
+	--@end-alpha@
 end
 
 local optionsFrame

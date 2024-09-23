@@ -1,11 +1,17 @@
 local Styling = {}
 
+local lsm = LibStub("LibSharedMedia-3.0")
+
 G_RLF.defaults.global.leftAlign = true
 G_RLF.defaults.global.growUp = true
 G_RLF.defaults.global.rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 } -- Default to dark grey with 80% opacity
 G_RLF.defaults.global.rowBackgroundGradientEnd = { 0.1, 0.1, 0.1, 0 } -- Default to dark grey with 0% opacity
 G_RLF.defaults.global.disableRowHighlight = false
+G_RLF.defaults.global.useFontObjects = true
 G_RLF.defaults.global.font = "GameFontNormalSmall"
+G_RLF.defaults.global.fontFace = "Friz Quadrata TT"
+G_RLF.defaults.global.fontSize = 10
+G_RLF.defaults.global.fontFlags = ""
 
 G_RLF.options.args.styles = {
 	type = "group",
@@ -59,15 +65,59 @@ G_RLF.options.args.styles = {
 			set = "SetRowHighlight",
 			order = 5,
 		},
+		useFontObjects = {
+			type = "toggle",
+			name = G_RLF.L["Use Font Objects"],
+			desc = G_RLF.L["UseFontObjectsDesc"],
+			width = "double",
+			get = "GetUseFontObjects",
+			set = "SetUseFontObjects",
+			order = 6,
+		},
 		font = {
 			type = "select",
 			name = G_RLF.L["Font"],
 			desc = G_RLF.L["FontDesc"],
+			disabled = "DisableFontObjects",
 			width = "double",
 			values = "GetFonts",
 			get = "GetRowFont",
 			set = "SetRowFont",
-			order = 6,
+			order = 7,
+		},
+		customFonts = {
+			type = "group",
+			name = G_RLF.L["Custom Fonts"],
+			desc = G_RLF.L["CustomFontsDesc"],
+			disabled = "DisableCustomFonts",
+			inline = true,
+			order = 8,
+			args = {
+				font = {
+					type = "select",
+					dialogControl = "LSM30_Font",
+					name = G_RLF.L["Font Face"],
+					desc = G_RLF.L["FontFaceDesc"],
+					width = "double",
+					values = lsm:HashTable(lsm.MediaType.FONT),
+					get = "GetRowFontFace",
+					set = "SetRowFontFace",
+					order = 1,
+				},
+				fontSize = {
+					type = "range",
+					name = G_RLF.L["Font Size"],
+					desc = G_RLF.L["FontSizeDesc"],
+					softMin = 6,
+					softMax = 24,
+					min = 1,
+					max = 72,
+					bigStep = 1,
+					get = "GetRowFontSize",
+					set = "SetRowFontSize",
+					order = 2,
+				},
+			},
 		},
 	},
 }
@@ -133,6 +183,40 @@ end
 
 function Styling:SetRowHighlight(info, value)
 	G_RLF.db.global.disableRowHighlight = value
+end
+
+function Styling:GetUseFontObjects(info, value)
+	return G_RLF.db.global.useFontObjects
+end
+
+function Styling:SetUseFontObjects(info, value)
+	G_RLF.db.global.useFontObjects = value
+end
+
+function Styling:DisableFontObjects(info, value)
+	return G_RLF.db.global.useFontObjects == false
+end
+
+function Styling:DisableCustomFonts(info, value)
+	return G_RLF.db.global.useFontObjects == true
+end
+
+function Styling:GetRowFontFace(info, value)
+	return G_RLF.db.global.fontFace
+end
+
+function Styling:SetRowFontFace(info, value)
+	G_RLF.db.global.fontFace = value
+	G_RLF.LootDisplay:UpdateRowStyles()
+end
+
+function Styling:GetRowFontSize(info, value)
+	return G_RLF.db.global.fontSize
+end
+
+function Styling:SetRowFontSize(info, value)
+	G_RLF.db.global.fontSize = value
+	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:SetRowFont(info, value)
