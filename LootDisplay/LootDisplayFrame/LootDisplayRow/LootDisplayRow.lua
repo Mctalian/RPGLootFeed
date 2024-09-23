@@ -254,16 +254,14 @@ end
 function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 	if icon then
 		self.icon = icon
-		if Masque and iconGroup then
-			if not quality then
-				self.Icon:SetItem(self.link)
-			else
-				self.Icon:SetItemButtonTexture(icon)
-				self.Icon:SetItemButtonQuality(quality, self.link)
-			end
-			iconGroup:ReSkin(self.Icon)
+		if not quality then
+			self.Icon:SetItem(self.link)
 		else
-			self.Icon:SetTexture(icon)
+			self.Icon:SetItemButtonTexture(icon)
+			self.Icon:SetItemButtonQuality(quality, self.link)
+		end
+		if Masque and iconGroup then
+			iconGroup:ReSkin(self.Icon)
 		end
 	end
 end
