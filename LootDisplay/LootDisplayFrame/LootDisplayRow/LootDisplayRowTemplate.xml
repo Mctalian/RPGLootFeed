@@ -15,7 +15,7 @@
 
             <!-- Amount Text Layer -->
             <Layer level="ARTWORK">
-                <FontString parentKey="AmountText" inherits="GameFontNormal" justifyH="LEFT" />
+                <FontString parentKey="AmountText" inherits="GameFontNormal" />
             </Layer>
 
             <!-- Highlight Border Layer -->
