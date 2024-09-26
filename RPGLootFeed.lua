@@ -56,6 +56,7 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 			C_CVar.SetCVar("autoLootDefault", "1")
 		end
 	end
+	G_RLF.TestMode:InitializeTestData()
 	--@alpha@
 	G_RLF.TestMode:SmokeTest()
 	--@end-alpha@

@@ -3,7 +3,6 @@ local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEven
 local lsm = LibStub("LibSharedMedia-3.0")
 
 -- Private method declaration
-local processRow
 local processFromQueue
 local getTextWidth
 local truncateItemLink
@@ -21,7 +20,9 @@ function LootDisplay:OnInitialize()
 
 	tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
 	tempFontString:Hide() -- Prevent it from showing up
-	self:RegisterBucketMessage("RLF_LootDisplay_RowReturned", 0.2, processFromQueue)
+	self:RegisterBucketMessage({ "RLF_LootDisplay_RowReturned", "RLF_LootDisplay_Process" }, 0.2, function()
+		G_RLF:fn(processFromQueue)
+	end)
 	self:RegisterMessage("RLF_RowHidden", function(_, row)
 		frame:ReleaseRow(row)
 	end)
@@ -67,17 +68,17 @@ function LootDisplay:UpdateFadeDelay()
 	frame:UpdateFadeDelay()
 end
 
+local elementQueue = {}
 function LootDisplay:ShowLoot(element)
 	if type(element) ~= "table" then
 		error("Expected arg to ShowLoot to be a table")
 	end
 
-	local e = element
-	processRow(e)
+	tinsert(elementQueue, element)
+	self:SendMessage("RLF_LootDisplay_Process")
 end
 
-local overflowQueue = {}
-processRow = function(element)
+local function processRow(element)
 	if not element:IsEnabled() then
 		return
 	end
@@ -106,7 +107,7 @@ processRow = function(element)
 		-- New row
 		row = frame:LeaseRow(key)
 		if row == nil then
-			tinsert(overflowQueue, element)
+			tinsert(elementQueue, element)
 			return
 		end
 
@@ -135,24 +136,22 @@ processRow = function(element)
 end
 
 processFromQueue = function()
-	local snapshotQueueSize = #overflowQueue
+	local snapshotQueueSize = #elementQueue
 	if snapshotQueueSize > 0 then
 		-- error("Test")
 		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.maxRows)
-		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from overflow queue", G_RLF.addonName)
+		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from element queue", G_RLF.addonName)
 		for i = 1, rowsToProcess do
-			-- Get the first element from the queue
-			local e = tremove(overflowQueue, 1) -- Remove and return the first element
-			-- Call processRow with the element
+			local e = tremove(elementQueue, 1)
 			processRow(e)
 		end
 	end
 end
 
 local function emptyQueue()
-	local queueSize = #overflowQueue
+	local queueSize = #elementQueue
 	for i = 1, queueSize do
-		tremove(overflowQueue, 1)
+		tremove(elementQueue, 1)
 	end
 end
 

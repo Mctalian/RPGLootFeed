@@ -11,11 +11,7 @@ local function getFrameHeight()
 end
 
 local function getNumberOfRows()
-	local n = 0
-	for row in rows:iterate() do
-		n = n + 1
-	end
-	return n
+	return rows.length
 end
 
 local function configureArrowRotation(arrow, direction)

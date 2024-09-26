@@ -5,28 +5,29 @@ local Currency = G_RLF.RLF:NewModule("Currency", "AceEvent-3.0")
 Currency.Element = {}
 
 function Currency.Element:new(...)
-	ns.InitializeLootDisplayProperties(self)
+	local element = {}
+	ns.InitializeLootDisplayProperties(element)
 
-	self.type = "Currency"
-	self.IsEnabled = function()
+	element.type = "Currency"
+	element.IsEnabled = function()
 		return Currency:IsEnabled()
 	end
 
-	self.isLink = true
+	element.isLink = true
 
 	local t
-	self.key, t, self.icon, self.quantity = ...
+	element.key, t, element.icon, element.quantity = ...
 
-	self.textFn = function(existingQuantity, truncatedLink)
+	element.textFn = function(existingQuantity, truncatedLink)
 		if not truncatedLink then
 			return t
 		end
-		return truncatedLink .. " x" .. ((existingQuantity or 0) + self.quantity)
+		return truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
 	end
 
-	self.quality = C_CurrencyInfo.GetCurrencyInfo(self.key).quality
+	element.quality = C_CurrencyInfo.GetCurrencyInfo(element.key).quality
 
-	return self
+	return element
 end
 
 local hiddenCurrencies
