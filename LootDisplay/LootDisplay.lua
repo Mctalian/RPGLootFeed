@@ -3,7 +3,6 @@ local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEven
 local lsm = LibStub("LibSharedMedia-3.0")
 
 -- Private method declaration
-local processRow
 local processFromQueue
 local getTextWidth
 local truncateItemLink
@@ -75,12 +74,11 @@ function LootDisplay:ShowLoot(element)
 		error("Expected arg to ShowLoot to be a table")
 	end
 
-	local e = element
-	tinsert(elementQueue, e)
+	tinsert(elementQueue, element)
 	self:SendMessage("RLF_LootDisplay_Process")
 end
 
-processRow = function(element)
+local function processRow(element)
 	if not element:IsEnabled() then
 		return
 	end
@@ -144,9 +142,7 @@ processFromQueue = function()
 		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.maxRows)
 		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from element queue", G_RLF.addonName)
 		for i = 1, rowsToProcess do
-			-- Get the first element from the queue
-			local e = tremove(elementQueue, 1) -- Remove and return the first element
-			-- Call processRow with the element
+			local e = tremove(elementQueue, 1)
 			processRow(e)
 		end
 	end

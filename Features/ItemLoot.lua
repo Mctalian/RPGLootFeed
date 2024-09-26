@@ -37,24 +37,25 @@ local function itemQualityName(enumValue)
 end
 
 function ItemLoot.Element:new(...)
-	ns.InitializeLootDisplayProperties(self)
+	local element = {}
+	ns.InitializeLootDisplayProperties(element)
 
-	self.type = "ItemLoot"
-	self.IsEnabled = function()
+	element.type = "ItemLoot"
+	element.IsEnabled = function()
 		return ItemLoot:IsEnabled()
 	end
 
-	self.isLink = true
+	element.isLink = true
 
 	local t
-	self.key, t, self.icon, self.quantity = ...
+	element.key, t, element.icon, element.quantity = ...
 
-	self.isPassingFilter = function()
+	element.isPassingFilter = function()
 		local itemName, _, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent =
 			C_Item.GetItemInfo(t)
 
 		if not G_RLF.db.global.itemQualityFilter[itemQuality] then
-			self:getLogger():Debug(
+			element:getLogger():Debug(
 				itemName .. " ignored by quality: " .. itemQualityName(itemQuality),
 				G_RLF.addonName,
 				"ItemLoot",
@@ -80,14 +81,14 @@ function ItemLoot.Element:new(...)
 		return true
 	end
 
-	self.textFn = function(existingQuantity, truncatedLink)
+	element.textFn = function(existingQuantity, truncatedLink)
 		if not truncatedLink then
 			return t
 		end
-		return truncatedLink .. " x" .. ((existingQuantity or 0) + self.quantity)
+		return truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
 	end
 
-	return self
+	return element
 end
 
 local logger
