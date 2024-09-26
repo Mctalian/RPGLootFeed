@@ -5,21 +5,22 @@ local Xp = G_RLF.RLF:NewModule("Experience", "AceEvent-3.0")
 Xp.Element = {}
 
 function Xp.Element:new(...)
-	ns.InitializeLootDisplayProperties(self)
+	local element = {}
+	ns.InitializeLootDisplayProperties(element)
 
-	self.type = "Experience"
-	self.IsEnabled = function()
+	element.type = "Experience"
+	element.IsEnabled = function()
 		return Xp:IsEnabled()
 	end
 
-	self.key = "EXPERIENCE"
-	self.quantity = ...
-	self.r, self.g, self.b, self.a = 1, 0, 1, 0.8
-	self.textFn = function(existingXP)
-		return "+" .. ((existingXP or 0) + self.quantity) .. " " .. G_RLF.L["XP"]
+	element.key = "EXPERIENCE"
+	element.quantity = ...
+	element.r, element.g, element.b, element.a = 1, 0, 1, 0.8
+	element.textFn = function(existingXP)
+		return "+" .. ((existingXP or 0) + element.quantity) .. " " .. G_RLF.L["XP"]
 	end
 
-	return self
+	return element
 end
 
 local currentXP, currentMaxXP, currentLevel

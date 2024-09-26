@@ -5,28 +5,29 @@ local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0")
 Rep.Element = {}
 
 function Rep.Element:new(...)
-	ns.InitializeLootDisplayProperties(self)
+	local element = {}
+	ns.InitializeLootDisplayProperties(element)
 
-	self.type = "Reputation"
-	self.IsEnabled = function()
+	element.type = "Reputation"
+	element.IsEnabled = function()
 		return Rep:IsEnabled()
 	end
 
 	local factionName, rL, gL, bL
-	self.quantity, factionName, rL, gL, bL = ...
-	self.r, self.g, self.b = rL or 0.5, gL or 0.5, bL or 1
-	self.a = 1
-	self.key = "REP_" .. factionName
-	self.textFn = function(existingRep)
+	element.quantity, factionName, rL, gL, bL = ...
+	element.r, element.g, element.b = rL or 0.5, gL or 0.5, bL or 1
+	element.a = 1
+	element.key = "REP_" .. factionName
+	element.textFn = function(existingRep)
 		local sign = "+"
-		local rep = (existingRep or 0) + self.quantity
+		local rep = (existingRep or 0) + element.quantity
 		if rep < 0 then
 			sign = "-"
 		end
 		return sign .. math.abs(rep) .. " " .. factionName
 	end
 
-	return self
+	return element
 end
 
 local locale

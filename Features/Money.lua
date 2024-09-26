@@ -5,28 +5,29 @@ local Money = G_RLF.RLF:NewModule("Money", "AceEvent-3.0")
 Money.Element = {}
 
 function Money.Element:new(...)
-	ns.InitializeLootDisplayProperties(self)
+	local element = {}
+	ns.InitializeLootDisplayProperties(element)
 
-	self.type = "Money"
-	self.IsEnabled = function()
+	element.type = "Money"
+	element.IsEnabled = function()
 		return Money:IsEnabled()
 	end
 
-	self.key = "MONEY_LOOT"
-	self.quantity = ...
-	if not self.quantity then
+	element.key = "MONEY_LOOT"
+	element.quantity = ...
+	if not element.quantity then
 		return
 	end
-	self.textFn = function(existingCopper)
+	element.textFn = function(existingCopper)
 		local sign = ""
-		local total = (existingCopper or 0) + self.quantity
+		local total = (existingCopper or 0) + element.quantity
 		if total < 0 then
 			sign = "-"
 		end
 		return sign .. C_CurrencyInfo.GetCoinTextureString(math.abs(total))
 	end
 
-	return self
+	return element
 end
 
 local startingMoney

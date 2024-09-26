@@ -110,6 +110,11 @@ local function generateRandomLoot()
 	end
 end
 
+function TestMode:InitializeTestData()
+	G_RLF:fn(initializeTestItems)
+	G_RLF:fn(initializeTestCurrencies)
+end
+
 function TestMode:ToggleTestMode()
 	if not logger then
 		logger = G_RLF.RLF:GetModule("Logger")
@@ -133,9 +138,6 @@ function TestMode:ToggleTestMode()
 		end)
 	end
 end
-
-G_RLF:fn(initializeTestItems)
-G_RLF:fn(initializeTestCurrencies)
 
 --@alpha@
 -- trunk-ignore-begin(no-invalid-prints/invalid-print)
