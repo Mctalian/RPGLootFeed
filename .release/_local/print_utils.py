@@ -1,7 +1,5 @@
 # .release/local/print_utils.py
 
-import sys
-
 # Define ANSI color codes
 CYAN = "\033[0;36m"
 YELLOW = "\033[33m"
