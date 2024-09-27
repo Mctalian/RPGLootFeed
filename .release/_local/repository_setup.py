@@ -66,6 +66,7 @@ def determine_releasedir():
             f'Unable to create the release directory "{releasedir_abs}".',
             file=sys.stderr,
         )
+        print(e)
         sys.exit(1)
 
     config.release_directory = releasedir_abs
