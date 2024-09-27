@@ -4,6 +4,7 @@ local acr = LibStub("AceConfigRegistry-3.0")
 local ae = LibStub("AceEvent-3.0")
 
 local rows = G_RLF.list()
+local keyRowMap = {}
 local rowFramePool = {}
 
 local function getFrameHeight()
@@ -140,12 +141,7 @@ function LootDisplayFrameMixin:MakeUnmovable()
 end
 
 function LootDisplayFrameMixin:GetRow(key)
-	for row in rows:iterate() do
-		if row.key == key then
-			return row
-		end
-	end
-	return nil
+	return keyRowMap[key]
 end
 
 function LootDisplayFrameMixin:LeaseRow(key)
@@ -165,17 +161,18 @@ function LootDisplayFrameMixin:LeaseRow(key)
 
 	-- Assign the key to the row
 	row.key = key
+	keyRowMap[key] = row
 
 	-- Add the row to the rows list and show it
 	rows:push(row)
-	row:Show()
 
 	-- Position the new row at the bottom (or top if growing up)
 	if getNumberOfRows() == 1 then
 		local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
 		row:SetPoint(vertDir, self, vertDir)
+		row:Show()
 	else
-		self:UpdateRowPositions()
+		ae:SendMessage("RLF_LootDisplay_UpdateRowPositions")
 	end
 
 	return row
@@ -183,15 +180,16 @@ end
 
 function LootDisplayFrameMixin:ReleaseRow(row)
 	rows:remove(row)
-	self:UpdateRowPositions()
+	keyRowMap[row.key] = nil
 	tinsert(rowFramePool, row)
 	ae:SendMessage("RLF_LootDisplay_RowReturned")
+	ae:SendMessage("RLF_LootDisplay_UpdateRowPositions")
 end
 
 function LootDisplayFrameMixin:UpdateRowPositions()
 	local index = 0
 	for row in rows:iterate() do
-		if row:IsShown() then
+		if not row:IsFading() then
 			row:ClearAllPoints()
 			local vertDir = "BOTTOM"
 			local yOffset = index * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding)
@@ -202,6 +200,7 @@ function LootDisplayFrameMixin:UpdateRowPositions()
 			row:SetPoint(vertDir, self, vertDir, 0, yOffset)
 			row:UpdateStyles()
 			index = index + 1
+			row:Show()
 		end
 	end
 end
