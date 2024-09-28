@@ -238,6 +238,10 @@ function LootDisplayRowMixin:SetupTooltip()
 	end)
 end
 
+function LootDisplayRowMixin:IsFading()
+	return self.FadeOutAnimation:IsPlaying() and not self.FadeOutAnimation.fadeOut:IsDelaying()
+end
+
 function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 	if a == nil then
 		a = 1
