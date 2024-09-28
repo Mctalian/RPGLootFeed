@@ -23,6 +23,9 @@ function LootDisplay:OnInitialize()
 	self:RegisterBucketMessage({ "RLF_LootDisplay_RowReturned", "RLF_LootDisplay_Process" }, 0.2, function()
 		G_RLF:fn(processFromQueue)
 	end)
+	self:RegisterBucketMessage("RLF_LootDisplay_UpdateRowPositions", 0.1, function()
+		G_RLF:fn(frame:UpdateRowPositions())
+	end)
 	self:RegisterMessage("RLF_RowHidden", function(_, row)
 		frame:ReleaseRow(row)
 	end)
@@ -51,7 +54,7 @@ function LootDisplay:UpdatePosition()
 end
 
 function LootDisplay:UpdateRowPositions()
-	frame:UpdateRowPositions()
+	self:SendMessage("RLF_LootDisplay_UpdateRowPositions")
 end
 
 function LootDisplay:UpdateStrata()
