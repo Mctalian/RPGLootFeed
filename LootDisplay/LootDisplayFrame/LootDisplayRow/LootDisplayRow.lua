@@ -43,15 +43,14 @@ local function rowAmountText(row, icon)
 	end
 	local anchor = "LEFT"
 	local iconAnchor = "RIGHT"
-	row.AmountText:SetJustifyH("LEFT")
 	local xOffset = G_RLF.db.global.iconSize / 2
 	if not G_RLF.db.global.leftAlign then
 		anchor = "RIGHT"
 		iconAnchor = "LEFT"
 		xOffset = xOffset * -1
-		row.AmountText:SetJustifyH("RIGHT")
 	end
 	row.AmountText:ClearAllPoints()
+	row.AmountText:SetJustifyH(anchor)
 	if icon then
 		row.AmountText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
 	else
@@ -144,15 +143,15 @@ local function rowFadeOutAnimation(row)
 	end
 	if not row.FadeOutAnimation.fadeOut then
 		row.FadeOutAnimation.fadeOut = row.FadeOutAnimation:CreateAnimation("Alpha")
+		row.FadeOutAnimation.fadeOut:SetFromAlpha(1)
+		row.FadeOutAnimation.fadeOut:SetToAlpha(0)
+		row.FadeOutAnimation.fadeOut:SetDuration(1)
+		row.FadeOutAnimation.fadeOut:SetScript("OnFinished", function()
+			row:Hide()
+		end)
 	end
 
-	row.FadeOutAnimation.fadeOut:SetFromAlpha(1)
-	row.FadeOutAnimation.fadeOut:SetToAlpha(0)
-	row.FadeOutAnimation.fadeOut:SetDuration(1)
 	row.FadeOutAnimation.fadeOut:SetStartDelay(G_RLF.db.global.fadeOutDelay)
-	row.FadeOutAnimation.fadeOut:SetScript("OnFinished", function()
-		row:Hide()
-	end)
 end
 
 local function rowStyles(row)

@@ -189,18 +189,17 @@ end
 function LootDisplayFrameMixin:UpdateRowPositions()
 	local index = 0
 	for row in rows:iterate() do
-		if not row:IsFading() then
-			row:ClearAllPoints()
-			local vertDir = "BOTTOM"
-			local yOffset = index * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding)
-			if not G_RLF.db.global.growUp then
-				vertDir = "TOP"
-				yOffset = yOffset * -1
-			end
-			row:SetPoint(vertDir, self, vertDir, 0, yOffset)
-			row:UpdateStyles()
-			index = index + 1
+		local vertDir = "BOTTOM"
+		local yOffset = index * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding)
+		if not G_RLF.db.global.growUp then
+			vertDir = "TOP"
+			yOffset = yOffset * -1
+		end
+		row:ClearAllPoints()
+		row:SetPoint(vertDir, self, vertDir, 0, yOffset)
+		if not row:IsShown() and not row:IsFading() then
 			row:Show()
 		end
+		index = index + 1
 	end
 end
