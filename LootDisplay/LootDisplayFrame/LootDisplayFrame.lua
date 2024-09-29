@@ -161,44 +161,27 @@ function LootDisplayFrameMixin:LeaseRow(key)
 	end
 	keyRowMap[key] = row
 
-	-- Position the new row at the bottom (or top if growing down)
-	if getNumberOfRows() == 1 then
-		local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
-		row:SetPoint(vertDir, self, vertDir)
-		row:Show()
-	else
-		ae:SendMessage("RLF_LootDisplay_UpdateRowPositions")
-	end
+	row:SetPosition(self)
 
 	return row
 end
 
 function LootDisplayFrameMixin:ReleaseRow(row)
 	keyRowMap[row.key] = nil
+	row:UpdateNeighborPositions(self)
 	rows:remove(row)
 	row:Reset()
 	tinsert(rowFramePool, row)
 	ae:SendMessage("RLF_LootDisplay_RowReturned")
-	ae:SendMessage("RLF_LootDisplay_UpdateRowPositions")
 end
 
 function LootDisplayFrameMixin:UpdateRowPositions()
-	local index = 0
+	local index = 1
 	for row in rows:iterate() do
-		local vertDir = "BOTTOM"
-		local yOffset = index * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding)
-		if not G_RLF.db.global.growUp then
-			vertDir = "TOP"
-			yOffset = yOffset * -1
-		end
-		row:ClearAllPoints()
-		row:SetPoint(vertDir, self, vertDir, 0, yOffset)
-		if not row:IsShown() and not row:IsFading() then
-			row:Show()
+		row:SetPosition(self)
+		if index > getNumberOfRows() + 2 then
+			error("Possible infinite loop detected!")
 		end
 		index = index + 1
-		if index > getNumberOfRows() then
-			error("We shouldn't be looping in iterate this long")
-		end
 	end
 end

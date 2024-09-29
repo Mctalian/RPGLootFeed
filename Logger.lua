@@ -286,6 +286,11 @@ local function addLogEntry(level, message, source, type, id, content, amount, is
 		return
 	end
 	table.insert(logTable, entry)
+	--[===[@non-alpha@
+	while #logTable > 100 do
+		table.remove(logTable, 1)
+	end
+	--@end-non-alpha@]===]
 	if frame and frame:IsShown() then
 		updateContent()
 	end

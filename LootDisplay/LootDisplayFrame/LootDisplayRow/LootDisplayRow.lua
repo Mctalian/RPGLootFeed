@@ -210,6 +210,44 @@ function LootDisplayRowMixin:UpdateQuantity()
 	end
 end
 
+local function getPositioningDetails()
+	-- Position the new row at the bottom (or top if growing down)
+	local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
+	local opposite = G_RLF.db.global.growUp and "TOP" or "BOTTOM"
+	local yOffset = G_RLF.db.global.padding
+	if not G_RLF.db.global.growUp then
+		yOffset = -yOffset
+	end
+
+	return vertDir, opposite, yOffset
+end
+
+function LootDisplayRowMixin:SetPosition(frame)
+	-- Position the new row at the bottom (or top if growing down)
+	local vertDir, opposite, yOffset = getPositioningDetails()
+	self:ClearAllPoints()
+	if self._prev then
+		self:SetPoint(vertDir, self._prev, opposite, 0, yOffset)
+	else
+		self:SetPoint(vertDir, frame, vertDir)
+	end
+end
+
+function LootDisplayRowMixin:UpdateNeighborPositions(frame)
+	local vertDir, opposite, yOffset = getPositioningDetails()
+	local _next = self._next
+	local _prev = self._prev
+
+	if _next then
+		_next:ClearAllPoints()
+		if _prev then
+			_next:SetPoint(vertDir, _prev, opposite, 0, yOffset)
+		else
+			_next:SetPoint(vertDir, frame, vertDir)
+		end
+	end
+end
+
 function LootDisplayRowMixin:SetupTooltip()
 	-- Add Tooltip
 	self.AmountText:SetScript("OnEnter", function()

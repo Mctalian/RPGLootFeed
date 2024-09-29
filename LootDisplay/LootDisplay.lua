@@ -133,6 +133,7 @@ local function processRow(element)
 		end
 
 		row:UpdateStyles()
+		row:Show()
 	end
 
 	row:ShowText(text, r, g, b, a)
