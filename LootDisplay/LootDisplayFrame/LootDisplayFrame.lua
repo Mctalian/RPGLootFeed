@@ -153,7 +153,7 @@ function LootDisplayFrameMixin:LeaseRow(key)
 		row = tremove(rowFramePool)
 		row:Reset()
 	end
-
+	row:SetParent(self)
 	row.key = key
 	local success = rows:push(row)
 	if not success then
@@ -166,10 +166,38 @@ function LootDisplayFrameMixin:LeaseRow(key)
 	return row
 end
 
+function LootDisplayFrameMixin:CheckForStragglers()
+	if getNumberOfRows() == 0 then
+		local r = {}
+		local children = { self:GetChildren() }
+		for i, v in ipairs(children) do
+			if v:IsShown() then
+				if v.key then
+					G_RLF:Print(v.key .. " still showing?")
+				end
+				tinsert(r, v)
+			end
+		end
+
+		if #r > 0 then
+			G_RLF:Print("number of tracked rows is empty, but we still found" .. #r .. "row(s) as child(ren)?")
+			for i, k in ipairs(r) do
+				G_RLF:Print(k.key)
+				r:Hide()
+			end
+		end
+	end
+end
+
 function LootDisplayFrameMixin:ReleaseRow(row)
-	keyRowMap[row.key] = nil
+	if row.key then
+		keyRowMap[row.key] = nil
+	else
+		G_RLF:Print("row without key")
+	end
 	row:UpdateNeighborPositions(self)
 	rows:remove(row)
+	row:SetParent(nil)
 	row:Reset()
 	tinsert(rowFramePool, row)
 	ae:SendMessage("RLF_LootDisplay_RowReturned")

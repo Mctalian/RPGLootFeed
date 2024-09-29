@@ -73,6 +73,7 @@ function LootDisplay:ReleaseRows(rows)
 	for row, freq in pairs(rows) do
 		frame:ReleaseRow(row)
 	end
+	frame:CheckForStragglers()
 end
 
 local elementQueue = {}
