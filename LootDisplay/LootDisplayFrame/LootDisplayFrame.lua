@@ -29,12 +29,7 @@ end
 
 local function createArrowsTestArea(self)
 	if not self.arrows then
-		self.arrows = {
-			self.ArrowUp,
-			self.ArrowDown,
-			self.ArrowLeft,
-			self.ArrowRight,
-		}
+		self.arrows = { self.ArrowUp, self.ArrowDown, self.ArrowLeft, self.ArrowRight }
 
 		-- Set arrow rotations
 		configureArrowRotation(self.ArrowUp, "UP")
@@ -159,14 +154,14 @@ function LootDisplayFrameMixin:LeaseRow(key)
 		row:Reset()
 	end
 
-	-- Assign the key to the row
 	row.key = key
+	local success = rows:push(row)
+	if not success then
+		error("Tried to push a row that already exists in the list")
+	end
 	keyRowMap[key] = row
 
-	-- Add the row to the rows list and show it
-	rows:push(row)
-
-	-- Position the new row at the bottom (or top if growing up)
+	-- Position the new row at the bottom (or top if growing down)
 	if getNumberOfRows() == 1 then
 		local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
 		row:SetPoint(vertDir, self, vertDir)
@@ -179,8 +174,9 @@ function LootDisplayFrameMixin:LeaseRow(key)
 end
 
 function LootDisplayFrameMixin:ReleaseRow(row)
-	rows:remove(row)
 	keyRowMap[row.key] = nil
+	rows:remove(row)
+	row:Reset()
 	tinsert(rowFramePool, row)
 	ae:SendMessage("RLF_LootDisplay_RowReturned")
 	ae:SendMessage("RLF_LootDisplay_UpdateRowPositions")
@@ -201,5 +197,8 @@ function LootDisplayFrameMixin:UpdateRowPositions()
 			row:Show()
 		end
 		index = index + 1
+		if index > getNumberOfRows() then
+			error("We shouldn't be looping in iterate this long")
+		end
 	end
 end
