@@ -4,7 +4,9 @@ local acr = LibStub("AceConfigRegistry-3.0")
 local ae = LibStub("AceEvent-3.0")
 
 local rows = G_RLF.list()
-local keyRowMap = {}
+local keyRowMap = {
+	length = 0,
+}
 local rowFramePool = {}
 
 local function getFrameHeight()
@@ -160,6 +162,7 @@ function LootDisplayFrameMixin:LeaseRow(key)
 		error("Tried to push a row that already exists in the list")
 	end
 	keyRowMap[key] = row
+	keyRowMap.length = keyRowMap.length + 1
 
 	row:SetPosition(self)
 
@@ -172,19 +175,29 @@ function LootDisplayFrameMixin:CheckForStragglers()
 		local children = { self:GetChildren() }
 		for i, v in ipairs(children) do
 			if v:IsShown() then
-				if v.key then
-					G_RLF:Print(v.key .. " still showing?")
-				end
 				tinsert(r, v)
 			end
 		end
 
 		if #r > 0 then
-			G_RLF:Print("number of tracked rows is empty, but we still found" .. #r .. "row(s) as child(ren)?")
+			local keys = "["
 			for i, k in ipairs(r) do
-				G_RLF:Print(k.key)
+				if i > 1 then
+					keys = keys .. ", "
+				end
+				keys = keys .. k.key
 				r:Hide()
 			end
+			keys = keys .. "]"
+			error(
+				getNumberOfRows()
+					.. " tracked rows, but still found "
+					.. #r
+					.. " row(s) as frame child(ren): "
+					.. keys
+					.. "\n\n"
+					.. self:Dump()
+			)
 		end
 	end
 end
@@ -192,8 +205,9 @@ end
 function LootDisplayFrameMixin:ReleaseRow(row)
 	if row.key then
 		keyRowMap[row.key] = nil
+		keyRowMap.length = keyRowMap.length - 1
 	else
-		G_RLF:Print("row without key")
+		error("Row without key: " .. row:Dump())
 	end
 	row:UpdateNeighborPositions(self)
 	rows:remove(row)
@@ -203,12 +217,47 @@ function LootDisplayFrameMixin:ReleaseRow(row)
 	ae:SendMessage("RLF_LootDisplay_RowReturned")
 end
 
+function LootDisplayFrameMixin:Dump()
+	local firstKey, lastKey
+	if rows.first then
+		firstKey = rows.first.key or "NONE"
+	else
+		firstKey = "first nil"
+	end
+
+	if rows.last then
+		lastKey = rows.last.key or "NONE"
+	else
+		lastKey = "last nil"
+	end
+
+	local children = { self:GetChildren() }
+	local childrenLog = "["
+	for i, r in ipairs(children) do
+		if i > 0 then
+			childrenLog = childrenLog .. ", "
+		end
+		childrenLog = childrenLog .. r:Dump()
+	end
+	childrenLog = childrenLog .. "]"
+
+	return format(
+		"{getNumberOfRows=%s,#rowFramePool=%s,#keyRowMap=%s,first.key=%s,last.key=%s,frame.children=%s}",
+		getNumberOfRows(),
+		#rowFramePool,
+		keyRowMap.length,
+		firstKey,
+		lastKey,
+		childrenLog
+	)
+end
+
 function LootDisplayFrameMixin:UpdateRowPositions()
 	local index = 1
 	for row in rows:iterate() do
 		row:SetPosition(self)
 		if index > getNumberOfRows() + 2 then
-			error("Possible infinite loop detected!")
+			error("Possible infinite loop detected!: " .. self:Dump())
 		end
 		index = index + 1
 	end

@@ -279,6 +279,30 @@ function LootDisplayRowMixin:IsFading()
 	return self.FadeOutAnimation:IsPlaying() and not self.FadeOutAnimation.fadeOut:IsDelaying()
 end
 
+function LootDisplayRowMixin:Dump()
+	local prevKey, nextKey
+	if self._prev then
+		prevKey = self._prev.key or "NONE"
+	else
+		prevKey = "prev nil"
+	end
+
+	if self._next then
+		nextKey = self._next.key or "NONE"
+	else
+		nextKey = "next nil"
+	end
+
+	return format(
+		"{key=%s, amount=%s, AmountText=%s, _prev.key=%s, _next.key=%s}",
+		self.key or "NONE",
+		self.amount or "NONE",
+		self.AmountText:GetText() or "NONE",
+		prevKey,
+		nextKey
+	)
+end
+
 function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 	if a == nil then
 		a = 1
