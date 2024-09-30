@@ -43,15 +43,14 @@ local function rowAmountText(row, icon)
 	end
 	local anchor = "LEFT"
 	local iconAnchor = "RIGHT"
-	row.AmountText:SetJustifyH("LEFT")
 	local xOffset = G_RLF.db.global.iconSize / 2
 	if not G_RLF.db.global.leftAlign then
 		anchor = "RIGHT"
 		iconAnchor = "LEFT"
 		xOffset = xOffset * -1
-		row.AmountText:SetJustifyH("RIGHT")
 	end
 	row.AmountText:ClearAllPoints()
+	row.AmountText:SetJustifyH(anchor)
 	if icon then
 		row.AmountText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
 	else
@@ -144,15 +143,15 @@ local function rowFadeOutAnimation(row)
 	end
 	if not row.FadeOutAnimation.fadeOut then
 		row.FadeOutAnimation.fadeOut = row.FadeOutAnimation:CreateAnimation("Alpha")
+		row.FadeOutAnimation.fadeOut:SetFromAlpha(1)
+		row.FadeOutAnimation.fadeOut:SetToAlpha(0)
+		row.FadeOutAnimation.fadeOut:SetDuration(1)
+		row.FadeOutAnimation.fadeOut:SetScript("OnFinished", function()
+			row:Hide()
+		end)
 	end
 
-	row.FadeOutAnimation.fadeOut:SetFromAlpha(1)
-	row.FadeOutAnimation.fadeOut:SetToAlpha(0)
-	row.FadeOutAnimation.fadeOut:SetDuration(1)
 	row.FadeOutAnimation.fadeOut:SetStartDelay(G_RLF.db.global.fadeOutDelay)
-	row.FadeOutAnimation.fadeOut:SetScript("OnFinished", function()
-		row:Hide()
-	end)
 end
 
 local function rowStyles(row)
@@ -211,6 +210,44 @@ function LootDisplayRowMixin:UpdateQuantity()
 	end
 end
 
+local function getPositioningDetails()
+	-- Position the new row at the bottom (or top if growing down)
+	local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
+	local opposite = G_RLF.db.global.growUp and "TOP" or "BOTTOM"
+	local yOffset = G_RLF.db.global.padding
+	if not G_RLF.db.global.growUp then
+		yOffset = -yOffset
+	end
+
+	return vertDir, opposite, yOffset
+end
+
+function LootDisplayRowMixin:SetPosition(frame)
+	-- Position the new row at the bottom (or top if growing down)
+	local vertDir, opposite, yOffset = getPositioningDetails()
+	self:ClearAllPoints()
+	if self._prev then
+		self:SetPoint(vertDir, self._prev, opposite, 0, yOffset)
+	else
+		self:SetPoint(vertDir, frame, vertDir)
+	end
+end
+
+function LootDisplayRowMixin:UpdateNeighborPositions(frame)
+	local vertDir, opposite, yOffset = getPositioningDetails()
+	local _next = self._next
+	local _prev = self._prev
+
+	if _next then
+		_next:ClearAllPoints()
+		if _prev then
+			_next:SetPoint(vertDir, _prev, opposite, 0, yOffset)
+		else
+			_next:SetPoint(vertDir, frame, vertDir)
+		end
+	end
+end
+
 function LootDisplayRowMixin:SetupTooltip()
 	-- Add Tooltip
 	self.AmountText:SetScript("OnEnter", function()
@@ -240,6 +277,30 @@ end
 
 function LootDisplayRowMixin:IsFading()
 	return self.FadeOutAnimation:IsPlaying() and not self.FadeOutAnimation.fadeOut:IsDelaying()
+end
+
+function LootDisplayRowMixin:Dump()
+	local prevKey, nextKey
+	if self._prev then
+		prevKey = self._prev.key or "NONE"
+	else
+		prevKey = "prev nil"
+	end
+
+	if self._next then
+		nextKey = self._next.key or "NONE"
+	else
+		nextKey = "next nil"
+	end
+
+	return format(
+		"{key=%s, amount=%s, AmountText=%s, _prev.key=%s, _next.key=%s}",
+		self.key or "NONE",
+		self.amount or "NONE",
+		self.AmountText:GetText() or "NONE",
+		prevKey,
+		nextKey
+	)
 end
 
 function LootDisplayRowMixin:ShowText(text, r, g, b, a)

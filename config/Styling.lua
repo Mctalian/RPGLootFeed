@@ -148,6 +148,7 @@ end
 
 function Styling:SetGradientStartColor(info, r, g, b, a)
 	G_RLF.db.global.rowBackgroundGradientStart = { r, g, b, a }
+	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:GetGradientEndColor(info, value)
@@ -157,6 +158,7 @@ end
 
 function Styling:SetGradientEndColor(info, r, g, b, a)
 	G_RLF.db.global.rowBackgroundGradientEnd = { r, g, b, a }
+	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:SetLeftAlign(info, value)

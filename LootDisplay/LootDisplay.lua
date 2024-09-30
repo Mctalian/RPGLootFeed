@@ -26,9 +26,7 @@ function LootDisplay:OnInitialize()
 	self:RegisterBucketMessage("RLF_LootDisplay_UpdateRowPositions", 0.1, function()
 		G_RLF:fn(frame:UpdateRowPositions())
 	end)
-	self:RegisterMessage("RLF_RowHidden", function(_, row)
-		frame:ReleaseRow(row)
-	end)
+	self:RegisterBucketMessage("RLF_RowHidden", 0.1, "ReleaseRows")
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)
@@ -69,6 +67,13 @@ end
 
 function LootDisplay:UpdateFadeDelay()
 	frame:UpdateFadeDelay()
+end
+
+function LootDisplay:ReleaseRows(rows)
+	for row, freq in pairs(rows) do
+		frame:ReleaseRow(row)
+	end
+	frame:CheckForStragglers()
 end
 
 local elementQueue = {}
@@ -129,6 +134,7 @@ local function processRow(element)
 		end
 
 		row:UpdateStyles()
+		row:Show()
 	end
 
 	row:ShowText(text, r, g, b, a)
