@@ -14,6 +14,11 @@ setmetatable(list, {
 })
 
 function list:push(t)
+	-- Check if node is already in the list (to avoid circular references)
+	if t._next or t._prev or t._inList then
+		return false
+	end
+
 	if self.last then
 		self.last._next = t
 		t._prev = self.last
@@ -25,9 +30,16 @@ function list:push(t)
 	end
 
 	self.length = self.length + 1
+	t._inList = true
+	return true
 end
 
 function list:unshift(t)
+	-- Check if node is already in the list (to avoid circular references)
+	if t._next or t._prev or t._inList then
+		return false
+	end
+
 	if self.first then
 		self.first._prev = t
 		t._next = self.first
@@ -38,25 +50,8 @@ function list:unshift(t)
 	end
 
 	self.length = self.length + 1
-end
-
-function list:insert(t, after)
-	if after then
-		if after._next then
-			after._next._prev = t
-			t._next = after._next
-		else
-			self.last = t
-		end
-
-		t._prev = after
-		after._next = t
-		self.length = self.length + 1
-	elseif not self.first then
-		-- this is the first node
-		self.first = t
-		self.last = t
-	end
+	t._inList = true
+	return true
 end
 
 function list:pop()
@@ -76,6 +71,7 @@ function list:pop()
 	end
 
 	self.length = self.length - 1
+	ret._inList = false
 	return ret
 end
 
@@ -95,10 +91,14 @@ function list:shift()
 	end
 
 	self.length = self.length - 1
+	ret._inList = false
 	return ret
 end
 
 function list:remove(t)
+	if not t._inList then
+		return
+	end
 	if t._next then
 		if t._prev then
 			t._next._prev = t._prev
@@ -118,8 +118,11 @@ function list:remove(t)
 		self.last = nil
 	end
 
+	-- Clear next and prev references to avoid dangling pointers
 	t._next = nil
 	t._prev = nil
+	t._inList = false
+
 	self.length = self.length - 1
 end
 

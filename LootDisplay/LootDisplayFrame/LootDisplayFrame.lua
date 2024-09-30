@@ -4,7 +4,9 @@ local acr = LibStub("AceConfigRegistry-3.0")
 local ae = LibStub("AceEvent-3.0")
 
 local rows = G_RLF.list()
-local keyRowMap = {}
+local keyRowMap = {
+	length = 0,
+}
 local rowFramePool = {}
 
 local function getFrameHeight()
@@ -29,12 +31,7 @@ end
 
 local function createArrowsTestArea(self)
 	if not self.arrows then
-		self.arrows = {
-			self.ArrowUp,
-			self.ArrowDown,
-			self.ArrowLeft,
-			self.ArrowRight,
-		}
+		self.arrows = { self.ArrowUp, self.ArrowDown, self.ArrowLeft, self.ArrowRight }
 
 		-- Set arrow rotations
 		configureArrowRotation(self.ArrowUp, "UP")
@@ -158,49 +155,110 @@ function LootDisplayFrameMixin:LeaseRow(key)
 		row = tremove(rowFramePool)
 		row:Reset()
 	end
-
-	-- Assign the key to the row
+	row:SetParent(self)
 	row.key = key
-	keyRowMap[key] = row
-
-	-- Add the row to the rows list and show it
-	rows:push(row)
-
-	-- Position the new row at the bottom (or top if growing up)
-	if getNumberOfRows() == 1 then
-		local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
-		row:SetPoint(vertDir, self, vertDir)
-		row:Show()
-	else
-		ae:SendMessage("RLF_LootDisplay_UpdateRowPositions")
+	local success = rows:push(row)
+	if not success then
+		error("Tried to push a row that already exists in the list")
 	end
+	keyRowMap[key] = row
+	keyRowMap.length = keyRowMap.length + 1
+
+	row:SetPosition(self)
 
 	return row
 end
 
+function LootDisplayFrameMixin:CheckForStragglers()
+	if getNumberOfRows() == 0 then
+		local r = {}
+		local children = { self:GetChildren() }
+		for i, v in ipairs(children) do
+			if v:IsShown() then
+				tinsert(r, v)
+			end
+		end
+
+		if #r > 0 then
+			local keys = "["
+			for i, k in ipairs(r) do
+				if i > 1 then
+					keys = keys .. ", "
+				end
+				keys = keys .. k.key
+				r:Hide()
+			end
+			keys = keys .. "]"
+			error(
+				getNumberOfRows()
+					.. " tracked rows, but still found "
+					.. #r
+					.. " row(s) as frame child(ren): "
+					.. keys
+					.. "\n\n"
+					.. self:Dump()
+			)
+		end
+	end
+end
+
 function LootDisplayFrameMixin:ReleaseRow(row)
+	if row.key then
+		keyRowMap[row.key] = nil
+		keyRowMap.length = keyRowMap.length - 1
+	else
+		error("Row without key: " .. row:Dump())
+	end
+	row:UpdateNeighborPositions(self)
 	rows:remove(row)
-	keyRowMap[row.key] = nil
+	row:SetParent(nil)
+	row:Reset()
 	tinsert(rowFramePool, row)
 	ae:SendMessage("RLF_LootDisplay_RowReturned")
-	ae:SendMessage("RLF_LootDisplay_UpdateRowPositions")
+end
+
+function LootDisplayFrameMixin:Dump()
+	local firstKey, lastKey
+	if rows.first then
+		firstKey = rows.first.key or "NONE"
+	else
+		firstKey = "first nil"
+	end
+
+	if rows.last then
+		lastKey = rows.last.key or "NONE"
+	else
+		lastKey = "last nil"
+	end
+
+	local children = { self:GetChildren() }
+	local childrenLog = "["
+	for i, r in ipairs(children) do
+		if i > 0 then
+			childrenLog = childrenLog .. ", "
+		end
+		childrenLog = childrenLog .. r:Dump()
+	end
+	childrenLog = childrenLog .. "]"
+
+	return format(
+		"{getNumberOfRows=%s,#rowFramePool=%s,#keyRowMap=%s,first.key=%s,last.key=%s,frame.children=%s}",
+		getNumberOfRows(),
+		#rowFramePool,
+		keyRowMap.length,
+		firstKey,
+		lastKey,
+		childrenLog
+	)
 end
 
 function LootDisplayFrameMixin:UpdateRowPositions()
-	local index = 0
+	local index = 1
 	for row in rows:iterate() do
-		if not row:IsFading() then
-			row:ClearAllPoints()
-			local vertDir = "BOTTOM"
-			local yOffset = index * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding)
-			if not G_RLF.db.global.growUp then
-				vertDir = "TOP"
-				yOffset = yOffset * -1
-			end
-			row:SetPoint(vertDir, self, vertDir, 0, yOffset)
-			row:UpdateStyles()
-			index = index + 1
-			row:Show()
+		row:SetPosition(self)
+		if index > getNumberOfRows() + 2 then
+			error("Possible infinite loop detected!: " .. self:Dump())
 		end
+		index = index + 1
 	end
 end

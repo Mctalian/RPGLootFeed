@@ -66,17 +66,6 @@ describe("List module", function()
 		assert.is_nil(l.first._prev)
 	end)
 
-	it("should insert elements after a given node", function()
-		local l = list(create_node("first"), create_node("third"))
-		local second = create_node("second")
-		l:insert(second, l.first)
-
-		assert.are.equal(l.length, 3)
-		assert.are.equal(l.first._next, second)
-		assert.are.equal(second._next.value, "third")
-		assert.are.equal(second._prev.value, "first")
-	end)
-
 	it("should remove a specific node from the list", function()
 		local l = list(create_node("first"), create_node("second"), create_node("third"))
 		l:remove(l.first._next) -- remove "second"
@@ -103,6 +92,7 @@ describe("List module", function()
 		local result = l:pop()
 
 		assert.is_nil(result)
+		assert.are.equal(l.length, 0)
 	end)
 
 	it("should gracefully handle shift on an empty list", function()
@@ -111,6 +101,7 @@ describe("List module", function()
 		local result = l:shift()
 
 		assert.is_nil(result)
+		assert.are.equal(l.length, 0)
 	end)
 
 	it("pops the only item from a list and leaves it empty", function()
@@ -120,5 +111,20 @@ describe("List module", function()
 		assert.are.equal(result.value, "first")
 		assert.is_nil(l.first)
 		assert.is_nil(l.last)
+		assert.are.equal(l.length, 0)
+	end)
+
+	it("does not allow the same node to be added twice", function()
+		local f = create_node("first")
+		local s = create_node("second")
+		local t = create_node("third")
+		local l = list(f, s, t, s) -- Adding 's' twice won't work
+		local result = {}
+
+		for node in l:iterate() do
+			table.insert(result, node.value)
+		end
+
+		assert.are.same(result, { "first", "second", "third" })
 	end)
 end)
