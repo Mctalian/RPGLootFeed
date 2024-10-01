@@ -1,3 +1,5 @@
+local addonName, G_RLF = ...
+
 local Timing = {}
 
 G_RLF.defaults.global.fadeOutDelay = 5

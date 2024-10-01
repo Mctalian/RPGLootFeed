@@ -1,3 +1,5 @@
+local addonName, G_RLF = ...
+
 local ConfigOptions = {}
 
 G_RLF.defaults = {

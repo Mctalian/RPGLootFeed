@@ -6,11 +6,11 @@ describe("RPGLootFeed module", function()
 			}
 		end
 		-- Define the global G_RLF
-		_G.G_RLF = {
+		local ns = {
 			RLF = {},
 		}
 		-- Load the list module before each test
-		require("RPGLootFeed")
+		assert(loadfile("RPGLootFeed.lua"))("TestAddon", ns)
 	end)
 
 	it("TODO", function()

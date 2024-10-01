@@ -1,4 +1,6 @@
-TestMode = {}
+local addonName, G_RLF = ...
+
+local TestMode = {}
 
 local logger
 
@@ -127,12 +129,12 @@ function TestMode:ToggleTestMode()
 			self.testTimer = nil
 		end
 		G_RLF:Print(G_RLF.L["Test Mode Disabled"])
-		logger:Debug("Test Mode Disabled", G_RLF.addonName)
+		logger:Debug("Test Mode Disabled", addonName)
 	else
 		-- Start test mode
 		self.testMode = true
 		G_RLF:Print(G_RLF.L["Test Mode Enabled"])
-		logger:Debug("Test Mode Enabled", G_RLF.addonName)
+		logger:Debug("Test Mode Enabled", addonName)
 		self.testTimer = C_Timer.NewTicker(1.5, function()
 			G_RLF:fn(generateRandomLoot)
 		end)
@@ -308,7 +310,7 @@ function TestMode:SmokeTest()
 	beforeEach()
 	testLootDisplay()
 
-	print(G_RLF.addonName .. " Smoke Test")
+	print(addonName .. " Smoke Test")
 	print(prints)
 	print("|cff00ff00Successes: " .. successCount .. "|r")
 	if failureCount > 0 then

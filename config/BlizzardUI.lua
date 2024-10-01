@@ -1,3 +1,5 @@
+local addonName, G_RLF = ...
+
 local BlizzardUI = {}
 
 G_RLF.defaults.global.enableAutoLoot = false

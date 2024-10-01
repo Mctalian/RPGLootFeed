@@ -1,6 +1,6 @@
-local addonName, ns = ...
+local addonName, G_RLF = ...
 
-ns.LootDisplayProperties = {
+G_RLF.LootDisplayProperties = {
 	"key",
 	"textFn",
 	"isLink",
@@ -14,8 +14,8 @@ ns.LootDisplayProperties = {
 	"logFn",
 }
 
-function ns.InitializeLootDisplayProperties(self)
-	for _, prop in ipairs(ns.LootDisplayProperties) do
+function G_RLF.InitializeLootDisplayProperties(self)
+	for _, prop in ipairs(G_RLF.LootDisplayProperties) do
 		self[prop] = nil
 	end
 
@@ -45,6 +45,6 @@ function ns.InitializeLootDisplayProperties(self)
 			amountLogText = format("%s (diff: %s%s)", amount, sign, math.abs(self.quantity))
 		end
 
-		self:getLogger():Info(self.type .. "Shown", G_RLF.addonName, self.type, self.key, text, amountLogText, new)
+		self:getLogger():Info(self.type .. "Shown", addonName, self.type, self.key, text, amountLogText, new)
 	end
 end

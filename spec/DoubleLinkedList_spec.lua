@@ -6,13 +6,14 @@ describe("List module", function()
 		return { value = value }
 	end
 
+	local ns
 	before_each(function()
 		-- Define the global G_RLF
-		_G.G_RLF = _G.G_RLF or {}
+		ns = ns or {}
 		-- Load the list module before each test
-		require("DoubleLinkedList")
+		assert(loadfile("DoubleLinkedList.lua"))("TestAddon", ns)
 
-		list = _G.G_RLF.list
+		list = ns.list
 	end)
 
 	it("should initialize an empty list", function()

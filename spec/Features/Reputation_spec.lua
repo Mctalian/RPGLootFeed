@@ -2,12 +2,11 @@ local common_stubs = require("spec/common_stubs")
 
 describe("Reputation module", function()
 	local _ = match._
-	local RepModule
+	local RepModule, ns
 
 	before_each(function()
-		common_stubs.setup_G_RLF(spy, assert)
+		ns = ns or common_stubs.setup_G_RLF(spy)
 		common_stubs.stub_C_Reputation()
-		local ns = {}
 
 		-- Load the LootDisplayProperties module to populate `ns`
 		assert(loadfile("Features/LootDisplayProperties.lua"))("TestAddon", ns)
@@ -31,7 +30,7 @@ describe("Reputation module", function()
 
 		assert.is_true(success)
 
-		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.not_called()
+		assert.stub(ns.LootDisplay.ShowLoot).was.not_called()
 	end)
 
 	it("handles rep increases", function()
@@ -42,9 +41,9 @@ describe("Reputation module", function()
 		assert.is_true(success)
 
 		assert.spy(newElement).was.called_with(_, 10, "Faction A", 1, 0, 0)
-		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.called()
+		assert.stub(ns.LootDisplay.ShowLoot).was.called()
 		-- Successfully populates the locale cache
-		assert.equal(_G.G_RLF.db.global.factionMaps.enUS["Faction A"], 1)
+		assert.equal(ns.db.global.factionMaps.enUS["Faction A"], 1)
 	end)
 
 	it("handles rep increases despite locale cache miss", function()
@@ -55,7 +54,7 @@ describe("Reputation module", function()
 		assert.is_true(success)
 
 		assert.spy(newElement).was.called_with(_, 100, "Faction B", nil, nil, nil)
-		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.called()
+		assert.stub(ns.LootDisplay.ShowLoot).was.called()
 		assert.spy(RepModule:getLogger().Warn).was.called()
 		assert.spy(RepModule:getLogger().Warn).was.called_with(_, "Faction B is STILL not cached for enUS", _, _)
 	end)

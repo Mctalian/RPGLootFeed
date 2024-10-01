@@ -1,4 +1,4 @@
-local addonName, ns = ...
+local addonName, G_RLF = ...
 
 local Currency = G_RLF.RLF:NewModule("Currency", "AceEvent-3.0")
 
@@ -6,7 +6,7 @@ Currency.Element = {}
 
 function Currency.Element:new(...)
 	local element = {}
-	ns.InitializeLootDisplayProperties(element)
+	G_RLF.InitializeLootDisplayProperties(element)
 
 	element.type = "Currency"
 	element.IsEnabled = function()
@@ -60,7 +60,7 @@ function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
 	if currencyType == nil or not quantityChange or quantityChange <= 0 then
 		self:getLogger():Debug(
 			"Skip showing currency",
-			G_RLF.addonName,
+			addonName,
 			self.moduleName,
 			currencyType,
 			"SKIP: Something was missing, don't display",
@@ -72,7 +72,7 @@ function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
 	if isHiddenCurrency(currencyType) then
 		self:getLogger():Debug(
 			"Skip showing currency",
-			G_RLF.addonName,
+			addonName,
 			self.moduleName,
 			currencyType,
 			"SKIP: This is a known hidden currencyType",
@@ -85,7 +85,7 @@ function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
 	if info == nil or info.description == "" or info.iconFileID == nil then
 		self:getLogger():Debug(
 			"Skip showing currency",
-			G_RLF.addonName,
+			addonName,
 			self.moduleName,
 			currencyType,
 			"SKIP: Description or icon was empty",

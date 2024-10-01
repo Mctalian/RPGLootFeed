@@ -1,3 +1,5 @@
+local addonName, G_RLF = ...
+
 local Positioning = {}
 
 G_RLF.defaults.global.relativePoint = "UIParent"

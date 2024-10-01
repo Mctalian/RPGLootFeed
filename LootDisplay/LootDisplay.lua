@@ -1,3 +1,5 @@
+local addonName, G_RLF = ...
+
 local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
 
 local lsm = LibStub("LibSharedMedia-3.0")
@@ -149,7 +151,7 @@ processFromQueue = function()
 	if snapshotQueueSize > 0 then
 		-- error("Test")
 		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.maxRows)
-		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from element queue", G_RLF.addonName)
+		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from element queue", addonName)
 		for i = 1, rowsToProcess do
 			local e = tremove(elementQueue, 1)
 			processRow(e)
@@ -213,3 +215,5 @@ truncateItemLink = function(itemLink, extraWidth)
 
 	return linkStart .. itemName .. linkEnd
 end
+
+return LootDisplay

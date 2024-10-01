@@ -1,3 +1,5 @@
+local addonName, G_RLF = ...
+
 local Features = {}
 
 G_RLF.defaults.global.itemLootFeed = true

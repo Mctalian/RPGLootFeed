@@ -1,4 +1,4 @@
-local addonName, ns = ...
+local addonName, G_RLF = ...
 
 local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0")
 
@@ -6,7 +6,7 @@ Rep.Element = {}
 
 function Rep.Element:new(...)
 	local element = {}
-	ns.InitializeLootDisplayProperties(element)
+	G_RLF.InitializeLootDisplayProperties(element)
 
 	element.type = "Reputation"
 	element.IsEnabled = function()
@@ -147,7 +147,7 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 		if not faction or not repChange then
 			self:getLogger():Error(
 				"Could not determine faction and/or rep change from message",
-				G_RLF.addonName,
+				addonName,
 				self.moduleName,
 				faction,
 				nil,
@@ -158,7 +158,7 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 		local r, g, b, color
 		if G_RLF.db.global.factionMaps[locale][faction] == nil then
 			-- attempt to find the missing faction's ID
-			self:getLogger():Debug(faction .. " not cached for " .. locale, G_RLF.addonName, self.moduleName)
+			self:getLogger():Debug(faction .. " not cached for " .. locale, addonName, self.moduleName)
 			buildFactionLocaleMap(faction)
 		end
 
@@ -175,7 +175,7 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 				end
 			end
 		else
-			self:getLogger():Warn(faction .. " is STILL not cached for " .. locale, G_RLF.addonName, self.moduleName)
+			self:getLogger():Warn(faction .. " is STILL not cached for " .. locale, addonName, self.moduleName)
 		end
 
 		if color then

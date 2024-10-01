@@ -1,4 +1,4 @@
-local addonName, ns = ...
+local addonName, G_RLF = ...
 
 local Xp = G_RLF.RLF:NewModule("Experience", "AceEvent-3.0")
 
@@ -6,7 +6,7 @@ Xp.Element = {}
 
 function Xp.Element:new(...)
 	local element = {}
-	ns.InitializeLootDisplayProperties(element)
+	G_RLF.InitializeLootDisplayProperties(element)
 
 	element.type = "Experience"
 	element.IsEnabled = function()
@@ -64,7 +64,7 @@ function Xp:PLAYER_XP_UPDATE(eventName, unitTarget)
 			local newCurrentXP = UnitXP(unitTarget)
 			local delta = 0
 			if newLevel == nil then
-				self:getLogger():Warn("Could not get player level", G_RLF.addonName, self.moduleName)
+				self:getLogger():Warn("Could not get player level", addonName, self.moduleName)
 				return
 			end
 			currentLevel = currentLevel or newLevel
@@ -80,8 +80,7 @@ function Xp:PLAYER_XP_UPDATE(eventName, unitTarget)
 				local e = self.Element:new(delta)
 				e:Show()
 			else
-				self:getLogger()
-					:Warn(eventName .. " fired but delta was not positive", G_RLF.addonName, self.moduleName)
+				self:getLogger():Warn(eventName .. " fired but delta was not positive", addonName, self.moduleName)
 			end
 		end
 	end)

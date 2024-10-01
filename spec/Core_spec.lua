@@ -10,8 +10,10 @@ describe("Core module", function()
 				end,
 			}
 		end
+
+		local ns = {}
 		-- Load the list module before each test
-		require("Core")
+		assert(loadfile("Core.lua"))("TestAddon", ns)
 	end)
 
 	it("TODO", function()

@@ -1,4 +1,4 @@
-local addonName = G_RLF.addonName
+local addonName, G_RLF = ...
 local acd = LibStub("AceConfigDialog-3.0")
 local lsm = LibStub("LibSharedMedia-3.0")
 RLF = G_RLF.RLF

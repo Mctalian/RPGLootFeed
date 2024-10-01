@@ -1,3 +1,5 @@
+local addonName, G_RLF = ...
+
 LootDisplayFrameMixin = {}
 
 local acr = LibStub("AceConfigRegistry-3.0")
@@ -51,7 +53,7 @@ local function configureTestArea(self)
 
 	self:MakeUnmovable()
 
-	self.InstructionText:SetText(G_RLF.addonName .. "\n" .. G_RLF.L["Drag to Move"]) -- Set localized text
+	self.InstructionText:SetText(addonName .. "\n" .. G_RLF.L["Drag to Move"]) -- Set localized text
 	self.InstructionText:Hide() -- Hide initially
 
 	createArrowsTestArea(self)
@@ -108,7 +110,7 @@ function LootDisplayFrameMixin:OnDragStop()
 
 	-- Update the frame position
 	G_RLF.LootDisplay:UpdatePosition()
-	acr:NotifyChange(G_RLF.addonName)
+	acr:NotifyChange(addonName)
 end
 
 function LootDisplayFrameMixin:ShowTestArea()

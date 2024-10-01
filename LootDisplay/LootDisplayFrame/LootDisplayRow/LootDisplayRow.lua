@@ -1,10 +1,12 @@
+local addonName, G_RLF = ...
+
 LootDisplayRowMixin = {}
 
 local ae = LibStub("AceEvent-3.0")
 local lsm = LibStub("LibSharedMedia-3.0")
 
 local Masque = LibStub and LibStub("Masque", true)
-local iconGroup = Masque and Masque:Group(G_RLF.addonName)
+local iconGroup = Masque and Masque:Group(addonName)
 
 local function rowBackground(row)
 	local leftColor = CreateColor(unpack(G_RLF.db.global.rowBackgroundGradientStart))
