@@ -27,4 +27,7 @@ Logger.lua
 
 Features/features.xml
 TestMode.lua
+#@alpha@
+SmokeTest.lua
+#@end-alpha@
 LootDisplay/LootDisplay.xml
