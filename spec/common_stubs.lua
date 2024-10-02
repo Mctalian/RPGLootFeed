@@ -30,6 +30,11 @@ function common_stubs.setup_G_RLF(spy)
 		list = function()
 			return {}
 		end,
+		Queue = {
+			new = function()
+				return {}
+			end,
+		},
 		RLF = {
 			NewModule = function(_, name, libs)
 				return {
