@@ -6,10 +6,8 @@ local acr = LibStub("AceConfigRegistry-3.0")
 local ae = LibStub("AceEvent-3.0")
 
 local rows = G_RLF.list()
-local keyRowMap = {
-	length = 0,
-}
-local rowFramePool = {}
+local keyRowMap
+local rowFramePool = G_RLF.Queue:new()
 
 local function getFrameHeight()
 	return G_RLF.db.global.maxRows * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding) - G_RLF.db.global.padding
@@ -60,6 +58,9 @@ local function configureTestArea(self)
 end
 
 function LootDisplayFrameMixin:Load()
+	keyRowMap = {
+		length = 0,
+	}
 	self:UpdateSize()
 	self:SetPoint(
 		G_RLF.db.global.anchorPoint,
@@ -149,12 +150,12 @@ function LootDisplayFrameMixin:LeaseRow(key)
 		return nil
 	end
 	local row
-	if #rowFramePool == 0 then
+	if rowFramePool:size() == 0 then
 		-- Create a new row from the XML template
 		row = CreateFrame("Frame", nil, self, "LootDisplayRowTemplate")
 	else
 		-- Reuse an existing row from the pool
-		row = tremove(rowFramePool)
+		row = rowFramePool:dequeue()
 		row:Reset()
 	end
 	row:SetParent(self)
@@ -206,16 +207,18 @@ end
 
 function LootDisplayFrameMixin:ReleaseRow(row)
 	if row.key then
-		keyRowMap[row.key] = nil
-		keyRowMap.length = keyRowMap.length - 1
+		if keyRowMap[row.key] then
+			keyRowMap[row.key] = nil
+			keyRowMap.length = keyRowMap.length - 1
+		end
 	else
 		error("Row without key: " .. row:Dump())
 	end
 	row:UpdateNeighborPositions(self)
 	rows:remove(row)
 	row:SetParent(nil)
-	row:Reset()
-	tinsert(rowFramePool, row)
+	row:Reset(true)
+	rowFramePool:enqueue(row)
 	ae:SendMessage("RLF_LootDisplay_RowReturned")
 end
 
@@ -246,7 +249,7 @@ function LootDisplayFrameMixin:Dump()
 	return format(
 		"{getNumberOfRows=%s,#rowFramePool=%s,#keyRowMap=%s,first.key=%s,last.key=%s,frame.children=%s}",
 		getNumberOfRows(),
-		#rowFramePool,
+		rowFramePool:size(),
 		keyRowMap.length,
 		firstKey,
 		lastKey,

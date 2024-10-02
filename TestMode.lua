@@ -64,9 +64,16 @@ local function initializeTestCurrencies()
 	end
 end
 
+local isLootDisplayReady = false
 function TestMode:OnInitialize()
+	self:RegisterMessage("RLF_LootDisplay_Ready")
 	self:RegisterEvent("ITEM_DATA_LOAD_RESULT")
 	self:InitializeTestData()
+end
+
+function TestMode:RLF_LootDisplay_Ready()
+	isLootDisplayReady = true
+
 	--@alpha@
 	if allItemsInitialized then
 		self:SmokeTest(testItems, testCurrencies, testFactions)
@@ -92,7 +99,9 @@ function TestMode:ITEM_DATA_LOAD_RESULT(eventName, itemID, success)
 		--@alpha@
 		if #testItems == #testItemIds then
 			allItemsInitialized = true
-			self:SmokeTest(testItems, testCurrencies, testFactions)
+			if isLootDisplayReady then
+				self:SmokeTest(testItems, testCurrencies, testFactions)
+			end
 		end
 		--@end-alpha@
 	elseif not success then
@@ -170,6 +179,9 @@ end
 function TestMode:ToggleTestMode()
 	if not logger then
 		logger = G_RLF.RLF:GetModule("Logger")
+	end
+	if not isLootDisplayReady then
+		error("LootDisplay did not signal it was ready (or we didn't receive the signal) - cannot start TestMode")
 	end
 	if self.testMode then
 		-- Stop test mode
