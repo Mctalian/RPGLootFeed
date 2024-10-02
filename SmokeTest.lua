@@ -10,11 +10,12 @@ local prints = ""
 local successCount = 0
 local failureCount = 0
 
-local function assertEqual(actual, expected, testName)
+local function assertEqual(actual, expected, testName, err)
 	tests[testName] = {
 		result = actual == expected,
 		expected = expected,
 		actual = actual,
+		err = err,
 	}
 	if actual == expected then
 		prints = prints .. "|cff00ff00•|r"
@@ -117,7 +118,7 @@ end
 
 local function runTestSafely(testFunction, testName)
 	local success, err = pcall(testFunction)
-	assertEqual(success, true, testName)
+	assertEqual(success, true, testName, err)
 end
 
 local function testLootDisplay()
@@ -174,7 +175,10 @@ function TestMode:SmokeTest(...)
 				.. tostring(testData.expected)
 				.. ", got "
 				.. tostring(testData.actual)
-				.. "|r|n"
+			if testData.err then
+				msg = msg .. " Error: " .. msg.err
+			end
+			msg = msg .. "|r|n"
 		end
 	end
 
