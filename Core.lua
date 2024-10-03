@@ -1,13 +1,13 @@
+local addonName, G_RLF = ...
+
 -- Define the global scope early so that the whole addon can use it
-G_RLF = {}
-local addonName = "RPGLootFeed"
 local dbName = addonName .. "DB"
 local localeName = addonName .. "Locale"
 
 local xpcall = xpcall
 
 local function errorhandler(err)
-	local suffix = "\n\n==== Addon Info " .. G_RLF.addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
+	local suffix = "\n\n==== Addon Info " .. addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
 	suffix = suffix .. G_RLF.L["Issues"] .. "\n\n"
 
 	return geterrorhandler()(err .. suffix)
@@ -28,7 +28,7 @@ G_RLF.RLF:SetDefaultModulePrototype({
 	end,
 	fn = function(s, func, ...)
 		local function errorhandler(err)
-			local suffix = "\n\n==== Addon Info " .. G_RLF.addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
+			local suffix = "\n\n==== Addon Info " .. addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
 			local status, trace = pcall(function()
 				return s:getLogger():Trace(s.moduleName)
 			end)
@@ -49,7 +49,6 @@ G_RLF.RLF:SetDefaultModulePrototype({
 		end
 	end,
 })
-G_RLF.addonName = addonName
 G_RLF.dbName = dbName
 G_RLF.localeName = localeName
 G_RLF.addonVersion = "@project-version@-@project-revision@-@project-abbreviated-hash@"

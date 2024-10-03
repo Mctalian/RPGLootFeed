@@ -1,3 +1,5 @@
+local addonName, G_RLF = ...
+
 local RLF = G_RLF.RLF
 
 local moneyAlertAttempts = 0

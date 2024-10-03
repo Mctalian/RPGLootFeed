@@ -1,3 +1,5 @@
+local addonName, G_RLF = ...
+
 local Styling = {}
 
 local lsm = LibStub("LibSharedMedia-3.0")

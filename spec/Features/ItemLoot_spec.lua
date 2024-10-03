@@ -1,13 +1,13 @@
 local common_stubs = require("spec/common_stubs")
 
 describe("ItemLoot module", function()
-	local LootModule
+	local LootModule, ns
 
 	before_each(function()
 		-- Define the global G_RLF
-		common_stubs.setup_G_RLF(spy)
+		ns = ns or common_stubs.setup_G_RLF(spy)
 		-- Load the list module before each test
-		LootModule = require("Features/ItemLoot")
+		LootModule = assert(loadfile("Features/ItemLoot.lua"))("TestAddon", ns)
 	end)
 
 	it("LootModule is not nil", function()

@@ -1,4 +1,4 @@
-local addonName, ns = ...
+local addonName, G_RLF = ...
 
 local Money = G_RLF.RLF:NewModule("Money", "AceEvent-3.0")
 
@@ -6,7 +6,7 @@ Money.Element = {}
 
 function Money.Element:new(...)
 	local element = {}
-	ns.InitializeLootDisplayProperties(element)
+	G_RLF.InitializeLootDisplayProperties(element)
 
 	element.type = "Money"
 	element.IsEnabled = function()

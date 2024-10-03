@@ -1,3 +1,5 @@
+local addonName, G_RLF = ...
+
 local Sizing = {}
 
 G_RLF.defaults.global.feedWidth = 330

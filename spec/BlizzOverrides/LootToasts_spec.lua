@@ -1,11 +1,11 @@
 describe("LootToasts module", function()
 	before_each(function()
 		-- Define the global G_RLF
-		_G.G_RLF = {
+		local ns = {
 			RLF = {},
 		}
 		-- Load the list module before each test
-		dofile("BlizzOverrides/LootToasts.lua")
+		assert(loadfile("BlizzOverrides/LootToasts.lua"))("TestAddon", ns)
 	end)
 
 	it("TODO", function()

@@ -1,4 +1,4 @@
-local addonName, ns = ...
+local addonName, G_RLF = ...
 
 local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 
@@ -38,7 +38,7 @@ end
 
 function ItemLoot.Element:new(...)
 	local element = {}
-	ns.InitializeLootDisplayProperties(element)
+	G_RLF.InitializeLootDisplayProperties(element)
 
 	element.type = "ItemLoot"
 	element.IsEnabled = function()
@@ -57,7 +57,7 @@ function ItemLoot.Element:new(...)
 		if not G_RLF.db.global.itemQualityFilter[itemQuality] then
 			element:getLogger():Debug(
 				itemName .. " ignored by quality: " .. itemQualityName(itemQuality),
-				G_RLF.addonName,
+				addonName,
 				"ItemLoot",
 				"",
 				nil,
