@@ -17,7 +17,7 @@ function common_stubs.setup_G_RLF(spy)
 		Warn = spy.new(),
 		Error = spy.new(),
 	}
-	_G.G_RLF = {
+	local ns = {
 		db = {
 			global = {
 				currencyFeed = true,
@@ -30,6 +30,11 @@ function common_stubs.setup_G_RLF(spy)
 		list = function()
 			return {}
 		end,
+		Queue = {
+			new = function()
+				return {}
+			end,
+		},
 		RLF = {
 			NewModule = function(_, name, libs)
 				return {
@@ -58,7 +63,9 @@ function common_stubs.setup_G_RLF(spy)
 	end
 
 	-- Spy or stub common methods if needed
-	spy.on(_G.G_RLF.LootDisplay, "ShowLoot")
+	spy.on(ns.LootDisplay, "ShowLoot")
+
+	return ns
 end
 
 function common_stubs.stub_C_CurrencyInfo()

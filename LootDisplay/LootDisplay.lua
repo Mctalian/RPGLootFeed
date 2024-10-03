@@ -1,3 +1,5 @@
+local addonName, G_RLF = ...
+
 local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
 
 local lsm = LibStub("LibSharedMedia-3.0")
@@ -27,6 +29,7 @@ function LootDisplay:OnInitialize()
 		G_RLF:fn(frame:UpdateRowPositions())
 	end)
 	self:RegisterBucketMessage("RLF_RowHidden", 0.1, "ReleaseRows")
+	self:SendMessage("RLF_LootDisplay_Ready")
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)
@@ -76,13 +79,9 @@ function LootDisplay:ReleaseRows(rows)
 	frame:CheckForStragglers()
 end
 
-local elementQueue = {}
+local elementQueue = G_RLF.Queue:new(true)
 function LootDisplay:ShowLoot(element)
-	if type(element) ~= "table" then
-		error("Expected arg to ShowLoot to be a table")
-	end
-
-	tinsert(elementQueue, element)
+	elementQueue:enqueue(element)
 	self:SendMessage("RLF_LootDisplay_Process")
 end
 
@@ -115,7 +114,7 @@ local function processRow(element)
 		-- New row
 		row = frame:LeaseRow(key)
 		if row == nil then
-			tinsert(elementQueue, element)
+			elementQueue:enqueue(element)
 			return
 		end
 
@@ -134,33 +133,34 @@ local function processRow(element)
 		end
 
 		row:UpdateStyles()
-		row:Show()
 	end
 
 	row:ShowText(text, r, g, b, a)
 
 	logFn(text, row.amount, new)
 
+	row:Show()
 	row:ResetFadeOut()
 end
 
 processFromQueue = function()
-	local snapshotQueueSize = #elementQueue
+	local snapshotQueueSize = elementQueue:size()
 	if snapshotQueueSize > 0 then
-		-- error("Test")
 		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.maxRows)
-		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from element queue", G_RLF.addonName)
+		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from element queue", addonName)
 		for i = 1, rowsToProcess do
-			local e = tremove(elementQueue, 1)
+			if elementQueue:isEmpty() then
+				return
+			end
+			local e = elementQueue:dequeue()
 			processRow(e)
 		end
 	end
 end
 
 local function emptyQueue()
-	local queueSize = #elementQueue
-	for i = 1, queueSize do
-		tremove(elementQueue, 1)
+	while not elementQueue:isEmpty() do
+		elementQueue:dequeue()
 	end
 end
 
@@ -213,3 +213,5 @@ truncateItemLink = function(itemLink, extraWidth)
 
 	return linkStart .. itemName .. linkEnd
 end
+
+return LootDisplay

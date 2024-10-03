@@ -2,13 +2,11 @@ local common_stubs = require("spec/common_stubs")
 
 describe("Experience module", function()
 	local _ = match._
-	local XpModule
+	local XpModule, ns
 
 	before_each(function()
-		common_stubs.setup_G_RLF(spy)
+		ns = ns or common_stubs.setup_G_RLF(spy)
 		common_stubs.stub_Unit_Funcs()
-
-		local ns = {}
 
 		-- Load the LootDisplayProperties module to populate `ns`
 		assert(loadfile("Features/LootDisplayProperties.lua"))("TestAddon", ns)
@@ -22,25 +20,25 @@ describe("Experience module", function()
 	end)
 
 	it("does not show xp if the unit target is not player", function()
-		_G.G_RLF.db.global.xpFeed = true
+		ns.db.global.xpFeed = true
 
 		XpModule:PLAYER_XP_UPDATE("PLAYER_XP_UPDATE", "target")
 
-		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was_not_called()
+		assert.stub(ns.LootDisplay.ShowLoot).was_not_called()
 	end)
 
 	it("does not show xp if the calculated delta is 0", function()
-		_G.G_RLF.db.global.xpFeed = true
+		ns.db.global.xpFeed = true
 
 		XpModule:PLAYER_ENTERING_WORLD()
 
 		XpModule:PLAYER_XP_UPDATE("PLAYER_XP_UPDATE", "player")
 
-		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was_not_called()
+		assert.stub(ns.LootDisplay.ShowLoot).was_not_called()
 	end)
 
 	it("show xp if the player levels up", function()
-		_G.G_RLF.db.global.xpFeed = true
+		ns.db.global.xpFeed = true
 
 		XpModule:PLAYER_ENTERING_WORLD()
 
@@ -60,6 +58,6 @@ describe("Experience module", function()
 		XpModule:PLAYER_XP_UPDATE("PLAYER_XP_UPDATE", "player")
 
 		assert.spy(newElement).was.called_with(_, 50)
-		assert.stub(_G.G_RLF.LootDisplay.ShowLoot).was.called()
+		assert.stub(ns.LootDisplay.ShowLoot).was.called()
 	end)
 end)

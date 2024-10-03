@@ -1,7 +1,7 @@
 describe("ConfigOptions module", function()
 	before_each(function()
 		-- Define the global G_RLF
-		_G.G_RLF = {
+		local ns = {
 			defaults = {
 				global = {},
 			},
@@ -18,7 +18,7 @@ describe("ConfigOptions module", function()
 			},
 		}
 		-- Load the list module before each test
-		dofile("config/ConfigOptions.lua")
+		assert(loadfile("config/ConfigOptions.lua"))("TestAddon", ns)
 	end)
 
 	it("TODO", function()

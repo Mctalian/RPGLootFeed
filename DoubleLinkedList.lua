@@ -1,3 +1,5 @@
+local _, G_RLF = ...
+
 local list = {}
 list.__index = list
 

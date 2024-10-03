@@ -1,7 +1,9 @@
+local addonName, G_RLF = ...
+
 local Logger = G_RLF.RLF:NewModule("Logger", "AceEvent-3.0")
 local gui = LibStub("AceGUI-3.0")
 
-local loggerName = G_RLF.addonName .. "Logger"
+local loggerName = addonName .. "Logger"
 local defaults = {
 	sessionsLogged = 0,
 	logs = {},
@@ -12,7 +14,7 @@ local getLogger
 local WOWEVENT = "WOWEVENT"
 
 local eventSource = {
-	[G_RLF.addonName] = true,
+	[addonName] = true,
 	[WOWEVENT] = false,
 }
 local function OnEventSourceChange(_, _, k, v)
@@ -88,10 +90,10 @@ local function initializeFrame()
 		logSources:SetLabel("Log Sources")
 		logSources:SetMultiselect(true)
 		logSources:SetList({
-			[G_RLF.addonName] = G_RLF.addonName,
+			[addonName] = addonName,
 			[WOWEVENT] = WOWEVENT,
 		}, {
-			G_RLF.addonName,
+			addonName,
 			WOWEVENT,
 		})
 		logSources:SetCallback("OnValueChanged", OnEventSourceChange)
@@ -159,7 +161,7 @@ function Logger:PLAYER_ENTERING_WORLD(_, isLogin, isReload)
 			tremove(G_RLF.db.global.logger.logs, 1)
 			G_RLF.db.global.logger.sessionsLogged = G_RLF.db.global.logger.sessionsLogged - 1
 		end
-		self:Debug("Logger is ready", G_RLF.addonName)
+		self:Debug("Logger is ready", addonName)
 	end
 end
 
@@ -193,7 +195,7 @@ end
 local function getSource(logEntry)
 	local source = logEntry.source
 	local sourceStrings = {
-		[G_RLF.addonName] = "(RLF)",
+		[addonName] = "(RLF)",
 		[WOWEVENT] = "(WOW)",
 	}
 	return sourceStrings[source] or ""
@@ -272,7 +274,7 @@ local function addLogEntry(level, message, source, type, id, content, amount, is
 	local entry = {
 		timestamp = date("%Y-%m-%d %H:%M:%S"),
 		level = level,
-		source = source or G_RLF.addonName,
+		source = source or addonName,
 		type = type or "General",
 		id = id or "",
 		content = content or "",

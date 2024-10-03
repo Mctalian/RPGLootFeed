@@ -1,7 +1,8 @@
-local addonName = G_RLF.addonName
+local addonName, G_RLF = ...
 local acd = LibStub("AceConfigDialog-3.0")
 local lsm = LibStub("LibSharedMedia-3.0")
-RLF = G_RLF.RLF
+local RLF = G_RLF.RLF
+local TestMode
 
 function RLF:OnInitialize()
 	G_RLF.db = LibStub("AceDB-3.0"):New(G_RLF.dbName, G_RLF.defaults, true)
@@ -22,12 +23,14 @@ function RLF:OnInitialize()
 			G_RLF.LootDisplay:SetBoundingBoxVisibility(false)
 		end)
 	end
+
+	TestMode = self:GetModule("TestMode")
 end
 
 function RLF:SlashCommand(msg, editBox)
 	G_RLF:fn(function()
 		if msg == "test" then
-			G_RLF.TestMode:ToggleTestMode()
+			TestMode:ToggleTestMode()
 		elseif msg == "clear" then
 			G_RLF.LootDisplay:HideLoot()
 		elseif msg == "log" then
@@ -56,10 +59,6 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 			C_CVar.SetCVar("autoLootDefault", "1")
 		end
 	end
-	G_RLF.TestMode:InitializeTestData()
-	--@alpha@
-	G_RLF.TestMode:SmokeTest()
-	--@end-alpha@
 end
 
 local optionsFrame

@@ -1,3 +1,5 @@
+local addonName, G_RLF = ...
+
 local ConfigOptions = {}
 
 G_RLF.defaults = {
@@ -41,8 +43,10 @@ function ConfigOptions:ToggleBoundingBox()
 	G_RLF.LootDisplay:ToggleBoundingBox()
 end
 
+local TestMode
 function ConfigOptions:ToggleTestMode()
-	G_RLF.TestMode:ToggleTestMode()
+	TestMode = TestMode or G_RLF.RLF:GetModule("TestMode")
+	TestMode:ToggleTestMode()
 end
 
 function ConfigOptions:ClearRows()
