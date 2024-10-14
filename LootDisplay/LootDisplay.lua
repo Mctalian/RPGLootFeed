@@ -2,7 +2,7 @@ local addonName, G_RLF = ...
 
 local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
 
-local lsm = LibStub("LibSharedMedia-3.0")
+local lsm = G_RLF.lsm
 
 -- Private method declaration
 local processFromQueue
