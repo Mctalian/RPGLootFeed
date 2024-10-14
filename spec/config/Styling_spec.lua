@@ -16,21 +16,16 @@ describe("Styling module", function()
 				DISABLE_MY_LOOT = 3,
 				DISABLE_GROUP_LOOT = 4,
 			},
-		}
-		_G.LibStub = function(lib)
-			if lib == "LibSharedMedia-3.0" then
-				local l = {}
-				function l:HashTable()
-					return {
-						["Test"] = "Test",
-					}
-				end
-				l.MediaType = {
+			lsm = {
+				MediaType = {
 					["FONT"] = "font",
-				}
-				return l
-			end
-			return nil
+				},
+			},
+		}
+		function ns.lsm:HashTable()
+			return {
+				["Test"] = "Test",
+			}
 		end
 		-- Load the list module before each test
 		assert(loadfile("config/Styling.lua"))("TestAddon", ns)
