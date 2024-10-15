@@ -95,11 +95,12 @@ function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
 	end
 
 	self:fn(function()
+		local basicInfo = C_CurrencyInfo.GetBasicCurrencyInfo(currencyType, quantityChange)
 		local e = self.Element:new(
 			info.currencyID,
 			C_CurrencyInfo.GetCurrencyLink(currencyType),
 			info.iconFileID,
-			quantityChange
+			basicInfo.displayAmount
 		)
 		e:Show()
 	end)
