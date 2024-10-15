@@ -2,7 +2,7 @@ local addonName, G_RLF = ...
 
 local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
 
-local lsm = LibStub("LibSharedMedia-3.0")
+local lsm = G_RLF.lsm
 
 -- Private method declaration
 local processFromQueue
@@ -28,7 +28,6 @@ function LootDisplay:OnInitialize()
 	self:RegisterBucketMessage("RLF_LootDisplay_UpdateRowPositions", 0.1, function()
 		G_RLF:fn(frame:UpdateRowPositions())
 	end)
-	self:RegisterBucketMessage("RLF_RowHidden", 0.1, "ReleaseRows")
 	self:SendMessage("RLF_LootDisplay_Ready")
 end
 
@@ -70,13 +69,6 @@ end
 
 function LootDisplay:UpdateFadeDelay()
 	frame:UpdateFadeDelay()
-end
-
-function LootDisplay:ReleaseRows(rows)
-	for row, freq in pairs(rows) do
-		frame:ReleaseRow(row)
-	end
-	frame:CheckForStragglers()
 end
 
 local elementQueue = G_RLF.Queue:new(true)

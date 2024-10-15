@@ -54,7 +54,7 @@ jobs:
           path: luacov-html/
 
   test_package:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     env:
       IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
 

@@ -1,4 +1,4 @@
-.PHONY: all_checks venv_up hardcode_string_check missing_translation_check test test-ci
+.PHONY: all_checks venv_up hardcode_string_check missing_translation_check test test-ci local
 
 all_checks: venv_up hardcode_string_check missing_translation_check
 
@@ -22,3 +22,6 @@ test:
 
 test-ci:
 	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage -o=TAP && $(ROCKSBIN)/luacov
+
+local:
+	@.release/local.sh -D

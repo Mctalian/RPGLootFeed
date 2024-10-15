@@ -60,6 +60,20 @@ G_RLF.DisableBossBanner = {
 	DISABLE_GROUP_LOOT = 4,
 }
 
+G_RLF.lsm = LibStub("LibSharedMedia-3.0")
+G_RLF.Masque = LibStub and LibStub("Masque", true)
+G_RLF.iconGroup = Masque and Masque:Group(addonName)
+
+local acr = LibStub("AceConfigRegistry-3.0")
+
+function G_RLF:NotifyChange(...)
+	acr:NotifyChange(...)
+end
+
+function G_RLF:SendMessage(...)
+	G_RLF.RLF:SendMessage(...)
+end
+
 function G_RLF:Print(...)
 	G_RLF.RLF:Print(...)
 end

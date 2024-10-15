@@ -2,12 +2,6 @@ local addonName, G_RLF = ...
 
 LootDisplayRowMixin = {}
 
-local ae = LibStub("AceEvent-3.0")
-local lsm = LibStub("LibSharedMedia-3.0")
-
-local Masque = LibStub and LibStub("Masque", true)
-local iconGroup = Masque and Masque:Group(addonName)
-
 local function rowBackground(row)
 	local leftColor = CreateColor(unpack(G_RLF.db.global.rowBackgroundGradientStart))
 	local rightColor = CreateColor(unpack(G_RLF.db.global.rowBackgroundGradientEnd))
@@ -29,8 +23,8 @@ local function rowIcon(row, icon)
 	if not G_RLF.db.global.leftAlign then
 		anchor, xOffset = "RIGHT", -xOffset
 	end
-	if Masque and iconGroup then
-		iconGroup:AddButton(row.Icon)
+	if G_RLF.Masque and G_RLF.iconGroup then
+		G_RLF.iconGroup:AddButton(row.Icon)
 	end
 	row.Icon:SetPoint(anchor, xOffset, 0)
 	row.Icon:SetShown(icon ~= nil)
@@ -40,7 +34,7 @@ local function rowAmountText(row, icon)
 	if G_RLF.db.global.useFontObjects or not G_RLF.db.global.fontFace then
 		row.AmountText:SetFontObject(G_RLF.db.global.font)
 	else
-		local fontPath = lsm:Fetch(lsm.MediaType.FONT, G_RLF.db.global.fontFace)
+		local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, G_RLF.db.global.fontFace)
 		row.AmountText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
 	end
 	local anchor = "LEFT"
@@ -150,6 +144,8 @@ local function rowFadeOutAnimation(row)
 		row.FadeOutAnimation.fadeOut:SetDuration(1)
 		row.FadeOutAnimation.fadeOut:SetScript("OnFinished", function()
 			row:Hide()
+			local frame = row:GetParent()
+			frame:ReleaseRow(row)
 		end)
 	end
 
@@ -204,7 +200,7 @@ end
 function LootDisplayRowMixin:UpdateStyles()
 	rowStyles(self)
 	if self.icon and iconGroup then
-		iconGroup:ReSkin(self.Icon)
+		self.iconGroup:ReSkin(self.Icon)
 	end
 end
 
@@ -342,8 +338,8 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 			self.Icon:SetItemButtonTexture(icon)
 			self.Icon:SetItemButtonQuality(quality, self.link)
 		end
-		if Masque and iconGroup then
-			iconGroup:ReSkin(self.Icon)
+		if G_RLF.Masque and G_RLF.iconGroup then
+			G_RLF.iconGroup:ReSkin(self.Icon)
 		end
 	end
 end
@@ -351,10 +347,6 @@ end
 function LootDisplayRowMixin:ResetFadeOut()
 	self.FadeOutAnimation:Stop()
 	self.FadeOutAnimation:Play()
-end
-
-function LootDisplayRowMixin:OnHide()
-	ae:SendMessage("RLF_RowHidden", self)
 end
 
 function LootDisplayRowMixin:ResetHighlightBorder()
