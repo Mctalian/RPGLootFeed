@@ -56,8 +56,5 @@
         <Frames>
             <ItemButton parentKey="Icon" />
         </Frames>
-        <Scripts>
-            <OnHide method="OnHide" />
-        </Scripts>
     </Frame>
 </Ui>

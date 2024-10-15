@@ -144,6 +144,8 @@ local function rowFadeOutAnimation(row)
 		row.FadeOutAnimation.fadeOut:SetDuration(1)
 		row.FadeOutAnimation.fadeOut:SetScript("OnFinished", function()
 			row:Hide()
+			local frame = row:GetParent()
+			frame:ReleaseRow(row)
 		end)
 	end
 
@@ -345,10 +347,6 @@ end
 function LootDisplayRowMixin:ResetFadeOut()
 	self.FadeOutAnimation:Stop()
 	self.FadeOutAnimation:Play()
-end
-
-function LootDisplayRowMixin:OnHide()
-	G_RLF:SendMessage("RLF_RowHidden", self)
 end
 
 function LootDisplayRowMixin:ResetHighlightBorder()
