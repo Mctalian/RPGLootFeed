@@ -2,7 +2,7 @@ local addonName, G_RLF = ...
 
 local Styling = {}
 
-local lsm = LibStub("LibSharedMedia-3.0")
+local lsm = G_RLF.lsm
 
 G_RLF.defaults.global.leftAlign = true
 G_RLF.defaults.global.growUp = true

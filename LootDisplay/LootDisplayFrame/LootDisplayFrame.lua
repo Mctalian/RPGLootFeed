@@ -2,9 +2,6 @@ local addonName, G_RLF = ...
 
 LootDisplayFrameMixin = {}
 
-local acr = LibStub("AceConfigRegistry-3.0")
-local ae = LibStub("AceEvent-3.0")
-
 local rows = G_RLF.list()
 local keyRowMap
 local rowFramePool = G_RLF.Queue:new()
@@ -111,7 +108,7 @@ function LootDisplayFrameMixin:OnDragStop()
 
 	-- Update the frame position
 	G_RLF.LootDisplay:UpdatePosition()
-	acr:NotifyChange(addonName)
+	G_RLF:NotifyChange(addonName)
 end
 
 function LootDisplayFrameMixin:ShowTestArea()
@@ -219,7 +216,7 @@ function LootDisplayFrameMixin:ReleaseRow(row)
 	row:SetParent(nil)
 	row:Reset(true)
 	rowFramePool:enqueue(row)
-	ae:SendMessage("RLF_LootDisplay_RowReturned")
+	G_RLF:SendMessage("RLF_LootDisplay_RowReturned")
 end
 
 function LootDisplayFrameMixin:Dump()
