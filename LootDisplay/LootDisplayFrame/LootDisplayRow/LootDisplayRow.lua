@@ -152,6 +152,14 @@ local function rowFadeOutAnimation(row)
 	row.FadeOutAnimation.fadeOut:SetStartDelay(G_RLF.db.global.fadeOutDelay)
 end
 
+--@alpha@
+rowBackground = G_RLF:ProfileFunction(rowBackground, "rowBackground")
+rowIcon = G_RLF:ProfileFunction(rowIcon, "rowIcon")
+rowAmountText = G_RLF:ProfileFunction(rowAmountText, "rowAmountText")
+rowHighlightBorder = G_RLF:ProfileFunction(rowHighlightBorder, "rowHighlightBorder")
+rowFadeOutAnimation = G_RLF:ProfileFunction(rowFadeOutAnimation, "rowFadeOutAnimation")
+--@end-alpha@
+
 local function rowStyles(row)
 	row:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
 	rowBackground(row)
@@ -162,7 +170,7 @@ local function rowStyles(row)
 end
 
 local defaultColor = { 1, 1, 1, 1 }
-function LootDisplayRowMixin:Reset(quick)
+function LootDisplayRowMixin:Reset()
 	self:ClearAllPoints()
 
 	-- Reset row-specific data
@@ -170,19 +178,6 @@ function LootDisplayRowMixin:Reset(quick)
 	self.amount = nil
 	self.icon = nil
 	self.link = nil
-	if quick then
-		if self:IsVisible() then
-			self:Hide()
-			--@alpha@
-			G_RLF:Print(self:GetDebugName() .. " row was still visible - trying to hide again: " .. self:Dump())
-			--@end-alpha@
-		end
-		return
-	end
-
-	if self:IsVisible() then
-		error("Row reset but still visible: " .. self:Dump())
-	end
 
 	-- Reset UI elements that were part of the template
 	self.TopBorder:SetAlpha(0)
@@ -199,8 +194,8 @@ end
 
 function LootDisplayRowMixin:UpdateStyles()
 	rowStyles(self)
-	if self.icon and iconGroup then
-		self.iconGroup:ReSkin(self.Icon)
+	if self.icon and G_RLF.iconGroup then
+		G_RLF.iconGroup:ReSkin(self.Icon)
 	end
 end
 
@@ -219,21 +214,9 @@ function LootDisplayRowMixin:UpdateQuantity()
 	end
 end
 
-local function getPositioningDetails()
-	-- Position the new row at the bottom (or top if growing down)
-	local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
-	local opposite = G_RLF.db.global.growUp and "TOP" or "BOTTOM"
-	local yOffset = G_RLF.db.global.padding
-	if not G_RLF.db.global.growUp then
-		yOffset = -yOffset
-	end
-
-	return vertDir, opposite, yOffset
-end
-
 function LootDisplayRowMixin:SetPosition(frame)
 	-- Position the new row at the bottom (or top if growing down)
-	local vertDir, opposite, yOffset = getPositioningDetails()
+	local vertDir, opposite, yOffset = frame.vertDir, frame.opposite, frame.yOffset
 	self:ClearAllPoints()
 	if self._prev then
 		self:SetPoint(vertDir, self._prev, opposite, 0, yOffset)
@@ -243,7 +226,7 @@ function LootDisplayRowMixin:SetPosition(frame)
 end
 
 function LootDisplayRowMixin:UpdateNeighborPositions(frame)
-	local vertDir, opposite, yOffset = getPositioningDetails()
+	local vertDir, opposite, yOffset = frame.vertDir, frame.opposite, frame.yOffset
 	local _next = self._next
 	local _prev = self._prev
 
@@ -263,9 +246,6 @@ function LootDisplayRowMixin:SetupTooltip()
 		self.FadeOutAnimation:Stop()
 		self.HighlightAnimation:Stop()
 		self:ResetHighlightBorder()
-		if not G_RLF.db.global.tooltip then
-			return
-		end
 		if G_RLF.db.global.tooltipOnShift and not IsShiftKeyDown() then
 			return
 		end
@@ -330,17 +310,28 @@ function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 end
 
 function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
-	if icon then
+	-- Only update if the icon has changed
+	if icon and self.icon ~= icon then
 		self.icon = icon
-		if not quality then
-			self.Icon:SetItem(self.link)
-		else
-			self.Icon:SetItemButtonTexture(icon)
-			self.Icon:SetItemButtonQuality(quality, self.link)
-		end
-		if G_RLF.Masque and G_RLF.iconGroup then
-			G_RLF.iconGroup:ReSkin(self.Icon)
-		end
+
+		C_Timer.After(0, function()
+			-- Handle quality logic
+			if not quality then
+				self.Icon:SetItem(self.link)
+			else
+				self.Icon:SetItemButtonTexture(icon)
+				self.Icon:SetItemButtonQuality(quality, self.link)
+			end
+
+			self.Icon.NormalTexture:SetTexture(nil)
+			self.Icon.HighlightTexture:SetTexture(nil)
+			self.Icon.PushedTexture:SetTexture(nil)
+
+			-- Masque reskinning (may be costly, consider reducing frequency)
+			if G_RLF.Masque and G_RLF.iconGroup then
+				G_RLF.iconGroup:ReSkin(self.Icon)
+			end
+		end)
 	end
 end
 

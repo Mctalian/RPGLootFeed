@@ -40,7 +40,12 @@ jobs:
         uses: actions/checkout@v4
 
       - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: 5.3.5
+
       - uses: leafo/gh-actions-luarocks@v4
+        with:
+          luarocksVersion: 3.11.1
 
       - name: Install luarock dependencies
         run: luarocks make --local rpglootfeed-1-1.rockspec
@@ -54,7 +59,7 @@ jobs:
           path: luacov-html/
 
   test_package:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
 
@@ -69,6 +74,11 @@ jobs:
       - name: Checkout code (fork)
         if: env.IS_FORK == 'true'
         uses: actions/checkout@v4
+
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: subversion
+          version: test_package_apt_cache
 
       - name: Package
         if: env.IS_FORK == 'false'

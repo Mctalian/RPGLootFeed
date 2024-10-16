@@ -66,12 +66,12 @@ end
 
 local isLootDisplayReady = false
 function TestMode:OnInitialize()
-	self:RegisterMessage("RLF_LootDisplay_Ready")
+	self.isLootDisplayReady = false
 	self:RegisterEvent("ITEM_DATA_LOAD_RESULT")
 	self:InitializeTestData()
 end
 
-function TestMode:RLF_LootDisplay_Ready()
+function TestMode:OnLootDisplayReady()
 	isLootDisplayReady = true
 
 	--@alpha@
