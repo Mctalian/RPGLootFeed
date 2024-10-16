@@ -39,12 +39,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - uses: awalsh128/cache-apt-pkgs-action@latest
-        with:
-          packages: libc6-dev
-          version: run_tests_apt_cache
-
       - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: 5.4.1
       - uses: leafo/gh-actions-luarocks@v4
 
       - name: Install luarock dependencies
