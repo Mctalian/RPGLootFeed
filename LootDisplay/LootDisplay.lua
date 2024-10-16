@@ -1,6 +1,6 @@
 local addonName, G_RLF = ...
 
-local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
+local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceEvent-3.0")
 
 local lsm = G_RLF.lsm
 
@@ -12,6 +12,7 @@ local truncateItemLink
 -- Private variable declaration
 local frame = nil
 local tempFontString = nil
+local elementQueue = G_RLF.Queue:new()
 
 -- Public methods
 local logger
@@ -22,12 +23,11 @@ function LootDisplay:OnInitialize()
 
 	tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
 	tempFontString:Hide() -- Prevent it from showing up
-	self:RegisterBucketMessage({ "RLF_LootDisplay_RowReturned", "RLF_LootDisplay_Process" }, 0.2, function()
-		G_RLF:fn(processFromQueue)
-	end)
-	self:RegisterBucketMessage("RLF_LootDisplay_UpdateRowPositions", 0.1, function()
-		G_RLF:fn(frame:UpdateRowPositions())
-	end)
+	frame.OnRowRelease = function()
+		if elementQueue:size() > 0 then
+			G_RLF:fn(processFromQueue)
+		end
+	end
 	self:SendMessage("RLF_LootDisplay_Ready")
 end
 
@@ -54,7 +54,7 @@ function LootDisplay:UpdatePosition()
 end
 
 function LootDisplay:UpdateRowPositions()
-	self:SendMessage("RLF_LootDisplay_UpdateRowPositions")
+	frame:UpdateRowPositions()
 end
 
 function LootDisplay:UpdateStrata()
@@ -69,12 +69,6 @@ end
 
 function LootDisplay:UpdateFadeDelay()
 	frame:UpdateFadeDelay()
-end
-
-local elementQueue = G_RLF.Queue:new(true)
-function LootDisplay:ShowLoot(element)
-	elementQueue:enqueue(element)
-	self:SendMessage("RLF_LootDisplay_Process")
 end
 
 local function processRow(element)
@@ -135,7 +129,16 @@ local function processRow(element)
 	row:ResetFadeOut()
 end
 
+function LootDisplay:ShowLoot(element)
+	processRow(element)
+end
+
+local queueProcessing = false
 processFromQueue = function()
+	if queueProcessing then
+		return
+	end
+	queueProcessing = true
 	local snapshotQueueSize = elementQueue:size()
 	if snapshotQueueSize > 0 then
 		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.maxRows)
@@ -148,6 +151,7 @@ processFromQueue = function()
 			processRow(e)
 		end
 	end
+	queueProcessing = false
 end
 
 local function emptyQueue()

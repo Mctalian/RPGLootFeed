@@ -216,7 +216,7 @@ function LootDisplayFrameMixin:ReleaseRow(row)
 	row:SetParent(nil)
 	row:Reset(true)
 	rowFramePool:enqueue(row)
-	G_RLF:SendMessage("RLF_LootDisplay_RowReturned")
+	self:OnRowRelease()
 end
 
 function LootDisplayFrameMixin:Dump()
