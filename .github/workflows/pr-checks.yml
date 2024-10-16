@@ -41,8 +41,11 @@ jobs:
 
       - uses: leafo/gh-actions-lua@v10
         with:
-          luaVersion: 5.4.4
+          luaVersion: 5.3.5
+
       - uses: leafo/gh-actions-luarocks@v4
+        with:
+          luarocksVersion: 3.11.1
 
       - name: Install luarock dependencies
         run: luarocks make --local rpglootfeed-1-1.rockspec
