@@ -33,11 +33,16 @@ jobs:
         run: python .scripts/hardcode_string_check.py
 
   run_tests:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: libc6-dev
+          version: run_tests_apt_cache
 
       - uses: leafo/gh-actions-lua@v10
       - uses: leafo/gh-actions-luarocks@v4
@@ -54,7 +59,7 @@ jobs:
           path: luacov-html/
 
   test_package:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     env:
       IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
 
@@ -69,6 +74,11 @@ jobs:
       - name: Checkout code (fork)
         if: env.IS_FORK == 'true'
         uses: actions/checkout@v4
+
+      - uses: awalsh128/cache-apt-pkgs-action@latest
+        with:
+          packages: subversion
+          version: test_package_apt_cache
 
       - name: Package
         if: env.IS_FORK == 'false'
