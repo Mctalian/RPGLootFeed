@@ -134,17 +134,20 @@ local function testLootDisplay()
 	amountLooted = 1
 	e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted)
 	runTestSafely(e.Show, "LootDisplay: Item")
+	e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted)
 	runTestSafely(e.Show, "LootDisplay: Item Quantity Update")
 	module = G_RLF.RLF:GetModule("Currency")
 	testObj = testCurrencies[2]
 	e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted)
 	runTestSafely(e.Show, "LootDisplay: Currency")
+	e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted)
 	runTestSafely(e.Show, "LootDisplay: Currency Quantity Update")
 	module = G_RLF.RLF:GetModule("Reputation")
 	testObj = testFactions[2]
 	amountLooted = 664
 	e = module.Element:new(amountLooted, testObj)
 	runTestSafely(e.Show, "LootDisplay: Reputation")
+	e = module.Element:new(amountLooted, testObj)
 	runTestSafely(e.Show, "LootDisplay: Reputation Quantity Update")
 end
 
@@ -176,9 +179,9 @@ function TestMode:SmokeTest(...)
 				.. ", got "
 				.. tostring(testData.actual)
 			if testData.err then
-				msg = msg .. " Error: " .. msg.err
+				msg = msg .. " Error: " .. testData.err
 			end
-			msg = msg .. "|r|n"
+			msg = msg .. "|r|n\n"
 		end
 	end
 

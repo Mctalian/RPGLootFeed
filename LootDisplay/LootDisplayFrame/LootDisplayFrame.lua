@@ -4,7 +4,6 @@ LootDisplayFrameMixin = {}
 
 local rows = G_RLF.list()
 local keyRowMap
-local rowFramePool = G_RLF.Queue:new()
 
 local function getFrameHeight()
 	return G_RLF.db.global.maxRows * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding) - G_RLF.db.global.padding
@@ -12,6 +11,18 @@ end
 
 local function getNumberOfRows()
 	return rows.length
+end
+
+local function getPositioningDetails()
+	-- Position the new row at the bottom (or top if growing down)
+	local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
+	local opposite = G_RLF.db.global.growUp and "TOP" or "BOTTOM"
+	local yOffset = G_RLF.db.global.padding
+	if not G_RLF.db.global.growUp then
+		yOffset = -yOffset
+	end
+
+	return vertDir, opposite, yOffset
 end
 
 local function configureArrowRotation(arrow, direction)
@@ -58,6 +69,11 @@ function LootDisplayFrameMixin:Load()
 	keyRowMap = {
 		length = 0,
 	}
+	self.rowFramePool = CreateFramePool("Frame", self, "LootDisplayRowTemplate", function(pool, row)
+		row:Reset()
+		row:SetParent(self)
+	end)
+	self.vertDir, self.opposite, self.yOffset = getPositioningDetails()
 	self:UpdateSize()
 	self:SetPoint(
 		G_RLF.db.global.anchorPoint,
@@ -146,60 +162,25 @@ function LootDisplayFrameMixin:LeaseRow(key)
 		-- Skip this, we've already allocated too much
 		return nil
 	end
-	local row
-	if rowFramePool:size() == 0 then
-		-- Create a new row from the XML template
-		row = CreateFrame("Frame", nil, self, "LootDisplayRowTemplate")
-	else
-		-- Reuse an existing row from the pool
-		row = rowFramePool:dequeue()
-		row:Reset()
-	end
-	row:SetParent(self)
+
+	local row = self.rowFramePool:Acquire()
+
 	row.key = key
+
 	local success = rows:push(row)
 	if not success then
 		error("Tried to push a row that already exists in the list")
 	end
+
 	keyRowMap[key] = row
 	keyRowMap.length = keyRowMap.length + 1
 
 	row:SetPosition(self)
+	C_Timer.After(0, function()
+		row:Show()
+	end)
 
 	return row
-end
-
-function LootDisplayFrameMixin:CheckForStragglers()
-	if getNumberOfRows() == 0 then
-		local r = {}
-		local children = { self:GetChildren() }
-		for i, v in ipairs(children) do
-			if v:IsShown() then
-				tinsert(r, v)
-			end
-		end
-
-		if #r > 0 then
-			local keys = "["
-			for i, k in ipairs(r) do
-				if i > 1 then
-					keys = keys .. ", "
-				end
-				keys = keys .. k.key
-				r:Hide()
-			end
-			keys = keys .. "]"
-			error(
-				getNumberOfRows()
-					.. " tracked rows, but still found "
-					.. #r
-					.. " row(s) as frame child(ren): "
-					.. keys
-					.. "\n\n"
-					.. self:Dump()
-			)
-		end
-	end
 end
 
 function LootDisplayFrameMixin:ReleaseRow(row)
@@ -211,12 +192,15 @@ function LootDisplayFrameMixin:ReleaseRow(row)
 	else
 		error("Row without key: " .. row:Dump())
 	end
+
 	row:UpdateNeighborPositions(self)
+
 	rows:remove(row)
+
 	row:SetParent(nil)
-	row:Reset(true)
-	rowFramePool:enqueue(row)
-	G_RLF:SendMessage("RLF_LootDisplay_RowReturned")
+
+	self.rowFramePool:Release(row)
+	self:OnRowRelease()
 end
 
 function LootDisplayFrameMixin:Dump()
@@ -255,6 +239,7 @@ function LootDisplayFrameMixin:Dump()
 end
 
 function LootDisplayFrameMixin:UpdateRowPositions()
+	self.vertDir, self.opposite, self.yOffset = getPositioningDetails()
 	local index = 1
 	for row in rows:iterate() do
 		row:SetPosition(self)
