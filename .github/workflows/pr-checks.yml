@@ -33,7 +33,7 @@ jobs:
         run: python .scripts/hardcode_string_check.py
 
   run_tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout code
