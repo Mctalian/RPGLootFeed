@@ -176,7 +176,7 @@ function TestMode:SmokeTest(...)
 				.. ", got "
 				.. tostring(testData.actual)
 			if testData.err then
-				msg = msg .. " Error: " .. msg.err
+				msg = msg .. " Error: " .. testData.err
 			end
 			msg = msg .. "|r|n"
 		end
