@@ -6,6 +6,7 @@ local lsm = G_RLF.lsm
 
 -- Private method declaration
 local processFromQueue
+local debounceProcessFromQueue
 local getTextWidth
 local truncateItemLink
 
@@ -13,6 +14,32 @@ local truncateItemLink
 local frame = nil
 local tempFontString = nil
 local elementQueue = G_RLF.Queue:new()
+
+--@alpha@
+local TestLabelQueueSize
+-- Create a label to display the queue size
+TestLabelQueueSize = UIParent:CreateFontString(nil, "ARTWORK")
+TestLabelQueueSize:SetFontObject(GameFontNormal)
+TestLabelQueueSize:SetPoint("TOPLEFT", 10, -10)
+TestLabelQueueSize:SetText("Queue Size: 0")
+-- Function to update test labels
+local function updateTestLabels()
+	if TestLabelQueueSize then
+		TestLabelQueueSize:SetText("Queue Size: " .. elementQueue:size())
+	end
+end
+-- Wrapper function to update test labels after calling the original function
+local function updateTestLabelsWrapper(func)
+	return function(...)
+		local result = { func(...) }
+		updateTestLabels()
+		return unpack(result)
+	end
+end
+
+elementQueue.enqueue = updateTestLabelsWrapper(elementQueue.enqueue)
+elementQueue.dequeue = updateTestLabelsWrapper(elementQueue.dequeue)
+--@end-alpha@
 
 -- Public methods
 local logger
@@ -25,10 +52,10 @@ function LootDisplay:OnInitialize()
 	tempFontString:Hide() -- Prevent it from showing up
 	frame.OnRowRelease = function()
 		if elementQueue:size() > 0 then
-			G_RLF:fn(processFromQueue)
+			debounceProcessFromQueue()
 		end
 	end
-	self:SendMessage("RLF_LootDisplay_Ready")
+	G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)
@@ -130,15 +157,11 @@ local function processRow(element)
 end
 
 function LootDisplay:ShowLoot(element)
-	processRow(element)
+	elementQueue:enqueue(element)
+	debounceProcessFromQueue()
 end
 
-local queueProcessing = false
 processFromQueue = function()
-	if queueProcessing then
-		return
-	end
-	queueProcessing = true
 	local snapshotQueueSize = elementQueue:size()
 	if snapshotQueueSize > 0 then
 		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.maxRows)
@@ -151,7 +174,32 @@ processFromQueue = function()
 			processRow(e)
 		end
 	end
-	queueProcessing = false
+end
+
+local debounceTimer = nil
+local maxWaitTimer = nil
+local debounceDelay = 0.15 -- 150 milliseconds
+local maxWaitTime = debounceDelay * 2
+debounceProcessFromQueue = function()
+	if debounceTimer then
+		debounceTimer:Cancel()
+	end
+
+	debounceTimer = C_Timer.NewTimer(debounceDelay, function()
+		G_RLF:fn(processFromQueue)
+		debounceTimer = nil
+	end)
+
+	if not maxWaitTimer then
+		maxWaitTimer = C_Timer.NewTimer(maxWaitTime, function()
+			if debounceTimer then
+				debounceTimer:Cancel()
+				debounceTimer = nil
+			end
+			G_RLF:fn(processFromQueue)
+			maxWaitTimer = nil
+		end)
+	end
 end
 
 local function emptyQueue()

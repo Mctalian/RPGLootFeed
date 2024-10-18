@@ -13,6 +13,18 @@ local function getNumberOfRows()
 	return rows.length
 end
 
+local function getPositioningDetails()
+	-- Position the new row at the bottom (or top if growing down)
+	local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
+	local opposite = G_RLF.db.global.growUp and "TOP" or "BOTTOM"
+	local yOffset = G_RLF.db.global.padding
+	if not G_RLF.db.global.growUp then
+		yOffset = -yOffset
+	end
+
+	return vertDir, opposite, yOffset
+end
+
 local function configureArrowRotation(arrow, direction)
 	if direction == "UP" then
 		arrow:SetRotation(0)
@@ -61,6 +73,7 @@ function LootDisplayFrameMixin:Load()
 		row:Reset()
 		row:SetParent(self)
 	end)
+	self.vertDir, self.opposite, self.yOffset = getPositioningDetails()
 	self:UpdateSize()
 	self:SetPoint(
 		G_RLF.db.global.anchorPoint,
@@ -223,6 +236,7 @@ function LootDisplayFrameMixin:Dump()
 end
 
 function LootDisplayFrameMixin:UpdateRowPositions()
+	self.vertDir, self.opposite, self.yOffset = getPositioningDetails()
 	local index = 1
 	for row in rows:iterate() do
 		row:SetPosition(self)
