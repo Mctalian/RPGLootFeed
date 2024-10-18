@@ -80,6 +80,16 @@ function common_stubs.stub_C_CurrencyInfo()
 		GetCurrencyLink = function(currencyType)
 			return "|c12345678|Hcurrency:" .. currencyType .. "|r"
 		end,
+		GetBasicCurrencyInfo = function(currencyType, quantity)
+			return {
+				name = "Best Coin",
+				description = "An awesome currency",
+				icon = 123456,
+				quality = 2,
+				displayAmount = quantity,
+				actualAmount = quantity,
+			}
+		end,
 	}
 end
 

@@ -32,3 +32,6 @@ TestMode.lua
 SmokeTest.lua
 #@end-alpha@
 LootDisplay/LootDisplay.xml
+#@alpha@
+LootDisplayProfiler.lua
+#@end-alpha@

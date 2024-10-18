@@ -6,6 +6,16 @@ describe("LootDisplay module", function()
 		-- Define the global G_RLF
 		ns = ns or common_stubs.setup_G_RLF(spy)
 		_G.LibStub = function() end
+		_G.UIParent = {
+			CreateFontString = function()
+				return {
+					Hide = function() end,
+					SetFontObject = function() end,
+					SetText = function() end,
+					SetPoint = function() end,
+				}
+			end,
+		}
 
 		-- Load the list module before each test
 		LootDisplayModule = assert(loadfile("LootDisplay/LootDisplay.lua"))("TestAddon", ns)

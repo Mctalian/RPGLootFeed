@@ -77,3 +77,19 @@ end
 function G_RLF:Print(...)
 	G_RLF.RLF:Print(...)
 end
+
+--@alpha@
+function G_RLF:ProfileFunction(func, funcName)
+	return function(...)
+		local startTime = debugprofilestop()
+		local result = { func(...) }
+		local endTime = debugprofilestop()
+		local duration = endTime - startTime
+		if duration > 1 then
+			G_RLF:Print(string.format("%s took %.2f ms", funcName, endTime - startTime))
+		end
+
+		return unpack(result)
+	end
+end
+--@end-alpha@
