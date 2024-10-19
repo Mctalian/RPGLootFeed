@@ -152,6 +152,14 @@ local function rowFadeOutAnimation(row)
 	row.FadeOutAnimation.fadeOut:SetStartDelay(G_RLF.db.global.fadeOutDelay)
 end
 
+--@alpha@
+rowBackground = G_RLF:ProfileFunction(rowBackground, "rowBackground")
+rowIcon = G_RLF:ProfileFunction(rowIcon, "rowIcon")
+rowAmountText = G_RLF:ProfileFunction(rowAmountText, "rowAmountText")
+rowHighlightBorder = G_RLF:ProfileFunction(rowHighlightBorder, "rowHighlightBorder")
+rowFadeOutAnimation = G_RLF:ProfileFunction(rowFadeOutAnimation, "rowFadeOutAnimation")
+--@end-alpha@
+
 local function rowStyles(row)
 	row:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
 	rowBackground(row)
@@ -186,8 +194,8 @@ end
 
 function LootDisplayRowMixin:UpdateStyles()
 	rowStyles(self)
-	if self.icon and iconGroup then
-		self.iconGroup:ReSkin(self.Icon)
+	if self.icon and G_RLF.iconGroup then
+		G_RLF.iconGroup:ReSkin(self.Icon)
 	end
 end
 
@@ -302,17 +310,28 @@ function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 end
 
 function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
-	if icon then
+	-- Only update if the icon has changed
+	if icon and self.icon ~= icon then
 		self.icon = icon
-		if not quality then
-			self.Icon:SetItem(self.link)
-		else
-			self.Icon:SetItemButtonTexture(icon)
-			self.Icon:SetItemButtonQuality(quality, self.link)
-		end
-		if G_RLF.Masque and G_RLF.iconGroup then
-			G_RLF.iconGroup:ReSkin(self.Icon)
-		end
+
+		C_Timer.After(0, function()
+			-- Handle quality logic
+			if not quality then
+				self.Icon:SetItem(self.link)
+			else
+				self.Icon:SetItemButtonTexture(icon)
+				self.Icon:SetItemButtonQuality(quality, self.link)
+			end
+
+			self.Icon.NormalTexture:SetTexture(nil)
+			self.Icon.HighlightTexture:SetTexture(nil)
+			self.Icon.PushedTexture:SetTexture(nil)
+
+			-- Masque reskinning (may be costly, consider reducing frequency)
+			if G_RLF.Masque and G_RLF.iconGroup then
+				G_RLF.iconGroup:ReSkin(self.Icon)
+			end
+		end)
 	end
 end
 

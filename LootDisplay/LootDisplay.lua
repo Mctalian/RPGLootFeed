@@ -152,7 +152,6 @@ local function processRow(element)
 
 	logFn(text, row.amount, new)
 
-	row:Show()
 	row:ResetFadeOut()
 end
 
