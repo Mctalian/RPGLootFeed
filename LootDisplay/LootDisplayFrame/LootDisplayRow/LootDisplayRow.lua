@@ -14,7 +14,6 @@ end
 local function rowIcon(row, icon)
 	row.Icon:ClearAllPoints()
 	row.Icon:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
-	-- row.Icon.icon:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
 	row.Icon.NormalTexture:SetTexture(nil)
 	row.Icon.HighlightTexture:SetTexture(nil)
 	row.Icon.PushedTexture:SetTexture(nil)
@@ -185,6 +184,8 @@ function LootDisplayRowMixin:Reset()
 	self.BottomBorder:SetAlpha(0)
 	self.LeftBorder:SetAlpha(0)
 
+	self.Icon:Reset()
+
 	-- Reset amount text behavior
 	self.AmountText:SetScript("OnEnter", nil)
 	self.AmountText:SetScript("OnLeave", nil)
@@ -321,6 +322,13 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 			else
 				self.Icon:SetItemButtonTexture(icon)
 				self.Icon:SetItemButtonQuality(quality, self.link)
+			end
+
+			if self.Icon.IconOverlay then
+				self.Icon.IconOverlay:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
+			end
+			if self.Icon.ProfessionQualityOverlay then
+				self.Icon.ProfessionQualityOverlay:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
 			end
 
 			self.Icon.NormalTexture:SetTexture(nil)
