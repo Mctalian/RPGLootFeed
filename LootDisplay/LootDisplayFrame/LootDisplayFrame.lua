@@ -175,8 +175,10 @@ function LootDisplayFrameMixin:LeaseRow(key)
 	keyRowMap[key] = row
 	keyRowMap.length = keyRowMap.length + 1
 
-	row:Show()
 	row:SetPosition(self)
+	C_Timer.After(0, function()
+		row:Show()
+	end)
 
 	return row
 end
