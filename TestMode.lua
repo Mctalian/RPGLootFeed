@@ -3,6 +3,8 @@ local addonName, G_RLF = ...
 local TestMode = G_RLF.RLF:NewModule("TestMode", "AceEvent-3.0")
 
 local logger
+local allItemsInitialized = false
+local isLootDisplayReady = false
 
 local function idExistsInTable(id, table)
 	for _, item in pairs(table) do
@@ -64,9 +66,8 @@ local function initializeTestCurrencies()
 	end
 end
 
-local isLootDisplayReady = false
 function TestMode:OnInitialize()
-	self.isLootDisplayReady = false
+	isLootDisplayReady = false
 	self:RegisterEvent("ITEM_DATA_LOAD_RESULT")
 	self:InitializeTestData()
 end
@@ -81,7 +82,6 @@ function TestMode:OnLootDisplayReady()
 	--@end-alpha@
 end
 
-local allItemsInitialized = false
 local failedRetrievals = {}
 function TestMode:ITEM_DATA_LOAD_RESULT(eventName, itemID, success)
 	if success and not idExistsInTable(itemId, testItems) then

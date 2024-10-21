@@ -55,7 +55,9 @@ function LootDisplay:OnInitialize()
 			debounceProcessFromQueue()
 		end
 	end
-	G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
+	C_Timer.After(0, function()
+		G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
+	end)
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)

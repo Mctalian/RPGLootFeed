@@ -181,7 +181,7 @@ function TestMode:SmokeTest(...)
 			if testData.err then
 				msg = msg .. " Error: " .. testData.err
 			end
-			msg = msg .. "|r|n"
+			msg = msg .. "|r|n\n"
 		end
 	end
 
