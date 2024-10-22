@@ -176,6 +176,9 @@ local function rowHighlightBorder(row)
 				fadeOut:SetToAlpha(0)
 				fadeOut:SetDuration(0.2)
 				fadeOut:SetStartDelay(0.3)
+				fadeOut:SetScript("OnFinished", function()
+					row:ResetHighlightBorder()
+				end)
 			end
 		end
 
@@ -413,8 +416,10 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 end
 
 function LootDisplayRowMixin:ResetFadeOut()
-	self.FadeOutAnimation:Stop()
-	self.FadeOutAnimation:Play()
+	C_Timer.After(0, function()
+		self.FadeOutAnimation:Stop()
+		self.FadeOutAnimation:Play()
+	end)
 end
 
 function LootDisplayRowMixin:ResetHighlightBorder()
