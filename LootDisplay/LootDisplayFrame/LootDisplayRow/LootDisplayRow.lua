@@ -3,59 +3,124 @@ local addonName, G_RLF = ...
 LootDisplayRowMixin = {}
 
 local function rowBackground(row)
-	local leftColor = CreateColor(unpack(G_RLF.db.global.rowBackgroundGradientStart))
-	local rightColor = CreateColor(unpack(G_RLF.db.global.rowBackgroundGradientEnd))
-	if not G_RLF.db.global.leftAlign then
-		leftColor, rightColor = rightColor, leftColor
+	local changed = false
+	if
+		row.cachedGradientStart ~= G_RLF.db.global.rowBackgroundGradientStart
+		or row.cachedGradientEnd ~= G_RLF.db.global.rowBackgroundGradientEnd
+	then
+		row.cachedGradientStart = G_RLF.db.global.rowBackgroundGradientStart
+		row.cachedGradientEnd = G_RLF.db.global.rowBackgroundGradientEnd
+		changed = true
 	end
-	row.Background:SetGradient("HORIZONTAL", leftColor, rightColor)
+
+	if row.cachedBackgoundLeftAlign ~= G_RLF.db.global.leftAlign then
+		row.cachedBackgoundLeftAlign = G_RLF.db.global.leftAlign
+		changed = true
+	end
+
+	if changed then
+		local leftColor = CreateColor(unpack(G_RLF.db.global.rowBackgroundGradientStart))
+		local rightColor = CreateColor(unpack(G_RLF.db.global.rowBackgroundGradientEnd))
+		if not G_RLF.db.global.leftAlign then
+			leftColor, rightColor = rightColor, leftColor
+		end
+		row.Background:SetGradient("HORIZONTAL", leftColor, rightColor)
+	end
 end
 
 local function rowIcon(row, icon)
-	row.Icon:ClearAllPoints()
-	row.Icon:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
-	-- row.Icon.icon:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
-	row.Icon.NormalTexture:SetTexture(nil)
-	row.Icon.HighlightTexture:SetTexture(nil)
-	row.Icon.PushedTexture:SetTexture(nil)
-	row.Icon.IconBorder:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
-	local anchor, xOffset = "LEFT", G_RLF.db.global.iconSize / 4
-	if not G_RLF.db.global.leftAlign then
-		anchor, xOffset = "RIGHT", -xOffset
+	local changed = false
+	if row.cachedIconSize ~= G_RLF.db.global.iconSize then
+		row.cachedIconSize = G_RLF.db.global.iconSize
+		changed = true
 	end
-	if G_RLF.Masque and G_RLF.iconGroup then
-		G_RLF.iconGroup:AddButton(row.Icon)
+
+	if row.cachedIconLeftAlign ~= G_RLF.db.global.leftAlign then
+		row.cachedIconLeftAlign = G_RLF.db.global.leftAlign
+		changed = true
 	end
-	row.Icon:SetPoint(anchor, xOffset, 0)
+
+	if changed then
+		row.Icon:ClearAllPoints()
+		row.Icon:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
+		row.Icon.IconBorder:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
+		row.Icon.NormalTexture:SetTexture(nil)
+		row.Icon.HighlightTexture:SetTexture(nil)
+		row.Icon.PushedTexture:SetTexture(nil)
+		local anchor, xOffset = "LEFT", G_RLF.db.global.iconSize / 4
+		if not G_RLF.db.global.leftAlign then
+			anchor, xOffset = "RIGHT", -xOffset
+		end
+		if G_RLF.Masque and G_RLF.iconGroup then
+			G_RLF.iconGroup:AddButton(row.Icon)
+		end
+		row.Icon:SetPoint(anchor, xOffset, 0)
+	end
 	row.Icon:SetShown(icon ~= nil)
 end
 
 local function rowAmountText(row, icon)
-	if G_RLF.db.global.useFontObjects or not G_RLF.db.global.fontFace then
-		row.AmountText:SetFontObject(G_RLF.db.global.font)
-	else
-		local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, G_RLF.db.global.fontFace)
-		row.AmountText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
+	local fontChanged = false
+	if
+		row.cachedFontFace ~= G_RLF.db.global.fontFace
+		or row.cachedFontSize ~= G_RLF.db.global.fontSize
+		or row.cachedFontFlags ~= G_RLF.defaults.global.fontFlags
+	then
+		row.cachedFontFace = G_RLF.db.global.fontFace
+		row.cachedFontSize = G_RLF.db.global.fontSize
+		row.cachedFontFlags = G_RLF.defaults.global.fontFlags
+		fontChanged = true
 	end
-	local anchor = "LEFT"
-	local iconAnchor = "RIGHT"
-	local xOffset = G_RLF.db.global.iconSize / 2
-	if not G_RLF.db.global.leftAlign then
-		anchor = "RIGHT"
-		iconAnchor = "LEFT"
-		xOffset = xOffset * -1
+
+	if row.cachedUseFontObject ~= G_RLF.db.global.useFontObjects then
+		row.cachedUseFontObject = G_RLF.db.global.useFontObjects
+		fontChanged = true
 	end
-	row.AmountText:ClearAllPoints()
-	row.AmountText:SetJustifyH(anchor)
-	if icon then
-		row.AmountText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
-	else
-		row.AmountText:SetPoint(anchor, row.Icon, anchor, 0, 0)
+
+	if fontChanged then
+		if G_RLF.db.global.useFontObjects or not G_RLF.db.global.fontFace then
+			row.AmountText:SetFontObject(G_RLF.db.global.font)
+		else
+			local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, G_RLF.db.global.fontFace)
+			row.AmountText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
+		end
+	end
+
+	if
+		row.cachedAmountTextLeftAlign ~= G_RLF.db.global.leftAlign
+		or row.cachedAmountTextXOffset ~= G_RLF.db.global.iconSize / 2
+		or row.cachedAmountTextIcon ~= icon
+	then
+		row.cachedAmountTextLeftAlign = G_RLF.db.global.leftAlign
+		row.cachedAmountTextXOffset = G_RLF.db.global.iconSize / 2
+		row.cachedAmountTextIcon = icon
+
+		local anchor = "LEFT"
+		local iconAnchor = "RIGHT"
+		local xOffset = G_RLF.db.global.iconSize / 2
+		if not G_RLF.db.global.leftAlign then
+			anchor = "RIGHT"
+			iconAnchor = "LEFT"
+			xOffset = xOffset * -1
+		end
+		row.AmountText:ClearAllPoints()
+		row.AmountText:SetJustifyH(anchor)
+		if icon then
+			row.AmountText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
+		else
+			row.AmountText:SetPoint(anchor, row.Icon, anchor, 0, 0)
+		end
 	end
 	-- Adjust the text position dynamically based on leftAlign or other conditions
 end
 
 local function updateBorderPositions(row)
+	if row.borderCachedWidth ~= row:GetWidth() or row.borderCachedHeight ~= row:GetHeight() then
+		row.borderCachedWidth = row:GetWidth()
+		row.borderCachedHeight = row:GetHeight()
+	else
+		return
+	end
 	-- Adjust the Top border
 	row.TopBorder:ClearAllPoints()
 	row.TopBorder:SetWidth(row:GetWidth())
@@ -152,6 +217,14 @@ local function rowFadeOutAnimation(row)
 	row.FadeOutAnimation.fadeOut:SetStartDelay(G_RLF.db.global.fadeOutDelay)
 end
 
+--@alpha@
+rowBackground = G_RLF:ProfileFunction(rowBackground, "rowBackground")
+rowIcon = G_RLF:ProfileFunction(rowIcon, "rowIcon")
+rowAmountText = G_RLF:ProfileFunction(rowAmountText, "rowAmountText")
+rowHighlightBorder = G_RLF:ProfileFunction(rowHighlightBorder, "rowHighlightBorder")
+rowFadeOutAnimation = G_RLF:ProfileFunction(rowFadeOutAnimation, "rowFadeOutAnimation")
+--@end-alpha@
+
 local function rowStyles(row)
 	row:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
 	rowBackground(row)
@@ -162,7 +235,7 @@ local function rowStyles(row)
 end
 
 local defaultColor = { 1, 1, 1, 1 }
-function LootDisplayRowMixin:Reset(quick)
+function LootDisplayRowMixin:Reset()
 	self:ClearAllPoints()
 
 	-- Reset row-specific data
@@ -170,19 +243,6 @@ function LootDisplayRowMixin:Reset(quick)
 	self.amount = nil
 	self.icon = nil
 	self.link = nil
-	if quick then
-		if self:IsVisible() then
-			self:Hide()
-			--@alpha@
-			G_RLF:Print(self:GetDebugName() .. " row was still visible - trying to hide again: " .. self:Dump())
-			--@end-alpha@
-		end
-		return
-	end
-
-	if self:IsVisible() then
-		error("Row reset but still visible: " .. self:Dump())
-	end
 
 	-- Reset UI elements that were part of the template
 	self.TopBorder:SetAlpha(0)
@@ -190,17 +250,22 @@ function LootDisplayRowMixin:Reset(quick)
 	self.BottomBorder:SetAlpha(0)
 	self.LeftBorder:SetAlpha(0)
 
+	self.Icon:Reset()
+
 	-- Reset amount text behavior
 	self.AmountText:SetScript("OnEnter", nil)
 	self.AmountText:SetScript("OnLeave", nil)
 
 	self.AmountText:SetTextColor(unpack(defaultColor))
+	rowBackground(self)
+	rowHighlightBorder(self)
+	rowFadeOutAnimation(self)
 end
 
 function LootDisplayRowMixin:UpdateStyles()
 	rowStyles(self)
-	if self.icon and iconGroup then
-		self.iconGroup:ReSkin(self.Icon)
+	if self.icon and G_RLF.iconGroup then
+		G_RLF.iconGroup:ReSkin(self.Icon)
 	end
 end
 
@@ -219,21 +284,9 @@ function LootDisplayRowMixin:UpdateQuantity()
 	end
 end
 
-local function getPositioningDetails()
-	-- Position the new row at the bottom (or top if growing down)
-	local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
-	local opposite = G_RLF.db.global.growUp and "TOP" or "BOTTOM"
-	local yOffset = G_RLF.db.global.padding
-	if not G_RLF.db.global.growUp then
-		yOffset = -yOffset
-	end
-
-	return vertDir, opposite, yOffset
-end
-
 function LootDisplayRowMixin:SetPosition(frame)
 	-- Position the new row at the bottom (or top if growing down)
-	local vertDir, opposite, yOffset = getPositioningDetails()
+	local vertDir, opposite, yOffset = frame.vertDir, frame.opposite, frame.yOffset
 	self:ClearAllPoints()
 	if self._prev then
 		self:SetPoint(vertDir, self._prev, opposite, 0, yOffset)
@@ -243,7 +296,7 @@ function LootDisplayRowMixin:SetPosition(frame)
 end
 
 function LootDisplayRowMixin:UpdateNeighborPositions(frame)
-	local vertDir, opposite, yOffset = getPositioningDetails()
+	local vertDir, opposite, yOffset = frame.vertDir, frame.opposite, frame.yOffset
 	local _next = self._next
 	local _prev = self._prev
 
@@ -263,9 +316,6 @@ function LootDisplayRowMixin:SetupTooltip()
 		self.FadeOutAnimation:Stop()
 		self.HighlightAnimation:Stop()
 		self:ResetHighlightBorder()
-		if not G_RLF.db.global.tooltip then
-			return
-		end
 		if G_RLF.db.global.tooltipOnShift and not IsShiftKeyDown() then
 			return
 		end
@@ -330,17 +380,35 @@ function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 end
 
 function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
-	if icon then
+	-- Only update if the icon has changed
+	if icon and self.icon ~= icon then
 		self.icon = icon
-		if not quality then
-			self.Icon:SetItem(self.link)
-		else
-			self.Icon:SetItemButtonTexture(icon)
-			self.Icon:SetItemButtonQuality(quality, self.link)
-		end
-		if G_RLF.Masque and G_RLF.iconGroup then
-			G_RLF.iconGroup:ReSkin(self.Icon)
-		end
+
+		C_Timer.After(0, function()
+			-- Handle quality logic
+			if not quality then
+				self.Icon:SetItem(self.link)
+			else
+				self.Icon:SetItemButtonTexture(icon)
+				self.Icon:SetItemButtonQuality(quality, self.link)
+			end
+
+			if self.Icon.IconOverlay then
+				self.Icon.IconOverlay:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
+			end
+			if self.Icon.ProfessionQualityOverlay then
+				self.Icon.ProfessionQualityOverlay:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
+			end
+
+			self.Icon.NormalTexture:SetTexture(nil)
+			self.Icon.HighlightTexture:SetTexture(nil)
+			self.Icon.PushedTexture:SetTexture(nil)
+
+			-- Masque reskinning (may be costly, consider reducing frequency)
+			if G_RLF.Masque and G_RLF.iconGroup then
+				G_RLF.iconGroup:ReSkin(self.Icon)
+			end
+		end)
 	end
 end
 

@@ -1,17 +1,45 @@
 local addonName, G_RLF = ...
 
-local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
+local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceEvent-3.0")
 
 local lsm = G_RLF.lsm
 
 -- Private method declaration
 local processFromQueue
+local debounceProcessFromQueue
 local getTextWidth
 local truncateItemLink
 
 -- Private variable declaration
 local frame = nil
 local tempFontString = nil
+local elementQueue = G_RLF.Queue:new()
+
+--@alpha@
+local TestLabelQueueSize
+-- Create a label to display the queue size
+TestLabelQueueSize = UIParent:CreateFontString(nil, "ARTWORK")
+TestLabelQueueSize:SetFontObject(GameFontNormal)
+TestLabelQueueSize:SetPoint("TOPLEFT", 10, -10)
+TestLabelQueueSize:SetText("Queue Size: 0")
+-- Function to update test labels
+local function updateTestLabels()
+	if TestLabelQueueSize then
+		TestLabelQueueSize:SetText("Queue Size: " .. elementQueue:size())
+	end
+end
+-- Wrapper function to update test labels after calling the original function
+local function updateTestLabelsWrapper(func)
+	return function(...)
+		local result = { func(...) }
+		updateTestLabels()
+		return unpack(result)
+	end
+end
+
+elementQueue.enqueue = updateTestLabelsWrapper(elementQueue.enqueue)
+elementQueue.dequeue = updateTestLabelsWrapper(elementQueue.dequeue)
+--@end-alpha@
 
 -- Public methods
 local logger
@@ -22,13 +50,14 @@ function LootDisplay:OnInitialize()
 
 	tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
 	tempFontString:Hide() -- Prevent it from showing up
-	self:RegisterBucketMessage({ "RLF_LootDisplay_RowReturned", "RLF_LootDisplay_Process" }, 0.2, function()
-		G_RLF:fn(processFromQueue)
+	frame.OnRowRelease = function()
+		if elementQueue:size() > 0 then
+			debounceProcessFromQueue()
+		end
+	end
+	C_Timer.After(0, function()
+		G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
 	end)
-	self:RegisterBucketMessage("RLF_LootDisplay_UpdateRowPositions", 0.1, function()
-		G_RLF:fn(frame:UpdateRowPositions())
-	end)
-	self:SendMessage("RLF_LootDisplay_Ready")
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)
@@ -54,7 +83,7 @@ function LootDisplay:UpdatePosition()
 end
 
 function LootDisplay:UpdateRowPositions()
-	self:SendMessage("RLF_LootDisplay_UpdateRowPositions")
+	frame:UpdateRowPositions()
 end
 
 function LootDisplay:UpdateStrata()
@@ -69,12 +98,6 @@ end
 
 function LootDisplay:UpdateFadeDelay()
 	frame:UpdateFadeDelay()
-end
-
-local elementQueue = G_RLF.Queue:new(true)
-function LootDisplay:ShowLoot(element)
-	elementQueue:enqueue(element)
-	self:SendMessage("RLF_LootDisplay_Process")
 end
 
 local function processRow(element)
@@ -131,8 +154,12 @@ local function processRow(element)
 
 	logFn(text, row.amount, new)
 
-	row:Show()
 	row:ResetFadeOut()
+end
+
+function LootDisplay:ShowLoot(element)
+	elementQueue:enqueue(element)
+	debounceProcessFromQueue()
 end
 
 processFromQueue = function()
@@ -147,6 +174,32 @@ processFromQueue = function()
 			local e = elementQueue:dequeue()
 			processRow(e)
 		end
+	end
+end
+
+local debounceTimer = nil
+local maxWaitTimer = nil
+local debounceDelay = 0.15 -- 150 milliseconds
+local maxWaitTime = debounceDelay * 2
+debounceProcessFromQueue = function()
+	if debounceTimer then
+		debounceTimer:Cancel()
+	end
+
+	debounceTimer = C_Timer.NewTimer(debounceDelay, function()
+		G_RLF:fn(processFromQueue)
+		debounceTimer = nil
+	end)
+
+	if not maxWaitTimer then
+		maxWaitTimer = C_Timer.NewTimer(maxWaitTime, function()
+			if debounceTimer then
+				debounceTimer:Cancel()
+				debounceTimer = nil
+			end
+			G_RLF:fn(processFromQueue)
+			maxWaitTimer = nil
+		end)
 	end
 end
 

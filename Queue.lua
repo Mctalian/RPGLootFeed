@@ -5,16 +5,15 @@ local Queue = {}
 Queue.__index = Queue
 
 -- Create a new queue
-function Queue:new(allowDupes)
-	allowDupes = allowDupes or false
-	local instance = { first = 1, last = 0, items = {}, allowDupes = allowDupes }
+function Queue:new()
+	local instance = { first = 1, last = 0, items = {} }
 	setmetatable(instance, Queue)
 	return instance
 end
 
 -- Add an item to the end of the queue (enqueue)
 function Queue:enqueue(item)
-	if item._inQueue and not self.allowDupes then
+	if item._inQueue then
 		return
 	end
 	self.last = self.last + 1
