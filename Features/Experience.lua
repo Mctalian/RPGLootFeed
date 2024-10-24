@@ -1,6 +1,7 @@
 local addonName, G_RLF = ...
 
 local Xp = G_RLF.RLF:NewModule("Experience", "AceEvent-3.0")
+local currentXP, currentMaxXP, currentLevel
 
 Xp.Element = {}
 
@@ -20,10 +21,26 @@ function Xp.Element:new(...)
 		return "+" .. ((existingXP or 0) + element.quantity) .. " " .. G_RLF.L["XP"]
 	end
 
+	element.secondaryTextFn = function()
+		if not currentXP then
+			return ""
+		end
+		if not currentMaxXP then
+			return ""
+		end
+		local color = G_RLF:RGBAToHexFormat(1, 1, 1, 1)
+
+		return "    "
+			.. color
+			.. currentLevel
+			.. "|r    "
+			.. math.floor((currentXP / currentMaxXP) * 10000) / 100
+			.. "%"
+	end
+
 	return element
 end
 
-local currentXP, currentMaxXP, currentLevel
 local function initXpValues()
 	currentXP = UnitXP("player")
 	currentMaxXP = UnitXPMax("player")

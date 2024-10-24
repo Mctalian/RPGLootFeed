@@ -22,6 +22,7 @@ TestLabelQueueSize = UIParent:CreateFontString(nil, "ARTWORK")
 TestLabelQueueSize:SetFontObject(GameFontNormal)
 TestLabelQueueSize:SetPoint("TOPLEFT", 10, -10)
 TestLabelQueueSize:SetText("Queue Size: 0")
+
 -- Function to update test labels
 local function updateTestLabels()
 	if TestLabelQueueSize then
@@ -58,6 +59,13 @@ function LootDisplay:OnInitialize()
 	C_Timer.After(0, function()
 		G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
 	end)
+
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnPlayerCombatChange")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnPlayerCombatChange")
+end
+
+function LootDisplay:OnPlayerCombatChange()
+	frame:UpdateTabVisibility()
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)
@@ -107,12 +115,20 @@ local function processRow(element)
 
 	local key = element.key
 	local textFn = element.textFn
+	local secondaryTextFn = element.secondaryTextFn or function()
+		return ""
+	end
 	local icon = element.icon
 	local quantity = element.quantity
 	local quality = element.quality
 	local r, g, b, a = element.r, element.g, element.b, element.a
 	local logFn = element.logFn
 	local isLink = element.isLink
+	local unit = element.unit
+
+	if unit then
+		key = unit .. "_" .. key
+	end
 
 	local new = true
 	local text
@@ -133,11 +149,20 @@ local function processRow(element)
 			return
 		end
 
+		if unit then
+			row.unit = unit
+		end
+
 		row.amount = quantity
 
 		if isLink then
 			local extraWidth = getTextWidth(" x" .. row.amount)
+			if row.unit then
+				local portraitSize = G_RLF.db.global.iconSize * 0.8
+				extraWidth = extraWidth + portraitSize - (portraitSize / 2)
+			end
 			row.link = truncateItemLink(textFn(), extraWidth)
+			row.quality = quality
 			text = textFn(0, row.link)
 
 			row:UpdateIcon(key, icon, quality)
@@ -147,7 +172,12 @@ local function processRow(element)
 			text = textFn()
 		end
 
+		row:UpdateSecondaryText(secondaryTextFn)
 		row:UpdateStyles()
+	end
+
+	if not new then
+		row:UpdateSecondaryText(secondaryTextFn)
 	end
 
 	row:ShowText(text, r, g, b, a)

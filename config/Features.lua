@@ -2,6 +2,9 @@ local addonName, G_RLF = ...
 
 local Features = {}
 
+G_RLF.defaults.global.lootHistoryEnabled = true
+G_RLF.defaults.global.historyLimit = 100
+G_RLF.defaults.global.enablePartyLoot = false
 G_RLF.defaults.global.itemLootFeed = true
 G_RLF.defaults.global.itemQualityFilter = {
 	[Enum.ItemQuality.Poor] = true,
@@ -27,6 +30,45 @@ G_RLF.options.args.features = {
 	desc = G_RLF.L["FeaturesDesc"],
 	order = 4,
 	args = {
+		enableLootHistory = {
+			type = "toggle",
+			name = G_RLF.L["Enable Loot History"],
+			desc = G_RLF.L["EnableLootHistoryDesc"],
+			width = "double",
+			get = "GetLootHistoryStatus",
+			set = "SetLootHistoryStatus",
+			order = 1,
+		},
+		lootHistorySize = {
+			type = "range",
+			name = G_RLF.L["Loot History Size"],
+			desc = G_RLF.L["LootHistorySizeDesc"],
+			disabled = "LootHistoryDisabled",
+			min = 1,
+			max = 1000,
+			step = 1,
+			get = "GetLootHistorySize",
+			set = "SetLootHistorySize",
+			order = 1.1,
+		},
+		enableSecondaryRowText = {
+			type = "toggle",
+			name = G_RLF.L["Enable Secondary Row Text"],
+			desc = G_RLF.L["EnableSecondaryRowTextDesc"],
+			width = "double",
+			get = "GetSecondaryRowText",
+			set = "SetSecondaryRowText",
+			order = 1.2,
+		},
+		enablePartyLoot = {
+			type = "toggle",
+			name = G_RLF.L["Enable Party Loot in Feed"],
+			desc = G_RLF.L["EnablePartyLootDesc"],
+			width = "double",
+			get = "GetPartyLootStatus",
+			set = "SetPartyLootStatus",
+			order = 1.3,
+		},
 		enableItemLoot = {
 			type = "toggle",
 			name = G_RLF.L["Enable Item Loot in Feed"],
@@ -34,14 +76,14 @@ G_RLF.options.args.features = {
 			width = "double",
 			get = "GetItemLootStatus",
 			set = "SetItemLootStatus",
-			order = 1,
+			order = 2,
 		},
 		itemLootConfig = {
 			type = "group",
 			disabled = "ItemLootDisabled",
 			name = G_RLF.L["Item Loot Config"],
 			inline = true,
-			order = 1.1,
+			order = 2.1,
 			args = {
 				itemQualityFilter = {
 					type = "multiselect",
@@ -71,7 +113,7 @@ G_RLF.options.args.features = {
 			width = "double",
 			get = "GetCurrencyStatus",
 			set = "SetCurrencyStatus",
-			order = 2,
+			order = 2.2,
 		},
 		enableTooltip = {
 			type = "toggle",
@@ -129,6 +171,48 @@ G_RLF.options.args.features = {
 		},
 	},
 }
+
+function Features:GetLootHistoryStatus()
+	return G_RLF.db.global.lootHistoryEnabled
+end
+
+function Features:SetLootHistoryStatus(info, value)
+	G_RLF.db.global.lootHistoryEnabled = value
+	LootDisplayFrame:UpdateTabVisibility()
+end
+
+function Features:LootHistoryDisabled()
+	return not G_RLF.db.global.lootHistoryEnabled
+end
+
+function Features:GetLootHistorySize()
+	return G_RLF.db.global.historyLimit
+end
+
+function Features:SetLootHistorySize(info, value)
+	G_RLF.db.global.historyLimit = value
+end
+
+function Features:GetSecondaryRowText(info, value)
+	return G_RLF.db.global.enabledSecondaryRowText
+end
+
+function Features:SetSecondaryRowText(info, value)
+	G_RLF.db.global.enabledSecondaryRowText = value
+	G_RLF.LootDisplay:UpdateRowStyles()
+end
+
+function Features:SecondaryTextDisabled()
+	return not G_RLF.db.global.enabledSecondaryRowText
+end
+
+function Features:GetPartyLootStatus()
+	return G_RLF.db.global.enablePartyLoot
+end
+
+function Features:SetPartyLootStatus(info, value)
+	G_RLF.db.global.enablePartyLoot = value
+end
 
 function Features:GetItemLootStatus(info, value)
 	return G_RLF.db.global.itemLootFeed
