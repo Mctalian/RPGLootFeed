@@ -22,6 +22,7 @@ TestLabelQueueSize = UIParent:CreateFontString(nil, "ARTWORK")
 TestLabelQueueSize:SetFontObject(GameFontNormal)
 TestLabelQueueSize:SetPoint("TOPLEFT", 10, -10)
 TestLabelQueueSize:SetText("Queue Size: 0")
+
 -- Function to update test labels
 local function updateTestLabels()
 	if TestLabelQueueSize then
@@ -55,9 +56,16 @@ function LootDisplay:OnInitialize()
 			debounceProcessFromQueue()
 		end
 	end
-	C_Timer.After(0, function()
+	RunNextFrame(function()
 		G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
 	end)
+
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnPlayerCombatChange")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnPlayerCombatChange")
+end
+
+function LootDisplay:OnPlayerCombatChange()
+	frame:UpdateTabVisibility()
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)
@@ -107,12 +115,20 @@ local function processRow(element)
 
 	local key = element.key
 	local textFn = element.textFn
+	local secondaryTextFn = element.secondaryTextFn or function()
+		return ""
+	end
 	local icon = element.icon
 	local quantity = element.quantity
 	local quality = element.quality
 	local r, g, b, a = element.r, element.g, element.b, element.a
 	local logFn = element.logFn
 	local isLink = element.isLink
+	local unit = element.unit
+
+	if unit then
+		key = unit .. "_" .. key
+	end
 
 	local new = true
 	local text
@@ -133,11 +149,20 @@ local function processRow(element)
 			return
 		end
 
+		if unit then
+			row.unit = unit
+		end
+
 		row.amount = quantity
 
 		if isLink then
 			local extraWidth = getTextWidth(" x" .. row.amount)
+			if row.unit then
+				local portraitSize = G_RLF.db.global.iconSize * 0.8
+				extraWidth = extraWidth + portraitSize - (portraitSize / 2)
+			end
 			row.link = truncateItemLink(textFn(), extraWidth)
+			row.quality = quality
 			text = textFn(0, row.link)
 
 			row:UpdateIcon(key, icon, quality)
@@ -147,7 +172,12 @@ local function processRow(element)
 			text = textFn()
 		end
 
+		row:UpdateSecondaryText(secondaryTextFn)
 		row:UpdateStyles()
+	end
+
+	if not new then
+		row:UpdateSecondaryText(secondaryTextFn)
 	end
 
 	row:ShowText(text, r, g, b, a)
@@ -166,7 +196,7 @@ processFromQueue = function()
 	local snapshotQueueSize = elementQueue:size()
 	if snapshotQueueSize > 0 then
 		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.maxRows)
-		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from element queue", addonName)
+		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from element queue")
 		for i = 1, rowsToProcess do
 			if elementQueue:isEmpty() then
 				return
@@ -184,21 +214,30 @@ local maxWaitTime = debounceDelay * 2
 debounceProcessFromQueue = function()
 	if debounceTimer then
 		debounceTimer:Cancel()
+		debounceTimer = nil
 	end
 
 	debounceTimer = C_Timer.NewTimer(debounceDelay, function()
-		G_RLF:fn(processFromQueue)
+		LootDisplay:getLogger():Debug("Debounce Timer fired", addonName)
+		if maxWaitTimer then
+			maxWaitTimer:Cancel()
+			maxWaitTimer = nil
+		end
+		debounceTimer:Cancel()
 		debounceTimer = nil
+		G_RLF:fn(processFromQueue)
 	end)
 
 	if not maxWaitTimer then
 		maxWaitTimer = C_Timer.NewTimer(maxWaitTime, function()
+			LootDisplay:getLogger():Debug("Max Wait Timer fired", addonName)
 			if debounceTimer then
 				debounceTimer:Cancel()
 				debounceTimer = nil
 			end
-			G_RLF:fn(processFromQueue)
+			maxWaitTimer:Cancel()
 			maxWaitTimer = nil
+			G_RLF:fn(processFromQueue)
 		end)
 	end
 end

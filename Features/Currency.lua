@@ -25,7 +25,43 @@ function Currency.Element:new(...)
 		return truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
 	end
 
-	element.quality = C_CurrencyInfo.GetCurrencyInfo(element.key).quality
+	local info = C_CurrencyInfo.GetCurrencyInfo(element.key)
+
+	element.quality = info.quality
+	element.currentTotal = info.quantity
+	element.totalEarned = info.totalEarned
+	element.cappedQuantity = info.maxQuantity
+
+	element.secondaryTextFn = function(...)
+		if element.currentTotal == 0 then
+			return ""
+		end
+
+		local str = "    |cFFBABABA" .. element.currentTotal .. "|r"
+
+		if element.cappedQuantity > 0 then
+			local percentage, numerator
+			if element.totalEarned > 0 then
+				numerator = element.totalEarned
+				percentage = element.totalEarned / element.cappedQuantity
+			else
+				numerator = element.currentTotal
+				percentage = element.currentTotal / element.cappedQuantity
+			end
+			local color
+			if percentage < 0.7 then
+				color = "|cFFFFFFFF"
+			elseif percentage >= 0.7 and percentage < 0.9 then
+				color = "|cFFFF9B00"
+			else
+				color = "|cFFFF0000"
+			end
+
+			str = str .. "  " .. color .. "(" .. numerator .. " / " .. element.cappedQuantity .. ")|r"
+		end
+
+		return str
+	end
 
 	return element
 end
@@ -46,15 +82,15 @@ end
 
 function Currency:OnDisable()
 	self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE")
+	self:UnregisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
 end
 
 function Currency:OnEnable()
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
+	self:RegisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
 end
 
-function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
-	local currencyType, _quantity, quantityChange, _quantityGainSource, _quantityLostSource = ...
-
+function Currency:Process(eventName, currencyType, quantityChange)
 	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, currencyType, eventName, quantityChange)
 
 	if currencyType == nil or not quantityChange or quantityChange <= 0 then
@@ -104,6 +140,18 @@ function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
 		)
 		e:Show()
 	end)
+end
+
+function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
+	local currencyType, _quantity, quantityChange, _quantityGainSource, _quantityLostSource = ...
+
+	self:Process(eventName, currencyType, quantityChange)
+end
+
+function Currency:PERKS_PROGRAM_CURRENCY_AWARDED(eventName, quantityChange)
+	local currencyType = 2032 -- https://www.wowhead.com/currency=2032/traders-tender
+
+	self:Process(eventName, currencyType, quantityChange)
 end
 
 hiddenCurrencies = {

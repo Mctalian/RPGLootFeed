@@ -15,7 +15,9 @@
 
             <!-- Amount Text Layer -->
             <Layer level="ARTWORK">
-                <FontString parentKey="AmountText" inherits="GameFontNormal" />
+                <Texture parentKey="UnitPortrait" />
+                <FontString parentKey="PrimaryText" inherits="GameFontNormal" />
+                <FontString parentKey="SecondaryText" inherits="GameFontNormal" hidden="true" />
             </Layer>
 
             <!-- Highlight Border Layer -->

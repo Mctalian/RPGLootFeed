@@ -28,10 +28,17 @@ L["XP"] = true
 L["Toggle Test Mode"] = true
 L["Clear rows"] = true
 L["Toggle Area"] = true
+L["Toggle Loot History"] = true
 
 -- ConfigOptions - Features Group
 L["Features"] = true
 L["FeaturesDesc"] = "Enable or Disable different RPGLootFeed features"
+L["Enable Loot History"] = true
+L["EnableLootHistoryDesc"] = "Store a history of looted items and display them in a separate frame"
+L["Loot History Size"] = true
+L["LootHistorySizeDesc"] = "The maximum number of items to store in the loot history"
+L["Enable Party Loot in Feed"] = true
+L["EnablePartyLootDesc"] = "Show party/raid looted items in the Loot Feed"
 L["Enable Item Loot in Feed"] = true
 L["EnableItemLootDesc"] = "Show looted items in the Loot Feed"
 L["Item Loot Config"] = true
@@ -125,6 +132,8 @@ L["Background Gradient End"] = true
 L["GradientEndDesc"] = "The end color of the row background gradient."
 L["Disable Row Highlight"] = true
 L["DisableRowHighlightDesc"] = "If checked, don't highlight a row when you loot the same item again and the quanity is updated."
+L["Enable Secondary Row Text"] = true
+L["EnableSecondaryRowTextDesc"] = "If checked, show secondary row text, such as item level, secondary stats, vendor price, etc. if applicable."
 L["Use Font Objects"] = true
 L["UseFontObjectsDesc"] = "If checked, use a font object to determine font face and font size."
 L["Font"] = true
@@ -135,6 +144,8 @@ L["Font Face"] = true
 L["FontFaceDesc"] = "The style of the text that will show in the loot feed."
 L["Font Size"] = true
 L["FontSizeDesc"] = "The size of the loot feed text in \"points\"."
+L["Secondary Font Size"] = true
+L["SecondaryFontSizeDesc"] = "The size of the secondary text in the loot feed in \"points\"."
 
 -- ConfigOptions - Timing Group
 L["Timing"] = true
