@@ -176,6 +176,9 @@ local function rowHighlightBorder(row)
 				fadeOut:SetToAlpha(0)
 				fadeOut:SetDuration(0.2)
 				fadeOut:SetStartDelay(0.3)
+				fadeOut:SetScript("OnFinished", function()
+					row:ResetHighlightBorder()
+				end)
 			end
 		end
 
@@ -209,7 +212,7 @@ local function rowFadeOutAnimation(row)
 		row.FadeOutAnimation.fadeOut:SetDuration(1)
 		row.FadeOutAnimation.fadeOut:SetScript("OnFinished", function()
 			row:Hide()
-			local frame = row:GetParent()
+			local frame = LootDisplayFrame
 			frame:ReleaseRow(row)
 		end)
 	end
@@ -310,12 +313,14 @@ function LootDisplayRowMixin:UpdateNeighborPositions(frame)
 	end
 end
 
-function LootDisplayRowMixin:SetupTooltip()
+function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 	-- Add Tooltip
 	self.AmountText:SetScript("OnEnter", function()
-		self.FadeOutAnimation:Stop()
-		self.HighlightAnimation:Stop()
-		self:ResetHighlightBorder()
+		if not isHistoryFrame then
+			self.FadeOutAnimation:Stop()
+			self.HighlightAnimation:Stop()
+			self:ResetHighlightBorder()
+		end
 		if G_RLF.db.global.tooltipOnShift and not IsShiftKeyDown() then
 			return
 		end
@@ -329,7 +334,9 @@ function LootDisplayRowMixin:SetupTooltip()
 		GameTooltip:Show()
 	end)
 	self.AmountText:SetScript("OnLeave", function()
-		self.FadeOutAnimation:Play()
+		if not isHistoryFrame then
+			self.FadeOutAnimation:Play()
+		end
 		GameTooltip:Hide()
 	end)
 end
@@ -413,8 +420,10 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 end
 
 function LootDisplayRowMixin:ResetFadeOut()
-	self.FadeOutAnimation:Stop()
-	self.FadeOutAnimation:Play()
+	C_Timer.After(0, function()
+		self.FadeOutAnimation:Stop()
+		self.FadeOutAnimation:Play()
+	end)
 end
 
 function LootDisplayRowMixin:ResetHighlightBorder()
@@ -422,4 +431,21 @@ function LootDisplayRowMixin:ResetHighlightBorder()
 	self.RightBorder:SetAlpha(0)
 	self.BottomBorder:SetAlpha(0)
 	self.LeftBorder:SetAlpha(0)
+end
+
+function LootDisplayRowMixin:UpdateWithHistoryData(data)
+	self:Reset()
+	self.key = data.key
+	self.amount = data.amount
+	self.link = data.link
+	self.quality = data.quality
+	self.AmountText:SetText(data.rowText)
+	self.AmountText:SetTextColor(unpack(data.textColor))
+	if data.icon then
+		self:UpdateIcon(self.key, data.icon, self.quality)
+		self:SetupTooltip(true)
+	else
+		self.icon = nil
+	end
+	self:UpdateStyles()
 end

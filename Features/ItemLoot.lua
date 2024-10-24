@@ -50,10 +50,7 @@ function ItemLoot.Element:new(...)
 	local t
 	element.key, t, element.icon, element.quantity = ...
 
-	element.isPassingFilter = function()
-		local itemName, _, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent =
-			C_Item.GetItemInfo(t)
-
+	function element:isPassingFilter(itemName, itemQuality)
 		if not G_RLF.db.global.itemQualityFilter[itemQuality] then
 			element:getLogger():Debug(
 				itemName .. " ignored by quality: " .. itemQualityName(itemQuality),
@@ -102,21 +99,46 @@ end
 
 function ItemLoot:OnDisable()
 	self:UnregisterEvent("CHAT_MSG_LOOT")
+	self:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 end
 
 function ItemLoot:OnEnable()
 	self:RegisterEvent("CHAT_MSG_LOOT")
+	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+end
+
+local pendingItemRequests = {}
+local function onItemReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality)
+	pendingItemRequests[itemId] = nil
+	local e = ItemLoot.Element:new(itemId, itemLink, itemTexture, amount)
+	e:Show(itemName, itemQuality)
+end
+
+function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
+	if not pendingItemRequests[itemID] then
+		return
+	end
+
+	local itemLink, amount = unpack(pendingItemRequests[itemID])
+
+	if not success then
+		error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount)
+	else
+		local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, _, _, _, _, _, _, _ =
+			C_Item.GetItemInfo(itemLink)
+		onItemReadyToShow(itemID, itemLink, itemTexture, amount, itemName, itemQuality)
+	end
 end
 
 local function showItemLoot(msg, itemLink)
 	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
-	local _, _, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent =
-		C_Item.GetItemInfo(itemLink)
-
 	local itemId = itemLink:match("Hitem:(%d+)")
+	pendingItemRequests[itemId] = { itemLink, amount }
+	local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, _, _, _, _, _, _, _ = C_Item.GetItemInfo(itemLink)
 
-	local e = ItemLoot.Element:new(itemId, itemLink, itemTexture, amount)
-	e:Show()
+	if itemName ~= nil then
+		onItemReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality)
+	end
 end
 
 function ItemLoot:CHAT_MSG_LOOT(eventName, ...)

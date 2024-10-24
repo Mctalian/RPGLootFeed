@@ -30,11 +30,17 @@ G_RLF.options = {
 			func = "ClearRows",
 			order = 2,
 		},
-		boundingBox = {
+		-- boundingBox = {
+		-- 	type = "execute",
+		-- 	name = G_RLF.L["Toggle Area"],
+		-- 	func = "ToggleBoundingBox",
+		-- 	order = 3,
+		-- },
+		lootHistory = {
 			type = "execute",
-			name = G_RLF.L["Toggle Area"],
-			func = "ToggleBoundingBox",
-			order = 3,
+			name = G_RLF.L["Toggle Loot History"],
+			func = "ToggleLootHistory",
+			order = 4,
 		},
 	},
 }
@@ -51,4 +57,8 @@ end
 
 function ConfigOptions:ClearRows()
 	G_RLF.LootDisplay:HideLoot()
+end
+
+function ConfigOptions:ToggleLootHistory()
+	LootDisplayFrame:ToggleHistoryFrame()
 end
