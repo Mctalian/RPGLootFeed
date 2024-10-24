@@ -56,6 +56,10 @@ function common_stubs.setup_G_RLF(spy)
 			return func(...)
 		end,
 		Print = function(msg) end,
+		RGBAToHexFormat = function(_, r, g, b, a)
+			local f = math.floor
+			return string.format("|c%02x%02x%02x%02x", f(a * 255), f(r * 255), f(g * 255), f(b * 255))
+		end,
 	}
 
 	_G.GetLocale = function()
@@ -98,6 +102,7 @@ function common_stubs.stub_C_Reputation()
 	_G.FACTION_GREEN_COLOR = { r = 0, g = 1, b = 0 }
 	_G.FACTION_BAR_COLORS = {
 		[1] = { r = 1, g = 0, b = 0 },
+		[8] = { r = 0, g = 1, b = 0 },
 	}
 	_G.FACTION_STANDING_INCREASED = "Rep with %s inc by %d."
 	_G.FACTION_STANDING_INCREASED_ACCOUNT_WIDE = "AccRep with %s inc by %d."
@@ -109,13 +114,24 @@ function common_stubs.stub_C_Reputation()
 	_G.FACTION_STANDING_DECREASED_ACCOUNT_WIDE = "AccRep with %s dec by %d."
 	_G.C_Reputation = {
 		GetNumFactions = function()
-			return 1
+			return 2
 		end,
-		GetFactionDataByIndex = function()
-			return {
-				name = "Faction A",
-				factionID = 1,
-			}
+		GetFactionDataByIndex = function(index)
+			if index == 1 then
+				return {
+					name = "Faction A",
+					factionID = 1,
+					reaction = 1,
+				}
+			end
+			if index == 2 then
+				return {
+					name = "Brann Bronzebeard",
+					factionID = 2640,
+					reaction = 8,
+				}
+			end
+			return nil
 		end,
 		GetFactionDataByID = function(id)
 			if id == 1 then
@@ -123,6 +139,15 @@ function common_stubs.stub_C_Reputation()
 					name = "Faction A",
 					factionID = 1,
 					reaction = 1,
+					currentStanding = 20,
+					currentReactionThreshold = 3000,
+				}
+			end
+			if id == 2640 then
+				return {
+					name = "Brann Bronzebeard",
+					factionID = 2640,
+					reaction = 8,
 				}
 			end
 		end,
@@ -131,6 +156,17 @@ function common_stubs.stub_C_Reputation()
 		end,
 		IsFactionParagon = function()
 			return false
+		end,
+	}
+end
+
+function common_stubs.stub_C_DelvesUI()
+	_G.C_DelvesUI = {
+		GetCurrentDelvesSeasonNumber = function()
+			return 1
+		end,
+		GetFactionForCompanion = function()
+			return 2640
 		end,
 	}
 end

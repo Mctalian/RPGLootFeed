@@ -78,6 +78,16 @@ function G_RLF:Print(...)
 	G_RLF.RLF:Print(...)
 end
 
+function G_RLF:RGBAToHexFormat(r, g, b, a)
+	local red = string.format("%02X", math.floor(r * 255))
+	local green = string.format("%02X", math.floor(g * 255))
+	local blue = string.format("%02X", math.floor(b * 255))
+	local alpha = string.format("%02X", math.floor((a or 1) * 255)) -- Default alpha to 1 if not provided
+
+	-- Return in WoW format with |c prefix
+	return "|c" .. alpha .. red .. green .. blue
+end
+
 --@alpha@
 function G_RLF:ProfileFunction(func, funcName)
 	return function(...)

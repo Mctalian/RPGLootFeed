@@ -5,6 +5,14 @@ local TestMode = G_RLF.RLF:NewModule("TestMode", "AceEvent-3.0")
 local logger
 local allItemsInitialized = false
 local isLootDisplayReady = false
+local pendingRequests = {}
+local testItems = {}
+local testCurrencies = {}
+local testFactions = {
+	"Undercity",
+	"Thunder Bluff",
+	"Orgrimmar",
+}
 
 local function idExistsInTable(id, table)
 	for _, item in pairs(table) do
@@ -15,41 +23,57 @@ local function idExistsInTable(id, table)
 	return false
 end
 
-local testFactions = {
-	"Undercity",
-	"Thunder Bluff",
-	"Orgrimmar",
-}
+local function anyPendingRequests()
+	for _, v in pairs(pendingRequests) do
+		if v ~= nil then
+			return true
+		end
+	end
+	return false
+end
 
-local testItemIds = { 50818, 2589, 2592, 1515, 730, 19019, 128507, 132842, 23538, 11754, 128827, 219325, 34494 }
+local function runSmokeTestIfReady()
+	if allItemsInitialized and isLootDisplayReady then
+		--@alpha@
+		TestMode:SmokeTest(testItems, testCurrencies, testFactions)
+		--@end-alpha@
+	end
+end
 
-local testItems = {}
+local function getItem(id)
+	local name, link, quality, _, _, _, _, _, _, icon, sellPrice = C_Item.GetItemInfo(id)
+	local isCached = name ~= nil
+	if isCached then
+		if name and link and quality and icon and not idExistsInTable(id, testItems) then
+			pendingRequests[id] = nil
+			table.insert(testItems, {
+				id = id,
+				link = link,
+				icon = icon,
+				name = name,
+				quality = quality,
+				sellPrice = sellPrice,
+			})
+		end
+	else
+		pendingRequests[id] = true
+	end
+end
+
+local testItemIds = { 50818, 2589, 2592, 1515, 730, 128827, 219325, 34494 }
 local function initializeTestItems()
 	for _, id in pairs(testItemIds) do
-		if not idExistsInTable(id, testItems) and C_Item.DoesItemExistByID(id) then
-			local _, link = C_Item.GetItemInfo(id)
-			local icon = C_Item.GetItemIconByID(id)
-			if link and icon then
-				table.insert(testItems, {
-					id = id,
-					link = link,
-					icon = icon,
-				})
-			else
-				-- Request item info to be loaded
-				C_Item.RequestLoadItemDataByID(id)
-			end
-		end
+		getItem(id)
 	end
 
 	if #testItems == #testItemIds then
 		allItemsInitialized = true
+		runSmokeTestIfReady()
+		return
 	end
 end
 
 local testCurrencyIds = { 2245, 1191, 1828, 1792, 1755, 1580, 1273, 1166, 515, 241, 1813, 2778, 3089, 1101, 1704 }
-
-local testCurrencies = {}
 local function initializeTestCurrencies()
 	for _, id in pairs(testCurrencyIds) do
 		if not idExistsInTable(id, testCurrencies) then
@@ -68,52 +92,38 @@ end
 
 function TestMode:OnInitialize()
 	isLootDisplayReady = false
-	self:RegisterEvent("ITEM_DATA_LOAD_RESULT")
+	allItemsInitialized = false
+	testCurrencies = {}
+	testItems = {}
+	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:InitializeTestData()
 end
 
 function TestMode:OnLootDisplayReady()
 	isLootDisplayReady = true
-
-	--@alpha@
-	if allItemsInitialized then
-		self:SmokeTest(testItems, testCurrencies, testFactions)
-	end
-	--@end-alpha@
+	runSmokeTestIfReady()
 end
 
 local failedRetrievals = {}
-function TestMode:ITEM_DATA_LOAD_RESULT(eventName, itemID, success)
-	if success and not idExistsInTable(itemId, testItems) then
-		-- Try to insert the item again after data is loaded
-		local _, link = C_Item.GetItemInfo(itemID)
-		local icon = C_Item.GetItemIconByID(itemID)
-		if link and icon then
-			table.insert(testItems, {
-				id = itemID,
-				link = link,
-				icon = icon,
-			})
-		end
+function TestMode:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
+	if not pendingRequests[itemID] then
+		return
+	end
 
-		--@alpha@
-		if #testItems == #testItemIds then
-			allItemsInitialized = true
-			if isLootDisplayReady then
-				self:SmokeTest(testItems, testCurrencies, testFactions)
-			end
-		end
-		--@end-alpha@
-	elseif not success then
+	if not success then
 		failedRetrievals[itemID] = (failedRetrievals[itemID] or 0) + 1
-		if failedRetrievals[itemID] < 5 then
-			-- Request item info to be loaded
-			C_Item.RequestLoadItemDataByID(itemID)
-		--@alpha@
-		else
+		if failedRetrievals[itemID] >= 5 then
+			--@alpha@
 			error("Failed to load item 5 times: " .. itemID)
 			--@end-alpha@
+			return
 		end
+	end
+	getItem(itemID)
+
+	if #testItems == #testItemIds and not anyPendingRequests() then
+		allItemsInitialized = true
+		runSmokeTestIfReady()
 	end
 end
 
@@ -149,8 +159,8 @@ local function generateRandomLoot()
 			local item = testItems[math.random(#testItems)]
 			local amountLooted = math.random(1, 5)
 			local module = G_RLF.RLF:GetModule("ItemLoot")
-			local e = module.Element:new(item.id, item.link, item.icon, amountLooted)
-			e:Show()
+			local e = module.Element:new(item.id, item.link, item.icon, amountLooted, item.sellPrice)
+			e:Show(item.name, item.quality)
 
 			-- 15% chance to show currency
 		elseif rng > 0.7 and rng <= 0.85 then
@@ -174,6 +184,21 @@ end
 function TestMode:InitializeTestData()
 	G_RLF:fn(initializeTestItems)
 	G_RLF:fn(initializeTestCurrencies)
+end
+
+function dump(o)
+	if type(o) == "table" then
+		local s = "{ "
+		for k, v in pairs(o) do
+			if type(k) ~= "number" then
+				k = '"' .. k .. '"'
+			end
+			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
+		end
+		return s .. "} "
+	else
+		return tostring(o)
+	end
 end
 
 function TestMode:ToggleTestMode()

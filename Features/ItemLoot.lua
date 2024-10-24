@@ -2,6 +2,12 @@ local addonName, G_RLF = ...
 
 local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 
+ItemLoot.SecondaryTextOption = {
+	["None"] = "None",
+	["SellPrice"] = "Sell Price",
+	["iLvl"] = "Item Level",
+}
+
 -- local equipLocToSlotID = {
 --   ["INVTYPE_HEAD"] = INVSLOT_HEAD,
 --   ["INVTYPE_NECK"] = INVSLOT_NECK,
@@ -48,12 +54,9 @@ function ItemLoot.Element:new(...)
 	element.isLink = true
 
 	local t
-	element.key, t, element.icon, element.quantity = ...
+	element.key, t, element.icon, element.quantity, element.sellPrice = ...
 
-	element.isPassingFilter = function()
-		local itemName, _, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent =
-			C_Item.GetItemInfo(t)
-
+	function element:isPassingFilter(itemName, itemQuality)
 		if not G_RLF.db.global.itemQualityFilter[itemQuality] then
 			element:getLogger():Debug(
 				itemName .. " ignored by quality: " .. itemQualityName(itemQuality),
@@ -88,6 +91,14 @@ function ItemLoot.Element:new(...)
 		return truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
 	end
 
+	element.secondaryTextFn = function(...)
+		local quantity = ...
+		if not element.sellPrice or element.sellPrice == 0 then
+			return ""
+		end
+		return "    " .. C_CurrencyInfo.GetCoinTextureString(element.sellPrice * (quantity or 1))
+	end
+
 	return element
 end
 
@@ -102,21 +113,46 @@ end
 
 function ItemLoot:OnDisable()
 	self:UnregisterEvent("CHAT_MSG_LOOT")
+	self:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
 end
 
 function ItemLoot:OnEnable()
 	self:RegisterEvent("CHAT_MSG_LOOT")
+	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
+end
+
+local pendingItemRequests = {}
+local function onItemReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice)
+	pendingItemRequests[itemId] = nil
+	local e = ItemLoot.Element:new(itemId, itemLink, itemTexture, amount, sellPrice)
+	e:Show(itemName, itemQuality)
+end
+
+function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
+	if not pendingItemRequests[itemID] then
+		return
+	end
+
+	local itemLink, amount = unpack(pendingItemRequests[itemID])
+
+	if not success then
+		error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount)
+	else
+		local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
+			C_Item.GetItemInfo(itemLink)
+		onItemReadyToShow(itemID, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice)
+	end
 end
 
 local function showItemLoot(msg, itemLink)
 	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
-	local _, _, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, setID, isCraftingReagent =
-		C_Item.GetItemInfo(itemLink)
-
 	local itemId = itemLink:match("Hitem:(%d+)")
-
-	local e = ItemLoot.Element:new(itemId, itemLink, itemTexture, amount)
-	e:Show()
+	pendingItemRequests[itemId] = { itemLink, amount }
+	local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
+		C_Item.GetItemInfo(itemLink)
+	if itemName ~= nil then
+		onItemReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice)
+	end
 end
 
 function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
