@@ -4,6 +4,7 @@ local Styling = {}
 
 local lsm = G_RLF.lsm
 
+G_RLF.defaults.global.enabledSecondaryRowText = false
 G_RLF.defaults.global.leftAlign = true
 G_RLF.defaults.global.growUp = true
 G_RLF.defaults.global.rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 } -- Default to dark grey with 80% opacity
@@ -13,6 +14,7 @@ G_RLF.defaults.global.useFontObjects = true
 G_RLF.defaults.global.font = "GameFontNormalSmall"
 G_RLF.defaults.global.fontFace = "Friz Quadrata TT"
 G_RLF.defaults.global.fontSize = 10
+G_RLF.defaults.global.secondaryFontSize = 8
 G_RLF.defaults.global.fontFlags = ""
 
 G_RLF.options.args.styles = {
@@ -67,6 +69,15 @@ G_RLF.options.args.styles = {
 			set = "SetRowHighlight",
 			order = 5,
 		},
+		enableSecondaryRowText = {
+			type = "toggle",
+			name = G_RLF.L["Enable Secondary Row Text"],
+			desc = G_RLF.L["EnableSecondaryRowTextDesc"],
+			width = "double",
+			get = "GetSecondaryRowText",
+			set = "SetSecondaryRowText",
+			order = 5.1,
+		},
 		useFontObjects = {
 			type = "toggle",
 			name = G_RLF.L["Use Font Objects"],
@@ -118,6 +129,20 @@ G_RLF.options.args.styles = {
 					get = "GetRowFontSize",
 					set = "SetRowFontSize",
 					order = 2,
+				},
+				secondaryFontSize = {
+					type = "range",
+					name = G_RLF.L["Secondary Font Size"],
+					desc = G_RLF.L["SecondaryFontSizeDesc"],
+					disabled = "SecondaryTextDisabled",
+					softMin = 6,
+					softMax = 24,
+					min = 1,
+					max = 72,
+					bigStep = 1,
+					get = "GetSecondaryRowFontSize",
+					set = "SetSecondaryRowFontSize",
+					order = 3,
 				},
 			},
 		},
@@ -189,6 +214,15 @@ function Styling:SetRowHighlight(info, value)
 	G_RLF.db.global.disableRowHighlight = value
 end
 
+function Styling:GetSecondaryRowText(info, value)
+	return G_RLF.db.global.enabledSecondaryRowText
+end
+
+function Styling:SetSecondaryRowText(info, value)
+	G_RLF.db.global.enabledSecondaryRowText = value
+	G_RLF.LootDisplay:UpdateRowStyles()
+end
+
 function Styling:GetUseFontObjects(info, value)
 	return G_RLF.db.global.useFontObjects
 end
@@ -220,6 +254,19 @@ end
 
 function Styling:SetRowFontSize(info, value)
 	G_RLF.db.global.fontSize = value
+	G_RLF.LootDisplay:UpdateRowStyles()
+end
+
+function Styling:SecondaryTextDisabled()
+	return not G_RLF.db.global.enabledSecondaryRowText
+end
+
+function Styling:GetSecondaryRowFontSize()
+	return G_RLF.db.global.secondaryFontSize
+end
+
+function Styling:SetSecondaryRowFontSize(info, value)
+	G_RLF.db.global.secondaryFontSize = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 

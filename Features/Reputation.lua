@@ -4,6 +4,12 @@ local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0")
 
 Rep.Element = {}
 
+local RepType = {
+	MajorFaction = 1,
+	Paragon = 2,
+	BaseFaction = 3,
+}
+
 function Rep.Element:new(...)
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
@@ -14,7 +20,7 @@ function Rep.Element:new(...)
 	end
 
 	local factionName, rL, gL, bL
-	element.quantity, factionName, rL, gL, bL = ...
+	element.quantity, factionName, rL, gL, bL, element.factionId, element.repType = ...
 	element.r, element.g, element.b = rL or 0.5, gL or 0.5, bL or 1
 	element.a = 1
 	element.key = "REP_" .. factionName
@@ -25,6 +31,67 @@ function Rep.Element:new(...)
 			sign = "-"
 		end
 		return sign .. math.abs(rep) .. " " .. factionName
+	end
+
+	element.secondaryTextFn = function()
+		local str = ""
+		local color = G_RLF:RGBAToHexFormat(element.r, element.g, element.b, 0.7)
+
+		local function normalRep()
+			local factionData = C_Reputation.GetFactionDataByID(element.factionId)
+			if factionData.currentStanding >= 0 and factionData.currentReactionThreshold > 0 then
+				str = str .. "  " .. factionData.currentStanding .. "/" .. factionData.currentReactionThreshold
+			end
+		end
+
+		if not element.factionId then
+			return str
+		end
+
+		if element.repType == RepType.MajorFaction then
+			local factionData = C_MajorFactions.GetMajorFactionRenownInfo(element.factionId)
+			if factionData.renownLevel ~= nil and factionData.renownLevel > 0 then
+				str = str .. factionData.renownLevel
+			end
+			if
+				factionData.renownReputationEarned ~= nil
+				and factionData.renownLevelThreshold ~= nil
+				and factionData.renownReputationEarned > 0
+				and factionData.renownLevelThreshold > 0
+			then
+				str = str
+					.. "    ("
+					.. factionData.renownReputationEarned
+					.. "/"
+					.. factionData.renownLevelThreshold
+					.. ")"
+			end
+		elseif element.repType == RepType.Paragon then
+			local currentValue, threshold, _, hasRewardPending, tooLowLevelForParagon =
+				C_Reputation.GetFactionParagonInfo(element.factionId)
+			if tooLowLevelForParagon then
+				normalRep()
+			else
+				if hasRewardPending then
+					local bagSize = G_RLF.db.global.fontSize
+					str = str .. "|A:ParagonReputation_Bag:" .. bagSize .. ":" .. bagSize .. ":0:0|a    "
+				end
+				if currentValue ~= nil and currentValue > 0 then
+					str = str .. currentValue
+				end
+				if threshold ~= nil and threshold > 0 then
+					str = str .. "/" .. threshold
+				end
+			end
+		else
+			normalRep()
+		end
+
+		if str ~= "" then
+			str = "    " .. color .. str .. "|r"
+		end
+
+		return str
 	end
 
 	return element
@@ -162,17 +229,21 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 			buildFactionLocaleMap(faction)
 		end
 
+		local type, fId
 		if G_RLF.db.global.factionMaps[locale][faction] then
-			local fId = G_RLF.db.global.factionMaps[locale][faction]
+			fId = G_RLF.db.global.factionMaps[locale][faction]
 			if C_Reputation.IsMajorFaction(fId) then
 				color = ACCOUNT_WIDE_FONT_COLOR
+				type = RepType.MajorFaction
 			elseif C_Reputation.IsFactionParagon(fId) then
 				color = FACTION_GREEN_COLOR
+				type = RepType.Paragon
 			else
 				local factionData = C_Reputation.GetFactionDataByID(fId)
 				if factionData.reaction then
 					color = FACTION_BAR_COLORS[factionData.reaction]
 				end
+				type = RepType.BaseFaction
 			end
 		else
 			self:getLogger():Warn(faction .. " is STILL not cached for " .. locale, addonName, self.moduleName)
@@ -182,7 +253,7 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 			r, g, b = color.r, color.g, color.b
 		end
 
-		local e = self.Element:new(repChange, faction, r, g, b)
+		local e = self.Element:new(repChange, faction, r, g, b, fId, type)
 		e:Show()
 	end)
 end

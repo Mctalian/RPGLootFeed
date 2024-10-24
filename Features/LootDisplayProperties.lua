@@ -3,6 +3,7 @@ local addonName, G_RLF = ...
 G_RLF.LootDisplayProperties = {
 	"key",
 	"textFn",
+	"secondaryTextFn",
 	"isLink",
 	"icon",
 	"quantity",
@@ -29,8 +30,8 @@ function G_RLF.InitializeLootDisplayProperties(self)
 		return true
 	end
 
-	self.Show = function()
-		if self.isPassingFilter() then
+	self.Show = function(_, itemName, itemQuality)
+		if self:isPassingFilter(itemName, itemQuality) then
 			G_RLF.LootDisplay:ShowLoot(self)
 		end
 	end
