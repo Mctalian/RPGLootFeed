@@ -177,6 +177,7 @@ function LootDisplayFrameMixin:LeaseRow(key)
 
 	row:SetPosition(self)
 	C_Timer.After(0, function()
+		row:ResetHighlightBorder()
 		row:Show()
 	end)
 
