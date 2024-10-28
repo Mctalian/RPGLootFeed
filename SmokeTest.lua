@@ -177,24 +177,7 @@ local function runReputationSmokeTest()
 	runTestSafely(e.Show, "LootDisplay: Reputation Quantity Update")
 end
 
-local function testLootDisplay()
-	runExperienceSmokeTest()
-	runMoneySmokeTest()
-	runItemLootSmokeTest()
-	runCurrencySmokeTest()
-	runReputationSmokeTest()
-end
-
-function TestMode:SmokeTest(...)
-	testItems, testCurrencies, testFactions, testItem = ...
-
-	tests = {}
-	prints = ""
-	successCount = 0
-	failureCount = 0
-	testWoWGlobals()
-	testLootDisplay()
-
+local function displayResults()
 	print(addonName .. " Smoke Test")
 	print(prints)
 	print("|cff00ff00Successes: " .. successCount .. "|r")
@@ -222,6 +205,32 @@ function TestMode:SmokeTest(...)
 	if failureCount > 0 then
 		error(msg)
 	end
+end
+
+local function testLootDisplay()
+	runExperienceSmokeTest()
+	runMoneySmokeTest()
+	runItemLootSmokeTest()
+	runCurrencySmokeTest()
+	runReputationSmokeTest()
+
+	local frame = LootDisplayFrame
+	assertEqual(frame ~= nil, true, "LootDisplayFrame")
+	C_Timer.After(G_RLF.db.global.fadeOutDelay + 3, function()
+		assertEqual(#frame.rowHistory, 5, "LootDisplayFrame: rowHistory")
+		displayResults()
+	end)
+end
+
+function TestMode:SmokeTest(...)
+	testItems, testCurrencies, testFactions, testItem = ...
+
+	tests = {}
+	prints = ""
+	successCount = 0
+	failureCount = 0
+	testWoWGlobals()
+	testLootDisplay()
 end
 
 -- trunk-ignore-end(no-invalid-prints/invalid-print)

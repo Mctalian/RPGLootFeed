@@ -2,6 +2,8 @@ local addonName, G_RLF = ...
 
 local Features = {}
 
+G_RLF.defaults.global.lootHistoryEnabled = true
+G_RLF.defaults.global.historyLimit = 100
 G_RLF.defaults.global.itemLootFeed = true
 G_RLF.defaults.global.itemQualityFilter = {
 	[Enum.ItemQuality.Poor] = true,

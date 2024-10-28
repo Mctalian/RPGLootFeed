@@ -69,6 +69,7 @@ function LootDisplayFrameMixin:Load()
 	keyRowMap = {
 		length = 0,
 	}
+	self.rowHistory = {}
 	self.rowFramePool = CreateFramePool("Frame", self, "LootDisplayRowTemplate", function(pool, row)
 		row:Reset()
 		row:SetParent(self)
@@ -185,23 +186,44 @@ function LootDisplayFrameMixin:LeaseRow(key)
 end
 
 function LootDisplayFrameMixin:ReleaseRow(row)
-	if row.key then
-		if keyRowMap[row.key] then
-			keyRowMap[row.key] = nil
-			keyRowMap.length = keyRowMap.length - 1
-		end
-	else
+	if not row.key then
 		error("Row without key: " .. row:Dump())
 	end
 
+	if keyRowMap[row.key] then
+		keyRowMap[row.key] = nil
+		keyRowMap.length = keyRowMap.length - 1
+	end
+
+	self:StoreRowHistory(row)
+
 	row:UpdateNeighborPositions(self)
-
 	rows:remove(row)
-
 	row:SetParent(nil)
 
 	self.rowFramePool:Release(row)
 	self:OnRowRelease()
+end
+
+function LootDisplayFrameMixin:StoreRowHistory(row)
+	if not G_RLF.db.global.lootHistoryEnabled then
+		return
+	end
+
+	local rowData = {
+		key = row.key,
+		amount = row.amount,
+		icon = row.icon,
+		link = row.link,
+		rowText = row.AmountText:GetText(),
+		textColor = row.AmountText:GetTextColor(),
+	}
+	table.insert(self.rowHistory, 1, rowData)
+
+	-- Trim the history to the configured limit
+	if #self.rowHistory > G_RLF.db.global.historyLimit then
+		table.remove(self.rowHistory) -- Remove the oldest entry to maintain the limit
+	end
 end
 
 function LootDisplayFrameMixin:Dump()
