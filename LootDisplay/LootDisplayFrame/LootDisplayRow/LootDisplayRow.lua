@@ -428,3 +428,16 @@ function LootDisplayRowMixin:ResetHighlightBorder()
 	self.BottomBorder:SetAlpha(0)
 	self.LeftBorder:SetAlpha(0)
 end
+
+function LootDisplayRowMixin:UpdateWithHistoryData(data)
+	self.key = data.key
+	self.amount = data.amount
+	self.link = data.link
+	self.quality = data.quality
+	self.AmountText:SetText(data.rowText)
+	self.AmountText:SetTextColor(unpack(data.textColor))
+	if data.icon then
+		self:UpdateIcon(self.key, data.icon, self.quality)
+	end
+	self:UpdateStyles()
+end

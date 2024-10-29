@@ -138,6 +138,7 @@ local function processRow(element)
 		if isLink then
 			local extraWidth = getTextWidth(" x" .. row.amount)
 			row.link = truncateItemLink(textFn(), extraWidth)
+			row.quality = quality
 			text = textFn(0, row.link)
 
 			row:UpdateIcon(key, icon, quality)

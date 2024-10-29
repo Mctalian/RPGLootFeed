@@ -87,5 +87,24 @@
             <OnDragStop method="OnDragStop"/>
         </Scripts>
     </Frame>
+    <!-- History Frame -->
+    <ScrollFrame name="LootHistoryFrame" virtual="true" inherits="UIPanelScrollFrameTemplate">
+        <Size>
+            <AbsDimension x="300" y="400"/>
+        </Size>
+        <Anchors>
+            <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="10" y="-10"/>
+        </Anchors>
+        <ScrollChild name="$parentScrollChild">
+            <Frame name="$parentContent">
+                <Size>
+                    <AbsDimension x="300" y="400"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT"/>
+                </Anchors>
+            </Frame>
+        </ScrollChild>
+    </ScrollFrame>
     <Include file="LootDisplayRow/LootDisplayRowTemplate.xml" />
 </Ui>

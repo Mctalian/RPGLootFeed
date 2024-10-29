@@ -37,7 +37,7 @@ local function configureArrowRotation(arrow, direction)
 	end
 end
 
-local function createArrowsTestArea(self)
+function LootDisplayFrameMixin:CreateArrowsTestArea()
 	if not self.arrows then
 		self.arrows = { self.ArrowUp, self.ArrowDown, self.ArrowLeft, self.ArrowRight }
 
@@ -54,7 +54,7 @@ local function createArrowsTestArea(self)
 	end
 end
 
-local function configureTestArea(self)
+function LootDisplayFrameMixin:ConfigureTestArea()
 	self.BoundingBox:Hide() -- Hide initially
 
 	self:MakeUnmovable()
@@ -62,7 +62,7 @@ local function configureTestArea(self)
 	self.InstructionText:SetText(addonName .. "\n" .. G_RLF.L["Drag to Move"]) -- Set localized text
 	self.InstructionText:Hide() -- Hide initially
 
-	createArrowsTestArea(self)
+	self:CreateArrowsTestArea()
 end
 
 function LootDisplayFrameMixin:Load()
@@ -85,7 +85,7 @@ function LootDisplayFrameMixin:Load()
 
 	self:SetFrameStrata(G_RLF.db.global.frameStrata) -- Set the frame strata here
 
-	configureTestArea(self)
+	self:ConfigureTestArea()
 end
 
 function LootDisplayFrameMixin:ClearFeed()
@@ -213,10 +213,11 @@ function LootDisplayFrameMixin:StoreRowHistory(row)
 	local rowData = {
 		key = row.key,
 		amount = row.amount,
+		quality = row.quality,
 		icon = row.icon,
 		link = row.link,
 		rowText = row.AmountText:GetText(),
-		textColor = row.AmountText:GetTextColor(),
+		textColor = { row.AmountText:GetTextColor() },
 	}
 	table.insert(self.rowHistory, 1, rowData)
 
@@ -270,5 +271,63 @@ function LootDisplayFrameMixin:UpdateRowPositions()
 			error("Possible infinite loop detected!: " .. self:Dump())
 		end
 		index = index + 1
+	end
+end
+
+function LootDisplayFrameMixin:CreateHistoryFrame()
+	self.historyFrame = CreateFrame("ScrollFrame", "LootHistoryFrame", self, "UIPanelScrollFrameTemplate")
+	self.historyFrame:SetSize(self:GetSize())
+	self.historyFrame:SetPoint("TOPLEFT", 10, -10)
+
+	self.historyContent = CreateFrame("Frame", "LootHistoryFrameContent", self.historyFrame)
+	self.historyContent:SetSize(self:GetSize())
+	self.historyFrame:SetScrollChild(self.historyContent)
+
+	self.historyRows = {}
+	for i = 1, G_RLF.db.global.maxRows do
+		local row = CreateFrame("Frame", nil, self.historyContent, "LootDisplayRowTemplate")
+		row:SetPoint("TOPLEFT", 0, -((i - 1) * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding)))
+		row:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
+		table.insert(self.historyRows, row)
+	end
+
+	self.historyFrame:SetScript("OnVerticalScroll", function(_, offset)
+		self:UpdateHistoryFrame(offset)
+	end)
+end
+
+function LootDisplayFrameMixin:UpdateHistoryFrame(offset)
+	offset = offset or 0
+	local rowHeight = G_RLF.db.global.rowHeight + G_RLF.db.global.padding
+	local visibleRows = G_RLF.db.global.maxRows
+	local totalRows = #self.rowHistory
+	local startIndex = math.floor(offset / rowHeight) + 1
+	local endIndex = math.min(startIndex + visibleRows - 1, totalRows)
+
+	for i, row in ipairs(self.historyRows) do
+		local dataIndex = startIndex + i - 1
+		if dataIndex <= endIndex then
+			row:UpdateWithHistoryData(self.rowHistory[dataIndex])
+			row:Show()
+		else
+			row:Hide()
+		end
+	end
+
+	self.historyFrame:SetSize(self:GetSize())
+	self.historyContent:SetSize(self:GetSize())
+end
+
+function LootDisplayFrameMixin:ShowHistoryFrame()
+	if not self.historyFrame then
+		self:CreateHistoryFrame()
+	end
+	self:UpdateHistoryFrame()
+	self.historyFrame:Show()
+end
+
+function LootDisplayFrameMixin:HideHistoryFrame()
+	if self.historyFrame then
+		self.historyFrame:Hide()
 	end
 end
