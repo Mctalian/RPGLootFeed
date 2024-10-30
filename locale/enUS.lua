@@ -28,11 +28,15 @@ L["XP"] = true
 L["Toggle Test Mode"] = true
 L["Clear rows"] = true
 L["Toggle Area"] = true
+L["Toggle Loot History"] = true
 
 -- ConfigOptions - Features Group
-L["Hover to show history"] = true
 L["Features"] = true
 L["FeaturesDesc"] = "Enable or Disable different RPGLootFeed features"
+L["Enable Loot History"] = true
+L["EnableLootHistoryDesc"] = "Store a history of looted items and display them in a separate frame"
+L["Loot History Size"] = true
+L["LootHistorySizeDesc"] = "The maximum number of items to store in the loot history"
 L["Enable Item Loot in Feed"] = true
 L["EnableItemLootDesc"] = "Show looted items in the Loot Feed"
 L["Item Loot Config"] = true

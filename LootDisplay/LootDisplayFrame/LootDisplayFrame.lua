@@ -87,7 +87,7 @@ function LootDisplayFrameMixin:CreateTab()
 	self.tab:SetScript("OnEnter", function()
 		self.tab:SetAlpha(1.0)
 		GameTooltip:SetOwner(self.tab, "ANCHOR_RIGHT")
-		GameTooltip:SetText("Show Loot History", 1, 1, 1)
+		GameTooltip:SetText(G_RLF.L["Toggle Loot History"], 1, 1, 1)
 		GameTooltip:Show()
 	end)
 	self.tab:SetScript("OnLeave", function()
@@ -97,11 +97,7 @@ function LootDisplayFrameMixin:CreateTab()
 
 	-- Handle click event to show the history frame
 	self.tab:SetScript("OnClick", function()
-		if not self.historyFrame or not self.historyFrame:IsVisible() then
-			self:ShowHistoryFrame()
-		else
-			self:HideHistoryFrame()
-		end
+		self:ToggleHistoryFrame()
 	end)
 end
 
@@ -374,6 +370,14 @@ function LootDisplayFrameMixin:UpdateHistoryFrame(offset)
 
 	self.historyFrame:SetSize(G_RLF.db.global.feedWidth, getFrameHeight() + rowHeight)
 	self.historyContent:SetSize(G_RLF.db.global.feedWidth, contentSize)
+end
+
+function LootDisplayFrameMixin:ToggleHistoryFrame()
+	if not self.historyFrame or not self.historyFrame:IsVisible() then
+		self:ShowHistoryFrame()
+	else
+		self:HideHistoryFrame()
+	end
 end
 
 function LootDisplayFrameMixin:ShowHistoryFrame()

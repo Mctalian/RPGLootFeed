@@ -29,6 +29,27 @@ G_RLF.options.args.features = {
 	desc = G_RLF.L["FeaturesDesc"],
 	order = 4,
 	args = {
+		enableLootHistory = {
+			type = "toggle",
+			name = G_RLF.L["Enable Loot History"],
+			desc = G_RLF.L["EnableLootHistoryDesc"],
+			width = "double",
+			get = "GetLootHistoryStatus",
+			set = "SetLootHistoryStatus",
+			order = 1,
+		},
+		lootHistorySize = {
+			type = "range",
+			name = G_RLF.L["Loot History Size"],
+			desc = G_RLF.L["LootHistorySizeDesc"],
+			disabled = "LootHistoryDisabled",
+			min = 1,
+			max = 1000,
+			step = 1,
+			get = "GetLootHistorySize",
+			set = "SetLootHistorySize",
+			order = 1.1,
+		},
 		enableItemLoot = {
 			type = "toggle",
 			name = G_RLF.L["Enable Item Loot in Feed"],
@@ -36,14 +57,14 @@ G_RLF.options.args.features = {
 			width = "double",
 			get = "GetItemLootStatus",
 			set = "SetItemLootStatus",
-			order = 1,
+			order = 2,
 		},
 		itemLootConfig = {
 			type = "group",
 			disabled = "ItemLootDisabled",
 			name = G_RLF.L["Item Loot Config"],
 			inline = true,
-			order = 1.1,
+			order = 2.1,
 			args = {
 				itemQualityFilter = {
 					type = "multiselect",
@@ -73,7 +94,7 @@ G_RLF.options.args.features = {
 			width = "double",
 			get = "GetCurrencyStatus",
 			set = "SetCurrencyStatus",
-			order = 2,
+			order = 2.2,
 		},
 		enableTooltip = {
 			type = "toggle",
@@ -131,6 +152,26 @@ G_RLF.options.args.features = {
 		},
 	},
 }
+
+function Features:GetLootHistoryStatus()
+	return G_RLF.db.global.lootHistoryEnabled
+end
+
+function Features:SetLootHistoryStatus(info, value)
+	G_RLF.db.global.lootHistoryEnabled = value
+end
+
+function Features:LootHistoryDisabled()
+	return not G_RLF.db.global.lootHistoryEnabled
+end
+
+function Features:GetLootHistorySize()
+	return G_RLF.db.global.historyLimit
+end
+
+function Features:SetLootHistorySize(info, value)
+	G_RLF.db.global.historyLimit = value
+end
 
 function Features:GetItemLootStatus(info, value)
 	return G_RLF.db.global.itemLootFeed
