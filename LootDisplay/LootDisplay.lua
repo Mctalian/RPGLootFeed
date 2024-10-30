@@ -72,6 +72,13 @@ function LootDisplay:OnInitialize()
 	C_Timer.After(0, function()
 		G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
 	end)
+
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnPlayerCombatChange")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnPlayerCombatChange")
+end
+
+function LootDisplay:OnPlayerCombatChange()
+	frame:UpdateTabVisibility()
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)

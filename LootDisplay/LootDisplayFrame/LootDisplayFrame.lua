@@ -65,6 +65,59 @@ function LootDisplayFrameMixin:ConfigureTestArea()
 	self:CreateArrowsTestArea()
 end
 
+-- Create the tab frame and anchor it to the LootDisplayFrame
+function LootDisplayFrameMixin:CreateTab()
+	self.tab = CreateFrame("Button", nil, UIParent, "UIPanelButtonTemplate")
+	self.tab:SetSize(14, 14)
+	if G_RLF.db.global.growUp then
+		self.tab:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", -14, 0)
+	else
+		self.tab:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
+	end
+	self.tab:SetAlpha(0.2)
+	self.tab:Hide()
+
+	-- self.tab:SetText("History")
+	-- Add an icon to the button
+	local icon = self.tab:CreateTexture(nil, "ARTWORK")
+	icon:SetTexture("Interface\\Icons\\INV_Misc_Book_09") -- Replace with the desired icon path
+	icon:SetAllPoints(self.tab)
+
+	-- Handle mouse enter and leave events to change alpha
+	self.tab:SetScript("OnEnter", function()
+		self.tab:SetAlpha(1.0)
+		GameTooltip:SetOwner(self.tab, "ANCHOR_RIGHT")
+		GameTooltip:SetText("Show Loot History", 1, 1, 1)
+		GameTooltip:Show()
+	end)
+	self.tab:SetScript("OnLeave", function()
+		self.tab:SetAlpha(0.2)
+		GameTooltip:Hide()
+	end)
+
+	-- Handle click event to show the history frame
+	self.tab:SetScript("OnClick", function()
+		if not self.historyFrame or not self.historyFrame:IsVisible() then
+			self:ShowHistoryFrame()
+		else
+			self:HideHistoryFrame()
+		end
+	end)
+end
+
+-- Function to update the tab visibility based on conditions
+function LootDisplayFrameMixin:UpdateTabVisibility()
+	local inCombat = UnitAffectingCombat("player")
+	local hasItems = getNumberOfRows() > 0
+
+	if not inCombat and not hasItems then
+		self.tab:Show()
+	else
+		self.tab:Hide()
+		self:HideHistoryFrame()
+	end
+end
+
 function LootDisplayFrameMixin:Load()
 	keyRowMap = {
 		length = 0,
@@ -86,6 +139,7 @@ function LootDisplayFrameMixin:Load()
 	self:SetFrameStrata(G_RLF.db.global.frameStrata) -- Set the frame strata here
 
 	self:ConfigureTestArea()
+	self:CreateTab()
 end
 
 function LootDisplayFrameMixin:ClearFeed()
@@ -181,6 +235,7 @@ function LootDisplayFrameMixin:LeaseRow(key)
 		row:ResetHighlightBorder()
 		row:Show()
 	end)
+	self:UpdateTabVisibility()
 
 	return row
 end
@@ -203,6 +258,7 @@ function LootDisplayFrameMixin:ReleaseRow(row)
 
 	self.rowFramePool:Release(row)
 	self:OnRowRelease()
+	self:UpdateTabVisibility()
 end
 
 function LootDisplayFrameMixin:StoreRowHistory(row)
@@ -275,9 +331,9 @@ function LootDisplayFrameMixin:UpdateRowPositions()
 end
 
 function LootDisplayFrameMixin:CreateHistoryFrame()
-	self.historyFrame = CreateFrame("ScrollFrame", "LootHistoryFrame", self, "UIPanelScrollFrameTemplate")
+	self.historyFrame = CreateFrame("ScrollFrame", "LootHistoryFrame", UIParent, "UIPanelScrollFrameTemplate")
 	self.historyFrame:SetSize(self:GetSize())
-	self.historyFrame:SetPoint("TOPLEFT", 0, 0)
+	self.historyFrame:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
 
 	self.historyContent = CreateFrame("Frame", "LootHistoryFrameContent", self.historyFrame)
 	self.historyContent:SetSize(self:GetSize())
@@ -331,5 +387,6 @@ end
 function LootDisplayFrameMixin:HideHistoryFrame()
 	if self.historyFrame then
 		self.historyFrame:Hide()
+		self.historyFrame:SetVerticalScroll(0)
 	end
 end
