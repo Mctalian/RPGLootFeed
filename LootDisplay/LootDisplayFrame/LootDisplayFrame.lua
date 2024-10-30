@@ -277,7 +277,7 @@ end
 function LootDisplayFrameMixin:CreateHistoryFrame()
 	self.historyFrame = CreateFrame("ScrollFrame", "LootHistoryFrame", self, "UIPanelScrollFrameTemplate")
 	self.historyFrame:SetSize(self:GetSize())
-	self.historyFrame:SetPoint("TOPLEFT", 10, -10)
+	self.historyFrame:SetPoint("TOPLEFT", 0, 0)
 
 	self.historyContent = CreateFrame("Frame", "LootHistoryFrameContent", self.historyFrame)
 	self.historyContent:SetSize(self:GetSize())
@@ -286,7 +286,6 @@ function LootDisplayFrameMixin:CreateHistoryFrame()
 	self.historyRows = {}
 	for i = 1, G_RLF.db.global.maxRows do
 		local row = CreateFrame("Frame", nil, self.historyContent, "LootDisplayRowTemplate")
-		row:SetPoint("TOPLEFT", 0, -((i - 1) * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding)))
 		row:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
 		table.insert(self.historyRows, row)
 	end
@@ -301,6 +300,7 @@ function LootDisplayFrameMixin:UpdateHistoryFrame(offset)
 	local rowHeight = G_RLF.db.global.rowHeight + G_RLF.db.global.padding
 	local visibleRows = G_RLF.db.global.maxRows
 	local totalRows = #self.rowHistory
+	local contentSize = totalRows * rowHeight - G_RLF.db.global.padding
 	local startIndex = math.floor(offset / rowHeight) + 1
 	local endIndex = math.min(startIndex + visibleRows - 1, totalRows)
 
@@ -309,13 +309,15 @@ function LootDisplayFrameMixin:UpdateHistoryFrame(offset)
 		if dataIndex <= endIndex then
 			row:UpdateWithHistoryData(self.rowHistory[dataIndex])
 			row:Show()
+			row:ClearAllPoints()
+			row:SetPoint("TOPLEFT", self.historyFrame, "TOPLEFT", 0, (i - 1) * -rowHeight)
 		else
 			row:Hide()
 		end
 	end
 
-	self.historyFrame:SetSize(self:GetSize())
-	self.historyContent:SetSize(self:GetSize())
+	self.historyFrame:SetSize(G_RLF.db.global.feedWidth, getFrameHeight() + rowHeight)
+	self.historyContent:SetSize(G_RLF.db.global.feedWidth, contentSize)
 end
 
 function LootDisplayFrameMixin:ShowHistoryFrame()

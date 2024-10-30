@@ -438,6 +438,8 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 	self.AmountText:SetTextColor(unpack(data.textColor))
 	if data.icon then
 		self:UpdateIcon(self.key, data.icon, self.quality)
+	else
+		self.icon = nil
 	end
 	self:UpdateStyles()
 end

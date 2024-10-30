@@ -30,6 +30,7 @@ L["Clear rows"] = true
 L["Toggle Area"] = true
 
 -- ConfigOptions - Features Group
+L["Hover to show history"] = true
 L["Features"] = true
 L["FeaturesDesc"] = "Enable or Disable different RPGLootFeed features"
 L["Enable Item Loot in Feed"] = true

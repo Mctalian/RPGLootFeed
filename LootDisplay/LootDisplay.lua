@@ -22,6 +22,20 @@ TestLabelQueueSize = UIParent:CreateFontString(nil, "ARTWORK")
 TestLabelQueueSize:SetFontObject(GameFontNormal)
 TestLabelQueueSize:SetPoint("TOPLEFT", 10, -10)
 TestLabelQueueSize:SetText("Queue Size: 0")
+
+-- I'd like a button that I can press to show or hide the frame history frame
+local TestButtonShowHistory = CreateFrame("Button", "TestButtonShowHistory", UIParent, "UIPanelButtonTemplate")
+TestButtonShowHistory:SetPoint("TOPLEFT", 10, -30)
+TestButtonShowHistory:SetSize(100, 20)
+TestButtonShowHistory:SetText("Toggle History")
+TestButtonShowHistory:SetScript("OnClick", function()
+	if not frame.historyFrame or not frame.historyFrame:IsVisible() then
+		frame:ShowHistoryFrame()
+	else
+		frame:HideHistoryFrame()
+	end
+end)
+
 -- Function to update test labels
 local function updateTestLabels()
 	if TestLabelQueueSize then
