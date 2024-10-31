@@ -159,6 +159,7 @@ end
 
 function Features:SetLootHistoryStatus(info, value)
 	G_RLF.db.global.lootHistoryEnabled = value
+	LootDisplayFrame:UpdateTabVisibility()
 end
 
 function Features:LootHistoryDisabled()

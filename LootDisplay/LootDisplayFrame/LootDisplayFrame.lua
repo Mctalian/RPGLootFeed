@@ -105,8 +105,9 @@ end
 function LootDisplayFrameMixin:UpdateTabVisibility()
 	local inCombat = UnitAffectingCombat("player")
 	local hasItems = getNumberOfRows() > 0
+	local isEnabled = G_RLF.db.global.lootHistoryEnabled
 
-	if not inCombat and not hasItems then
+	if not inCombat and not hasItems and isEnabled then
 		self.tab:Show()
 	else
 		self.tab:Hide()
@@ -146,6 +147,7 @@ function LootDisplayFrameMixin:ClearFeed()
 		row = row._prev
 		oldRow.FadeOutAnimation:Stop()
 		oldRow:Hide()
+		self:ReleaseRow(oldRow)
 	end
 end
 
@@ -306,7 +308,7 @@ function LootDisplayFrameMixin:Dump()
 	return format(
 		"{getNumberOfRows=%s,#rowFramePool=%s,#keyRowMap=%s,first.key=%s,last.key=%s,frame.children=%s}",
 		getNumberOfRows(),
-		rowFramePool:size(),
+		self.rowFramePool:size(),
 		keyRowMap.length,
 		firstKey,
 		lastKey,
