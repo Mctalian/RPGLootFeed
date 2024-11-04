@@ -48,7 +48,7 @@ function ItemLoot.Element:new(...)
 	element.isLink = true
 
 	local t
-	element.key, t, element.icon, element.quantity = ...
+	element.key, t, element.icon, element.quantity, element.sellPrice = ...
 
 	function element:isPassingFilter(itemName, itemQuality)
 		if not G_RLF.db.global.itemQualityFilter[itemQuality] then
@@ -85,6 +85,14 @@ function ItemLoot.Element:new(...)
 		return truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
 	end
 
+	element.secondaryTextFn = function(...)
+		local quantity = ...
+		if not element.sellPrice or element.sellPrice == 0 then
+			return ""
+		end
+		return C_CurrencyInfo.GetCoinTextureString(element.sellPrice * (quantity or 1))
+	end
+
 	return element
 end
 
@@ -108,9 +116,9 @@ function ItemLoot:OnEnable()
 end
 
 local pendingItemRequests = {}
-local function onItemReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality)
+local function onItemReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice)
 	pendingItemRequests[itemId] = nil
-	local e = ItemLoot.Element:new(itemId, itemLink, itemTexture, amount)
+	local e = ItemLoot.Element:new(itemId, itemLink, itemTexture, amount, sellPrice)
 	e:Show(itemName, itemQuality)
 end
 
@@ -124,9 +132,9 @@ function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
 	if not success then
 		error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount)
 	else
-		local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, _, _, _, _, _, _, _ =
+		local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
 			C_Item.GetItemInfo(itemLink)
-		onItemReadyToShow(itemID, itemLink, itemTexture, amount, itemName, itemQuality)
+		onItemReadyToShow(itemID, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice)
 	end
 end
 
@@ -134,10 +142,10 @@ local function showItemLoot(msg, itemLink)
 	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
 	local itemId = itemLink:match("Hitem:(%d+)")
 	pendingItemRequests[itemId] = { itemLink, amount }
-	local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, _, _, _, _, _, _, _ = C_Item.GetItemInfo(itemLink)
-
+	local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
+		C_Item.GetItemInfo(itemLink)
 	if itemName ~= nil then
-		onItemReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality)
+		onItemReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice)
 	end
 end
 

@@ -3,6 +3,7 @@ local addonName, G_RLF = ...
 G_RLF.LootDisplayProperties = {
 	"key",
 	"textFn",
+	"secondaryTextFn",
 	"isLink",
 	"icon",
 	"quantity",

@@ -270,8 +270,8 @@ function LootDisplayFrameMixin:StoreRowHistory(row)
 		quality = row.quality,
 		icon = row.icon,
 		link = row.link,
-		rowText = row.AmountText:GetText(),
-		textColor = { row.AmountText:GetTextColor() },
+		rowText = row.PrimaryText:GetText(),
+		textColor = { row.PrimaryText:GetTextColor() },
 	}
 	table.insert(self.rowHistory, 1, rowData)
 

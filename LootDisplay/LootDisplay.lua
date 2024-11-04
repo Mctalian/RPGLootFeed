@@ -115,6 +115,9 @@ local function processRow(element)
 
 	local key = element.key
 	local textFn = element.textFn
+	local secondaryTextFn = element.secondaryTextFn or function()
+		return ""
+	end
 	local icon = element.icon
 	local quantity = element.quantity
 	local quality = element.quality
@@ -156,7 +159,12 @@ local function processRow(element)
 			text = textFn()
 		end
 
+		row:UpdateSecondaryText(secondaryTextFn)
 		row:UpdateStyles()
+	end
+
+	if not new then
+		row:UpdateSecondaryText(secondaryTextFn)
 	end
 
 	row:ShowText(text, r, g, b, a)

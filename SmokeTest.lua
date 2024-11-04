@@ -147,7 +147,7 @@ local function runItemLootSmokeTest()
 	local module = G_RLF.RLF:GetModule("ItemLoot")
 	local testObj = testItems[2]
 	local amountLooted = 1
-	local e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted)
+	local e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted, testObj.sellPrice)
 	if testObj.name == nil then
 		G_RLF:Print("Item not cached, skipping ItemLoot test")
 	else

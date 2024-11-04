@@ -59,7 +59,7 @@ local function rowIcon(row, icon)
 	row.Icon:SetShown(icon ~= nil)
 end
 
-local function rowAmountText(row, icon)
+local function rowText(row, icon)
 	local fontChanged = false
 	if
 		row.cachedFontFace ~= G_RLF.db.global.fontFace
@@ -79,21 +79,27 @@ local function rowAmountText(row, icon)
 
 	if fontChanged then
 		if G_RLF.db.global.useFontObjects or not G_RLF.db.global.fontFace then
-			row.AmountText:SetFontObject(G_RLF.db.global.font)
+			row.PrimaryText:SetFontObject(G_RLF.db.global.font)
+			row.SecondaryText:SetFontObject(G_RLF.db.global.font)
 		else
 			local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, G_RLF.db.global.fontFace)
-			row.AmountText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
+			row.PrimaryText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
+			row.SecondaryText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
 		end
 	end
 
 	if
-		row.cachedAmountTextLeftAlign ~= G_RLF.db.global.leftAlign
-		or row.cachedAmountTextXOffset ~= G_RLF.db.global.iconSize / 2
-		or row.cachedAmountTextIcon ~= icon
+		row.cachedRowTextLeftAlign ~= G_RLF.db.global.leftAlign
+		or row.cachedRowTextXOffset ~= G_RLF.db.global.iconSize / 2
+		or row.cachedRowTextIcon ~= icon
+		or row.cachedEnabledSecondaryText ~= G_RLF.db.global.enabledSecondaryRowText
+		or row.cachedSecondaryText ~= row.secondaryText
 	then
-		row.cachedAmountTextLeftAlign = G_RLF.db.global.leftAlign
-		row.cachedAmountTextXOffset = G_RLF.db.global.iconSize / 2
-		row.cachedAmountTextIcon = icon
+		row.cachedRowTextLeftAlign = G_RLF.db.global.leftAlign
+		row.cachedRowTextXOffset = G_RLF.db.global.iconSize / 2
+		row.cachedRowTextIcon = icon
+		row.cachedEnabledSecondaryText = G_RLF.db.global.enabledSecondaryRowText
+		row.cachedSecondaryText = row.secondaryText
 
 		local anchor = "LEFT"
 		local iconAnchor = "RIGHT"
@@ -103,12 +109,26 @@ local function rowAmountText(row, icon)
 			iconAnchor = "LEFT"
 			xOffset = xOffset * -1
 		end
-		row.AmountText:ClearAllPoints()
-		row.AmountText:SetJustifyH(anchor)
+		row.PrimaryText:ClearAllPoints()
+		row.PrimaryText:SetJustifyH(anchor)
 		if icon then
-			row.AmountText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
+			row.PrimaryText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
 		else
-			row.AmountText:SetPoint(anchor, row.Icon, anchor, 0, 0)
+			row.PrimaryText:SetPoint(anchor, row.Icon, anchor, 0, 0)
+		end
+
+		if G_RLF.db.global.enabledSecondaryRowText and row.secondaryText ~= nil and row.secondaryText ~= "" then
+			row.SecondaryText:ClearAllPoints()
+			row.SecondaryText:SetJustifyH(anchor)
+			if icon then
+				row.SecondaryText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
+			else
+				row.SecondaryText:SetPoint(anchor, row.Icon, anchor, 0, 0)
+			end
+			local padding = G_RLF.db.global.padding
+			row.PrimaryText:SetPoint("BOTTOM", row, "CENTER", 0, padding)
+			row.SecondaryText:SetPoint("TOP", row, "CENTER", 0, -padding)
+			row.SecondaryText:SetShown(true)
 		end
 	end
 	-- Adjust the text position dynamically based on leftAlign or other conditions
@@ -223,7 +243,7 @@ end
 --@alpha@
 rowBackground = G_RLF:ProfileFunction(rowBackground, "rowBackground")
 rowIcon = G_RLF:ProfileFunction(rowIcon, "rowIcon")
-rowAmountText = G_RLF:ProfileFunction(rowAmountText, "rowAmountText")
+rowText = G_RLF:ProfileFunction(rowText, "rowPrimaryText")
 rowHighlightBorder = G_RLF:ProfileFunction(rowHighlightBorder, "rowHighlightBorder")
 rowFadeOutAnimation = G_RLF:ProfileFunction(rowFadeOutAnimation, "rowFadeOutAnimation")
 --@end-alpha@
@@ -232,7 +252,7 @@ local function rowStyles(row)
 	row:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
 	rowBackground(row)
 	rowIcon(row, row.icon)
-	rowAmountText(row, row.icon)
+	rowText(row, row.icon)
 	rowHighlightBorder(row)
 	rowFadeOutAnimation(row)
 end
@@ -246,6 +266,7 @@ function LootDisplayRowMixin:Reset()
 	self.amount = nil
 	self.icon = nil
 	self.link = nil
+	self.secondaryText = nil
 
 	-- Reset UI elements that were part of the template
 	self.TopBorder:SetAlpha(0)
@@ -256,10 +277,10 @@ function LootDisplayRowMixin:Reset()
 	self.Icon:Reset()
 
 	-- Reset amount text behavior
-	self.AmountText:SetScript("OnEnter", nil)
-	self.AmountText:SetScript("OnLeave", nil)
+	self.PrimaryText:SetScript("OnEnter", nil)
+	self.PrimaryText:SetScript("OnLeave", nil)
 
-	self.AmountText:SetTextColor(unpack(defaultColor))
+	self.PrimaryText:SetTextColor(unpack(defaultColor))
 	rowBackground(self)
 	rowHighlightBorder(self)
 	rowFadeOutAnimation(self)
@@ -274,6 +295,19 @@ end
 
 function LootDisplayRowMixin:UpdateFadeoutDelay()
 	rowFadeOutAnimation(self)
+end
+
+function LootDisplayRowMixin:UpdateSecondaryText(secondaryTextFn)
+	if
+		G_RLF.db.global.enabledSecondaryRowText
+		and type(secondaryTextFn) == "function"
+		and secondaryTextFn(self.amount) ~= ""
+		and secondaryTextFn(self.amount) ~= nil
+	then
+		self.secondaryText = secondaryTextFn(self.amount)
+	else
+		self.secondaryText = nil
+	end
 end
 
 function LootDisplayRowMixin:UpdateQuantity()
@@ -315,7 +349,7 @@ end
 
 function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 	-- Add Tooltip
-	self.AmountText:SetScript("OnEnter", function()
+	self.PrimaryText:SetScript("OnEnter", function()
 		if not isHistoryFrame then
 			self.FadeOutAnimation:Stop()
 			self.HighlightAnimation:Stop()
@@ -329,11 +363,11 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 			GameTooltip:Hide()
 			return
 		end
-		GameTooltip:SetOwner(self.AmountText, "ANCHOR_RIGHT")
+		GameTooltip:SetOwner(self.PrimaryText, "ANCHOR_RIGHT")
 		GameTooltip:SetHyperlink(self.link) -- Use the item's link to show the tooltip
 		GameTooltip:Show()
 	end)
-	self.AmountText:SetScript("OnLeave", function()
+	self.PrimaryText:SetScript("OnLeave", function()
 		if not isHistoryFrame then
 			self.FadeOutAnimation:Play()
 		end
@@ -360,11 +394,11 @@ function LootDisplayRowMixin:Dump()
 	end
 
 	return format(
-		"{name=%s, key=%s, amount=%s, AmountText=%s, _prev.key=%s, _next.key=%s}",
+		"{name=%s, key=%s, amount=%s, PrimaryText=%s, _prev.key=%s, _next.key=%s}",
 		self:GetDebugName(),
 		self.key or "NONE",
 		self.amount or "NONE",
-		self.AmountText:GetText() or "NONE",
+		self.PrimaryText:GetText() or "NONE",
 		prevKey,
 		nextKey
 	)
@@ -375,7 +409,7 @@ function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 		a = 1
 	end
 
-	self.AmountText:SetText(text)
+	self.PrimaryText:SetText(text)
 
 	if r == nil and g == nil and b == nil and self.amount ~= nil and self.amount < 0 then
 		r, g, b, a = 1, 0, 0, 0.8
@@ -383,7 +417,14 @@ function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 		r, g, b, a = unpack(defaultColor)
 	end
 
-	self.AmountText:SetTextColor(r, g, b, a)
+	self.PrimaryText:SetTextColor(r, g, b, a)
+
+	if G_RLF.db.global.enabledSecondaryRowText and self.secondaryText ~= nil and self.secondaryText ~= "" then
+		self.SecondaryText:SetText(self.secondaryText)
+		self.SecondaryText:Show()
+	else
+		self.SecondaryText:Hide()
+	end
 end
 
 function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
@@ -439,8 +480,8 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 	self.amount = data.amount
 	self.link = data.link
 	self.quality = data.quality
-	self.AmountText:SetText(data.rowText)
-	self.AmountText:SetTextColor(unpack(data.textColor))
+	self.PrimaryText:SetText(data.rowText)
+	self.PrimaryText:SetTextColor(unpack(data.textColor))
 	if data.icon then
 		self:UpdateIcon(self.key, data.icon, self.quality)
 		self:SetupTooltip(true)

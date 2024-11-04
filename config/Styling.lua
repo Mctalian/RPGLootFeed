@@ -4,6 +4,7 @@ local Styling = {}
 
 local lsm = G_RLF.lsm
 
+G_RLF.defaults.global.enabledSecondaryRowText = false
 G_RLF.defaults.global.leftAlign = true
 G_RLF.defaults.global.growUp = true
 G_RLF.defaults.global.rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 } -- Default to dark grey with 80% opacity
@@ -66,6 +67,15 @@ G_RLF.options.args.styles = {
 			get = "GetRowHighlight",
 			set = "SetRowHighlight",
 			order = 5,
+		},
+		enableSecondaryRowText = {
+			type = "toggle",
+			name = G_RLF.L["Enable Secondary Row Text"],
+			desc = G_RLF.L["EnableSecondaryRowTextDesc"],
+			width = "double",
+			get = "GetSecondaryRowText",
+			set = "SetSecondaryRowText",
+			order = 5.1,
 		},
 		useFontObjects = {
 			type = "toggle",
@@ -187,6 +197,15 @@ end
 
 function Styling:SetRowHighlight(info, value)
 	G_RLF.db.global.disableRowHighlight = value
+end
+
+function Styling:GetSecondaryRowText(info, value)
+	return G_RLF.db.global.enabledSecondaryRowText
+end
+
+function Styling:SetSecondaryRowText(info, value)
+	G_RLF.db.global.enabledSecondaryRowText = value
+	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:GetUseFontObjects(info, value)

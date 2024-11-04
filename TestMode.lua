@@ -41,7 +41,7 @@ local function runSmokeTestIfReady()
 end
 
 local function getItem(id)
-	local name, link, quality, _, _, _, _, _, _, icon = C_Item.GetItemInfo(id)
+	local name, link, quality, _, _, _, _, _, _, icon, sellPrice = C_Item.GetItemInfo(id)
 	local isCached = name ~= nil
 	if isCached then
 		if name and link and quality and icon and not idExistsInTable(id, testItems) then
@@ -52,6 +52,7 @@ local function getItem(id)
 				icon = icon,
 				name = name,
 				quality = quality,
+				sellPrice = sellPrice,
 			})
 		end
 	else
@@ -158,7 +159,7 @@ local function generateRandomLoot()
 			local item = testItems[math.random(#testItems)]
 			local amountLooted = math.random(1, 5)
 			local module = G_RLF.RLF:GetModule("ItemLoot")
-			local e = module.Element:new(item.id, item.link, item.icon, amountLooted)
+			local e = module.Element:new(item.id, item.link, item.icon, amountLooted, item.sellPrice)
 			e:Show(item.name, item.quality)
 
 			-- 15% chance to show currency
