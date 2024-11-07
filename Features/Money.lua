@@ -27,6 +27,10 @@ function Money.Element:new(...)
 		return sign .. C_CurrencyInfo.GetCoinTextureString(math.abs(total))
 	end
 
+	element.secondaryTextFn = function()
+		return "Total: " .. C_CurrencyInfo.GetCoinTextureString(GetMoney())
+	end
+
 	return element
 end
 
