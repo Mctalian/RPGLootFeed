@@ -2,6 +2,12 @@ local addonName, G_RLF = ...
 
 local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 
+ItemLoot.SecondaryTextOption = {
+	["None"] = "None",
+	["SellPrice"] = "Sell Price",
+	["iLvl"] = "Item Level",
+}
+
 -- local equipLocToSlotID = {
 --   ["INVTYPE_HEAD"] = INVSLOT_HEAD,
 --   ["INVTYPE_NECK"] = INVSLOT_NECK,

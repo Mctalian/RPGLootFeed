@@ -25,7 +25,26 @@ function Currency.Element:new(...)
 		return truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
 	end
 
-	element.quality = C_CurrencyInfo.GetCurrencyInfo(element.key).quality
+	local info = C_CurrencyInfo.GetCurrencyInfo(element.key)
+
+	element.quality = info.quality
+	element.currentTotal = info.quantity
+	element.totalEarned = info.totalEarned
+	element.cappedQuantity = info.maxQuantity
+
+	element.secondaryTextFn = function(...)
+		if element.currentTotal == 0 then
+			return ""
+		end
+
+		local str = element.currentTotal
+
+		if element.cappedQuantity > 0 then
+			str = str .. "    (" .. element.totalEarned .. " / " .. element.cappedQuantity .. ")"
+		end
+
+		return str
+	end
 
 	return element
 end

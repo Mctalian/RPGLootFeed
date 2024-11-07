@@ -64,10 +64,12 @@ local function rowText(row, icon)
 	if
 		row.cachedFontFace ~= G_RLF.db.global.fontFace
 		or row.cachedFontSize ~= G_RLF.db.global.fontSize
+		or row.cachedSecondaryFontSize ~= G_RLF.db.global.secondaryFontSize
 		or row.cachedFontFlags ~= G_RLF.defaults.global.fontFlags
 	then
 		row.cachedFontFace = G_RLF.db.global.fontFace
 		row.cachedFontSize = G_RLF.db.global.fontSize
+		row.cachedSecondaryFontSize = G_RLF.db.global.secondaryFontSize
 		row.cachedFontFlags = G_RLF.defaults.global.fontFlags
 		fontChanged = true
 	end
@@ -84,7 +86,7 @@ local function rowText(row, icon)
 		else
 			local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, G_RLF.db.global.fontFace)
 			row.PrimaryText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
-			row.SecondaryText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
+			row.SecondaryText:SetFont(fontPath, G_RLF.db.global.secondaryFontSize, G_RLF.defaults.global.fontFlags)
 		end
 	end
 

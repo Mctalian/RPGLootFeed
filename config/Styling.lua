@@ -14,6 +14,7 @@ G_RLF.defaults.global.useFontObjects = true
 G_RLF.defaults.global.font = "GameFontNormalSmall"
 G_RLF.defaults.global.fontFace = "Friz Quadrata TT"
 G_RLF.defaults.global.fontSize = 10
+G_RLF.defaults.global.secondaryFontSize = 8
 G_RLF.defaults.global.fontFlags = ""
 
 G_RLF.options.args.styles = {
@@ -129,6 +130,20 @@ G_RLF.options.args.styles = {
 					set = "SetRowFontSize",
 					order = 2,
 				},
+				secondaryFontSize = {
+					type = "range",
+					name = G_RLF.L["Secondary Font Size"],
+					desc = G_RLF.L["SecondaryFontSizeDesc"],
+					disabled = "SecondaryTextDisabled",
+					softMin = 6,
+					softMax = 24,
+					min = 1,
+					max = 72,
+					bigStep = 1,
+					get = "GetSecondaryRowFontSize",
+					set = "SetSecondaryRowFontSize",
+					order = 3,
+				},
 			},
 		},
 	},
@@ -239,6 +254,19 @@ end
 
 function Styling:SetRowFontSize(info, value)
 	G_RLF.db.global.fontSize = value
+	G_RLF.LootDisplay:UpdateRowStyles()
+end
+
+function Styling:SecondaryTextDisabled()
+	return not G_RLF.db.global.enabledSecondaryRowText
+end
+
+function Styling:GetSecondaryRowFontSize()
+	return G_RLF.db.global.secondaryFontSize
+end
+
+function Styling:SetSecondaryRowFontSize(info, value)
+	G_RLF.db.global.secondaryFontSize = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 

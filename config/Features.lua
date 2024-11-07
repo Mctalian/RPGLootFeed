@@ -50,6 +50,15 @@ G_RLF.options.args.features = {
 			set = "SetLootHistorySize",
 			order = 1.1,
 		},
+		enableSecondaryRowText = {
+			type = "toggle",
+			name = G_RLF.L["Enable Secondary Row Text"],
+			desc = G_RLF.L["EnableSecondaryRowTextDesc"],
+			width = "double",
+			get = "GetSecondaryRowText",
+			set = "SetSecondaryRowText",
+			order = 1.2,
+		},
 		enableItemLoot = {
 			type = "toggle",
 			name = G_RLF.L["Enable Item Loot in Feed"],
@@ -172,6 +181,19 @@ end
 
 function Features:SetLootHistorySize(info, value)
 	G_RLF.db.global.historyLimit = value
+end
+
+function Features:GetSecondaryRowText(info, value)
+	return G_RLF.db.global.enabledSecondaryRowText
+end
+
+function Features:SetSecondaryRowText(info, value)
+	G_RLF.db.global.enabledSecondaryRowText = value
+	G_RLF.LootDisplay:UpdateRowStyles()
+end
+
+function Features:SecondaryTextDisabled()
+	return not G_RLF.db.global.enabledSecondaryRowText
 end
 
 function Features:GetItemLootStatus(info, value)
