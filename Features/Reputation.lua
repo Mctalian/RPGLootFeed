@@ -44,12 +44,21 @@ function Rep.Element:new(...)
 			end
 		end
 
+		if not element.factionId then
+			return str
+		end
+
 		if element.repType == RepType.MajorFaction then
-			local factionData = C_MajorFaction.GetMajorFactionRenownInfo(element.factionId)
-			if factionData.currentLevel > 0 then
-				str = str .. factionData.currentLevel
+			local factionData = C_MajorFactions.GetMajorFactionRenownInfo(element.factionId)
+			if factionData.renownLevel ~= nil and factionData.renownLevel > 0 then
+				str = str .. factionData.renownLevel
 			end
-			if factionData.renownReputationEarned > 0 and factionData.renownLevelThreshold > 0 then
+			if
+				factionData.renownReputationEarned ~= nil
+				and factionData.renownLevelThreshold ~= nil
+				and factionData.renownReputationEarned > 0
+				and factionData.renownLevelThreshold > 0
+			then
 				str = str
 					.. "    ("
 					.. factionData.renownReputationEarned
@@ -58,24 +67,20 @@ function Rep.Element:new(...)
 					.. ")"
 			end
 		elseif element.repType == RepType.Paragon then
-			local factionData = C_Reputation.GetFactionParagonInfo(element.factionId)
-			if factionData.tooLowLevelForParagon then
+			local currentValue, threshold, _, hasRewardPending, tooLowLevelForParagon =
+				C_Reputation.GetFactionParagonInfo(element.factionId)
+			if tooLowLevelForParagon then
 				normalRep()
 			else
-				if factionData.hasRewardPending then
-					local secondaryFontSize = G_RLF.db.global.secondaryFontSize
-					str = str
-						.. "|A:ParagonReputation_Bag:"
-						.. secondaryFontSize
-						.. ":"
-						.. secondaryFontSize
-						.. ":0:0|a    "
+				if hasRewardPending then
+					local bagSize = G_RLF.db.global.fontSize
+					str = str .. "|A:ParagonReputation_Bag:" .. bagSize .. ":" .. bagSize .. ":0:0|a    "
 				end
-				if factionData.currentValue > 0 then
-					str = str .. factionData.currentValue
+				if currentValue ~= nil and currentValue > 0 then
+					str = str .. currentValue
 				end
-				if factionData.threshold > 0 then
-					str = str .. "/" .. factionData.threshold
+				if threshold ~= nil and threshold > 0 then
+					str = str .. "/" .. threshold
 				end
 			end
 		else
@@ -83,7 +88,7 @@ function Rep.Element:new(...)
 		end
 
 		if str ~= "" then
-			str = "|c" .. color .. str .. "|r"
+			str = color .. str .. "|r"
 		end
 
 		return str
