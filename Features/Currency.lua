@@ -75,15 +75,15 @@ end
 
 function Currency:OnDisable()
 	self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE")
+	self:UnregisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
 end
 
 function Currency:OnEnable()
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
+	self:RegisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
 end
 
-function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
-	local currencyType, _quantity, quantityChange, _quantityGainSource, _quantityLostSource = ...
-
+function Currency:Process(eventName, currencyType, quantityChange)
 	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, currencyType, eventName, quantityChange)
 
 	if currencyType == nil or not quantityChange or quantityChange <= 0 then
@@ -133,6 +133,18 @@ function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
 		)
 		e:Show()
 	end)
+end
+
+function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
+	local currencyType, _quantity, quantityChange, _quantityGainSource, _quantityLostSource = ...
+
+	self:Process(eventName, currencyType, quantityChange)
+end
+
+function Currency:PERKS_PROGRAM_CURRENCY_AWARDED(eventName, quantityChange)
+	local currencyType = 2032 -- https://www.wowhead.com/currency=2032/traders-tender
+
+	self:Process(eventName, currencyType, quantityChange)
 end
 
 hiddenCurrencies = {
