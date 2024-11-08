@@ -28,8 +28,14 @@ function Xp.Element:new(...)
 		if not currentMaxXP then
 			return ""
 		end
+		local color = G_RLF:RGBAToHexFormat(1, 1, 1, 1)
 
-		return "    " .. currentLevel .. "    " .. math.floor((currentXP / currentMaxXP) * 10000) / 100 .. "%"
+		return "    "
+			.. color
+			.. currentLevel
+			.. "|r    "
+			.. math.floor((currentXP / currentMaxXP) * 10000) / 100
+			.. "%"
 	end
 
 	return element

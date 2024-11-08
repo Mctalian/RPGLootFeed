@@ -50,7 +50,15 @@ function Currency.Element:new(...)
 				color = "|cFFFF0000"
 			end
 
-			str = str .. "    " .. color .. "(" .. element.totalEarned .. " / " .. element.cappedQuantity .. ")|r"
+			str = "    "
+				.. str
+				.. "  "
+				.. color
+				.. "("
+				.. element.totalEarned
+				.. " / "
+				.. element.cappedQuantity
+				.. ")|r"
 		end
 
 		return str
