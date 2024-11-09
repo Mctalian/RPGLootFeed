@@ -96,7 +96,7 @@ function ItemLoot.Element:new(...)
 		if not element.sellPrice or element.sellPrice == 0 then
 			return ""
 		end
-		return C_CurrencyInfo.GetCoinTextureString(element.sellPrice * (quantity or 1))
+		return "    " .. C_CurrencyInfo.GetCoinTextureString(element.sellPrice * (quantity or 1))
 	end
 
 	return element

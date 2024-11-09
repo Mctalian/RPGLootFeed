@@ -40,12 +40,7 @@ function Rep.Element:new(...)
 		local function normalRep()
 			local factionData = C_Reputation.GetFactionDataByID(element.factionId)
 			if factionData.currentStanding >= 0 and factionData.currentReactionThreshold > 0 then
-				str = "    "
-					.. str
-					.. "  "
-					.. factionData.currentStanding
-					.. "/"
-					.. factionData.currentReactionThreshold
+				str = str .. "  " .. factionData.currentStanding .. "/" .. factionData.currentReactionThreshold
 			end
 		end
 
@@ -93,7 +88,7 @@ function Rep.Element:new(...)
 		end
 
 		if str ~= "" then
-			str = color .. str .. "|r"
+			str = "    " .. color .. str .. "|r"
 		end
 
 		return str

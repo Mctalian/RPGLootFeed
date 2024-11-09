@@ -37,10 +37,17 @@ function Currency.Element:new(...)
 			return ""
 		end
 
-		local str = "|cFFBABABA" .. element.currentTotal .. "|r"
+		local str = "    |cFFBABABA" .. element.currentTotal .. "|r"
 
 		if element.cappedQuantity > 0 then
-			local percentage = math.floor(element.totalEarned / element.cappedQuantity)
+			local percentage, numerator
+			if element.totalEarned > 0 then
+				numerator = element.totalEarned
+				percentage = element.totalEarned / element.cappedQuantity
+			else
+				numerator = element.currentTotal
+				percentage = element.currentTotal / element.cappedQuantity
+			end
 			local color
 			if percentage < 0.7 then
 				color = "|cFFFFFFFF"
@@ -50,15 +57,7 @@ function Currency.Element:new(...)
 				color = "|cFFFF0000"
 			end
 
-			str = "    "
-				.. str
-				.. "  "
-				.. color
-				.. "("
-				.. element.totalEarned
-				.. " / "
-				.. element.cappedQuantity
-				.. ")|r"
+			str = str .. "  " .. color .. "(" .. numerator .. " / " .. element.cappedQuantity .. ")|r"
 		end
 
 		return str
