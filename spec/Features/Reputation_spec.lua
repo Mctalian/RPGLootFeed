@@ -40,7 +40,7 @@ describe("Reputation module", function()
 
 		assert.is_true(success)
 
-		assert.spy(newElement).was.called_with(_, 10, "Faction A", 1, 0, 0)
+		assert.spy(newElement).was.called_with(_, 10, "Faction A", 1, 0, 0, 1, 3)
 		assert.stub(ns.LootDisplay.ShowLoot).was.called()
 		-- Successfully populates the locale cache
 		assert.equal(ns.db.global.factionMaps.enUS["Faction A"], 1)
@@ -53,7 +53,7 @@ describe("Reputation module", function()
 
 		assert.is_true(success)
 
-		assert.spy(newElement).was.called_with(_, 100, "Faction B", nil, nil, nil)
+		assert.spy(newElement).was.called_with(_, 100, "Faction B", nil, nil, nil, nil, nil)
 		assert.stub(ns.LootDisplay.ShowLoot).was.called()
 		assert.spy(RepModule:getLogger().Warn).was.called()
 		assert.spy(RepModule:getLogger().Warn).was.called_with(_, "Faction B is STILL not cached for enUS", _, _)
