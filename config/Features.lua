@@ -4,6 +4,7 @@ local Features = {}
 
 G_RLF.defaults.global.lootHistoryEnabled = true
 G_RLF.defaults.global.historyLimit = 100
+G_RLF.defaults.global.enablePartyLoot = false
 G_RLF.defaults.global.itemLootFeed = true
 G_RLF.defaults.global.itemQualityFilter = {
 	[Enum.ItemQuality.Poor] = true,
@@ -58,6 +59,15 @@ G_RLF.options.args.features = {
 			get = "GetSecondaryRowText",
 			set = "SetSecondaryRowText",
 			order = 1.2,
+		},
+		enablePartyLoot = {
+			type = "toggle",
+			name = G_RLF.L["Enable Party Loot in Feed"],
+			desc = G_RLF.L["EnablePartyLootDesc"],
+			width = "double",
+			get = "GetPartyLootStatus",
+			set = "SetPartyLootStatus",
+			order = 1.3,
 		},
 		enableItemLoot = {
 			type = "toggle",
@@ -194,6 +204,14 @@ end
 
 function Features:SecondaryTextDisabled()
 	return not G_RLF.db.global.enabledSecondaryRowText
+end
+
+function Features:GetPartyLootStatus()
+	return G_RLF.db.global.enablePartyLoot
+end
+
+function Features:SetPartyLootStatus(info, value)
+	G_RLF.db.global.enablePartyLoot = value
 end
 
 function Features:GetItemLootStatus(info, value)

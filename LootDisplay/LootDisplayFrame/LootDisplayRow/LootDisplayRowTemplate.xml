@@ -15,6 +15,7 @@
 
             <!-- Amount Text Layer -->
             <Layer level="ARTWORK">
+                <Texture parentKey="UnitPortrait" />
                 <FontString parentKey="PrimaryText" inherits="GameFontNormal" />
                 <FontString parentKey="SecondaryText" inherits="GameFontNormal" hidden="true" />
             </Layer>

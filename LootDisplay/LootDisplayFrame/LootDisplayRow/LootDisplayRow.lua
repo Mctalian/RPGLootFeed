@@ -59,6 +59,23 @@ local function rowIcon(row, icon)
 	row.Icon:SetShown(icon ~= nil)
 end
 
+local function rowUnitPortrait(row)
+	if row.unit then
+		SetPortraitTexture(row.UnitPortrait, row.unit)
+		local portraitSize = G_RLF.db.global.iconSize * 0.8
+		row.UnitPortrait:SetSize(portraitSize, portraitSize)
+		row.UnitPortrait:ClearAllPoints()
+		local anchor, xOffset = "LEFT", G_RLF.db.global.iconSize / 4
+		if not G_RLF.db.global.leftAlign then
+			anchor, xOffset = "RIGHT", -xOffset
+		end
+		row.UnitPortrait:SetPoint(anchor, row.Icon, anchor, xOffset, 0)
+		row.UnitPortrait:Show()
+	else
+		row.UnitPortrait:Hide()
+	end
+end
+
 local function rowText(row, icon)
 	local fontChanged = false
 	if
@@ -96,12 +113,14 @@ local function rowText(row, icon)
 		or row.cachedRowTextIcon ~= icon
 		or row.cachedEnabledSecondaryText ~= G_RLF.db.global.enabledSecondaryRowText
 		or row.cachedSecondaryText ~= row.secondaryText
+		or row.cachedUnit ~= row.unit
 	then
 		row.cachedRowTextLeftAlign = G_RLF.db.global.leftAlign
 		row.cachedRowTextXOffset = G_RLF.db.global.iconSize / 4
 		row.cachedRowTextIcon = icon
 		row.cachedEnabledSecondaryText = G_RLF.db.global.enabledSecondaryRowText
 		row.cachedSecondaryText = row.secondaryText
+		row.cachedUnit = row.unit
 
 		local anchor = "LEFT"
 		local iconAnchor = "RIGHT"
@@ -114,7 +133,11 @@ local function rowText(row, icon)
 		row.PrimaryText:ClearAllPoints()
 		row.PrimaryText:SetJustifyH(anchor)
 		if icon then
-			row.PrimaryText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
+			if row.unit then
+				row.PrimaryText:SetPoint(anchor, row.UnitPortrait, iconAnchor, xOffset, 0)
+			else
+				row.PrimaryText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
+			end
 		else
 			row.PrimaryText:SetPoint(anchor, row.Icon, anchor, 0, 0)
 		end
@@ -123,7 +146,11 @@ local function rowText(row, icon)
 			row.SecondaryText:ClearAllPoints()
 			row.SecondaryText:SetJustifyH(anchor)
 			if icon then
-				row.SecondaryText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
+				if row.unit then
+					row.SecondaryText:SetPoint(anchor, row.UnitPortrait, iconAnchor, xOffset, 0)
+				else
+					row.SecondaryText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
+				end
 			else
 				row.SecondaryText:SetPoint(anchor, row.Icon, anchor, 0, 0)
 			end
@@ -242,22 +269,25 @@ local function rowFadeOutAnimation(row)
 	row.FadeOutAnimation.fadeOut:SetStartDelay(G_RLF.db.global.fadeOutDelay)
 end
 
---@alpha@
-rowBackground = G_RLF:ProfileFunction(rowBackground, "rowBackground")
-rowIcon = G_RLF:ProfileFunction(rowIcon, "rowIcon")
-rowText = G_RLF:ProfileFunction(rowText, "rowPrimaryText")
-rowHighlightBorder = G_RLF:ProfileFunction(rowHighlightBorder, "rowHighlightBorder")
-rowFadeOutAnimation = G_RLF:ProfileFunction(rowFadeOutAnimation, "rowFadeOutAnimation")
---@end-alpha@
-
 local function rowStyles(row)
 	row:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
 	rowBackground(row)
 	rowIcon(row, row.icon)
+	rowUnitPortrait(row)
 	rowText(row, row.icon)
 	rowHighlightBorder(row)
 	rowFadeOutAnimation(row)
 end
+
+--@alpha@
+rowStyles = G_RLF:ProfileFunction(rowStyles, "rowStyles")
+rowBackground = G_RLF:ProfileFunction(rowBackground, "rowBackground")
+rowIcon = G_RLF:ProfileFunction(rowIcon, "rowIcon")
+rowUnitPortrait = G_RLF:ProfileFunction(rowUnitPortrait, "rowUnitPortrait")
+rowText = G_RLF:ProfileFunction(rowText, "rowPrimaryText")
+rowHighlightBorder = G_RLF:ProfileFunction(rowHighlightBorder, "rowHighlightBorder")
+rowFadeOutAnimation = G_RLF:ProfileFunction(rowFadeOutAnimation, "rowFadeOutAnimation")
+--@end-alpha@
 
 local defaultColor = { 1, 1, 1, 1 }
 function LootDisplayRowMixin:Reset()
@@ -269,6 +299,7 @@ function LootDisplayRowMixin:Reset()
 	self.icon = nil
 	self.link = nil
 	self.secondaryText = nil
+	self.unit = nil
 
 	-- Reset UI elements that were part of the template
 	self.TopBorder:SetAlpha(0)
@@ -277,6 +308,8 @@ function LootDisplayRowMixin:Reset()
 	self.LeftBorder:SetAlpha(0)
 
 	self.Icon:Reset()
+
+	self.UnitPortrait:SetTexture(nil)
 
 	-- Reset amount text behavior
 	self.PrimaryText:SetScript("OnEnter", nil)

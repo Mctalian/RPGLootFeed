@@ -124,6 +124,11 @@ local function processRow(element)
 	local r, g, b, a = element.r, element.g, element.b, element.a
 	local logFn = element.logFn
 	local isLink = element.isLink
+	local unit = element.unit
+
+	if unit then
+		key = unit .. "_" .. key
+	end
 
 	local new = true
 	local text
@@ -144,10 +149,18 @@ local function processRow(element)
 			return
 		end
 
+		if unit then
+			row.unit = unit
+		end
+
 		row.amount = quantity
 
 		if isLink then
 			local extraWidth = getTextWidth(" x" .. row.amount)
+			if row.unit then
+				local portraitSize = G_RLF.db.global.iconSize * 0.8
+				extraWidth = extraWidth + portraitSize - (portraitSize / 2)
+			end
 			row.link = truncateItemLink(textFn(), extraWidth)
 			row.quality = quality
 			text = textFn(0, row.link)
