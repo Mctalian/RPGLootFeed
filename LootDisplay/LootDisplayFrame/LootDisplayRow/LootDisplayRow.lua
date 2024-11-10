@@ -65,11 +65,12 @@ local function rowUnitPortrait(row)
 		local portraitSize = G_RLF.db.global.iconSize * 0.8
 		row.UnitPortrait:SetSize(portraitSize, portraitSize)
 		row.UnitPortrait:ClearAllPoints()
-		local anchor, xOffset = "LEFT", G_RLF.db.global.iconSize / 4
+		local anchor, iconAnchor, xOffset = "LEFT", "RIGHT", G_RLF.db.global.iconSize / 4
 		if not G_RLF.db.global.leftAlign then
-			anchor, xOffset = "RIGHT", -xOffset
+			anchor, iconAnchor, xOffset = "RIGHT", "LEFT", -xOffset
 		end
-		row.UnitPortrait:SetPoint(anchor, row.Icon, anchor, xOffset, 0)
+
+		row.UnitPortrait:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
 		row.UnitPortrait:Show()
 	else
 		row.UnitPortrait:Hide()
@@ -515,8 +516,13 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 	self.amount = data.amount
 	self.link = data.link
 	self.quality = data.quality
+	self.unit = data.unit
 	self.PrimaryText:SetText(data.rowText)
 	self.PrimaryText:SetTextColor(unpack(data.textColor))
+	if self.unit and data.secondaryText then
+		self.secondaryText = data.secondaryText
+		self.SecondaryText:SetText(self.secondaryText)
+	end
 	if data.icon then
 		self:UpdateIcon(self.key, data.icon, self.quality)
 		self:SetupTooltip(true)

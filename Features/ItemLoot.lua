@@ -62,7 +62,6 @@ local function setNameUnitMap()
 	for _, unit in ipairs(units) do
 		local name, server = UnitName(unit)
 		if name then
-			print(name, unit)
 			nameUnitMap[name] = unit
 		end
 	end
@@ -118,6 +117,10 @@ function ItemLoot.Element:new(...)
 	end
 
 	element.secondaryTextFn = function(...)
+		if element.unit then
+			local name, server = UnitName(element.unit)
+			return "    " .. name .. "-" .. server
+		end
 		local quantity = ...
 		if not element.sellPrice or element.sellPrice == 0 then
 			return ""
@@ -230,11 +233,12 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 			self:getLogger():Debug("Party Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
 			return
 		end
-		print(playerName, playerName2)
 		local sanitizedPlayerName = (playerName or playerName2):gsub("%-.+", "")
-		print(sanitizedPlayerName)
 		local unit = nameUnitMap[sanitizedPlayerName]
-		print(unit)
+		local itemLink = msg:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
+		if itemLink then
+			self:fn(showPartyLoot, msg, itemLink, unit)
+		end
 		return
 	end
 
