@@ -45,7 +45,7 @@ function Rep.Element:new(...)
 		local function normalRep()
 			local factionData = C_Reputation.GetFactionDataByID(element.factionId)
 			if factionData.currentStanding >= 0 and factionData.currentReactionThreshold > 0 then
-				str = str .. "  " .. factionData.currentStanding .. "/" .. factionData.currentReactionThreshold
+				str = str .. factionData.currentStanding .. "/" .. factionData.currentReactionThreshold
 			end
 		end
 
@@ -171,8 +171,16 @@ local function extractFactionAndRepForDelves(message)
 	local factionId = C_DelvesUI.GetFactionForCompanion(season)
 	local factionData = C_Reputation.GetFactionDataByID(factionId)
 
+	if not factionData then
+		return nil, nil
+	end
+
 	-- Check to see if factionData.name exists in message
 	local factionName = factionData.name
+	if not factionName then
+		return nil, nil
+	end
+
 	local factionStart, factionEnd = string.find(message, factionName, 1, true)
 	if factionStart then
 		local repStart, repEnd = string.find(message, "%d+", factionEnd + 1)
