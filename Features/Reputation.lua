@@ -20,7 +20,7 @@ function Rep.Element:new(...)
 	end
 
 	local factionName, rL, gL, bL
-	element.quantity, factionName, rL, gL, bL, element.factionId, element.repType = ...
+	element.quantity, factionName, rL, gL, bL, element.factionId, element.repType, element.isDelveCompanion = ...
 	element.r, element.g, element.b = rL or 0.5, gL or 0.5, bL or 1
 	element.a = 1
 	element.key = "REP_" .. factionName
@@ -35,6 +35,11 @@ function Rep.Element:new(...)
 
 	element.secondaryTextFn = function()
 		local str = ""
+
+		if not element.factionId or element.isDelveCompanion then
+			return str
+		end
+
 		local color = G_RLF:RGBAToHexFormat(element.r, element.g, element.b, 0.7)
 
 		local function normalRep()
@@ -42,10 +47,6 @@ function Rep.Element:new(...)
 			if factionData.currentStanding >= 0 and factionData.currentReactionThreshold > 0 then
 				str = str .. "  " .. factionData.currentStanding .. "/" .. factionData.currentReactionThreshold
 			end
-		end
-
-		if not element.factionId then
-			return str
 		end
 
 		if element.repType == RepType.MajorFaction then
@@ -165,6 +166,25 @@ local function extractFactionAndRep(message, patterns)
 	return nil, nil
 end
 
+local function extractFactionAndRepForDelves(message)
+	local season = C_DelvesUI.GetCurrentDelvesSeasonNumber()
+	local factionId = C_DelvesUI.GetFactionForCompanion(season)
+	local factionData = C_Reputation.GetFactionDataByID(factionId)
+
+	-- Check to see if factionData.name exists in message
+	local factionName = factionData.name
+	local factionStart, factionEnd = string.find(message, factionName, 1, true)
+	if factionStart then
+		local repStart, repEnd = string.find(message, "%d+", factionEnd + 1)
+		if repStart then
+			local rep = message:sub(repStart, repEnd)
+			return factionName, tonumber(rep)
+		end
+	end
+
+	return nil, nil
+end
+
 -- Precompute pattern segments to optimize runtime message parsing
 local function precomputePatternSegments(patterns)
 	local computedPatterns = {}
@@ -204,11 +224,18 @@ end
 function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 	self:getLogger():Info(eventName .. " " .. message, "WOWEVENT", self.moduleName)
 	return self:fn(function()
+		local isDelveCompanion = false
 		local faction, repChange = extractFactionAndRep(message, increasePatterns)
 		if not faction then
 			faction, repChange = extractFactionAndRep(message, decreasePatterns)
 			if repChange then
 				repChange = -repChange
+			end
+		end
+		if not faction then
+			faction, repChange = extractFactionAndRepForDelves(message)
+			if faction then
+				isDelveCompanion = true
 			end
 		end
 		if not faction or not repChange then
@@ -253,7 +280,7 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 			r, g, b = color.r, color.g, color.b
 		end
 
-		local e = self.Element:new(repChange, faction, r, g, b, fId, type)
+		local e = self.Element:new(repChange, faction, r, g, b, fId, type, isDelveCompanion)
 		e:Show()
 	end)
 end

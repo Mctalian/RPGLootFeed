@@ -92,20 +92,20 @@ local function rowText(row, icon)
 
 	if
 		row.cachedRowTextLeftAlign ~= G_RLF.db.global.leftAlign
-		or row.cachedRowTextXOffset ~= G_RLF.db.global.iconSize / 2
+		or row.cachedRowTextXOffset ~= G_RLF.db.global.iconSize / 4
 		or row.cachedRowTextIcon ~= icon
 		or row.cachedEnabledSecondaryText ~= G_RLF.db.global.enabledSecondaryRowText
 		or row.cachedSecondaryText ~= row.secondaryText
 	then
 		row.cachedRowTextLeftAlign = G_RLF.db.global.leftAlign
-		row.cachedRowTextXOffset = G_RLF.db.global.iconSize / 2
+		row.cachedRowTextXOffset = G_RLF.db.global.iconSize / 4
 		row.cachedRowTextIcon = icon
 		row.cachedEnabledSecondaryText = G_RLF.db.global.enabledSecondaryRowText
 		row.cachedSecondaryText = row.secondaryText
 
 		local anchor = "LEFT"
 		local iconAnchor = "RIGHT"
-		local xOffset = G_RLF.db.global.iconSize / 2
+		local xOffset = G_RLF.db.global.iconSize / 4
 		if not G_RLF.db.global.leftAlign then
 			anchor = "RIGHT"
 			iconAnchor = "LEFT"
