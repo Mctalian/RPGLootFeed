@@ -81,6 +81,10 @@ function ItemLoot.Element:new(...)
 	local t
 	element.key, t, element.icon, element.quantity, element.sellPrice, element.unit = ...
 
+	if not G_RLF.db.global.enablePartyLoot then
+		element.unit = nil
+	end
+
 	function element:isPassingFilter(itemName, itemQuality)
 		if not G_RLF.db.global.itemQualityFilter[itemQuality] then
 			element:getLogger():Debug(
@@ -119,7 +123,10 @@ function ItemLoot.Element:new(...)
 	element.secondaryTextFn = function(...)
 		if element.unit then
 			local name, server = UnitName(element.unit)
-			return "    " .. name .. "-" .. server
+			if server then
+				return "    " .. name .. "-" .. server
+			end
+			return "    " .. name
 		end
 		local quantity = ...
 		if not element.sellPrice or element.sellPrice == 0 then

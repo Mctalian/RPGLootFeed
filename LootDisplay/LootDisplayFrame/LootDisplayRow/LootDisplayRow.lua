@@ -311,6 +311,7 @@ function LootDisplayRowMixin:Reset()
 	self.Icon:Reset()
 
 	self.UnitPortrait:SetTexture(nil)
+	self.SecondaryText:SetText(nil)
 
 	-- Reset amount text behavior
 	self.PrimaryText:SetScript("OnEnter", nil)

@@ -162,6 +162,14 @@ local function generateRandomLoot()
 			local e = module.Element:new(item.id, item.link, item.icon, amountLooted, item.sellPrice)
 			e:Show(item.name, item.quality)
 
+			-- 10% chance of iitem loot to show up as a party member
+			if rng < 0.3 then
+				local unit = "player"
+				local module = G_RLF.RLF:GetModule("ItemLoot")
+				local e = module.Element:new(item.id, item.link, item.icon, amountLooted, item.sellPrice, unit)
+				e:Show(item.name, item.quality)
+			end
+
 			-- 15% chance to show currency
 		elseif rng > 0.7 and rng <= 0.85 then
 			local currency = testCurrencies[math.random(#testCurrencies)]

@@ -4,6 +4,8 @@ G_RLF.LootDisplayProperties = {
 	"key",
 	"textFn",
 	"secondaryTextFn",
+	"unit",
+	"sellPrice",
 	"isLink",
 	"icon",
 	"quantity",
