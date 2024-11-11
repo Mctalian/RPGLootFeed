@@ -14,7 +14,6 @@
 embeds.xml
 
 Core.lua
-DynamicPropertyTable.lua
 DoubleLinkedList.lua
 Queue.lua
 

@@ -4,6 +4,8 @@ local Money = G_RLF.RLF:NewModule("Money", "AceEvent-3.0")
 
 Money.Element = {}
 
+local startingMoney
+
 function Money.Element:new(...)
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
@@ -27,10 +29,16 @@ function Money.Element:new(...)
 		return sign .. C_CurrencyInfo.GetCoinTextureString(math.abs(total))
 	end
 
+	element.secondaryTextFn = function()
+		local money = GetMoney()
+		if money > 10000000 then
+			money = math.floor(money / 10000) * 10000
+		end
+		return "    " .. C_CurrencyInfo.GetCoinTextureString(money)
+	end
+
 	return element
 end
-
-local startingMoney
 
 function Money:OnInitialize()
 	if G_RLF.db.global.moneyFeed then
