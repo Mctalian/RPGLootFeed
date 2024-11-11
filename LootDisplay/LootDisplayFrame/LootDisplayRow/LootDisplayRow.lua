@@ -520,7 +520,7 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 	self.unit = data.unit
 	self.PrimaryText:SetText(data.rowText)
 	self.PrimaryText:SetTextColor(unpack(data.textColor))
-	if self.unit and data.secondaryText then
+	if self.unit and data.secondaryText and G_RLF.db.global.enabledSecondaryRowText then
 		self.secondaryText = data.secondaryText
 		self.SecondaryText:SetText(self.secondaryText)
 	end
