@@ -152,8 +152,10 @@ local function runItemLootSmokeTest()
 		G_RLF:Print("Item not cached, skipping ItemLoot test")
 	else
 		runTestSafely(e.Show, "LootDisplay: Item", e, testObj.name, testObj.quality)
-		e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted)
+		e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted, testObj.sellPrice)
 		runTestSafely(e.Show, "LootDisplay: Item Quantity Update", e, testObj.name, testObj.quality)
+		e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted, nil, "player")
+		runTestSafely(e.Show, "LootDisplay: Item Unit", e, testObj.name, testObj.quality)
 	end
 end
 
@@ -217,7 +219,7 @@ local function testLootDisplay()
 	local frame = LootDisplayFrame
 	assertEqual(frame ~= nil, true, "LootDisplayFrame")
 	C_Timer.After(G_RLF.db.global.fadeOutDelay + 3, function()
-		assertEqual(#frame.rowHistory, 5, "LootDisplayFrame: rowHistory")
+		assertEqual(#frame.rowHistory, 6, true, "LootDisplayFrame: rowHistory")
 		displayResults()
 	end)
 end

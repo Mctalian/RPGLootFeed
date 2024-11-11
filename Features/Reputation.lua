@@ -139,19 +139,16 @@ function Rep.Element:new(...)
 		elseif element.repType == RepType.Paragon then
 			local currentValue, threshold, _, hasRewardPending, tooLowLevelForParagon =
 				C_Reputation.GetFactionParagonInfo(element.factionId)
-			if tooLowLevelForParagon then
-				normalRep()
-			else
-				if hasRewardPending then
-					local bagSize = G_RLF.db.global.fontSize
-					str = str .. "|A:ParagonReputation_Bag:" .. bagSize .. ":" .. bagSize .. ":0:0|a    "
-				end
-				if currentValue ~= nil and currentValue > 0 then
-					str = str .. currentValue
-				end
-				if threshold ~= nil and threshold > 0 then
-					str = str .. "/" .. threshold
-				end
+
+			if hasRewardPending then
+				local bagSize = G_RLF.db.global.fontSize
+				str = str .. "|A:ParagonReputation_Bag:" .. bagSize .. ":" .. bagSize .. ":0:0|a    "
+			end
+			if currentValue ~= nil and currentValue > 0 then
+				str = str .. currentValue
+			end
+			if threshold ~= nil and threshold > 0 then
+				str = str .. "/" .. threshold
 			end
 		else
 			normalRep()
