@@ -16,7 +16,8 @@ function Currency.Element:new(...)
 	element.isLink = true
 
 	local t
-	element.key, t, element.icon, element.quantity = ...
+	element.key, t, element.icon, element.quantity, element.totalCount, element.quality, element.totalEarned, element.cappedQuantity =
+		...
 
 	element.textFn = function(existingQuantity, truncatedLink)
 		if not truncatedLink then
@@ -25,28 +26,15 @@ function Currency.Element:new(...)
 		return truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
 	end
 
-	local info = C_CurrencyInfo.GetCurrencyInfo(element.key)
-
-	element.quality = info.quality
-	element.currentTotal = info.quantity
-	element.totalEarned = info.totalEarned
-	element.cappedQuantity = info.maxQuantity
-
 	element.secondaryTextFn = function(...)
-		if element.currentTotal == 0 then
-			return ""
-		end
-
-		local str = "    |cFFBABABA" .. element.currentTotal .. "|r"
-
-		if element.cappedQuantity > 0 then
+		if element.cappedQuantity and element.cappedQuantity > 0 then
 			local percentage, numerator
 			if element.totalEarned > 0 then
 				numerator = element.totalEarned
 				percentage = element.totalEarned / element.cappedQuantity
 			else
-				numerator = element.currentTotal
-				percentage = element.currentTotal / element.cappedQuantity
+				numerator = element.totalCount
+				percentage = element.totalCount / element.cappedQuantity
 			end
 			local color
 			if percentage < 0.7 then
@@ -57,10 +45,10 @@ function Currency.Element:new(...)
 				color = "|cFFFF0000"
 			end
 
-			str = str .. "  " .. color .. "(" .. numerator .. " / " .. element.cappedQuantity .. ")|r"
+			return "    " .. color .. numerator .. " / " .. element.cappedQuantity .. "|r"
 		end
 
-		return str
+		return ""
 	end
 
 	return element
@@ -132,11 +120,16 @@ function Currency:Process(eventName, currencyType, quantityChange)
 
 	self:fn(function()
 		local basicInfo = C_CurrencyInfo.GetBasicCurrencyInfo(currencyType, quantityChange)
+		local ratio = basicInfo.displayAmount / quantityChange
 		local e = self.Element:new(
 			info.currencyID,
 			C_CurrencyInfo.GetCurrencyLink(currencyType),
 			info.iconFileID,
-			basicInfo.displayAmount
+			basicInfo.displayAmount,
+			info.quantity * ratio,
+			info.quality,
+			info.totalEarned,
+			info.maxQuantity
 		)
 		e:Show()
 	end)

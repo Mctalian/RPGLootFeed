@@ -1,6 +1,6 @@
 local addonName, G_RLF = ...
 
-local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceEvent-3.0")
+local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
 
 local lsm = G_RLF.lsm
 
@@ -14,6 +14,7 @@ local truncateItemLink
 local frame = nil
 local tempFontString = nil
 local elementQueue = G_RLF.Queue:new()
+local pendingCounts = {}
 
 --@alpha@
 local TestLabelQueueSize
@@ -62,6 +63,7 @@ function LootDisplay:OnInitialize()
 
 	self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnPlayerCombatChange")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnPlayerCombatChange")
+	self:RegisterBucketEvent("BAG_UPDATE_DELAYED", 0.5, "BAG_UPDATE_DELAYED")
 end
 
 function LootDisplay:OnPlayerCombatChange()
@@ -108,6 +110,33 @@ function LootDisplay:UpdateFadeDelay()
 	frame:UpdateFadeDelay()
 end
 
+function LootDisplay:BAG_UPDATE_DELAYED()
+	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, nil, eventName)
+
+	local snapshotCountsNum = #pendingCounts
+
+	local function ItemCountUpdate(itemId, row)
+		local itemCount = C_Item.GetItemCount(itemId, true, false, true, true)
+		if itemCount and itemCount > 0 then
+			row:ShowItemCountText(itemCount)
+		else
+			print("ItemCountUpdate", "No item count", itemId, itemCount)
+		end
+	end
+
+	for i = 1, snapshotCountsNum do
+		local itemId, row = unpack(pendingCounts[1])
+		RunNextFrame(function()
+			ItemCountUpdate(itemId, row)
+		end)
+		tremove(pendingCounts, 1)
+	end
+	if #pendingCounts > 0 then
+		print("BAG_UPDATE_DELAYED", "Pending counts remaining", #pendingCounts)
+		print(dump(pendingCounts))
+	end
+end
+
 local function processRow(element)
 	if not element:IsEnabled() then
 		return
@@ -125,6 +154,7 @@ local function processRow(element)
 	local logFn = element.logFn
 	local isLink = element.isLink
 	local unit = element.unit
+	local itemCount = element.itemCount
 
 	if unit then
 		key = unit .. "_" .. key
@@ -156,7 +186,12 @@ local function processRow(element)
 		row.amount = quantity
 
 		if isLink then
-			local extraWidth = getTextWidth(" x" .. row.amount)
+			local extraWidthStr = " x" .. row.amount
+			if element.itemCount then
+				extraWidthStr = extraWidthStr .. " (" .. element.itemCount .. ")"
+			end
+
+			local extraWidth = getTextWidth(extraWidthStr)
 			if row.unit then
 				local portraitSize = G_RLF.db.global.iconSize * 0.8
 				extraWidth = extraWidth + portraitSize - (portraitSize / 2)
@@ -178,6 +213,14 @@ local function processRow(element)
 
 	if not new then
 		row:UpdateSecondaryText(secondaryTextFn)
+	end
+
+	if element.type == "ItemLoot" and not element.unit then
+		tinsert(pendingCounts, { textFn(), row })
+	end
+
+	if element.type == "Currency" then
+		row:ShowItemCountText(element.totalCount)
 	end
 
 	row:ShowText(text, r, g, b, a)

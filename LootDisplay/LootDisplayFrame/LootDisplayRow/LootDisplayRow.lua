@@ -100,10 +100,12 @@ local function rowText(row, icon)
 	if fontChanged then
 		if G_RLF.db.global.useFontObjects or not G_RLF.db.global.fontFace then
 			row.PrimaryText:SetFontObject(G_RLF.db.global.font)
+			row.ItemCountText:SetFontObject(G_RLF.db.global.font)
 			row.SecondaryText:SetFontObject(G_RLF.db.global.font)
 		else
 			local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, G_RLF.db.global.fontFace)
 			row.PrimaryText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
+			row.ItemCountText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
 			row.SecondaryText:SetFont(fontPath, G_RLF.db.global.secondaryFontSize, G_RLF.defaults.global.fontFlags)
 		end
 	end
@@ -132,6 +134,7 @@ local function rowText(row, icon)
 			xOffset = xOffset * -1
 		end
 		row.PrimaryText:ClearAllPoints()
+		row.ItemCountText:ClearAllPoints()
 		row.PrimaryText:SetJustifyH(anchor)
 		if icon then
 			if row.unit then
@@ -160,8 +163,9 @@ local function rowText(row, icon)
 			row.SecondaryText:SetPoint("TOP", row, "CENTER", 0, -padding)
 			row.SecondaryText:SetShown(true)
 		end
+
+		row.ItemCountText:SetPoint(anchor, row.PrimaryText, iconAnchor, 2, 0)
 	end
-	-- Adjust the text position dynamically based on leftAlign or other conditions
 end
 
 local function updateBorderPositions(row)
@@ -312,6 +316,8 @@ function LootDisplayRowMixin:Reset()
 
 	self.UnitPortrait:SetTexture(nil)
 	self.SecondaryText:SetText(nil)
+	self.ItemCountText:SetText(nil)
+	self.ItemCountText:Hide()
 
 	-- Reset amount text behavior
 	self.PrimaryText:SetScript("OnEnter", nil)
@@ -439,6 +445,15 @@ function LootDisplayRowMixin:Dump()
 		prevKey,
 		nextKey
 	)
+end
+
+function LootDisplayRowMixin:ShowItemCountText(itemCount)
+	if itemCount and itemCount > 1 then
+		self.ItemCountText:SetText("|cFFBCBCBC(" .. itemCount .. ")|r")
+		self.ItemCountText:Show()
+	else
+		self.ItemCountText:Hide()
+	end
 end
 
 function LootDisplayRowMixin:ShowText(text, r, g, b, a)

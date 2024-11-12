@@ -105,11 +105,31 @@ function Rep.Element:new(...)
 	element.secondaryTextFn = function()
 		local str = ""
 
-		if not element.factionId or element.isDelveCompanion then
+		if not element.factionId then
 			return str
 		end
 
 		local color = G_RLF:RGBAToHexFormat(element.r, element.g, element.b, 0.7)
+
+		if element.isDelveCompanion then
+			local ranks = C_GossipInfo.GetFriendshipReputationRanks(element.factionId)
+			local info = C_GossipInfo.GetFriendshipReputation(element.factionId)
+
+			local currentLevel = ranks and ranks.currentLevel or 0
+			local maxLevel = ranks and ranks.maxLevel or 0
+			local currentXp, nextLevelAt
+			if currentLevel < maxLevel and currentLevel > 0 then
+				str = currentLevel
+			end
+			if info.nextThreshold then
+				currentXp = info.standing - info.reactionThreshold
+				nextLevelAt = info.nextThreshold - info.reactionThreshold
+
+				str = str .. "    " .. math.floor((currentXp / nextLevelAt) * 10000) / 100 .. "%"
+			end
+
+			return "    " .. color .. str .. "|r"
+		end
 
 		local function normalRep()
 			local factionData = C_Reputation.GetFactionDataByID(element.factionId)
