@@ -163,9 +163,27 @@ local function runCurrencySmokeTest()
 	local module = G_RLF.RLF:GetModule("Currency")
 	local testObj = testCurrencies[2]
 	local amountLooted = 1
-	local e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted)
+	local e = module.Element:new(
+		testObj.id,
+		testObj.link,
+		testObj.icon,
+		amountLooted,
+		testObj.quantity,
+		testObj.quality,
+		testObj.totalEarned,
+		testObj.maxQuantity
+	)
 	runTestSafely(e.Show, "LootDisplay: Currency")
-	e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted)
+	e = module.Element:new(
+		testObj.id,
+		testObj.link,
+		testObj.icon,
+		amountLooted,
+		testObj.quantity,
+		testObj.quality,
+		testObj.totalEarned,
+		testObj.maxQuantity
+	)
 	runTestSafely(e.Show, "LootDisplay: Currency Quantity Update")
 end
 

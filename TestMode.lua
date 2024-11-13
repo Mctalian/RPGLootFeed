@@ -79,11 +79,17 @@ local function initializeTestCurrencies()
 		if not idExistsInTable(id, testCurrencies) then
 			local info = C_CurrencyInfo.GetCurrencyInfo(id)
 			local link = C_CurrencyInfo.GetCurrencyLink(id)
+			local basicInfo = C_CurrencyInfo.GetBasicCurrencyInfo(id, 100)
+			local ratio = basicInfo.displayAmount / 100
 			if info and link and info.currencyID and info.iconFileID then
 				table.insert(testCurrencies, {
 					id = info.currencyID,
 					link = link,
 					icon = info.iconFileID,
+					quantity = info.quantity * (ratio or 1),
+					quality = info.quality,
+					totalEarned = info.totalEarned,
+					maxQuantity = info.maxQuantity,
 				})
 			end
 		end
@@ -175,7 +181,16 @@ local function generateRandomLoot()
 			local currency = testCurrencies[math.random(#testCurrencies)]
 			local amountLooted = math.random(1, 500)
 			local module = G_RLF.RLF:GetModule("Currency")
-			local e = module.Element:new(currency.id, currency.link, currency.icon, amountLooted)
+			local e = module.Element:new(
+				currency.id,
+				currency.link,
+				currency.icon,
+				amountLooted,
+				currency.quantity,
+				currency.quality,
+				currency.totalEarned,
+				currency.maxQuantity
+			)
 			e:Show()
 
 			-- 10% chance to show reputation (least frequent)

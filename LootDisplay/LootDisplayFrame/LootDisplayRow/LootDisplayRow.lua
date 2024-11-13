@@ -299,12 +299,14 @@ function LootDisplayRowMixin:Reset()
 	self:ClearAllPoints()
 
 	-- Reset row-specific data
+	self.id = nil
 	self.key = nil
 	self.amount = nil
 	self.icon = nil
 	self.link = nil
 	self.secondaryText = nil
 	self.unit = nil
+	self.type = nil
 
 	-- Reset UI elements that were part of the template
 	self.TopBorder:SetAlpha(0)
@@ -445,6 +447,18 @@ function LootDisplayRowMixin:Dump()
 		prevKey,
 		nextKey
 	)
+end
+
+function LootDisplayRowMixin:UpdateItemCount()
+	RunNextFrame(function()
+		if self.id then
+			local itemCount = C_Item.GetItemCount(self.id, true, false, true, true)
+
+			if itemCount then
+				self:ShowItemCountText(itemCount)
+			end
+		end
+	end)
 end
 
 function LootDisplayRowMixin:ShowItemCountText(itemCount)

@@ -14,7 +14,6 @@ local truncateItemLink
 local frame = nil
 local tempFontString = nil
 local elementQueue = G_RLF.Queue:new()
-local pendingCounts = {}
 
 --@alpha@
 local TestLabelQueueSize
@@ -111,30 +110,9 @@ function LootDisplay:UpdateFadeDelay()
 end
 
 function LootDisplay:BAG_UPDATE_DELAYED()
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, nil, eventName)
+	self:getLogger():Info("BAG_UPDATE_DELAYED", "WOWEVENT", self.moduleName, nil, "BAG_UPDATE_DELAYED")
 
-	local snapshotCountsNum = #pendingCounts
-
-	local function ItemCountUpdate(itemId, row)
-		local itemCount = C_Item.GetItemCount(itemId, true, false, true, true)
-		if itemCount and itemCount > 0 then
-			row:ShowItemCountText(itemCount)
-		else
-			print("ItemCountUpdate", "No item count", itemId, itemCount)
-		end
-	end
-
-	for i = 1, snapshotCountsNum do
-		local itemId, row = unpack(pendingCounts[1])
-		RunNextFrame(function()
-			ItemCountUpdate(itemId, row)
-		end)
-		tremove(pendingCounts, 1)
-	end
-	if #pendingCounts > 0 then
-		print("BAG_UPDATE_DELAYED", "Pending counts remaining", #pendingCounts)
-		print(dump(pendingCounts))
-	end
+	frame:UpdateRowItemCounts()
 end
 
 local function processRow(element)
@@ -183,7 +161,9 @@ local function processRow(element)
 			row.unit = unit
 		end
 
+		row.id = element.key
 		row.amount = quantity
+		row.type = element.type
 
 		if isLink then
 			local extraWidthStr = " x" .. row.amount
@@ -216,7 +196,10 @@ local function processRow(element)
 	end
 
 	if element.type == "ItemLoot" and not element.unit then
-		tinsert(pendingCounts, { textFn(), row })
+		RunNextFrame(function()
+			local itemCount = C_Item.GetItemCount(element.key, true, false, true, true)
+			row:ShowItemCountText(itemCount)
+		end)
 	end
 
 	if element.type == "Currency" then
