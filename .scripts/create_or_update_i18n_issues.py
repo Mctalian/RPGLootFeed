@@ -18,7 +18,7 @@ headers = {
 def get_all_translation_issues():
     """Search for an existing issue for the given locale."""
     search_url = f"{GITHUB_API_URL}/search/issues"
-    query = f'repo:{REPO_OWNER}/{REPO_NAME} is:issue label:i18n state:open'
+    query = f"repo:{REPO_OWNER}/{REPO_NAME} is:issue label:i18n state:open"
     params = {"q": query}
 
     response = requests.get(search_url, headers=headers, params=params)
