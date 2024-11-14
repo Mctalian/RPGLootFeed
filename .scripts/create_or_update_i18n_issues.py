@@ -18,7 +18,7 @@ headers = {
 def get_all_translation_issues():
     """Search for an existing issue for the given locale."""
     search_url = f"{GITHUB_API_URL}/search/issues"
-    query = f'repo:{REPO_OWNER}/{REPO_NAME} is:issue label:i18n label:"help wanted" state:open'
+    query = f'repo:{REPO_OWNER}/{REPO_NAME} is:issue label:i18n state:open'
     params = {"q": query}
 
     response = requests.get(search_url, headers=headers, params=params)
@@ -44,7 +44,7 @@ def create_issue(locale, markdown_content):
     issue_data = {
         "title": title,
         "body": markdown_content,
-        "labels": ["i18n", "help wanted"],  # Add or modify labels as needed
+        "labels": ["i18n"],
     }
 
     response = requests.post(issue_url, headers=headers, json=issue_data)
