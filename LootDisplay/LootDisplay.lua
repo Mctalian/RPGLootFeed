@@ -213,6 +213,13 @@ local function processRow(element)
 		)
 	end
 
+	if element.type == "Experience" and element.currentLevel then
+		row:ShowItemCountText(
+			element.currentLevel,
+			{ color = G_RLF:RGBAToHexFormat(0.749, 0.737, 0.012, 1), wrapChar = G_RLF.WrapCharEnum.ANGLE }
+		)
+	end
+
 	row:ShowText(text, r, g, b, a)
 
 	logFn(text, row.amount, new)
