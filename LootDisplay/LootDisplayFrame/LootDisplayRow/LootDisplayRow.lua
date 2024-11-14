@@ -164,7 +164,7 @@ local function rowText(row, icon)
 			row.SecondaryText:SetShown(true)
 		end
 
-		row.ItemCountText:SetPoint(anchor, row.PrimaryText, iconAnchor, 2, 0)
+		row.ItemCountText:SetPoint(anchor, row.PrimaryText, iconAnchor, xOffset, 0)
 	end
 end
 
@@ -455,15 +455,35 @@ function LootDisplayRowMixin:UpdateItemCount()
 			local itemCount = C_Item.GetItemCount(self.id, true, false, true, true)
 
 			if itemCount then
-				self:ShowItemCountText(itemCount)
+				self:ShowItemCountText(itemCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
 			end
 		end
 	end)
 end
 
-function LootDisplayRowMixin:ShowItemCountText(itemCount)
+function LootDisplayRowMixin:ShowItemCountText(itemCount, options)
+	local WrapChar = G_RLF.WrapCharEnum
+	options = options or {}
+	local color = options.color or "|cFFBCBCBC"
+	local wrapChar = options.wrapChar or WrapChar.DEFAULT
+
+	local sChar, eChar
+	if wrapChar == WrapChar.SPACE then
+		sChar, eChar = " ", ""
+	elseif wrapChar == WrapChar.PARENTHESIS then
+		sChar, eChar = "(", ")"
+	elseif wrapChar == WrapChar.BRACKET then
+		sChar, eChar = "[", "]"
+	elseif wrapChar == WrapChar.BRACE then
+		sChar, eChar = "{", "}"
+	elseif wrapChar == WrapChar.ANGLE then
+		sChar, eChar = "<", ">"
+	else
+		sChar, eChar = "", ""
+	end
+
 	if itemCount and itemCount > 1 then
-		self.ItemCountText:SetText("|cFFBCBCBC(" .. itemCount .. ")|r")
+		self.ItemCountText:SetText(color .. sChar .. itemCount .. eChar .. "|r")
 		self.ItemCountText:Show()
 	else
 		self.ItemCountText:Hide()

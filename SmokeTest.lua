@@ -237,7 +237,7 @@ local function testLootDisplay()
 	local frame = LootDisplayFrame
 	assertEqual(frame ~= nil, true, "LootDisplayFrame")
 	C_Timer.After(G_RLF.db.global.fadeOutDelay + 3, function()
-		assertEqual(#frame.rowHistory, 6, true, "LootDisplayFrame: rowHistory")
+		assertEqual(#frame.rowHistory, 6, "LootDisplayFrame: rowHistory")
 		displayResults()
 	end)
 end

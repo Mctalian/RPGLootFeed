@@ -198,12 +198,19 @@ local function processRow(element)
 	if element.type == "ItemLoot" and not element.unit then
 		RunNextFrame(function()
 			local itemCount = C_Item.GetItemCount(element.key, true, false, true, true)
-			row:ShowItemCountText(itemCount)
+			row:ShowItemCountText(itemCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
 		end)
 	end
 
 	if element.type == "Currency" then
-		row:ShowItemCountText(element.totalCount)
+		row:ShowItemCountText(element.totalCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
+	end
+
+	if element.type == "Reputation" and element.repLevel then
+		row:ShowItemCountText(
+			element.repLevel,
+			{ color = G_RLF:RGBAToHexFormat(0.5, 0.5, 1, 1), wrapChar = G_RLF.WrapCharEnum.ANGLE }
+		)
 	end
 
 	row:ShowText(text, r, g, b, a)
