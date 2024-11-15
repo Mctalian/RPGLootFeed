@@ -104,12 +104,13 @@ function Rep.Element:new(...)
 		return sign .. math.abs(rep) .. " " .. factionName
 	end
 
-	if element.repType == RepType.MajorFaction then
-		element.repLevel = factionData.renownLevel
-	elseif element.repType == RepType.DelveCompanion then
-		element.repLevel = factionData.currentLevel
-	else
-		element.repLevel = nil
+	element.repLevel = nil
+	if factionData then
+		if factionData.renownLevel then
+			element.repLevel = factionData.renownLevel
+		elseif element.repType == RepType.DelveCompanion then
+			element.repLevel = factionData.currentLevel
+		end
 	end
 
 	element.secondaryTextFn = function()
@@ -302,12 +303,6 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 				color = ACCOUNT_WIDE_FONT_COLOR
 				repType = RepType.MajorFaction
 				factionData = C_MajorFactions.GetMajorFactionRenownInfo(fId)
-			elseif C_Reputation.IsFactionParagon(fId) then
-				color = FACTION_GREEN_COLOR
-				repType = RepType.Paragon
-				factionData = {}
-				factionData.currentValue, factionData.threshold, factionData.rewardQuestId, factionData.hasRewardPending, factionData.tooLowLevelForParagon =
-					C_Reputation.GetFactionParagonInfo(fId)
 			elseif isDelveCompanion then
 				factionData = C_Reputation.GetFactionDataByID(fId)
 				local ranks = C_GossipInfo.GetFriendshipReputationRanks(fId)
@@ -326,6 +321,14 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 					color = FACTION_BAR_COLORS[factionData.reaction]
 				end
 				repType = RepType.BaseFaction
+			end
+
+			if C_Reputation.IsFactionParagon(fId) then
+				color = color or FACTION_GREEN_COLOR
+				repType = RepType.Paragon
+				factionData = factionData or {}
+				factionData.currentValue, factionData.threshold, factionData.rewardQuestId, factionData.hasRewardPending, factionData.tooLowLevelForParagon =
+					C_Reputation.GetFactionParagonInfo(fId)
 			end
 		else
 			self:getLogger():Warn(faction .. " is STILL not cached for " .. locale, addonName, self.moduleName)
