@@ -10,6 +10,7 @@ G_RLF.LootDisplayProperties = {
 	"icon",
 	"quantity",
 	"quality",
+	"totalCount",
 	"r",
 	"g",
 	"b",

@@ -41,7 +41,7 @@ describe("Reputation module", function()
 
 		assert.is_true(success)
 
-		assert.spy(newElement).was.called_with(_, 10, "Faction A", 1, 0, 0, 1, 3, false)
+		assert.spy(newElement).was.called_with(_, 10, "Faction A", 1, 0, 0, 1, _, 3)
 		assert.stub(ns.LootDisplay.ShowLoot).was.called()
 		-- Successfully populates the locale cache
 		assert.equal(ns.db.global.factionMaps.enUS["Faction A"], 1)
@@ -54,7 +54,7 @@ describe("Reputation module", function()
 
 		assert.is_true(success)
 
-		assert.spy(newElement).was.called_with(_, 100, "Faction B", nil, nil, nil, nil, nil, false)
+		assert.spy(newElement).was.called_with(_, 100, "Faction B", nil, nil, nil, nil, nil, nil)
 		assert.stub(ns.LootDisplay.ShowLoot).was.called()
 		assert.spy(RepModule:getLogger().Warn).was.called()
 		assert.spy(RepModule:getLogger().Warn).was.called_with(_, "Faction B is STILL not cached for enUS", _, _)
@@ -69,7 +69,7 @@ describe("Reputation module", function()
 
 		assert.is_true(success)
 
-		assert.spy(newElement).was.called_with(_, 313, "Brann Bronzebeard", 0, 1, 0, 2640, 3, true)
+		assert.spy(newElement).was.called_with(_, 313, "Brann Bronzebeard", 0, 1, 0, 2640, _, 4)
 		assert.stub(ns.LootDisplay.ShowLoot).was.called()
 		-- Successfully populates the locale cache
 		assert.equal(ns.db.global.factionMaps.enUS["Brann Bronzebeard"], 2640)
@@ -77,21 +77,21 @@ describe("Reputation module", function()
 
 	describe("element.textFn", function()
 		it("handles positive rep gains", function()
-			local element = RepModule.Element:new(10, "Faction A", 1, 0, 0, 1, 3, false)
+			local element = RepModule.Element:new(10, "Faction A", 1, 0, 0, 1, _, 3)
 			local text = element.textFn()
 
 			assert.equal(text, "+10 Faction A")
 		end)
 
 		it("handles negative rep gains", function()
-			local element = RepModule.Element:new(-10, "Faction A", 1, 0, 0, 1, 3, false)
+			local element = RepModule.Element:new(-10, "Faction A", 1, 0, 0, 1, _, 3)
 			local text = element.textFn()
 
 			assert.equal(text, "-10 Faction A")
 		end)
 
 		it("handles updated rep values", function()
-			local element = RepModule.Element:new(10, "Faction A", 1, 0, 0, 1, 3, false)
+			local element = RepModule.Element:new(10, "Faction A", 1, 0, 0, 1, _, 3)
 			local text = element.textFn(20)
 
 			assert.equal(text, "+30 Faction A")
@@ -100,22 +100,36 @@ describe("Reputation module", function()
 
 	describe("element.secondaryTextFn", function()
 		it("does not continue if factionId is missing", function()
-			local element = RepModule.Element:new(10, "Faction A", 1, 0, 0, nil, 3, false)
+			local element = RepModule.Element:new(10, "Faction A", 1, 0, 0, nil, _, 3)
 			local text = element.secondaryTextFn()
 
 			assert.equal(text, "")
 		end)
 
 		it("does not continue if this is a delve companion experience gain", function()
-			local element = RepModule.Element:new(10, "Brann Bronzebeard", 1, 0, 0, 2640, 3, true)
+			local factionData = {
+				factionId = 2640,
+				factionName = "Brann Bronzebeard",
+				currentLevel = 1,
+				maxLevel = 10,
+				currentXp = 23,
+				nextLevelAt = 100,
+			}
+			local element = RepModule.Element:new(10, "Brann Bronzebeard", 1, 0, 0, 2640, factionData, 4)
 			local text = element.secondaryTextFn()
 
-			assert.equal(text, "")
+			assert.is_not_nil(string.match(text, "23.0%%"))
 		end)
 
 		describe("normal factions", function()
 			it("shows current standing and progress to next standing", function()
-				local element = RepModule.Element:new(10, "Faction A", 1, 0, 0, 1, 3, false)
+				local factionData = {
+					factionId = 1,
+					factionName = "Faction A",
+					currentStanding = 20,
+					currentReactionThreshold = 3000,
+				}
+				local element = RepModule.Element:new(10, "Faction A", 1, 0, 0, 1, factionData, 3)
 				local text = element.secondaryTextFn()
 
 				-- assert that text containns "20/3000"

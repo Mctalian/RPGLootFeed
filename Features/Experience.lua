@@ -20,6 +20,7 @@ function Xp.Element:new(...)
 	element.textFn = function(existingXP)
 		return "+" .. ((existingXP or 0) + element.quantity) .. " " .. G_RLF.L["XP"]
 	end
+	element.currentLevel = currentLevel
 
 	element.secondaryTextFn = function()
 		if not currentXP then
@@ -28,14 +29,9 @@ function Xp.Element:new(...)
 		if not currentMaxXP then
 			return ""
 		end
-		local color = G_RLF:RGBAToHexFormat(1, 1, 1, 1)
+		local color = G_RLF:RGBAToHexFormat(element.r, element.g, element.b, element.a)
 
-		return "    "
-			.. color
-			.. currentLevel
-			.. "|r    "
-			.. math.floor((currentXP / currentMaxXP) * 10000) / 100
-			.. "%"
+		return "    " .. color .. math.floor((currentXP / currentMaxXP) * 10000) / 100 .. "%|r"
 	end
 
 	return element

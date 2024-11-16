@@ -8,6 +8,7 @@ local RepType = {
 	MajorFaction = 1,
 	Paragon = 2,
 	BaseFaction = 3,
+	DelveCompanion = 4,
 }
 
 -- Precompute pattern segments to optimize runtime message parsing
@@ -39,7 +40,8 @@ end
 local function buildFactionLocaleMap(findName)
 	local numFactions = C_Reputation.GetNumFactions()
 	local mappedFactions = countMappedFactions()
-	if mappedFactions >= numFactions and not findName then
+	local hasMoreFactions = C_Reputation.GetFactionDataByIndex(mappedFactions + 1) ~= nil
+	if not hasMoreFactions and not findName then
 		return
 	end
 
@@ -88,8 +90,8 @@ function Rep.Element:new(...)
 		return Rep:IsEnabled()
 	end
 
-	local factionName, rL, gL, bL
-	element.quantity, factionName, rL, gL, bL, element.factionId, element.repType, element.isDelveCompanion = ...
+	local factionName, factionData, rL, gL, bL
+	element.quantity, factionName, rL, gL, bL, element.factionId, factionData, element.repType = ...
 	element.r, element.g, element.b = rL or 0.5, gL or 0.5, bL or 1
 	element.a = 1
 	element.key = "REP_" .. factionName
@@ -102,56 +104,53 @@ function Rep.Element:new(...)
 		return sign .. math.abs(rep) .. " " .. factionName
 	end
 
+	element.repLevel = nil
+	if factionData then
+		if factionData.renownLevel then
+			element.repLevel = factionData.renownLevel
+		elseif element.repType == RepType.DelveCompanion then
+			element.repLevel = factionData.currentLevel
+		end
+	end
+
 	element.secondaryTextFn = function()
 		local str = ""
 
-		if not element.factionId or element.isDelveCompanion then
+		if not element.factionId or not factionData then
 			return str
 		end
 
 		local color = G_RLF:RGBAToHexFormat(element.r, element.g, element.b, 0.7)
 
-		local function normalRep()
-			local factionData = C_Reputation.GetFactionDataByID(element.factionId)
-			if factionData.currentStanding >= 0 and factionData.currentReactionThreshold > 0 then
-				str = str .. factionData.currentStanding .. "/" .. factionData.currentReactionThreshold
-			end
+		if element.repType == RepType.DelveCompanion and factionData then
+			str = math.floor((factionData.currentXp / factionData.nextLevelAt) * 10000) / 100 .. "%"
+			return "    " .. color .. str .. "|r"
 		end
 
 		if element.repType == RepType.MajorFaction then
-			local factionData = C_MajorFactions.GetMajorFactionRenownInfo(element.factionId)
-			if factionData.renownLevel ~= nil and factionData.renownLevel > 0 then
-				str = str .. factionData.renownLevel
-			end
 			if
 				factionData.renownReputationEarned ~= nil
 				and factionData.renownLevelThreshold ~= nil
 				and factionData.renownReputationEarned > 0
 				and factionData.renownLevelThreshold > 0
 			then
-				str = str
-					.. "    ("
-					.. factionData.renownReputationEarned
-					.. "/"
-					.. factionData.renownLevelThreshold
-					.. ")"
+				str = str .. factionData.renownReputationEarned .. "/" .. factionData.renownLevelThreshold
 			end
 		elseif element.repType == RepType.Paragon then
-			local currentValue, threshold, _, hasRewardPending, tooLowLevelForParagon =
-				C_Reputation.GetFactionParagonInfo(element.factionId)
-
-			if hasRewardPending then
+			if factionData.hasRewardPending then
 				local bagSize = G_RLF.db.global.fontSize
 				str = str .. "|A:ParagonReputation_Bag:" .. bagSize .. ":" .. bagSize .. ":0:0|a    "
 			end
-			if currentValue ~= nil and currentValue > 0 then
-				str = str .. currentValue
+			if factionData.currentValue ~= nil and factionData.currentValue > 0 then
+				str = str .. factionData.currentValue
 			end
-			if threshold ~= nil and threshold > 0 then
-				str = str .. "/" .. threshold
+			if factionData.threshold ~= nil and factionData.threshold > 0 then
+				str = str .. "/" .. factionData.threshold
 			end
 		else
-			normalRep()
+			if factionData.currentStanding >= 0 and factionData.currentReactionThreshold > 0 then
+				str = str .. factionData.currentStanding .. "/" .. factionData.currentReactionThreshold
+			end
 		end
 
 		if str ~= "" then
@@ -297,21 +296,39 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 			buildFactionLocaleMap(faction)
 		end
 
-		local type, fId
+		local repType, fId, factionData
 		if G_RLF.db.global.factionMaps[locale][faction] then
 			fId = G_RLF.db.global.factionMaps[locale][faction]
 			if C_Reputation.IsMajorFaction(fId) then
 				color = ACCOUNT_WIDE_FONT_COLOR
-				type = RepType.MajorFaction
-			elseif C_Reputation.IsFactionParagon(fId) then
-				color = FACTION_GREEN_COLOR
-				type = RepType.Paragon
-			else
-				local factionData = C_Reputation.GetFactionDataByID(fId)
+				repType = RepType.MajorFaction
+				factionData = C_MajorFactions.GetMajorFactionRenownInfo(fId)
+			elseif isDelveCompanion then
+				factionData = C_Reputation.GetFactionDataByID(fId)
+				local ranks = C_GossipInfo.GetFriendshipReputationRanks(fId)
+				local info = C_GossipInfo.GetFriendshipReputation(fId)
 				if factionData.reaction then
 					color = FACTION_BAR_COLORS[factionData.reaction]
 				end
-				type = RepType.BaseFaction
+				factionData.currentLevel = ranks and ranks.currentLevel or 0
+				factionData.maxLevel = ranks and ranks.maxLevel or 0
+				factionData.currentXp = info.standing - info.reactionThreshold
+				factionData.nextLevelAt = info.nextThreshold - info.reactionThreshold
+				repType = RepType.DelveCompanion
+			else
+				factionData = C_Reputation.GetFactionDataByID(fId)
+				if factionData.reaction then
+					color = FACTION_BAR_COLORS[factionData.reaction]
+				end
+				repType = RepType.BaseFaction
+			end
+
+			if C_Reputation.IsFactionParagon(fId) then
+				color = color or FACTION_GREEN_COLOR
+				repType = RepType.Paragon
+				factionData = factionData or {}
+				factionData.currentValue, factionData.threshold, factionData.rewardQuestId, factionData.hasRewardPending, factionData.tooLowLevelForParagon =
+					C_Reputation.GetFactionParagonInfo(fId)
 			end
 		else
 			self:getLogger():Warn(faction .. " is STILL not cached for " .. locale, addonName, self.moduleName)
@@ -321,7 +338,7 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 			r, g, b = color.r, color.g, color.b
 		end
 
-		local e = self.Element:new(repChange, faction, r, g, b, fId, type, isDelveCompanion)
+		local e = self.Element:new(repChange, faction, r, g, b, fId, factionData, repType)
 		e:Show()
 	end)
 end

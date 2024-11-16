@@ -398,3 +398,11 @@ function LootDisplayFrameMixin:HideHistoryFrame()
 		self.historyFrame:SetVerticalScroll(0)
 	end
 end
+
+function LootDisplayFrameMixin:UpdateRowItemCounts()
+	for row in rows:iterate() do
+		if row.id and row.type == "ItemLoot" then
+			row:UpdateItemCount()
+		end
+	end
+end

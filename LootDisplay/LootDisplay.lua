@@ -1,6 +1,6 @@
 local addonName, G_RLF = ...
 
-local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceEvent-3.0")
+local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
 
 local lsm = G_RLF.lsm
 
@@ -62,6 +62,7 @@ function LootDisplay:OnInitialize()
 
 	self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnPlayerCombatChange")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnPlayerCombatChange")
+	self:RegisterBucketEvent("BAG_UPDATE_DELAYED", 0.5, "BAG_UPDATE_DELAYED")
 end
 
 function LootDisplay:OnPlayerCombatChange()
@@ -108,6 +109,12 @@ function LootDisplay:UpdateFadeDelay()
 	frame:UpdateFadeDelay()
 end
 
+function LootDisplay:BAG_UPDATE_DELAYED()
+	self:getLogger():Info("BAG_UPDATE_DELAYED", "WOWEVENT", self.moduleName, nil, "BAG_UPDATE_DELAYED")
+
+	frame:UpdateRowItemCounts()
+end
+
 local function processRow(element)
 	if not element:IsEnabled() then
 		return
@@ -125,6 +132,7 @@ local function processRow(element)
 	local logFn = element.logFn
 	local isLink = element.isLink
 	local unit = element.unit
+	local itemCount = element.itemCount
 
 	if unit then
 		key = unit .. "_" .. key
@@ -153,10 +161,17 @@ local function processRow(element)
 			row.unit = unit
 		end
 
+		row.id = element.key
 		row.amount = quantity
+		row.type = element.type
 
 		if isLink then
-			local extraWidth = getTextWidth(" x" .. row.amount)
+			local extraWidthStr = " x" .. row.amount
+			if element.itemCount then
+				extraWidthStr = extraWidthStr .. " (" .. element.itemCount .. ")"
+			end
+
+			local extraWidth = getTextWidth(extraWidthStr)
 			if row.unit then
 				local portraitSize = G_RLF.db.global.iconSize * 0.8
 				extraWidth = extraWidth + portraitSize - (portraitSize / 2)
@@ -178,6 +193,31 @@ local function processRow(element)
 
 	if not new then
 		row:UpdateSecondaryText(secondaryTextFn)
+	end
+
+	if element.type == "ItemLoot" and not element.unit then
+		RunNextFrame(function()
+			local itemCount = C_Item.GetItemCount(element.key, true, false, true, true)
+			row:ShowItemCountText(itemCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
+		end)
+	end
+
+	if element.type == "Currency" then
+		row:ShowItemCountText(element.totalCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
+	end
+
+	if element.type == "Reputation" and element.repLevel then
+		row:ShowItemCountText(
+			element.repLevel,
+			{ color = G_RLF:RGBAToHexFormat(0.5, 0.5, 1, 1), wrapChar = G_RLF.WrapCharEnum.ANGLE }
+		)
+	end
+
+	if element.type == "Experience" and element.currentLevel then
+		row:ShowItemCountText(
+			element.currentLevel,
+			{ color = G_RLF:RGBAToHexFormat(0.749, 0.737, 0.012, 1), wrapChar = G_RLF.WrapCharEnum.ANGLE }
+		)
 	end
 
 	row:ShowText(text, r, g, b, a)

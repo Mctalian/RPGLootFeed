@@ -164,6 +164,21 @@ function common_stubs.stub_C_Reputation()
 			return false
 		end,
 	}
+	_G.C_GossipInfo = {
+		GetFriendshipReputationRanks = function()
+			return {
+				currentLevel = 3,
+				maxLevel = 60,
+			}
+		end,
+		GetFriendshipReputation = function()
+			return {
+				standing = 63,
+				reactionThreshold = 60,
+				nextThreshold = 100,
+			}
+		end,
+	}
 end
 
 function common_stubs.stub_C_DelvesUI()
