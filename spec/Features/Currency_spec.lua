@@ -76,6 +76,8 @@ describe("Currency module", function()
 				currencyID = 123,
 				description = "An awesome currency",
 				iconFileID = 123456,
+				quantity = 5,
+				quality = 2,
 			}
 		end
 
@@ -83,7 +85,7 @@ describe("Currency module", function()
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, 5, 2)
 
-		assert.spy(newElement).was.called_with(_, 123, "|c12345678|Hcurrency:123|r", 123456, 2)
+		assert.spy(newElement).was.called_with(_, 123, "|c12345678|Hcurrency:123|r", 123456, 2, 5, 2, nil, nil)
 		assert.stub(ns.LootDisplay.ShowLoot).was.called()
 	end)
 end)

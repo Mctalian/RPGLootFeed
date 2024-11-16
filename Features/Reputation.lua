@@ -122,7 +122,7 @@ function Rep.Element:new(...)
 
 		local color = G_RLF:RGBAToHexFormat(element.r, element.g, element.b, 0.7)
 
-		if element.isDelveCompanion and element.factionData then
+		if element.repType == RepType.DelveCompanion and factionData then
 			str = math.floor((factionData.currentXp / factionData.nextLevelAt) * 10000) / 100 .. "%"
 			return "    " .. color .. str .. "|r"
 		end
