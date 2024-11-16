@@ -46,11 +46,7 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 	if self.optionsFrame == nil then
 		self.optionsFrame = acd:AddToBlizOptions(addonName, addonName)
 	end
-	G_RLF:fn(function()
-		self:BossBannerHook()
-		self:LootToastHook()
-		self:MoneyAlertHook()
-	end)
+
 	local isNewVersion = currentVersion ~= G_RLF.db.global.lastVersionLoaded
 	if isLogin and isReload == false and isNewVersion then
 		G_RLF.db.global.lastVersionLoaded = currentVersion

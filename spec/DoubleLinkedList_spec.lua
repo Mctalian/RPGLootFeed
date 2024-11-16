@@ -76,6 +76,26 @@ describe("List module", function()
 		assert.are.equal(l.last._prev.value, "first")
 	end)
 
+	it("can remove the only node from the list", function()
+		local l = list(create_node("first"))
+		l:remove(l.last) -- remove "first"
+
+		assert.are.equal(l.length, 0)
+		assert.is_nil(l.first)
+		assert.is_nil(l.last)
+	end)
+
+	it("can remove the last node from the list", function()
+		local l = list(create_node("first"), create_node("second"))
+		l:remove(l.last) -- remove "second"
+
+		assert.are.equal(l.length, 1)
+		assert.are.equal(l.first.value, "first")
+		assert.is_nil(l.first._next)
+		assert.are.equal(l.last, l.first)
+		assert.is_not_nil(l.last)
+	end)
+
 	it("should iterate over the list", function()
 		local l = list(create_node("first"), create_node("second"), create_node("third"))
 		local result = {}

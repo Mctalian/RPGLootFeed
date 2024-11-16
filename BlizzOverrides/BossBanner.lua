@@ -1,28 +1,25 @@
 local addonName, G_RLF = ...
 
-local RLF = G_RLF.RLF
+local BossBannerOverride = G_RLF.RLF:NewModule("BossBanner", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
+
+function BossBannerOverride:OnInitialize()
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "BossBannerHook")
+end
 
 local bossBannerAttempts = 0
-
-function RLF:BossBannerHook()
+function BossBannerOverride:BossBannerHook()
 	if self:IsHooked(BossBanner, "OnEvent") then
 		return
 	end
 	if BossBanner then
 		self:RawHookScript(BossBanner, "OnEvent", "InterceptBossBannerAlert", true)
+		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	else
-		if bossBannerAttempts <= 30 then
-			bossBannerAttempts = bossBannerAttempts + 1
-			-- Keep checking until it's available
-			self:ScheduleTimer("BossBannerHook", 1)
-		else
-			self:Print(G_RLF.L["BossBannerAlertUnavailable"])
-			self:Print(G_RLF.L["Issues"])
-		end
+		bossBannerAttempts = G_RLF.retryHook(self, "BossBannerHook", bossBannerAttempts, "BossBannerAlertUnavailable")
 	end
 end
 
-function RLF:InterceptBossBannerAlert(s, event, ...)
+function BossBannerOverride:InterceptBossBannerAlert(s, event, ...)
 	if G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.FULLY_DISABLE then
 		return
 	end
@@ -55,3 +52,5 @@ function RLF:InterceptBossBannerAlert(s, event, ...)
 	-- Call the original AddAlert function if not blocked
 	self.hooks[BossBanner].OnEvent(s, event, ...)
 end
+
+return BossBannerOverride

@@ -52,3 +52,5 @@ function G_RLF.InitializeLootDisplayProperties(self)
 		self:getLogger():Info(self.type .. "Shown", addonName, self.type, self.key, text, amountLogText, new)
 	end
 end
+
+return G_RLF.LootDisplayProperties

@@ -41,8 +41,8 @@ function common_stubs.setup_G_RLF(spy)
 			end,
 		},
 		RLF = {
-			NewModule = function(_, name, libs)
-				return {
+			NewModule = function(_, name, ...)
+				local module = {
 					moduleName = name,
 					getLogger = function(self)
 						return logger
@@ -55,12 +55,47 @@ function common_stubs.setup_G_RLF(spy)
 						end
 					end,
 				}
+
+				for _, lib in ipairs({ ... }) do
+					if lib == "AceEvent-3.0" then
+						module.RegisterEvent = function(self, event, handler) end
+						module.UnregisterEvent = function(self, event) end
+						module.RegisterMessage = function(self, message, handler) end
+						module.SendMessage = function(self, message, ...) end
+						module.UnregisterMessage = function(self, message) end
+					end
+					if lib == "AceHook-3.0" then
+						module.Hook = function(self, object, method, handler, hookSecure) end
+						module.HookScript = function(self, frame, script, handler) end
+						module.IsHooked = function(self, obj, method)
+							return false
+						end
+						module.RawHook = function(self, object, method, handler, hookSecure) end
+						module.RawHookScript = function(self, frame, script, handler) end
+						module.SecureHook = function(self, object, method, handler) end
+						module.SecureHookScript = function(self, frame, script, handler) end
+						module.Unhook = function(self, object, method) end
+						module.UnhookAll = function(self) end
+						module.hooks = {}
+					end
+				end
+
+				return module
+			end,
+			GetModule = function(_, name)
+				return {
+					Enable = function() end,
+					Disable = function() end,
+				}
 			end,
 		},
 		fn = function(_, func, ...)
 			return func(...)
 		end,
 		Print = function(msg) end,
+		ProfileFunction = function(_, name, func)
+			return func
+		end,
 		RGBAToHexFormat = function(_, r, g, b, a)
 			local f = math.floor
 			return string.format("|c%02x%02x%02x%02x", f(a * 255), f(r * 255), f(g * 255), f(b * 255))

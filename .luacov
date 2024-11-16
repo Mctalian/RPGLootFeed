@@ -5,5 +5,6 @@ include = {
     "^BlizzOverrides/",  -- Include all files in BlizzOverrides/
     "^config/",          -- Include all files in config/
     "^Features/",        -- Include all files in Features/
+    "^LootDisplay/",     -- Include all files in LootDisplay/
     "^[^/]+$"            -- Include all Lua files in the repo root
 }
