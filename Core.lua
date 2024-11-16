@@ -64,6 +64,15 @@ G_RLF.lsm = LibStub("LibSharedMedia-3.0")
 G_RLF.Masque = LibStub and LibStub("Masque", true)
 G_RLF.iconGroup = Masque and Masque:Group(addonName)
 
+G_RLF.WrapCharEnum = {
+	DEFAULT = 0,
+	SPACE = 1,
+	PARENTHESIS = 2,
+	BRACKET = 3,
+	BRACE = 4,
+	ANGLE = 5,
+}
+
 local acr = LibStub("AceConfigRegistry-3.0")
 
 function G_RLF:NotifyChange(...)

@@ -10,6 +10,7 @@ G_RLF.LootDisplayProperties = {
 	"icon",
 	"quantity",
 	"quality",
+	"totalCount",
 	"r",
 	"g",
 	"b",
@@ -32,9 +33,9 @@ function G_RLF.InitializeLootDisplayProperties(self)
 		return true
 	end
 
-	self.Show = function(_, itemName, itemQuality)
+	self.Show = function(element, itemName, itemQuality)
 		if self:isPassingFilter(itemName, itemQuality) then
-			G_RLF.LootDisplay:ShowLoot(self)
+			G_RLF:SendMessage("RLF_NEW_LOOT", self)
 		end
 	end
 
@@ -51,3 +52,5 @@ function G_RLF.InitializeLootDisplayProperties(self)
 		self:getLogger():Info(self.type .. "Shown", addonName, self.type, self.key, text, amountLogText, new)
 	end
 end
+
+return G_RLF.LootDisplayProperties

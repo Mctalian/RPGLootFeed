@@ -1,12 +1,11 @@
 local addonName, G_RLF = ...
 
-local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceEvent-3.0")
+local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
 
 local lsm = G_RLF.lsm
 
 -- Private method declaration
 local processFromQueue
-local debounceProcessFromQueue
 local getTextWidth
 local truncateItemLink
 
@@ -51,17 +50,18 @@ function LootDisplay:OnInitialize()
 
 	tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
 	tempFontString:Hide() -- Prevent it from showing up
-	frame.OnRowRelease = function()
-		if elementQueue:size() > 0 then
-			debounceProcessFromQueue()
-		end
-	end
+end
+
+function LootDisplay:OnEnable()
+	self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnPlayerCombatChange")
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnPlayerCombatChange")
+	self:RegisterBucketEvent("BAG_UPDATE_DELAYED", 0.5, "BAG_UPDATE_DELAYED")
+	self:RegisterBucketMessage("RLF_NEW_LOOT", 0.1, "OnLootReady")
+	self:RegisterBucketMessage("RLF_ROW_RETURNED", 0.3, "OnRowReturn")
+
 	RunNextFrame(function()
 		G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
 	end)
-
-	self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnPlayerCombatChange")
-	self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnPlayerCombatChange")
 end
 
 function LootDisplay:OnPlayerCombatChange()
@@ -108,6 +108,12 @@ function LootDisplay:UpdateFadeDelay()
 	frame:UpdateFadeDelay()
 end
 
+function LootDisplay:BAG_UPDATE_DELAYED()
+	self:getLogger():Info("BAG_UPDATE_DELAYED", "WOWEVENT", self.moduleName, nil, "BAG_UPDATE_DELAYED")
+
+	frame:UpdateRowItemCounts()
+end
+
 local function processRow(element)
 	if not element:IsEnabled() then
 		return
@@ -125,6 +131,7 @@ local function processRow(element)
 	local logFn = element.logFn
 	local isLink = element.isLink
 	local unit = element.unit
+	local itemCount = element.itemCount
 
 	if unit then
 		key = unit .. "_" .. key
@@ -153,10 +160,17 @@ local function processRow(element)
 			row.unit = unit
 		end
 
+		row.id = element.key
 		row.amount = quantity
+		row.type = element.type
 
 		if isLink then
-			local extraWidth = getTextWidth(" x" .. row.amount)
+			local extraWidthStr = " x" .. row.amount
+			if element.itemCount then
+				extraWidthStr = extraWidthStr .. " (" .. element.itemCount .. ")"
+			end
+
+			local extraWidth = getTextWidth(extraWidthStr)
 			if row.unit then
 				local portraitSize = G_RLF.db.global.iconSize * 0.8
 				extraWidth = extraWidth + portraitSize - (portraitSize / 2)
@@ -164,12 +178,13 @@ local function processRow(element)
 			row.link = truncateItemLink(textFn(), extraWidth)
 			row.quality = quality
 			text = textFn(0, row.link)
-
-			row:UpdateIcon(key, icon, quality)
-
 			row:SetupTooltip()
 		else
 			text = textFn()
+		end
+
+		if icon then
+			row:UpdateIcon(key, icon, quality)
 		end
 
 		row:UpdateSecondaryText(secondaryTextFn)
@@ -180,6 +195,38 @@ local function processRow(element)
 		row:UpdateSecondaryText(secondaryTextFn)
 	end
 
+	if element.type == "ItemLoot" and not element.unit then
+		RunNextFrame(function()
+			local itemCount = C_Item.GetItemCount(element.key, true, false, true, true)
+			row:ShowItemCountText(itemCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
+		end)
+	end
+
+	if element.type == "Currency" then
+		row:ShowItemCountText(element.totalCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
+	end
+
+	if element.type == "Reputation" and element.repLevel then
+		row:ShowItemCountText(
+			element.repLevel,
+			{ color = G_RLF:RGBAToHexFormat(0.5, 0.5, 1, 1), wrapChar = G_RLF.WrapCharEnum.ANGLE }
+		)
+	end
+
+	if element.type == "Experience" and element.currentLevel then
+		row:ShowItemCountText(
+			element.currentLevel,
+			{ color = G_RLF:RGBAToHexFormat(0.749, 0.737, 0.012, 1), wrapChar = G_RLF.WrapCharEnum.ANGLE }
+		)
+	end
+
+	if element.type == "Professions" then
+		row:ShowItemCountText(
+			row.amount,
+			{ color = "|cFF5555FF", wrapChar = G_RLF.WrapCharEnum.BRACKET, showSign = true }
+		)
+	end
+
 	row:ShowText(text, r, g, b, a)
 
 	logFn(text, row.amount, new)
@@ -187,9 +234,18 @@ local function processRow(element)
 	row:ResetFadeOut()
 end
 
-function LootDisplay:ShowLoot(element)
-	elementQueue:enqueue(element)
-	debounceProcessFromQueue()
+function LootDisplay:OnLootReady(elements)
+	for element, n in pairs(elements) do
+		RunNextFrame(function()
+			processRow(element)
+		end)
+	end
+end
+
+function LootDisplay:OnRowReturn()
+	RunNextFrame(function()
+		processFromQueue()
+	end)
 end
 
 processFromQueue = function()
@@ -202,43 +258,10 @@ processFromQueue = function()
 				return
 			end
 			local e = elementQueue:dequeue()
-			processRow(e)
+			RunNextFrame(function()
+				processRow(e)
+			end)
 		end
-	end
-end
-
-local debounceTimer = nil
-local maxWaitTimer = nil
-local debounceDelay = 0.15 -- 150 milliseconds
-local maxWaitTime = debounceDelay * 2
-debounceProcessFromQueue = function()
-	if debounceTimer then
-		debounceTimer:Cancel()
-		debounceTimer = nil
-	end
-
-	debounceTimer = C_Timer.NewTimer(debounceDelay, function()
-		LootDisplay:getLogger():Debug("Debounce Timer fired", addonName)
-		if maxWaitTimer then
-			maxWaitTimer:Cancel()
-			maxWaitTimer = nil
-		end
-		debounceTimer:Cancel()
-		debounceTimer = nil
-		G_RLF:fn(processFromQueue)
-	end)
-
-	if not maxWaitTimer then
-		maxWaitTimer = C_Timer.NewTimer(maxWaitTime, function()
-			LootDisplay:getLogger():Debug("Max Wait Timer fired", addonName)
-			if debounceTimer then
-				debounceTimer:Cancel()
-				debounceTimer = nil
-			end
-			maxWaitTimer:Cancel()
-			maxWaitTimer = nil
-			G_RLF:fn(processFromQueue)
-		end)
 	end
 end
 

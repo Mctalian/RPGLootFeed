@@ -22,6 +22,7 @@ G_RLF.defaults.global.tooltipOnShift = false
 G_RLF.defaults.global.moneyFeed = true
 G_RLF.defaults.global.xpFeed = true
 G_RLF.defaults.global.repFeed = true
+G_RLF.defaults.global.profFeed = true
 
 G_RLF.options.args.features = {
 	type = "group",
@@ -169,6 +170,15 @@ G_RLF.options.args.features = {
 			set = "SetRepStatus",
 			order = 7,
 		},
+		enableProf = {
+			type = "toggle",
+			name = G_RLF.L["Enable Professions in Feed"],
+			desc = G_RLF.L["EnableProfDesc"],
+			width = "double",
+			get = "GetProfStatus",
+			set = "SetProfStatus",
+			order = 8,
+		},
 	},
 }
 
@@ -308,5 +318,18 @@ function Features:SetRepStatus(info, value)
 		G_RLF.RLF:EnableModule("Reputation")
 	else
 		G_RLF.RLF:DisableModule("Reputation")
+	end
+end
+
+function Features:GetProfStatus(info, value)
+	return G_RLF.db.global.profFeed
+end
+
+function Features:SetProfStatus(info, value)
+	G_RLF.db.global.profFeed = value
+	if value then
+		G_RLF.RLF:EnableModule("Professions")
+	else
+		G_RLF.RLF:DisableModule("Professions")
 	end
 end
