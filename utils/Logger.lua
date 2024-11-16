@@ -1,6 +1,6 @@
 local addonName, G_RLF = ...
 
-local Logger = G_RLF.RLF:NewModule("Logger", "AceEvent-3.0")
+local Logger = G_RLF.RLF:NewModule("Logger", "AceBucket-3.0", "AceEvent-3.0")
 local gui = LibStub("AceGUI-3.0")
 
 local loggerName = addonName .. "Logger"
@@ -10,11 +10,15 @@ local defaults = {
 }
 
 local updateContent
-local getLogger
-local WOWEVENT = "WOWEVENT"
+local function getLogger()
+	if G_RLF.db.global.logger ~= nil and G_RLF.db.global.logger.sessionsLogged > 0 then
+		return G_RLF.db.global.logger.logs[G_RLF.db.global.logger.sessionsLogged]
+	end
+end
+local WOWEVENT = G_RLF.LogEventSource.WOWEVENT
 
 local eventSource = {
-	[addonName] = true,
+	[G_RLF.LogEventSource.ADDON] = true,
 	[WOWEVENT] = false,
 }
 local function OnEventSourceChange(_, _, k, v)
@@ -22,10 +26,10 @@ local function OnEventSourceChange(_, _, k, v)
 	updateContent()
 end
 
-local debug = "DEBUG"
-local info = "INFO"
-local warn = "WARN"
-local error = "ERROR"
+local debug = G_RLF.LogLevel.debug
+local info = G_RLF.LogLevel.info
+local warn = G_RLF.LogLevel.warn
+local error = G_RLF.LogLevel.error
 local eventLevel = {
 	[debug] = false,
 	[info] = true,
@@ -37,17 +41,19 @@ local function OnEventLevelChange(_, _, k, v)
 	updateContent()
 end
 
-local ItemLoot = "ItemLoot"
-local Currency = "Currency"
-local Money = "Money"
-local Reputation = "Reputation"
-local Experience = "Experience"
+local ItemLoot = G_RLF.FeatureModule.ItemLoot
+local Currency = G_RLF.FeatureModule.Currency
+local Money = G_RLF.FeatureModule.Money
+local Reputation = G_RLF.FeatureModule.Reputation
+local Experience = G_RLF.FeatureModule.Experience
+local Profession = G_RLF.FeatureModule.Profession
 local eventType = {
 	[ItemLoot] = true,
 	[Currency] = true,
 	[Money] = true,
 	[Reputation] = true,
 	[Experience] = true,
+	[Profession] = true,
 }
 local function OnEventTypeChange(_, _, k, v)
 	eventType[k] = v
@@ -63,93 +69,109 @@ local function OnClearLog()
 end
 
 local frame, contentBox
-local function initializeFrame()
+function Logger:InitializeFrame()
 	if not frame then
 		frame = gui:Create("Frame")
-		frame:SetTitle("Loot Log")
-		frame:EnableResize(false)
-		frame:SetCallback("OnClose", function(widget)
-			gui:Release(widget)
-			frame = nil
+		frame:Hide()
+		RunNextFrame(function()
+			frame:SetTitle("Loot Log")
+			frame:EnableResize(false)
+			frame:SetCallback("OnClose", function(widget)
+				gui:Release(widget)
+				frame = nil
+			end)
+			frame:SetLayout("Flow")
 		end)
-		frame:SetLayout("Flow")
 
 		local filterBar = gui:Create("SimpleGroup")
-		filterBar:SetFullWidth(true)
-		filterBar:SetLayout("Flow")
 		frame:AddChild(filterBar)
+		RunNextFrame(function()
+			filterBar:SetFullWidth(true)
+			filterBar:SetLayout("Flow")
+		end)
 
 		contentBox = gui:Create("MultiLineEditBox")
-		contentBox:SetLabel("Logs")
-		contentBox:DisableButton(true)
-		contentBox:SetFullWidth(true)
-		contentBox:SetNumLines(23)
 		frame:AddChild(contentBox)
+		RunNextFrame(function()
+			contentBox:SetLabel("Logs")
+			contentBox:DisableButton(true)
+			contentBox:SetFullWidth(true)
+			contentBox:SetNumLines(23)
+		end)
 
 		local logSources = gui:Create("Dropdown")
-		logSources:SetLabel("Log Sources")
-		logSources:SetMultiselect(true)
-		logSources:SetList({
-			[addonName] = addonName,
-			[WOWEVENT] = WOWEVENT,
-		}, {
-			addonName,
-			WOWEVENT,
-		})
-		logSources:SetCallback("OnValueChanged", OnEventSourceChange)
-		for k, v in pairs(eventSource) do
-			logSources:SetItemValue(k, v)
-		end
 		filterBar:AddChild(logSources)
+		RunNextFrame(function()
+			logSources:SetLabel("Log Sources")
+			logSources:SetMultiselect(true)
+			logSources:SetList({
+				[addonName] = addonName,
+				[WOWEVENT] = WOWEVENT,
+			}, {
+				addonName,
+				WOWEVENT,
+			})
+			logSources:SetCallback("OnValueChanged", OnEventSourceChange)
+			for k, v in pairs(eventSource) do
+				logSources:SetItemValue(k, v)
+			end
+		end)
 
 		local logLevels = gui:Create("Dropdown")
-		logLevels:SetLabel("Log Levels")
-		logLevels:SetMultiselect(true)
-		logLevels:SetList({
-			[debug] = debug,
-			[info] = info,
-			[warn] = warn,
-			[error] = error,
-		})
-		logLevels:SetCallback("OnValueChanged", OnEventLevelChange)
-		for k, v in pairs(eventLevel) do
-			logLevels:SetItemValue(k, v)
-		end
 		filterBar:AddChild(logLevels)
+		RunNextFrame(function()
+			logLevels:SetLabel("Log Levels")
+			logLevels:SetMultiselect(true)
+			logLevels:SetList({
+				[debug] = debug,
+				[info] = info,
+				[warn] = warn,
+				[error] = error,
+			})
+			logLevels:SetCallback("OnValueChanged", OnEventLevelChange)
+			for k, v in pairs(eventLevel) do
+				logLevels:SetItemValue(k, v)
+			end
+		end)
 
 		local logTypes = gui:Create("Dropdown")
-		logTypes:SetLabel("Log Types")
-		logTypes:SetMultiselect(true)
-		logTypes:SetList({
-			[ItemLoot] = ItemLoot,
-			[Currency] = Currency,
-			[Money] = Money,
-			[Reputation] = Reputation,
-			[Experience] = Experience,
-		})
-		logTypes:SetCallback("OnValueChanged", OnEventTypeChange)
-		for k, v in pairs(eventType) do
-			logTypes:SetItemValue(k, v)
-		end
 		filterBar:AddChild(logTypes)
+		RunNextFrame(function()
+			logTypes:SetLabel("Log Types")
+			logTypes:SetMultiselect(true)
+			logTypes:SetList({
+				[ItemLoot] = ItemLoot,
+				[Currency] = Currency,
+				[Money] = Money,
+				[Reputation] = Reputation,
+				[Experience] = Experience,
+				[Profession] = Profession,
+			})
+			logTypes:SetCallback("OnValueChanged", OnEventTypeChange)
+			for k, v in pairs(eventType) do
+				logTypes:SetItemValue(k, v)
+			end
+		end)
 
 		local clearButton = gui:Create("Button")
-		clearButton:SetText("Clear Current Log")
-		clearButton:SetCallback("OnClick", OnClearLog)
 		filterBar:AddChild(clearButton)
+		RunNextFrame(function()
+			clearButton:SetText("Clear Current Log")
+			clearButton:SetCallback("OnClick", OnClearLog)
+		end)
 
-		frame:DoLayout()
-	end
-end
-
-getLogger = function()
-	if G_RLF.db.global.logger ~= nil and G_RLF.db.global.logger.sessionsLogged > 0 then
-		return G_RLF.db.global.logger.logs[G_RLF.db.global.logger.sessionsLogged]
+		RunNextFrame(function()
+			frame:DoLayout()
+		end)
 	end
 end
 
 function Logger:OnInitialize()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterBucketMessage("RLF_LOG", 0.5, "ProcessLogs")
+	RunNextFrame(function()
+		self:InitializeFrame()
+	end)
 end
 
 function Logger:PLAYER_ENTERING_WORLD(_, isLogin, isReload)
@@ -161,7 +183,7 @@ function Logger:PLAYER_ENTERING_WORLD(_, isLogin, isReload)
 			tremove(G_RLF.db.global.logger.logs, 1)
 			G_RLF.db.global.logger.sessionsLogged = G_RLF.db.global.logger.sessionsLogged - 1
 		end
-		self:Debug("Logger is ready", addonName)
+		G_RLF:LogDebug("Logger is ready", addonName)
 	end
 end
 
@@ -186,6 +208,7 @@ local function getType(logEntry)
 		[Money] = "|cFFC0C0C0[GOLD]|r", -- Silver/Gray for money
 		[Reputation] = "|cFF1E90FF[REPU]|r", -- Blue for reputation
 		[Experience] = "|cFF9932CC[EXPR]|r", -- Purple for experience
+		[Profession] = "|cFF8B4513[PROF]|r", -- Brown for profession
 	}
 
 	-- Return an empty string for "General" and the corresponding value for others
@@ -195,7 +218,7 @@ end
 local function getSource(logEntry)
 	local source = logEntry.source
 	local sourceStrings = {
-		[addonName] = "(RLF)",
+		[addonName] = "(" .. addonName .. ")",
 		[WOWEVENT] = "(WOW)",
 	}
 	return sourceStrings[source] or ""
@@ -237,7 +260,7 @@ local function getId(logEntry)
 	return format(" [%s]", logEntry.id)
 end
 
-local function formatLogEntry(logEntry)
+function Logger:FormatLogEntry(logEntry)
 	return format(
 		"[%s]%s%s%s: %s%s%s%s\n",
 		getTimestamp(logEntry),
@@ -255,7 +278,7 @@ updateContent = function()
 	local text = ""
 
 	local function addText(logEntry)
-		text = formatLogEntry(logEntry) .. text
+		text = Logger:FormatLogEntry(logEntry) .. text
 	end
 
 	for i, logEntry in ipairs(getLogger()) do
@@ -298,20 +321,10 @@ local function addLogEntry(level, message, source, type, id, content, amount, is
 	end
 end
 
-function Logger:Debug(message, source, type, id, content, amount, isNew)
-	addLogEntry(debug, message, source, type, id, content, amount, isNew)
-end
-
-function Logger:Info(message, source, type, id, content, amount, isNew)
-	addLogEntry(info, message, source, type, id, content, amount, isNew)
-end
-
-function Logger:Warn(message, source, type, id, content, amount, isNew)
-	addLogEntry(warn, message, source, type, id, content, amount, isNew)
-end
-
-function Logger:Error(message, source, type, id, content, amount, isNew)
-	addLogEntry(error, message, source, type, id, content, amount, isNew)
+function Logger:ProcessLogs(logs)
+	for log, _ in pairs(logs) do
+		addLogEntry(unpack(log))
+	end
 end
 
 function Logger:Trace(type, traceSize)
@@ -322,7 +335,7 @@ function Logger:Trace(type, traceSize)
 	for i = #logs, 1, -1 do
 		if logs[i].type == type then
 			count = count + 1
-			trace = trace .. formatLogEntry(logs[i])
+			trace = trace .. self:FormatLogEntry(logs[i])
 		end
 		if count >= traceSize then
 			break
@@ -333,10 +346,9 @@ function Logger:Trace(type, traceSize)
 end
 
 function Logger:Show()
-	if frame then
+	if frame:IsShown() then
 		self:Hide()
 	else
-		initializeFrame()
 		updateContent()
 		frame:Show()
 	end
@@ -345,3 +357,5 @@ end
 function Logger:Hide()
 	frame:Hide()
 end
+
+return Logger

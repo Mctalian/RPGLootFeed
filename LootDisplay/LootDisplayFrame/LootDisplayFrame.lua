@@ -255,7 +255,7 @@ function LootDisplayFrameMixin:ReleaseRow(row)
 	row:SetParent(nil)
 
 	self.rowFramePool:Release(row)
-	self:OnRowRelease()
+	G_RLF:SendMessage("RLF_ROW_RETURNED")
 	self:UpdateTabVisibility()
 end
 
@@ -396,5 +396,13 @@ function LootDisplayFrameMixin:HideHistoryFrame()
 	if self.historyFrame then
 		self.historyFrame:Hide()
 		self.historyFrame:SetVerticalScroll(0)
+	end
+end
+
+function LootDisplayFrameMixin:UpdateRowItemCounts()
+	for row in rows:iterate() do
+		if row.id and row.type == "ItemLoot" and not row.unit then
+			row:UpdateItemCount()
+		end
 	end
 end

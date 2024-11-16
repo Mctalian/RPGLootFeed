@@ -1,0 +1,12 @@
+<Ui xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+  <Script file="AddonMethods.lua"/>
+  <!--@alpha@-->
+  <Script file="AlphaHelpers.lua"/>
+  <!--@end-alpha@-->
+  <Script file="DoubleLinkedList.lua"/>
+  <Script file="Enums.lua"/>
+  <Script file="ItemInfo.lua"/>
+  <Script file="Logger.lua"/>
+  <Script file="Maps.lua"/>
+  <Script file="Queue.lua"/>
+</Ui>

@@ -14,23 +14,10 @@
 embeds.xml
 
 Core.lua
-DoubleLinkedList.lua
-Queue.lua
-
+utils/utils.xml
 locale/locales.xml
-
-BlizzOverrides/overrides.xml
-
 config/config.xml
-RPGLootFeed.lua
-Logger.lua
-
+BlizzOverrides/overrides.xml
 Features/features.xml
-TestMode.lua
-#@alpha@
-SmokeTest.lua
-#@end-alpha@
 LootDisplay/LootDisplay.xml
-#@alpha@
-LootDisplayProfiler.lua
-#@end-alpha@
+GameTesting/testing.xml

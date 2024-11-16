@@ -6,22 +6,13 @@ G_RLF.defaults.global.lootHistoryEnabled = true
 G_RLF.defaults.global.historyLimit = 100
 G_RLF.defaults.global.enablePartyLoot = false
 G_RLF.defaults.global.itemLootFeed = true
-G_RLF.defaults.global.itemQualityFilter = {
-	[Enum.ItemQuality.Poor] = true,
-	[Enum.ItemQuality.Common] = true,
-	[Enum.ItemQuality.Uncommon] = true,
-	[Enum.ItemQuality.Rare] = true,
-	[Enum.ItemQuality.Epic] = true,
-	[Enum.ItemQuality.Legendary] = true,
-	[Enum.ItemQuality.Artifact] = true,
-	[Enum.ItemQuality.Heirloom] = true,
-}
 G_RLF.defaults.global.currencyFeed = true
 G_RLF.defaults.global.tooltip = true
 G_RLF.defaults.global.tooltipOnShift = false
 G_RLF.defaults.global.moneyFeed = true
 G_RLF.defaults.global.xpFeed = true
 G_RLF.defaults.global.repFeed = true
+G_RLF.defaults.global.profFeed = true
 
 G_RLF.options.args.features = {
 	type = "group",
@@ -77,34 +68,6 @@ G_RLF.options.args.features = {
 			get = "GetItemLootStatus",
 			set = "SetItemLootStatus",
 			order = 2,
-		},
-		itemLootConfig = {
-			type = "group",
-			disabled = "ItemLootDisabled",
-			name = G_RLF.L["Item Loot Config"],
-			inline = true,
-			order = 2.1,
-			args = {
-				itemQualityFilter = {
-					type = "multiselect",
-					name = G_RLF.L["Item Quality Filter"],
-					desc = G_RLF.L["ItemQualityFilterDesc"],
-					values = {
-						[Enum.ItemQuality.Poor] = G_RLF.L["Poor"],
-						[Enum.ItemQuality.Common] = G_RLF.L["Common"],
-						[Enum.ItemQuality.Uncommon] = G_RLF.L["Uncommon"],
-						[Enum.ItemQuality.Rare] = G_RLF.L["Rare"],
-						[Enum.ItemQuality.Epic] = G_RLF.L["Epic"],
-						[Enum.ItemQuality.Legendary] = G_RLF.L["Legendary"],
-						[Enum.ItemQuality.Artifact] = G_RLF.L["Artifact"],
-						[Enum.ItemQuality.Heirloom] = G_RLF.L["Heirloom"],
-					},
-					width = "double",
-					get = "GetItemQualityFilter",
-					set = "SetItemQualityFilter",
-					order = 1,
-				},
-			},
 		},
 		enableCurrency = {
 			type = "toggle",
@@ -169,6 +132,15 @@ G_RLF.options.args.features = {
 			set = "SetRepStatus",
 			order = 7,
 		},
+		enableProf = {
+			type = "toggle",
+			name = G_RLF.L["Enable Professions in Feed"],
+			desc = G_RLF.L["EnableProfDesc"],
+			width = "double",
+			get = "GetProfStatus",
+			set = "SetProfStatus",
+			order = 8,
+		},
 	},
 }
 
@@ -225,18 +197,6 @@ function Features:SetItemLootStatus(info, value)
 	else
 		G_RLF.RLF:DisableModule("ItemLoot")
 	end
-end
-
-function Features:ItemLootDisabled()
-	return not G_RLF.db.global.itemLootFeed
-end
-
-function Features:GetItemQualityFilter(info, quality)
-	return G_RLF.db.global.itemQualityFilter[quality]
-end
-
-function Features:SetItemQualityFilter(info, quality, value)
-	G_RLF.db.global.itemQualityFilter[quality] = value
 end
 
 function Features:GetCurrencyStatus(info, value)
@@ -308,5 +268,18 @@ function Features:SetRepStatus(info, value)
 		G_RLF.RLF:EnableModule("Reputation")
 	else
 		G_RLF.RLF:DisableModule("Reputation")
+	end
+end
+
+function Features:GetProfStatus(info, value)
+	return G_RLF.db.global.profFeed
+end
+
+function Features:SetProfStatus(info, value)
+	G_RLF.db.global.profFeed = value
+	if value then
+		G_RLF.RLF:EnableModule("Professions")
+	else
+		G_RLF.RLF:DisableModule("Professions")
 	end
 end

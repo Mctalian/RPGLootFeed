@@ -61,7 +61,11 @@ end
 
 local function rowUnitPortrait(row)
 	if row.unit then
-		SetPortraitTexture(row.UnitPortrait, row.unit)
+		RunNextFrame(function()
+			if row.unit then
+				SetPortraitTexture(row.UnitPortrait, row.unit)
+			end
+		end)
 		local portraitSize = G_RLF.db.global.iconSize * 0.8
 		row.UnitPortrait:SetSize(portraitSize, portraitSize)
 		row.UnitPortrait:ClearAllPoints()
@@ -100,10 +104,12 @@ local function rowText(row, icon)
 	if fontChanged then
 		if G_RLF.db.global.useFontObjects or not G_RLF.db.global.fontFace then
 			row.PrimaryText:SetFontObject(G_RLF.db.global.font)
+			row.ItemCountText:SetFontObject(G_RLF.db.global.font)
 			row.SecondaryText:SetFontObject(G_RLF.db.global.font)
 		else
 			local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, G_RLF.db.global.fontFace)
 			row.PrimaryText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
+			row.ItemCountText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
 			row.SecondaryText:SetFont(fontPath, G_RLF.db.global.secondaryFontSize, G_RLF.defaults.global.fontFlags)
 		end
 	end
@@ -132,6 +138,7 @@ local function rowText(row, icon)
 			xOffset = xOffset * -1
 		end
 		row.PrimaryText:ClearAllPoints()
+		row.ItemCountText:ClearAllPoints()
 		row.PrimaryText:SetJustifyH(anchor)
 		if icon then
 			if row.unit then
@@ -160,8 +167,9 @@ local function rowText(row, icon)
 			row.SecondaryText:SetPoint("TOP", row, "CENTER", 0, -padding)
 			row.SecondaryText:SetShown(true)
 		end
+
+		row.ItemCountText:SetPoint(anchor, row.PrimaryText, iconAnchor, xOffset, 0)
 	end
-	-- Adjust the text position dynamically based on leftAlign or other conditions
 end
 
 local function updateBorderPositions(row)
@@ -260,6 +268,11 @@ local function rowFadeOutAnimation(row)
 		row.FadeOutAnimation.fadeOut:SetFromAlpha(1)
 		row.FadeOutAnimation.fadeOut:SetToAlpha(0)
 		row.FadeOutAnimation.fadeOut:SetDuration(1)
+		row.FadeOutAnimation.fadeOut:SetScript("OnUpdate", function()
+			if row.glowTexture and row.glowTexture:IsShown() then
+				row.glowTexture:SetAlpha(0.75 * (1 - row.FadeOutAnimation.fadeOut:GetProgress()))
+			end
+		end)
 		row.FadeOutAnimation.fadeOut:SetScript("OnFinished", function()
 			row:Hide()
 			local frame = LootDisplayFrame
@@ -270,10 +283,57 @@ local function rowFadeOutAnimation(row)
 	row.FadeOutAnimation.fadeOut:SetStartDelay(G_RLF.db.global.fadeOutDelay)
 end
 
+local function rowHighlightIcon(row)
+	if not row.glowTexture then
+		-- Create the glow texture
+		row.glowTexture = row.Icon:CreateTexture(nil, "OVERLAY")
+		row.glowTexture:SetDrawLayer("OVERLAY", 7)
+		row.glowTexture:SetTexture("Interface\\SpellActivationOverlay\\IconAlert")
+		row.glowTexture:SetPoint("CENTER", row.Icon, "CENTER", 0, 0)
+		row.glowTexture:SetSize(row.Icon:GetWidth() * 1.75, row.Icon:GetHeight() * 1.75)
+		row.glowTexture:SetBlendMode("ADD") -- "ADD" is often better for glow effects
+		row.glowTexture:SetAlpha(0.75)
+		row.glowTexture:SetTexCoord(0.00781250, 0.50781250, 0.27734375, 0.52734375)
+	end
+
+	row.glowTexture:Hide()
+
+	-- Create the animation group if it doesn't exist
+	if not row.glowAnimationGroup then
+		row.glowAnimationGroup = row.glowTexture:CreateAnimationGroup()
+
+		-- Add a scale animation for pulsing
+		local scaleUp = row.glowAnimationGroup:CreateAnimation("Scale")
+		scaleUp:SetScale(1.25, 1.25) -- Slightly increase size
+		scaleUp:SetDuration(0.5) -- Half a second to scale up
+		scaleUp:SetOrder(1)
+		scaleUp:SetSmoothing("IN_OUT") -- Smooth scaling in and out
+
+		local scaleDown = row.glowAnimationGroup:CreateAnimation("Scale")
+		scaleDown:SetScale(0.8, 0.8) -- Slightly decrease size back
+		scaleDown:SetDuration(0.5) -- Half a second to scale down
+		scaleDown:SetOrder(2)
+		scaleDown:SetSmoothing("IN_OUT")
+
+		-- Optional: Add a subtle alpha fade during the pulse
+		local alphaPulse = row.glowAnimationGroup:CreateAnimation("Alpha")
+		alphaPulse:SetFromAlpha(0.75)
+		alphaPulse:SetToAlpha(1)
+		alphaPulse:SetDuration(0.5)
+		alphaPulse:SetOrder(1)
+		alphaPulse:SetSmoothing("IN_OUT")
+
+		row.glowAnimationGroup:SetLooping("REPEAT")
+	end
+end
+
 local function rowStyles(row)
 	row:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
 	rowBackground(row)
 	rowIcon(row, row.icon)
+	RunNextFrame(function()
+		rowHighlightIcon(row)
+	end)
 	rowUnitPortrait(row)
 	rowText(row, row.icon)
 	rowHighlightBorder(row)
@@ -295,12 +355,14 @@ function LootDisplayRowMixin:Reset()
 	self:ClearAllPoints()
 
 	-- Reset row-specific data
+	self.id = nil
 	self.key = nil
 	self.amount = nil
 	self.icon = nil
 	self.link = nil
 	self.secondaryText = nil
 	self.unit = nil
+	self.type = nil
 
 	-- Reset UI elements that were part of the template
 	self.TopBorder:SetAlpha(0)
@@ -310,8 +372,17 @@ function LootDisplayRowMixin:Reset()
 
 	self.Icon:Reset()
 
+	if self.glowAnimationGroup then
+		self.glowAnimationGroup:Stop()
+	end
+	if self.glowTexture then
+		self.glowTexture:Hide()
+	end
+
 	self.UnitPortrait:SetTexture(nil)
 	self.SecondaryText:SetText(nil)
+	self.ItemCountText:SetText(nil)
+	self.ItemCountText:Hide()
 
 	-- Reset amount text behavior
 	self.PrimaryText:SetScript("OnEnter", nil)
@@ -441,6 +512,52 @@ function LootDisplayRowMixin:Dump()
 	)
 end
 
+function LootDisplayRowMixin:UpdateItemCount()
+	RunNextFrame(function()
+		if self.id then
+			local itemCount = C_Item.GetItemCount(self.id, true, false, true, true)
+
+			if itemCount then
+				self:ShowItemCountText(itemCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
+			end
+		end
+	end)
+end
+
+function LootDisplayRowMixin:ShowItemCountText(itemCount, options)
+	local WrapChar = G_RLF.WrapCharEnum
+	options = options or {}
+	local color = options.color or "|cFFBCBCBC"
+	local wrapChar = options.wrapChar or WrapChar.DEFAULT
+	local showSign = options.showSign or false
+
+	local sChar, eChar
+	if wrapChar == WrapChar.SPACE then
+		sChar, eChar = " ", ""
+	elseif wrapChar == WrapChar.PARENTHESIS then
+		sChar, eChar = "(", ")"
+	elseif wrapChar == WrapChar.BRACKET then
+		sChar, eChar = "[", "]"
+	elseif wrapChar == WrapChar.BRACE then
+		sChar, eChar = "{", "}"
+	elseif wrapChar == WrapChar.ANGLE then
+		sChar, eChar = "<", ">"
+	else
+		sChar, eChar = "", ""
+	end
+
+	if itemCount and (itemCount > 1 or (showSign and itemCount >= 1)) then
+		local sign = ""
+		if showSign then
+			sign = "+"
+		end
+		self.ItemCountText:SetText(color .. sChar .. sign .. itemCount .. eChar .. "|r")
+		self.ItemCountText:Show()
+	else
+		self.ItemCountText:Hide()
+	end
+end
+
 function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 	if a == nil then
 		a = 1
@@ -495,6 +612,14 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 			end
 		end)
 	end
+end
+
+function LootDisplayRowMixin:HighlightIcon()
+	RunNextFrame(function()
+		-- Show the glow texture and play the animation
+		self.glowTexture:Show()
+		self.glowAnimationGroup:Play()
+	end)
 end
 
 function LootDisplayRowMixin:ResetFadeOut()
