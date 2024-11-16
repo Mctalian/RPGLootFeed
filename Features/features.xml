@@ -8,4 +8,5 @@
     <Script file="Money.lua"/>
     <Script file="Experience.lua"/>
     <Script file="Reputation.lua"/>
+    <Script file="Professions.lua"/>
 </Ui>

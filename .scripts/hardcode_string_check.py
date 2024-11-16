@@ -68,6 +68,7 @@ def scan_directory(directory, ignore_files=None, ignore_dirs=None):
 
 def main():
     ignore_files = [
+        "IntegrationTest.lua",
         "SmokeTest.lua",
     ]
     ignore_dirs = [

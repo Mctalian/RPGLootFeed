@@ -17,6 +17,7 @@
             <Layer level="ARTWORK">
                 <Texture parentKey="UnitPortrait" />
                 <FontString parentKey="PrimaryText" inherits="GameFontNormal" />
+                <FontString parentKey="ItemCountText" inherits="GameFontNormal" hidden="true" />
                 <FontString parentKey="SecondaryText" inherits="GameFontNormal" hidden="true" />
             </Layer>
 

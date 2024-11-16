@@ -31,7 +31,7 @@ describe("Features module", function()
 			},
 		}
 		-- Load the list module before each test
-		assert(loadfile("config/Features.lua"))("TestAddon", ns)
+		assert(loadfile("config/Features/Features.lua"))("TestAddon", ns)
 	end)
 
 	it("TODO", function()

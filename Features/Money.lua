@@ -4,8 +4,6 @@ local Money = G_RLF.RLF:NewModule("Money", "AceEvent-3.0")
 
 Money.Element = {}
 
-local startingMoney
-
 function Money.Element:new(...)
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
@@ -41,6 +39,7 @@ function Money.Element:new(...)
 end
 
 function Money:OnInitialize()
+	self.startingMoney = 0
 	if G_RLF.db.global.moneyFeed then
 		self:Enable()
 	else
@@ -56,20 +55,20 @@ end
 function Money:OnEnable()
 	self:RegisterEvent("PLAYER_MONEY")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
-	startingMoney = GetMoney()
+	self.startingMoney = GetMoney()
 end
 
 function Money:PLAYER_ENTERING_WORLD(eventName)
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName)
-	startingMoney = GetMoney()
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName)
+	self.startingMoney = GetMoney()
 end
 
 function Money:PLAYER_MONEY(eventName)
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName)
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName)
 	self:fn(function()
 		local newMoney = GetMoney()
-		local amountInCopper = newMoney - startingMoney
-		startingMoney = newMoney
+		local amountInCopper = newMoney - self.startingMoney
+		self.startingMoney = newMoney
 		local e = self.Element:new(amountInCopper)
 		e:Show()
 	end)

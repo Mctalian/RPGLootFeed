@@ -24,7 +24,7 @@ describe("Experience module", function()
 
 		XpModule:PLAYER_XP_UPDATE("PLAYER_XP_UPDATE", "target")
 
-		assert.stub(ns.LootDisplay.ShowLoot).was_not_called()
+		assert.stub(ns.SendMessage).was_not_called()
 	end)
 
 	it("does not show xp if the calculated delta is 0", function()
@@ -34,7 +34,7 @@ describe("Experience module", function()
 
 		XpModule:PLAYER_XP_UPDATE("PLAYER_XP_UPDATE", "player")
 
-		assert.stub(ns.LootDisplay.ShowLoot).was_not_called()
+		assert.stub(ns.SendMessage).was_not_called()
 	end)
 
 	it("show xp if the player levels up", function()
@@ -58,6 +58,6 @@ describe("Experience module", function()
 		XpModule:PLAYER_XP_UPDATE("PLAYER_XP_UPDATE", "player")
 
 		assert.spy(newElement).was.called_with(_, 50)
-		assert.stub(ns.LootDisplay.ShowLoot).was.called()
+		assert.stub(ns.SendMessage).was.called()
 	end)
 end)

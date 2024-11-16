@@ -8,32 +8,14 @@ ItemLoot.SecondaryTextOption = {
 	["iLvl"] = "Item Level",
 }
 
--- local equipLocToSlotID = {
---   ["INVTYPE_HEAD"] = INVSLOT_HEAD,
---   ["INVTYPE_NECK"] = INVSLOT_NECK,
---   ["INVTYPE_SHOULDER"] = INVSLOT_SHOULDER,
---   ["INVTYPE_CHEST"] = INVSLOT_CHEST,
---   ["INVTYPE_WAIST"] = INVSLOT_WAIST,
---   ["INVTYPE_LEGS"] = INVSLOT_LEGS,
---   ["INVTYPE_FEET"] = INVSLOT_FEET,
---   ["INVTYPE_WRIST"] = INVSLOT_WRIST,
---   ["INVTYPE_HAND"] = INVSLOT_HAND,
---   ["INVSLOT_FINGER1"] = INVSLOT_FINGER1,
---   ["INVSLOT_FINGER2"] = INVSLOT_FINGER2,
---   ["INVSLOT_TRINKET1"] = INVSLOT_TRINKET1,
---   ["INVSLOT_TRINKET2"] = INVSLOT_TRINKET2,
---   ["INVTYPE_BACK"] = INVSLOT_BACK,
---   ["INVTYPE_MAINHAND"] = INVSLOT_MAINHAND,
---   ["INVTYPE_OFFHAND"] = INVSLOT_OFFHAND,
---   ["INVTYPE_RANGED"] = INVSLOT_RANGED,
---   ["INVTYPE_WEAPON"] = INVSLOT_MAINHAND, -- Generally used for one-handed weapons
---   ["INVTYPE_2HWEAPON"] = INVSLOT_MAINHAND, -- Two-handed weapons
---   ["INVTYPE_RANGEDRIGHT"] = INVSLOT_RANGED, -- Ranged weapons
--- }
+local cachedArmorClass = nil
+local onlyEpicPartyLoot = false
 
 ItemLoot.Element = {}
 
-local function itemQualityName(enumValue)
+local ItemInfo = G_RLF.ItemInfo
+
+function ItemLoot:ItemQualityName(enumValue)
 	for k, v in pairs(Enum.ItemQuality) do
 		if v == enumValue then
 			return k
@@ -42,27 +24,98 @@ local function itemQualityName(enumValue)
 	return nil
 end
 
-local nameUnitMap = {}
-
-local function setNameUnitMap()
+function ItemLoot:SetNameUnitMap()
 	local units = {}
+	local groupMembers = GetNumGroupMembers()
 	if IsInRaid() then
-		for i = 1, MEMBERS_PER_RAID_GROUP do
+		for i = 1, groupMembers do
 			table.insert(units, "raid" .. i)
 		end
 	else
 		table.insert(units, "player")
 
-		for i = 2, MEMBERS_PER_RAID_GROUP do
+		for i = 2, groupMembers do
 			table.insert(units, "party" .. (i - 1))
 		end
 	end
 
-	nameUnitMap = {}
+	self.nameUnitMap = {}
 	for _, unit in ipairs(units) do
 		local name, server = UnitName(unit)
 		if name then
-			nameUnitMap[name] = unit
+			self.nameUnitMap[name] = unit
+		end
+	end
+end
+
+function ItemLoot:SetPartyLootFilters()
+	if IsInRaid() then
+		onlyEpicPartyLoot = true
+		return
+	end
+
+	if IsInInstance() then
+		onlyEpicPartyLoot = true
+		return
+	end
+
+	onlyEpicPartyLoot = false
+end
+
+local function IsMount(info)
+	if G_RLF.db.global.itemHighlights.mounts then
+		return info:IsMount()
+	end
+end
+
+local function IsLegendary(info)
+	if G_RLF.db.global.itemHighlights.legendaries then
+		return info:IsLegendary()
+	end
+end
+
+local function IsBetterThanEquipped(info)
+	-- Highlight Better Than Equipped
+	if G_RLF.db.global.itemHighlights.betterThanEquipped then
+		local equippedLink
+		if type(slot) == "table" then
+			for _, s in ipairs(slot) do
+				equippedLink = GetInventoryItemLink("player", s)
+				if equippedLink then
+					break
+				end
+			end
+		else
+			equippedLink = GetInventoryItemLink("player", slot)
+		end
+
+		if not equippedLink then
+			return
+		end
+
+		local equippedId = C_Item.GetItemIDForItemInfo(equippedLink)
+		local equippedInfo = ItemInfo:new(equippedId, C_Item.GetItemInfo(equippedLink))
+		if not equippedInfo then
+			return
+		end
+
+		if equippedInfo.itemLevel and equippedInfo.itemLevel < info.itemLevel then
+			self.highlight = true
+			return
+		elseif equippedInfo.itemLevel == info.itemLevel then
+			local statDelta = C_Item.GetItemStatDelta(equippedLink, info.itemLink)
+			for k, v in pairs(statDelta) do
+				-- Has a Tertiary Stat
+				if k:find("ITEM_MOD_CR_") and v > 0 then
+					self.highlight = true
+					return
+				end
+				-- Has a Gem Socket
+				if k:find("EMPTY_SOCKET_") and v > 0 then
+					self.highlight = true
+					return
+				end
+			end
 		end
 	end
 end
@@ -78,8 +131,13 @@ function ItemLoot.Element:new(...)
 
 	element.isLink = true
 
-	local t
-	element.key, t, element.icon, element.quantity, element.sellPrice, element.unit = ...
+	local t, info
+	info, element.quantity, element.unit = ...
+	t = info.itemLink
+
+	element.key = info.itemId
+	element.icon = info.itemTexture
+	element.sellPrice = info.sellPrice
 
 	if not G_RLF.db.global.enablePartyLoot then
 		element.unit = nil
@@ -87,8 +145,8 @@ function ItemLoot.Element:new(...)
 
 	function element:isPassingFilter(itemName, itemQuality)
 		if not G_RLF.db.global.itemQualityFilter[itemQuality] then
-			element:getLogger():Debug(
-				itemName .. " ignored by quality: " .. itemQualityName(itemQuality),
+			G_RLF:LogDebug(
+				itemName .. " ignored by quality: " .. ItemLoot:ItemQualityName(itemQuality),
 				addonName,
 				"ItemLoot",
 				"",
@@ -97,18 +155,6 @@ function ItemLoot.Element:new(...)
 			)
 			return false
 		end
-
-		-- if G_RLF.db.global.onlyBetterThanEquipped and itemEquipLoc then
-		--   local equippedLink = GetInventoryItemLink("player", equipLocToSlotID[itemEquipLoc])
-		--   if equippedLink then
-		--     local _, _, _, equippediLvl, _, _, equippedSubType = C_Item.GetItemInfo(equippedLink)
-		--     if equippediLvl > itemLevel then
-		--         return
-		--     elseif equippedSubType ~= itemSubType then
-		--         return
-		--     end
-		--   end
-		-- end
 
 		return true
 	end
@@ -123,6 +169,9 @@ function ItemLoot.Element:new(...)
 	element.secondaryTextFn = function(...)
 		if element.unit then
 			local name, server = UnitName(element.unit)
+			if not name then
+				return "A former party member"
+			end
 			if server then
 				return "    " .. name .. "-" .. server
 			end
@@ -135,11 +184,18 @@ function ItemLoot.Element:new(...)
 		return "    " .. C_CurrencyInfo.GetCoinTextureString(element.sellPrice * (quantity or 1))
 	end
 
+	function element:SetHighlight()
+		self.highlight = IsMount(info) or IsLegendary(info) or IsBetterThanEquipped(info)
+	end
+
 	return element
 end
 
 local logger
 function ItemLoot:OnInitialize()
+	self.pendingItemRequests = {}
+	self.pendingPartyRequests = {}
+	self.nameUnitMap = {}
 	if G_RLF.db.global.itemLootFeed then
 		self:Enable()
 	else
@@ -157,108 +213,113 @@ function ItemLoot:OnEnable()
 	self:RegisterEvent("CHAT_MSG_LOOT")
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:RegisterEvent("GROUP_ROSTER_UPDATE")
-	setNameUnitMap()
+	self:SetNameUnitMap()
 end
 
-local pendingItemRequests = {}
-local function onItemReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice)
-	pendingItemRequests[itemId] = nil
-	local e = ItemLoot.Element:new(itemId, itemLink, itemTexture, amount, sellPrice, false)
-	e:Show(itemName, itemQuality)
+function ItemLoot:OnItemReadyToShow(info, amount)
+	self.pendingItemRequests[info.itemId] = nil
+	local e = ItemLoot.Element:new(info, amount, false)
+	e:SetHighlight()
+	e:Show(info.itemName, info.itemQuality)
 end
 
-local pendingPartyRequests = {}
-local function onPartyReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice, unit)
-	pendingPartyRequests[itemId] = nil
-	local e = ItemLoot.Element:new(itemId, itemLink, itemTexture, amount, sellPrice, unit)
-	e:Show(itemName, itemQuality)
+function ItemLoot:OnPartyReadyToShow(info, amount, unit)
+	if not unit then
+		return
+	end
+	if onlyEpicPartyLoot and info.itemQuality < Enum.ItemQuality.Epic then
+		return
+	end
+	self.pendingPartyRequests[info.itemId] = nil
+	local e = ItemLoot.Element:new(info, amount, unit)
+	e:Show(info.itemName, info.itemQuality)
 end
 
 function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
-	if pendingItemRequests[itemID] then
-		local itemLink, amount = unpack(pendingItemRequests[itemID])
+	if self.pendingItemRequests[itemID] then
+		local itemLink, amount = unpack(self.pendingItemRequests[itemID])
 
 		if not success then
 			error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount)
 		else
-			local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
-				C_Item.GetItemInfo(itemLink)
-			onItemReadyToShow(itemID, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice)
+			local info = ItemInfo:new(itemID, C_Item.GetItemInfo(itemLink))
+			self:OnItemReadyToShow(info, amount)
 		end
 		return
 	end
 
-	if pendingPartyRequests[itemID] then
-		local itemLink, amount, unit = unpack(pendingPartyRequests[itemID])
+	if self.pendingPartyRequests[itemID] then
+		local itemLink, amount, unit = unpack(self.pendingPartyRequests[itemID])
 
 		if not success then
 			error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount .. " for " .. unit)
 		else
-			local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
-				C_Item.GetItemInfo(itemLink)
-			onPartyReadyToShow(itemID, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice, unit)
+			local info = ItemInfo:new(itemID, C_Item.GetItemInfo(itemLink))
+			self:OnPartyReadyToShow(info, amount, unit)
 		end
 		return
 	end
 end
 
-local function showPartyLoot(msg, itemLink, unit)
+function ItemLoot:ShowPartyLoot(msg, itemLink, unit)
 	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
 	local itemId = itemLink:match("Hitem:(%d+)")
-	pendingPartyRequests[itemId] = { itemLink, amount, unit }
-	local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
-		C_Item.GetItemInfo(itemLink)
-	if itemName ~= nil then
-		onPartyReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice, unit)
+	self.pendingPartyRequests[itemId] = { itemLink, amount, unit }
+	local info = ItemInfo:new(itemId, C_Item.GetItemInfo(itemLink))
+	if info ~= nil then
+		self:OnPartyReadyToShow(info, amount, unit)
 	end
 end
 
-local function showItemLoot(msg, itemLink)
+function ItemLoot:ShowItemLoot(msg, itemLink)
 	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
-	local itemId = itemLink:match("Hitem:(%d+)")
-	pendingItemRequests[itemId] = { itemLink, amount }
-	local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
-		C_Item.GetItemInfo(itemLink)
-	if itemName ~= nil then
-		onItemReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice)
+	local itemId = C_Item.GetItemIDForItemInfo(itemLink)
+	self.pendingItemRequests[itemId] = { itemLink, amount }
+	local info = ItemInfo:new(itemId, C_Item.GetItemInfo(itemLink))
+	if info ~= nil then
+		self:OnItemReadyToShow(info, amount)
 	end
 end
 
 function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 	local msg, playerName, _, _, playerName2, _, _, _, _, _, _, guid = ...
 	local raidLoot = msg:match("HlootHistory:")
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, nil, eventName .. " " .. msg)
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, nil, eventName .. " " .. msg)
 	if raidLoot then
 		-- Ignore this message as it's a raid loot message
-		self:getLogger():Debug("Raid Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
+		G_RLF:LogDebug("Raid Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
 		return
 	end
 
 	local me = guid == GetPlayerGuid()
 	if not me then
 		if not G_RLF.db.global.enablePartyLoot then
-			self:getLogger():Debug("Party Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
+			G_RLF:LogDebug("Party Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
 			return
 		end
 		local sanitizedPlayerName = (playerName or playerName2):gsub("%-.+", "")
-		local unit = nameUnitMap[sanitizedPlayerName]
+		local unit = self.nameUnitMap[sanitizedPlayerName]
+		if not unit then
+			return
+		end
 		local itemLink = msg:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
 		if itemLink then
-			self:fn(showPartyLoot, msg, itemLink, unit)
+			self:fn(self.ShowPartyLoot, self, msg, itemLink, unit)
 		end
 		return
 	end
 
 	local itemLink = msg:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
 	if itemLink then
-		self:fn(showItemLoot, msg, itemLink)
+		self:fn(self.ShowItemLoot, self, msg, itemLink)
 	end
 end
 
 function ItemLoot:GROUP_ROSTER_UPDATE(eventName, ...)
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, nil, eventName)
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, nil, eventName)
 
-	setNameUnitMap()
+	self:SetNameUnitMap()
+	self:SetPartyLootFilters()
 end
 
 return ItemLoot

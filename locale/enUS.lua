@@ -52,6 +52,14 @@ L["Epic"] = true
 L["Legendary"] = true
 L["Artifact"] = true
 L["Heirloom"] = true
+L["Item Highlights"] = true
+L["ItemHighlightsDesc"] = "Highlight items in the Loot Feed based on certain criteria"
+L["Highlight Mounts"] = true
+L["HighlightMountsDesc"] = "Highlight Mounts in the Loot Feed"
+L["Highlight Legendary Items"] = true
+L["HighlightLegendaryDesc"] = "Highlight Legendary items in the Loot Feed"
+L["Highlight Items Better Than Equipped"] = true
+L["HighlightBetterThanEquippedDesc"] = "Highlight items that are better than what you have equipped in the Loot Feed"
 L["Enable Currency in Feed"] = true
 L["EnableCurrencyDesc"] = "Show currency such as Flightstones, Honor, Drake's Awakened Crest, etc. in the Loot Feed"
 L["Enable Item/Currency Tooltips"] = true
@@ -65,6 +73,8 @@ L["Enable Experience in Feed"] = true
 L["EnableXPDesc"] = "Show experience gains in the Loot Feed"
 L["Enable Reputation in Feed"] = true
 L["EnableRepDesc"] = "Show reputation gains in the Loot Feed"
+L["Enable Professions in Feed"] = true
+L["EnableProfDesc"] = "Show profession skill gains in the Loot Feed"
 
 -- ConfigOptions - Positioning Group
 L["Toggle Test Mode"] = true

@@ -1,30 +1,30 @@
 local addonName, G_RLF = ...
 
-local RLF = G_RLF.RLF
+local MoneyAlertOverride = G_RLF.RLF:NewModule("MoneyAlerts", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
+
+function MoneyAlertOverride:OnInitialize()
+	self:RegisterEvent("PLAYER_ENTERING_WORLD", "MoneyAlertHook")
+end
 
 local moneyAlertAttempts = 0
-function RLF:MoneyAlertHook()
-	if RLF:IsHooked(MoneyWonAlertSystem, "AddAlert") then
+function MoneyAlertOverride:MoneyAlertHook()
+	if self:IsHooked(MoneyWonAlertSystem, "AddAlert") then
 		return
 	end
 	if MoneyWonAlertSystem and MoneyWonAlertSystem.AddAlert then
-		RLF:RawHook(MoneyWonAlertSystem, "AddAlert", "InterceptMoneyAddAlert", true)
+		self:RawHook(MoneyWonAlertSystem, "AddAlert", "InterceptMoneyAddAlert", true)
+		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	else
-		if moneyAlertAttempts <= 30 then
-			moneyAlertAttempts = moneyAlertAttempts + 1
-			-- Keep checking until it's available
-			RLF:ScheduleTimer("MoneyAlertHook", 1)
-		else
-			RLF:Print(G_RLF.L["AddMoneyAlertUnavailable"])
-			RLF:Print(G_RLF.L["Issues"])
-		end
+		moneyAlertAttempts = G_RLF.retryHook(self, "MoneyAlertHook", moneyAlertAttempts, "AddMoneyAlertUnavailable")
 	end
 end
 
-function RLF:InterceptMoneyAddAlert(frame, ...)
+function MoneyAlertOverride:InterceptMoneyAddAlert(frame, ...)
 	if G_RLF.db.global.disableBlizzMoneyAlerts then
 		return
 	end
 	-- Call the original AddAlert function if not blocked
-	RLF.hooks[MoneyWonAlertSystem].AddAlert(frame, ...)
+	self.hooks[MoneyWonAlertSystem].AddAlert(frame, ...)
 end
+
+return MoneyAlertOverride
