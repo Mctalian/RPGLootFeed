@@ -35,13 +35,18 @@ end
 local function runSmokeTestIfReady()
 	if allItemsInitialized and isLootDisplayReady then
 		--@alpha@
-		TestMode:SmokeTest(testItems, testCurrencies, testFactions)
+		RunNextFrame(function()
+			TestMode:SmokeTest(testItems, testCurrencies, testFactions)
+		end)
 		--@end-alpha@
 	end
 end
 
 local function getItem(id)
-	local name, link, quality, _, _, _, _, _, _, icon, sellPrice = C_Item.GetItemInfo(id)
+	local name, link, quality, icon, sellPrice, _
+	G_RLF:ProfileFunction(function()
+		name, link, quality, _, _, _, _, _, _, icon, sellPrice = C_Item.GetItemInfo(id)
+	end, "C_Item.GetItemInfo")(id)
 	local isCached = name ~= nil
 	if isCached then
 		if name and link and quality and icon and not idExistsInTable(id, testItems) then
@@ -125,7 +130,9 @@ function TestMode:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
 			return
 		end
 	end
-	getItem(itemID)
+
+	G_RLF:ProfileFunction(getItem, "getItem")(itemID)
+	-- getItem(itemID)
 
 	if #testItems == #testItemIds and not anyPendingRequests() then
 		allItemsInitialized = true
@@ -209,6 +216,7 @@ function TestMode:InitializeTestData()
 	G_RLF:fn(initializeTestCurrencies)
 end
 
+--@alpha@
 function dump(o)
 	if type(o) == "table" then
 		local s = "{ "
@@ -223,6 +231,7 @@ function dump(o)
 		return tostring(o)
 	end
 end
+--@end-alpha@
 
 function TestMode:ToggleTestMode()
 	if not logger then

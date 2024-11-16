@@ -6,7 +6,6 @@ local lsm = G_RLF.lsm
 
 -- Private method declaration
 local processFromQueue
-local debounceProcessFromQueue
 local getTextWidth
 local truncateItemLink
 
@@ -51,18 +50,18 @@ function LootDisplay:OnInitialize()
 
 	tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
 	tempFontString:Hide() -- Prevent it from showing up
-	frame.OnRowRelease = function()
-		if elementQueue:size() > 0 then
-			debounceProcessFromQueue()
-		end
-	end
-	RunNextFrame(function()
-		G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
-	end)
+end
 
+function LootDisplay:OnEnable()
 	self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnPlayerCombatChange")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnPlayerCombatChange")
 	self:RegisterBucketEvent("BAG_UPDATE_DELAYED", 0.5, "BAG_UPDATE_DELAYED")
+	self:RegisterBucketMessage("RLF_NEW_LOOT", 0.1, "OnLootReady")
+	self:RegisterBucketMessage("RLF_ROW_RETURNED", 0.3, "OnRowReturn")
+
+	RunNextFrame(function()
+		G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
+	end)
 end
 
 function LootDisplay:OnPlayerCombatChange()
@@ -227,9 +226,18 @@ local function processRow(element)
 	row:ResetFadeOut()
 end
 
-function LootDisplay:ShowLoot(element)
-	elementQueue:enqueue(element)
-	debounceProcessFromQueue()
+function LootDisplay:OnLootReady(elements)
+	for element, n in pairs(elements) do
+		RunNextFrame(function()
+			processRow(element)
+		end)
+	end
+end
+
+function LootDisplay:OnRowReturn()
+	RunNextFrame(function()
+		processFromQueue()
+	end)
 end
 
 processFromQueue = function()
@@ -242,43 +250,10 @@ processFromQueue = function()
 				return
 			end
 			local e = elementQueue:dequeue()
-			processRow(e)
+			RunNextFrame(function()
+				processRow(e)
+			end)
 		end
-	end
-end
-
-local debounceTimer = nil
-local maxWaitTimer = nil
-local debounceDelay = 0.15 -- 150 milliseconds
-local maxWaitTime = debounceDelay * 2
-debounceProcessFromQueue = function()
-	if debounceTimer then
-		debounceTimer:Cancel()
-		debounceTimer = nil
-	end
-
-	debounceTimer = C_Timer.NewTimer(debounceDelay, function()
-		LootDisplay:getLogger():Debug("Debounce Timer fired", addonName)
-		if maxWaitTimer then
-			maxWaitTimer:Cancel()
-			maxWaitTimer = nil
-		end
-		debounceTimer:Cancel()
-		debounceTimer = nil
-		G_RLF:fn(processFromQueue)
-	end)
-
-	if not maxWaitTimer then
-		maxWaitTimer = C_Timer.NewTimer(maxWaitTime, function()
-			LootDisplay:getLogger():Debug("Max Wait Timer fired", addonName)
-			if debounceTimer then
-				debounceTimer:Cancel()
-				debounceTimer = nil
-			end
-			maxWaitTimer:Cancel()
-			maxWaitTimer = nil
-			G_RLF:fn(processFromQueue)
-		end)
 	end
 end
 

@@ -255,7 +255,7 @@ function LootDisplayFrameMixin:ReleaseRow(row)
 	row:SetParent(nil)
 
 	self.rowFramePool:Release(row)
-	self:OnRowRelease()
+	G_RLF:SendMessage("RLF_ROW_RETURNED")
 	self:UpdateTabVisibility()
 end
 

@@ -31,7 +31,7 @@ describe("Reputation module", function()
 
 		assert.is_true(success)
 
-		assert.stub(ns.LootDisplay.ShowLoot).was.not_called()
+		assert.stub(ns.SendMessage).was.not_called()
 	end)
 
 	it("handles rep increases", function()
@@ -42,7 +42,7 @@ describe("Reputation module", function()
 		assert.is_true(success)
 
 		assert.spy(newElement).was.called_with(_, 10, "Faction A", 1, 0, 0, 1, _, 3)
-		assert.stub(ns.LootDisplay.ShowLoot).was.called()
+		assert.stub(ns.SendMessage).was.called()
 		-- Successfully populates the locale cache
 		assert.equal(ns.db.global.factionMaps.enUS["Faction A"], 1)
 	end)
@@ -55,7 +55,7 @@ describe("Reputation module", function()
 		assert.is_true(success)
 
 		assert.spy(newElement).was.called_with(_, 100, "Faction B", nil, nil, nil, nil, nil, nil)
-		assert.stub(ns.LootDisplay.ShowLoot).was.called()
+		assert.stub(ns.SendMessage).was.called()
 		assert.spy(RepModule:getLogger().Warn).was.called()
 		assert.spy(RepModule:getLogger().Warn).was.called_with(_, "Faction B is STILL not cached for enUS", _, _)
 	end)
@@ -70,7 +70,7 @@ describe("Reputation module", function()
 		assert.is_true(success)
 
 		assert.spy(newElement).was.called_with(_, 313, "Brann Bronzebeard", 0, 1, 0, 2640, _, 4)
-		assert.stub(ns.LootDisplay.ShowLoot).was.called()
+		assert.stub(ns.SendMessage).was.called()
 		-- Successfully populates the locale cache
 		assert.equal(ns.db.global.factionMaps.enUS["Brann Bronzebeard"], 2640)
 	end)

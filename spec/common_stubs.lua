@@ -29,9 +29,7 @@ function common_stubs.setup_G_RLF(spy)
 				factionMaps = {},
 			},
 		},
-		LootDisplay = {
-			ShowLoot = function() end,
-		},
+		LootDisplay = {},
 		list = function()
 			return {}
 		end,
@@ -89,6 +87,7 @@ function common_stubs.setup_G_RLF(spy)
 				}
 			end,
 		},
+		SendMessage = spy.new(),
 		fn = function(_, func, ...)
 			return func(...)
 		end,
@@ -105,9 +104,6 @@ function common_stubs.setup_G_RLF(spy)
 	_G.GetLocale = function()
 		return "enUS"
 	end
-
-	-- Spy or stub common methods if needed
-	spy.on(ns.LootDisplay, "ShowLoot")
 
 	return ns
 end
