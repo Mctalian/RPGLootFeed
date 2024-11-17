@@ -2,19 +2,7 @@
 local common_stubs = {}
 
 function common_stubs.setup_G_RLF(spy)
-	_G.unpack = table.unpack
-	_G.handledError = function(err)
-		print("\n")
-		print(err)
-		print("The above error was thrown during a test and caught by xpcall")
-		print("This is usually indicative of an issue, or an improperly mocked test")
-		print("\n")
-		return false
-	end
-
-	_G.RunNextFrame = function(func)
-		func()
-	end
+	common_stubs.stub_WoWGlobals(spy)
 
 	local logger = {
 		Debug = spy.new(),
@@ -101,11 +89,40 @@ function common_stubs.setup_G_RLF(spy)
 		end,
 	}
 
+	return ns
+end
+
+function common_stubs.stub_WoWGlobals(spy)
+	common_stubs.stub_Unit_Funcs()
+	common_stubs.stub_Money_Funcs()
+
+	_G.MEMBERS_PER_RAID_GROUP = 5
+
+	_G.unpack = table.unpack
+	_G.handledError = function(err)
+		print("\n")
+		print(err)
+		print("The above error was thrown during a test and caught by xpcall")
+		print("This is usually indicative of an issue, or an improperly mocked test")
+		print("\n")
+		return false
+	end
+
+	_G.RunNextFrame = function(func)
+		func()
+	end
+
+	_G.IsInRaid = function()
+		return false
+	end
+
+	_G.GetPlayerGuid = function()
+		return "player"
+	end
+
 	_G.GetLocale = function()
 		return "enUS"
 	end
-
-	return ns
 end
 
 function common_stubs.stub_C_CurrencyInfo()
@@ -129,6 +146,17 @@ function common_stubs.stub_C_CurrencyInfo()
 				displayAmount = quantity,
 				actualAmount = quantity,
 			}
+		end,
+	}
+end
+
+function common_stubs.stub_C_Item()
+	_G.C_Item = {
+		GetItemCount = function(itemID)
+			return 1
+		end,
+		GetItemInfo = function(itemLink)
+			return 18803, "Finkle's Lava Dredger", 2, 60, 1, "INV_AXE_33"
 		end,
 	}
 end
@@ -224,8 +252,14 @@ function common_stubs.stub_C_DelvesUI()
 end
 
 function common_stubs.stub_Unit_Funcs()
+	_G.UnitGUID = function(unit)
+		return "player"
+	end
 	_G.UnitLevel = function()
 		return 2
+	end
+	_G.UnitName = function()
+		return "Player"
 	end
 	_G.UnitXP = function()
 		return 10

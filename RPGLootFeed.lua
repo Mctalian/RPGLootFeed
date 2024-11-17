@@ -89,3 +89,5 @@ function RLF:OnOptionsClose(...)
 		optionsFrame = nil
 	end)
 end
+
+return RLF
