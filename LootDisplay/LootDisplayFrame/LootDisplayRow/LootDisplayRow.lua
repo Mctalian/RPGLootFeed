@@ -466,6 +466,7 @@ function LootDisplayRowMixin:ShowItemCountText(itemCount, options)
 	options = options or {}
 	local color = options.color or "|cFFBCBCBC"
 	local wrapChar = options.wrapChar or WrapChar.DEFAULT
+	local showSign = options.showSign or false
 
 	local sChar, eChar
 	if wrapChar == WrapChar.SPACE then
@@ -482,8 +483,12 @@ function LootDisplayRowMixin:ShowItemCountText(itemCount, options)
 		sChar, eChar = "", ""
 	end
 
-	if itemCount and itemCount > 1 then
-		self.ItemCountText:SetText(color .. sChar .. itemCount .. eChar .. "|r")
+	if itemCount and (itemCount > 1 or (showSign and itemCount >= 1)) then
+		local sign = ""
+		if showSign then
+			sign = "+"
+		end
+		self.ItemCountText:SetText(color .. sChar .. sign .. itemCount .. eChar .. "|r")
 		self.ItemCountText:Show()
 	else
 		self.ItemCountText:Hide()
