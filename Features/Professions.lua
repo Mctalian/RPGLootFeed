@@ -37,7 +37,11 @@ end
 function Professions:OnInitialize()
 	self.professions = {}
 	self.isRegisteredSkillLinesChanged = false
-	self:Enable()
+	if G_RLF.db.global.profFeed then
+		self:Enable()
+	else
+		self:Disable()
+	end
 end
 
 function Professions:OnDisable()
@@ -114,3 +118,5 @@ function Professions:SKILL_LINES_CHANGED()
 		end
 	end
 end
+
+return Professions

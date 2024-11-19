@@ -38,12 +38,12 @@ local function countMappedFactions()
 end
 
 local function buildFactionLocaleMap(findName)
-	local numFactions = C_Reputation.GetNumFactions()
 	local mappedFactions = countMappedFactions()
 	local hasMoreFactions = C_Reputation.GetFactionDataByIndex(mappedFactions + 1) ~= nil
 	if not hasMoreFactions and not findName then
 		return
 	end
+	local numFactions = mappedFactions + 5
 
 	if not findName then
 		local buckets = math.ceil(numFactions / 10) + 1
@@ -64,9 +64,6 @@ local function buildFactionLocaleMap(findName)
 
 		return
 	end
-
-	-- If we are searching for a specific faction, we need to expand all headers to ensure we find it
-	C_Reputation.ExpandAllFactionHeaders()
 
 	for i = 1, numFactions do
 		local factionData = C_Reputation.GetFactionDataByIndex(i)
@@ -163,7 +160,6 @@ function Rep.Element:new(...)
 	return element
 end
 
-local season, companionFactionId, companionFactionName
 local increasePatterns, decreasePatterns
 function Rep:OnInitialize()
 	locale = GetLocale()
@@ -171,11 +167,10 @@ function Rep:OnInitialize()
 	G_RLF.db.global.factionMaps = G_RLF.db.global.factionMaps or {}
 	G_RLF.db.global.factionMaps[locale] = G_RLF.db.global.factionMaps[locale] or {}
 
-	season = C_DelvesUI.GetCurrentDelvesSeasonNumber()
-	companionFactionId = C_DelvesUI.GetFactionForCompanion(season)
-	local factionData = C_Reputation.GetFactionDataByID(companionFactionId)
+	self.companionFactionId = C_DelvesUI.GetFactionForCompanion(BRANN_COMPANION_INFO_ID)
+	local factionData = C_Reputation.GetFactionDataByID(self.companionFactionId)
 	if factionData then
-		companionFactionName = factionData.name
+		self.companionFactionName = factionData.name
 	end
 
 	increasePatterns = precomputePatternSegments({
@@ -229,7 +224,7 @@ local function extractFactionAndRep(message, patterns)
 	return nil, nil
 end
 
-local function extractFactionAndRepForDelves(message)
+local function extractFactionAndRepForDelves(message, companionFactionName)
 	if not companionFactionName then
 		return nil, nil
 	end
@@ -252,6 +247,7 @@ end
 
 function Rep:OnEnable()
 	self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
+	print(self.companionFactionName)
 end
 
 function Rep:ParseFactionChangeMessage(message)
@@ -264,7 +260,7 @@ function Rep:ParseFactionChangeMessage(message)
 		end
 	end
 	if not faction then
-		faction, repChange = extractFactionAndRepForDelves(message)
+		faction, repChange = extractFactionAndRepForDelves(message, self.companionFactionName)
 		if faction then
 			isDelveCompanion = true
 		end

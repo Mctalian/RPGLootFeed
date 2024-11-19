@@ -65,6 +65,8 @@ L["Enable Experience in Feed"] = true
 L["EnableXPDesc"] = "Show experience gains in the Loot Feed"
 L["Enable Reputation in Feed"] = true
 L["EnableRepDesc"] = "Show reputation gains in the Loot Feed"
+L["Enable Professions in Feed"] = true
+L["EnableProfDesc"] = "Show profession skill gains in the Loot Feed"
 
 -- ConfigOptions - Positioning Group
 L["Toggle Test Mode"] = true

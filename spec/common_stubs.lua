@@ -87,6 +87,9 @@ function common_stubs.setup_G_RLF(spy)
 			local f = math.floor
 			return string.format("|c%02x%02x%02x%02x", f(a * 255), f(r * 255), f(g * 255), f(b * 255))
 		end,
+		InitializeLootDisplayProperties = function(element)
+			element.Show = spy.new()
+		end,
 	}
 
 	return ns
