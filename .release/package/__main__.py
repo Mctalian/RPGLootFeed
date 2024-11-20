@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import sys
 
 from .argument_parser import parse_args

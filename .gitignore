@@ -41,8 +41,7 @@ luac.out
 
 .release/*
 !.release/local.sh
-!.release/local
-!.release/_local
+!.release/package
 
 .scripts/.output
 
