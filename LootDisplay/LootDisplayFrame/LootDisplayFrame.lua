@@ -401,7 +401,7 @@ end
 
 function LootDisplayFrameMixin:UpdateRowItemCounts()
 	for row in rows:iterate() do
-		if row.id and row.type == "ItemLoot" then
+		if row.id and row.type == "ItemLoot" and row.unit == false then
 			row:UpdateItemCount()
 		end
 	end

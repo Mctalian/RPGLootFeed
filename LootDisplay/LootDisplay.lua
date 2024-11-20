@@ -178,12 +178,13 @@ local function processRow(element)
 			row.link = truncateItemLink(textFn(), extraWidth)
 			row.quality = quality
 			text = textFn(0, row.link)
-
-			row:UpdateIcon(key, icon, quality)
-
 			row:SetupTooltip()
 		else
 			text = textFn()
+		end
+
+		if icon then
+			row:UpdateIcon(key, icon, quality)
 		end
 
 		row:UpdateSecondaryText(secondaryTextFn)
@@ -216,6 +217,13 @@ local function processRow(element)
 		row:ShowItemCountText(
 			element.currentLevel,
 			{ color = G_RLF:RGBAToHexFormat(0.749, 0.737, 0.012, 1), wrapChar = G_RLF.WrapCharEnum.ANGLE }
+		)
+	end
+
+	if element.type == "Professions" then
+		row:ShowItemCountText(
+			row.amount,
+			{ color = "|cFF5555FF", wrapChar = G_RLF.WrapCharEnum.BRACKET, showSign = true }
 		)
 	end
 
