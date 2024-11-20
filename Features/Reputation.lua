@@ -139,13 +139,16 @@ function Rep.Element:new(...)
 				local bagSize = G_RLF.db.global.fontSize
 				str = str .. "|A:ParagonReputation_Bag:" .. bagSize .. ":" .. bagSize .. ":0:0|a    "
 			end
-			if factionData.currentValue ~= nil and factionData.currentValue > 0 then
-				str = str .. factionData.currentValue
-			end
-			if factionData.threshold ~= nil and factionData.threshold > 0 then
+			if
+				factionData.currentValue ~= nil
+				and factionData.currentValue > 0
+				and factionData.threshold ~= nil
+				and factionData.threshold > 0
+			then
+				str = str .. (factionData.currentValue - factionData.threshold)
 				str = str .. "/" .. factionData.threshold
 			end
-		elseif element.typeType == RepType.Friendship then
+		elseif element.repType == RepType.Friendship then
 			if factionData.repNumerator ~= nil and factionData.repNumerator > 0 then
 				str = str .. factionData.repNumerator
 				if factionData.repDenominator ~= nil and factionData.repDenominator > 0 then
@@ -255,7 +258,6 @@ end
 
 function Rep:OnEnable()
 	self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
-	print(self.companionFactionName)
 end
 
 function Rep:ParseFactionChangeMessage(message)
@@ -325,7 +327,13 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 				if factionData.reaction then
 					color = FACTION_BAR_COLORS[factionData.reaction]
 				end
-				if friendInfo and friendInfo.friendshipFactionID and friendInfo.friendshipFactionID > 0 then
+				if
+					friendInfo
+					and friendInfo.friendshipFactionID
+					and friendInfo.friendshipFactionID > 0
+					and friendInfo.nextThreshold
+					and friendInfo.nextThreshold > 1
+				then
 					local ranks = C_GossipInfo.GetFriendshipReputationRanks(fId)
 					factionData.currentLevel = ranks and ranks.currentLevel or 0
 					factionData.maxLevel = ranks and ranks.maxLevel or 0
