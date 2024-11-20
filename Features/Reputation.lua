@@ -9,6 +9,7 @@ local RepType = {
 	Paragon = 2,
 	BaseFaction = 3,
 	DelveCompanion = 4,
+	Friendship = 5,
 }
 
 -- Precompute pattern segments to optimize runtime message parsing
@@ -143,6 +144,13 @@ function Rep.Element:new(...)
 			end
 			if factionData.threshold ~= nil and factionData.threshold > 0 then
 				str = str .. "/" .. factionData.threshold
+			end
+		elseif element.typeType == RepType.Friendship then
+			if factionData.repNumerator ~= nil and factionData.repNumerator > 0 then
+				str = str .. factionData.repNumerator
+				if factionData.repDenominator ~= nil and factionData.repDenominator > 0 then
+					str = str .. "/" .. factionData.repDenominator
+				end
 			end
 		else
 			if factionData.currentStanding >= 0 and factionData.currentReactionThreshold > 0 then
@@ -312,11 +320,21 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 				factionData.nextLevelAt = info.nextThreshold - info.reactionThreshold
 				repType = RepType.DelveCompanion
 			else
+				local friendInfo = C_GossipInfo.GetFriendshipReputation(fId)
 				factionData = C_Reputation.GetFactionDataByID(fId)
 				if factionData.reaction then
 					color = FACTION_BAR_COLORS[factionData.reaction]
 				end
-				repType = RepType.BaseFaction
+				if friendInfo and friendInfo.friendshipFactionID and friendInfo.friendshipFactionID > 0 then
+					local ranks = C_GossipInfo.GetFriendshipReputationRanks(fId)
+					factionData.currentLevel = ranks and ranks.currentLevel or 0
+					factionData.maxLevel = ranks and ranks.maxLevel or 0
+					factionData.repNumerator = friendInfo.standing - friendInfo.reactionThreshold
+					factionData.repDenominator = friendInfo.nextThreshold - friendInfo.reactionThreshold
+					repType = RepType.Friendship
+				else
+					repType = RepType.BaseFaction
+				end
 			end
 
 			if C_Reputation.IsFactionParagon(fId) then

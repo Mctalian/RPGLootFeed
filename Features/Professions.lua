@@ -62,7 +62,7 @@ function Professions:InitializeProfessions()
 			self.professions[profs[i]] = {
 				name = name,
 			}
-			self.professions[profs[i]][expansionName] = {
+			self.professions[profs[i]][expansionName or name] = {
 				icon = icon,
 				level = level,
 				maxLevel = maxLevel,
@@ -73,11 +73,11 @@ function Professions:InitializeProfessions()
 end
 
 function Professions:PLAYER_ENTERING_WORLD()
+	self:InitializeProfessions()
 	if self.isRegisteredSkillLinesChanged == false then
 		self.isRegisteredSkillLinesChanged = true
 		self:RegisterEvent("SKILL_LINES_CHANGED")
 	end
-	self:InitializeProfessions()
 end
 
 function Professions:SKILL_LINES_CHANGED()
@@ -97,7 +97,7 @@ function Professions:SKILL_LINES_CHANGED()
 						e:Show()
 					end
 				else
-					self.professions[profs[i]][expansionName] = {
+					self.professions[profs[i]][expansionName or name] = {
 						icon = icon,
 						level = level,
 						maxLevel = maxLevel,
@@ -108,7 +108,7 @@ function Professions:SKILL_LINES_CHANGED()
 				self.professions[profs[i]] = {
 					name = name,
 				}
-				self.professions[profs[i]][expansionName] = {
+				self.professions[profs[i]][expansionName or name] = {
 					icon = icon,
 					level = level,
 					maxLevel = maxLevel,
