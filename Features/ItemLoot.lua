@@ -161,9 +161,34 @@ function ItemLoot:OnEnable()
 	self:SetNameUnitMap()
 end
 
-function ItemLoot:OnItemReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice)
+local ItemTypeEnum = {
+	MISC = 15,
+}
+
+local MiscSubTyperEnum = {
+	MOUNT = 5,
+}
+
+function ItemLoot:OnItemReadyToShow(
+	itemId,
+	itemLink,
+	itemTexture,
+	amount,
+	itemName,
+	itemQuality,
+	sellPrice,
+	itemType,
+	itemSubType
+)
 	self.pendingItemRequests[itemId] = nil
 	local e = ItemLoot.Element:new(itemId, itemLink, itemTexture, amount, sellPrice, false)
+	if
+		itemType == ItemTypeEnum.MISC
+		and itemSubType == MiscSubTyperEnum.MOUNT
+		and G_RLF.db.global.itemHighlights.mounts
+	then
+		e.highlight = true
+	end
 	e:Show(itemName, itemQuality)
 end
 
@@ -180,9 +205,19 @@ function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
 		if not success then
 			error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount)
 		else
-			local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
+			local itemName, _, itemQuality, _, _, itemType, itemSubType, _, _, itemTexture, sellPrice, classID, subclassID, _, _, _, _ =
 				C_Item.GetItemInfo(itemLink)
-			self:OnItemReadyToShow(itemID, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice)
+			self:OnItemReadyToShow(
+				itemID,
+				itemLink,
+				itemTexture,
+				amount,
+				itemName,
+				itemQuality,
+				sellPrice,
+				classID,
+				subclassID
+			)
 		end
 		return
 	end
@@ -216,10 +251,20 @@ function ItemLoot:ShowItemLoot(msg, itemLink)
 	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
 	local itemId = itemLink:match("Hitem:(%d+)")
 	self.pendingItemRequests[itemId] = { itemLink, amount }
-	local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
+	local itemName, _, itemQuality, _, _, itemType, itemSubType, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
 		C_Item.GetItemInfo(itemLink)
 	if itemName ~= nil then
-		self:OnItemReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice)
+		self:OnItemReadyToShow(
+			itemId,
+			itemLink,
+			itemTexture,
+			amount,
+			itemName,
+			itemQuality,
+			sellPrice,
+			itemType,
+			itemSubType
+		)
 	end
 end
 

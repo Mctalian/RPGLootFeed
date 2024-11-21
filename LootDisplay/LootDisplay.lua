@@ -132,6 +132,7 @@ local function processRow(element)
 	local isLink = element.isLink
 	local unit = element.unit
 	local itemCount = element.itemCount
+	local highlight = element.highlight
 
 	if unit then
 		key = unit .. "_" .. key
@@ -228,6 +229,12 @@ local function processRow(element)
 	end
 
 	row:ShowText(text, r, g, b, a)
+
+	if highlight then
+		RunNextFrame(function()
+			row:HighlightIcon()
+		end)
+	end
 
 	logFn(text, row.amount, new)
 

@@ -264,6 +264,11 @@ local function rowFadeOutAnimation(row)
 		row.FadeOutAnimation.fadeOut:SetFromAlpha(1)
 		row.FadeOutAnimation.fadeOut:SetToAlpha(0)
 		row.FadeOutAnimation.fadeOut:SetDuration(1)
+		row.FadeOutAnimation.fadeOut:SetScript("OnUpdate", function()
+			if row.glowTexture and row.glowTexture:IsShown() then
+				row.glowTexture:SetAlpha(0.75 * (1 - row.FadeOutAnimation.fadeOut:GetProgress()))
+			end
+		end)
 		row.FadeOutAnimation.fadeOut:SetScript("OnFinished", function()
 			row:Hide()
 			local frame = LootDisplayFrame
@@ -315,6 +320,13 @@ function LootDisplayRowMixin:Reset()
 	self.LeftBorder:SetAlpha(0)
 
 	self.Icon:Reset()
+
+	if self.glowAnimationGroup then
+		self.glowAnimationGroup:Stop()
+	end
+	if self.glowTexture then
+		self.glowTexture:Hide()
+	end
 
 	self.UnitPortrait:SetTexture(nil)
 	self.SecondaryText:SetText(nil)
@@ -549,6 +561,50 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 			end
 		end)
 	end
+end
+
+function LootDisplayRowMixin:HighlightIcon()
+	if not self.glowTexture then
+		-- Create the glow texture
+		self.glowTexture = self:CreateTexture(nil, "OVERLAY")
+		self.glowTexture:SetTexture("Interface\\SpellActivationOverlay\\IconAlert")
+		self.glowTexture:SetPoint("CENTER", self.Icon, "CENTER", 0, 0)
+		self.glowTexture:SetSize(self.Icon:GetWidth() * 1.75, self.Icon:GetHeight() * 1.75)
+		self.glowTexture:SetBlendMode("BLEND")
+		self.glowTexture:SetAlpha(0.75)
+		self.glowTexture:SetTexCoord(0.00781250, 0.50781250, 0.27734375, 0.52734375)
+	end
+
+	-- Create the animation group if it doesn't exist
+	if not self.glowAnimationGroup then
+		self.glowAnimationGroup = self.glowTexture:CreateAnimationGroup()
+
+		-- Add a rotation animation
+		local rotate = self.glowAnimationGroup:CreateAnimation("Rotation")
+		local duration = G_RLF.db.global.fadeOutDelay + 2
+		rotate:SetDuration(duration) -- Adjust for desired speed
+		rotate:SetDegrees(360 * duration)
+		rotate:SetOrder(1)
+
+		local alphaIn = self.glowAnimationGroup:CreateAnimation("Alpha")
+		alphaIn:SetFromAlpha(0.5)
+		alphaIn:SetToAlpha(1)
+		alphaIn:SetDuration(0.5)
+		alphaIn:SetOrder(1)
+		alphaIn:SetSmoothing("IN_OUT")
+
+		local alphaOut = self.glowAnimationGroup:CreateAnimation("Alpha")
+		alphaOut:SetFromAlpha(1)
+		alphaOut:SetToAlpha(0.5)
+		alphaOut:SetDuration(0.5)
+		alphaOut:SetOrder(2)
+		alphaOut:SetSmoothing("IN_OUT")
+
+		self.glowAnimationGroup:SetLooping("REPEAT")
+	end
+
+	self.glowTexture:Show()
+	self.glowAnimationGroup:Play()
 end
 
 function LootDisplayRowMixin:ResetFadeOut()

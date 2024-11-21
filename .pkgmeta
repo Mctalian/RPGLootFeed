@@ -20,8 +20,8 @@ ignore:
   - spec/*
   - Makefile
   - trunk
-  - *.ps1
-  - *.md
-  - *.rockspec
+  - "*.ps1"
+  - "*.md"
+  - "*.rockspec"
   - requirements.txt
 
