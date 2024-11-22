@@ -19,6 +19,7 @@ G_RLF.defaults.global.itemHighlights = {
 	transmog = false,
 	mounts = true,
 	legendary = true,
+	betterThanEquipped = true,
 }
 
 G_RLF.options.args.features.args.itemLootConfig = {
@@ -97,6 +98,19 @@ G_RLF.options.args.features.args.itemLootConfig = {
 						G_RLF.db.global.itemHighlights.legendary = value
 					end,
 					order = 2,
+				},
+				highlightBetterThanEquipped = {
+					type = "toggle",
+					name = G_RLF.L["Highlight Items Better Than Equipped"],
+					desc = G_RLF.L["HighlightBetterThanEquippedDesc"],
+					width = "double",
+					get = function(info)
+						return G_RLF.db.global.itemHighlights.betterThanEquipped
+					end,
+					set = function(info, value)
+						G_RLF.db.global.itemHighlights.betterThanEquipped = value
+					end,
+					order = 3,
 				},
 				-- highlightBoE = {
 				--   type = "toggle",

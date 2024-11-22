@@ -23,6 +23,9 @@ function ItemInfo:new(...)
 	if not self.itemName then
 		return nil
 	end
+	if not self.itemId then
+		self.itemId = C_Item.GetItemIDForItemInfo(self.itemLink)
+	end
 	return self
 end
 

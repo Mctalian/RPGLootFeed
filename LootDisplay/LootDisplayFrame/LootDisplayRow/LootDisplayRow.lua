@@ -61,7 +61,11 @@ end
 
 local function rowUnitPortrait(row)
 	if row.unit then
-		SetPortraitTexture(row.UnitPortrait, row.unit)
+		RunNextFrame(function()
+			if row.unit then
+				SetPortraitTexture(row.UnitPortrait, row.unit)
+			end
+		end)
 		local portraitSize = G_RLF.db.global.iconSize * 0.8
 		row.UnitPortrait:SetSize(portraitSize, portraitSize)
 		row.UnitPortrait:ClearAllPoints()
@@ -604,8 +608,11 @@ function LootDisplayRowMixin:HighlightIcon()
 		self.glowAnimationGroup:SetLooping("REPEAT")
 	end
 
-	self.glowTexture:Show()
-	self.glowAnimationGroup:Play()
+	RunNextFrame(function()
+		-- Show the glow texture and play the animation
+		self.glowTexture:Show()
+		self.glowAnimationGroup:Play()
+	end)
 end
 
 function LootDisplayRowMixin:ResetFadeOut()
