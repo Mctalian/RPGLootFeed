@@ -566,11 +566,12 @@ end
 function LootDisplayRowMixin:HighlightIcon()
 	if not self.glowTexture then
 		-- Create the glow texture
-		self.glowTexture = self:CreateTexture(nil, "OVERLAY")
+		self.glowTexture = self.Icon:CreateTexture(nil, "OVERLAY")
+		self.glowTexture:SetDrawLayer("OVERLAY", 7)
 		self.glowTexture:SetTexture("Interface\\SpellActivationOverlay\\IconAlert")
 		self.glowTexture:SetPoint("CENTER", self.Icon, "CENTER", 0, 0)
 		self.glowTexture:SetSize(self.Icon:GetWidth() * 1.75, self.Icon:GetHeight() * 1.75)
-		self.glowTexture:SetBlendMode("BLEND")
+		self.glowTexture:SetBlendMode("ADD") -- "ADD" is often better for glow effects
 		self.glowTexture:SetAlpha(0.75)
 		self.glowTexture:SetTexCoord(0.00781250, 0.50781250, 0.27734375, 0.52734375)
 	end
@@ -579,26 +580,26 @@ function LootDisplayRowMixin:HighlightIcon()
 	if not self.glowAnimationGroup then
 		self.glowAnimationGroup = self.glowTexture:CreateAnimationGroup()
 
-		-- Add a rotation animation
-		local rotate = self.glowAnimationGroup:CreateAnimation("Rotation")
-		local duration = G_RLF.db.global.fadeOutDelay + 2
-		rotate:SetDuration(duration) -- Adjust for desired speed
-		rotate:SetDegrees(360 * duration)
-		rotate:SetOrder(1)
+		-- Add a scale animation for pulsing
+		local scaleUp = self.glowAnimationGroup:CreateAnimation("Scale")
+		scaleUp:SetScale(1.25, 1.25) -- Slightly increase size
+		scaleUp:SetDuration(0.5) -- Half a second to scale up
+		scaleUp:SetOrder(1)
+		scaleUp:SetSmoothing("IN_OUT") -- Smooth scaling in and out
 
-		local alphaIn = self.glowAnimationGroup:CreateAnimation("Alpha")
-		alphaIn:SetFromAlpha(0.5)
-		alphaIn:SetToAlpha(1)
-		alphaIn:SetDuration(0.5)
-		alphaIn:SetOrder(1)
-		alphaIn:SetSmoothing("IN_OUT")
+		local scaleDown = self.glowAnimationGroup:CreateAnimation("Scale")
+		scaleDown:SetScale(0.8, 0.8) -- Slightly decrease size back
+		scaleDown:SetDuration(0.5) -- Half a second to scale down
+		scaleDown:SetOrder(2)
+		scaleDown:SetSmoothing("IN_OUT")
 
-		local alphaOut = self.glowAnimationGroup:CreateAnimation("Alpha")
-		alphaOut:SetFromAlpha(1)
-		alphaOut:SetToAlpha(0.5)
-		alphaOut:SetDuration(0.5)
-		alphaOut:SetOrder(2)
-		alphaOut:SetSmoothing("IN_OUT")
+		-- Optional: Add a subtle alpha fade during the pulse
+		local alphaPulse = self.glowAnimationGroup:CreateAnimation("Alpha")
+		alphaPulse:SetFromAlpha(0.75)
+		alphaPulse:SetToAlpha(1)
+		alphaPulse:SetDuration(0.5)
+		alphaPulse:SetOrder(1)
+		alphaPulse:SetSmoothing("IN_OUT")
 
 		self.glowAnimationGroup:SetLooping("REPEAT")
 	end

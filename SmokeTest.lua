@@ -153,6 +153,7 @@ local function runItemLootSmokeTest()
 	else
 		runTestSafely(e.Show, "LootDisplay: Item", e, info.itemName, info.itemQuality)
 		e = module.Element:new(info, amountLooted, false)
+		e.highlight = true
 		runTestSafely(e.Show, "LootDisplay: Item Quantity Update", e, info.itemName, info.itemQuality)
 		e = module.Element:new(info, amountLooted, "player")
 		runTestSafely(e.Show, "LootDisplay: Item Unit", e, info.itemName, info.itemQuality)
