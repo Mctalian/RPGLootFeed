@@ -13,6 +13,21 @@ local function errorhandler(err)
 	return geterrorhandler()(err .. suffix)
 end
 
+local ItemInfo = {}
+ItemInfo.__index = ItemInfo
+function ItemInfo:new(...)
+	local self = {}
+	setmetatable(self, ItemInfo)
+	self.itemId, self.itemName, self.itemLink, self.itemQuality, self.itemLevel, self.itemMinLevel, self.itemType, self.itemSubType, self.itemStackCount, self.itemEquipLoc, self.itemTexture, self.sellPrice, self.classID, self.subclassID, self.bindType, self.expansionID, self.setID, self.isCraftingReagent =
+		...
+	if not self.itemName then
+		return nil
+	end
+	return self
+end
+
+G_RLF.ItemInfo = ItemInfo
+
 function G_RLF:fn(func, ...)
 	-- Borrowed from AceAddon-3.0
 	if type(func) == "function" then

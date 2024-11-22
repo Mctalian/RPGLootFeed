@@ -33,6 +33,8 @@ ItemLoot.SecondaryTextOption = {
 
 ItemLoot.Element = {}
 
+local ItemInfo = G_RLF.ItemInfo
+
 function ItemLoot:ItemQualityName(enumValue)
 	for k, v in pairs(Enum.ItemQuality) do
 		if v == enumValue then
@@ -76,8 +78,13 @@ function ItemLoot.Element:new(...)
 
 	element.isLink = true
 
-	local t
-	element.key, t, element.icon, element.quantity, element.sellPrice, element.unit = ...
+	local t, info
+	info, element.quantity, element.unit = ...
+	t = info.itemLink
+
+	element.key = info.itemId
+	element.icon = info.itemTexture
+	element.sellPrice = info.sellPrice
 
 	if not G_RLF.db.global.enablePartyLoot then
 		element.unit = nil
@@ -169,33 +176,26 @@ local MiscSubTyperEnum = {
 	MOUNT = 5,
 }
 
-function ItemLoot:OnItemReadyToShow(
-	itemId,
-	itemLink,
-	itemTexture,
-	amount,
-	itemName,
-	itemQuality,
-	sellPrice,
-	itemType,
-	itemSubType
-)
-	self.pendingItemRequests[itemId] = nil
-	local e = ItemLoot.Element:new(itemId, itemLink, itemTexture, amount, sellPrice, false)
+function ItemLoot:OnItemReadyToShow(info, amount)
+	self.pendingItemRequests[info.itemId] = nil
+	local e = ItemLoot.Element:new(info, amount, false)
 	if
-		itemType == ItemTypeEnum.MISC
-		and itemSubType == MiscSubTyperEnum.MOUNT
+		info.classID == ItemTypeEnum.MISC
+		and info.subclassID == MiscSubTyperEnum.MOUNT
 		and G_RLF.db.global.itemHighlights.mounts
 	then
 		e.highlight = true
 	end
-	e:Show(itemName, itemQuality)
+	if info.itemQuality == Enum.ItemQuality.Legendary and G_RLF.db.global.itemHighlights.legendary then
+		e.highlight = true
+	end
+	e:Show(info.itemName, info.itemQuality)
 end
 
-function ItemLoot:OnPartyReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice, unit)
-	self.pendingPartyRequests[itemId] = nil
-	local e = ItemLoot.Element:new(itemId, itemLink, itemTexture, amount, sellPrice, unit)
-	e:Show(itemName, itemQuality)
+function ItemLoot:OnPartyReadyToShow(info, amount, unit)
+	self.pendingPartyRequests[info.itemId] = nil
+	local e = ItemLoot.Element:new(info, amount, unit)
+	e:Show(info.itemName, info.itemQuality)
 end
 
 function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
@@ -205,19 +205,8 @@ function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
 		if not success then
 			error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount)
 		else
-			local itemName, _, itemQuality, _, _, itemType, itemSubType, _, _, itemTexture, sellPrice, classID, subclassID, _, _, _, _ =
-				C_Item.GetItemInfo(itemLink)
-			self:OnItemReadyToShow(
-				itemID,
-				itemLink,
-				itemTexture,
-				amount,
-				itemName,
-				itemQuality,
-				sellPrice,
-				classID,
-				subclassID
-			)
+			local info = ItemInfo:new(itemID, C_Item.GetItemInfo(itemLink))
+			self:OnItemReadyToShow(info, amount)
 		end
 		return
 	end
@@ -228,9 +217,8 @@ function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
 		if not success then
 			error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount .. " for " .. unit)
 		else
-			local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
-				C_Item.GetItemInfo(itemLink)
-			self:OnPartyReadyToShow(itemID, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice, unit)
+			local info = ItemInfo:new(itemID, C_Item.GetItemInfo(itemLink))
+			self:OnPartyReadyToShow(info, amount, unit)
 		end
 		return
 	end
@@ -240,10 +228,9 @@ function ItemLoot:ShowPartyLoot(msg, itemLink, unit)
 	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
 	local itemId = itemLink:match("Hitem:(%d+)")
 	self.pendingPartyRequests[itemId] = { itemLink, amount, unit }
-	local itemName, _, itemQuality, _, _, _, _, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
-		C_Item.GetItemInfo(itemLink)
-	if itemName ~= nil then
-		self:OnPartyReadyToShow(itemId, itemLink, itemTexture, amount, itemName, itemQuality, sellPrice, unit)
+	local info = ItemInfo:new(itemId, C_Item.GetItemInfo(itemLink))
+	if info ~= nil then
+		self:OnPartyReadyToShow(info, amount, unit)
 	end
 end
 
@@ -251,20 +238,9 @@ function ItemLoot:ShowItemLoot(msg, itemLink)
 	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
 	local itemId = itemLink:match("Hitem:(%d+)")
 	self.pendingItemRequests[itemId] = { itemLink, amount }
-	local itemName, _, itemQuality, _, _, itemType, itemSubType, _, _, itemTexture, sellPrice, _, _, _, _, _, _ =
-		C_Item.GetItemInfo(itemLink)
-	if itemName ~= nil then
-		self:OnItemReadyToShow(
-			itemId,
-			itemLink,
-			itemTexture,
-			amount,
-			itemName,
-			itemQuality,
-			sellPrice,
-			itemType,
-			itemSubType
-		)
+	local info = ItemInfo:new(itemId, C_Item.GetItemInfo(itemLink))
+	if info ~= nil then
+		self:OnItemReadyToShow(info, amount)
 	end
 end
 

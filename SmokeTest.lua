@@ -84,7 +84,7 @@ local function testWoWGlobals()
 	assertEqual(type(UnitLevel), "function", "Global: UnitLevel")
 	assertEqual(type(GetPlayerGuid), "function", "Global: GetPlayerGuid")
 	assertEqual(type(C_Item.GetItemInfo), "function", "Global: C_Item.GetItemInfo")
-	local id = testItems[#testItems].id
+	local id = testItems[#testItems].itemId
 	local isCached = C_Item.GetItemInfo(id) ~= nil
 	if not isCached then
 		G_RLF:Print("Item not cached, skipping GetItemInfo test")
@@ -145,17 +145,17 @@ end
 
 local function runItemLootSmokeTest()
 	local module = G_RLF.RLF:GetModule("ItemLoot")
-	local testObj = testItems[2]
+	local info = testItems[2]
 	local amountLooted = 1
-	local e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted, testObj.sellPrice)
-	if testObj.name == nil then
+	local e = module.Element:new(info, amountLooted, false)
+	if info.itemName == nil then
 		G_RLF:Print("Item not cached, skipping ItemLoot test")
 	else
-		runTestSafely(e.Show, "LootDisplay: Item", e, testObj.name, testObj.quality)
-		e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted, testObj.sellPrice)
-		runTestSafely(e.Show, "LootDisplay: Item Quantity Update", e, testObj.name, testObj.quality)
-		e = module.Element:new(testObj.id, testObj.link, testObj.icon, amountLooted, nil, "player")
-		runTestSafely(e.Show, "LootDisplay: Item Unit", e, testObj.name, testObj.quality)
+		runTestSafely(e.Show, "LootDisplay: Item", e, info.itemName, info.itemQuality)
+		e = module.Element:new(info, amountLooted, false)
+		runTestSafely(e.Show, "LootDisplay: Item Quantity Update", e, info.itemName, info.itemQuality)
+		e = module.Element:new(info, amountLooted, "player")
+		runTestSafely(e.Show, "LootDisplay: Item Unit", e, info.itemName, info.itemQuality)
 	end
 end
 

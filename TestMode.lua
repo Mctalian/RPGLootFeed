@@ -16,7 +16,10 @@ local testFactions = {
 
 local function idExistsInTable(id, table)
 	for _, item in pairs(table) do
-		if item.id == id then
+		if item.id and item.id == id then
+			return true
+		end
+		if item.itemId and item.itemId == id then
 			return true
 		end
 	end
@@ -44,21 +47,12 @@ end
 
 local function getItem(id)
 	local name, link, quality, icon, sellPrice, _
-	G_RLF:ProfileFunction(function()
-		name, link, quality, _, _, _, _, _, _, icon, sellPrice = C_Item.GetItemInfo(id)
-	end, "C_Item.GetItemInfo")(id)
-	local isCached = name ~= nil
+	local info = G_RLF.ItemInfo:new(id, C_Item.GetItemInfo(id))
+	local isCached = info ~= nil
 	if isCached then
-		if name and link and quality and icon and not idExistsInTable(id, testItems) then
+		if not idExistsInTable(id, testItems) then
 			pendingRequests[id] = nil
-			table.insert(testItems, {
-				id = id,
-				link = link,
-				icon = icon,
-				name = name,
-				quality = quality,
-				sellPrice = sellPrice,
-			})
+			table.insert(testItems, info)
 		end
 	else
 		pendingRequests[id] = true
@@ -169,18 +163,18 @@ local function generateRandomLoot()
 
 		-- 50% chance to show items
 		if rng > 0.2 and rng <= 0.7 then
-			local item = testItems[math.random(#testItems)]
+			local info = testItems[math.random(#testItems)]
 			local amountLooted = math.random(1, 5)
 			local module = G_RLF.RLF:GetModule("ItemLoot")
-			local e = module.Element:new(item.id, item.link, item.icon, amountLooted, item.sellPrice)
-			e:Show(item.name, item.quality)
+			local e = module.Element:new(info, amountLooted, false)
+			e:Show(info.itemName, info.itemQuality)
 
 			-- 10% chance of iitem loot to show up as a party member
 			if rng < 0.3 then
 				local unit = "player"
 				local module = G_RLF.RLF:GetModule("ItemLoot")
-				local e = module.Element:new(item.id, item.link, item.icon, amountLooted, item.sellPrice, unit)
-				e:Show(item.name, item.quality)
+				local e = module.Element:new(info, amountLooted, unit)
+				e:Show(info.itemName, info.itemQuality)
 			end
 
 			-- 15% chance to show currency
