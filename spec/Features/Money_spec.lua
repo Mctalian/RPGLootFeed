@@ -60,7 +60,6 @@ describe("Money module", function()
 
 	it("Money:PLAYER_MONEY updates startingMoney and creates a new element", function()
 		stub(_G, "GetMoney").returns(3000)
-		stub(MoneyModule, "getLogger").returns({ Info = function() end })
 		stub(MoneyModule.Element, "new").returns({ Show = function() end })
 
 		MoneyModule.startingMoney = 1000
@@ -69,7 +68,6 @@ describe("Money module", function()
 		assert.equals(MoneyModule.startingMoney, 3000)
 		assert.stub(MoneyModule.Element.new).was_called_with(MoneyModule.Element, 2000)
 
-		MoneyModule.getLogger:revert()
 		MoneyModule.Element.new:revert()
 		_G.GetMoney:revert()
 	end)

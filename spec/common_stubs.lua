@@ -1,7 +1,62 @@
 -- common_stubs.lua
 local common_stubs = {}
 
+local function embedLibs(addonOrModule, ...)
+	for _, lib in ipairs({ ... }) do
+		if lib == "AceEvent-3.0" then
+			addonOrModule.RegisterEvent = function(self, event, handler) end
+			addonOrModule.UnregisterEvent = function(self, event) end
+			addonOrModule.RegisterMessage = function(self, message, handler) end
+			addonOrModule.SendMessage = function(self, message, ...) end
+			addonOrModule.UnregisterMessage = function(self, message) end
+		end
+		if lib == "AceHook-3.0" then
+			addonOrModule.Hook = function(self, object, method, handler, hookSecure) end
+			addonOrModule.HookScript = function(self, frame, script, handler) end
+			addonOrModule.IsHooked = function(self, obj, method)
+				return false
+			end
+			addonOrModule.RawHook = function(self, object, method, handler, hookSecure) end
+			addonOrModule.RawHookScript = function(self, frame, script, handler) end
+			addonOrModule.SecureHook = function(self, object, method, handler) end
+			addonOrModule.SecureHookScript = function(self, frame, script, handler) end
+			addonOrModule.Unhook = function(self, object, method) end
+			addonOrModule.UnhookAll = function(self) end
+			addonOrModule.hooks = {}
+		end
+	end
+end
+
 function common_stubs.setup_G_RLF(spy)
+	_G.LibStub = function(lib)
+		if lib == "AceAddon-3.0" then
+			return {
+				NewAddon = function(...)
+					local addon = {}
+					embedLibs(addon, ...)
+					addon.SetDefaultModuleState = function() end
+					addon.SetDefaultModulePrototype = function() end
+					return addon
+				end,
+			}
+		end
+		if lib == "LibSharedMedia-3.0" then
+			return {
+				Register = spy.new(),
+				MediaType = {
+					FONT = "font",
+				},
+			}
+		end
+		return {
+			GetLocale = function() end,
+			New = function()
+				return { global = {} }
+			end,
+			RegisterOptionsTable = function() end,
+			AddToBlizOptions = function() end,
+		}
+	end
 	common_stubs.stub_WoWGlobals(spy)
 
 	local logger = {
@@ -15,6 +70,7 @@ function common_stubs.setup_G_RLF(spy)
 			global = {
 				currencyFeed = true,
 				factionMaps = {},
+				itemHighlights = {},
 			},
 		},
 		LootDisplay = {},
@@ -30,9 +86,6 @@ function common_stubs.setup_G_RLF(spy)
 			NewModule = function(_, name, ...)
 				local module = {
 					moduleName = name,
-					getLogger = function(self)
-						return logger
-					end,
 					Enable = function() end,
 					Disable = function() end,
 					fn = function(s, func, ...)
@@ -41,31 +94,7 @@ function common_stubs.setup_G_RLF(spy)
 						end
 					end,
 				}
-
-				for _, lib in ipairs({ ... }) do
-					if lib == "AceEvent-3.0" then
-						module.RegisterEvent = function(self, event, handler) end
-						module.UnregisterEvent = function(self, event) end
-						module.RegisterMessage = function(self, message, handler) end
-						module.SendMessage = function(self, message, ...) end
-						module.UnregisterMessage = function(self, message) end
-					end
-					if lib == "AceHook-3.0" then
-						module.Hook = function(self, object, method, handler, hookSecure) end
-						module.HookScript = function(self, frame, script, handler) end
-						module.IsHooked = function(self, obj, method)
-							return false
-						end
-						module.RawHook = function(self, object, method, handler, hookSecure) end
-						module.RawHookScript = function(self, frame, script, handler) end
-						module.SecureHook = function(self, object, method, handler) end
-						module.SecureHookScript = function(self, frame, script, handler) end
-						module.Unhook = function(self, object, method) end
-						module.UnhookAll = function(self) end
-						module.hooks = {}
-					end
-				end
-
+				embedLibs(module, ...)
 				return module
 			end,
 			GetModule = function(_, name)
@@ -90,6 +119,37 @@ function common_stubs.setup_G_RLF(spy)
 		InitializeLootDisplayProperties = function(element)
 			element.Show = spy.new()
 		end,
+		ItemInfo = {
+			new = function()
+				return {
+					itemId = 18803,
+					itemName = "Finkle's Lava Dredger",
+					itemQuality = 2,
+				}
+			end,
+		},
+		FeatureModule = {
+			ItemLoot = "ItemLoot",
+			Currency = "Currency",
+			Money = "Money",
+			Reputation = "Reputation",
+			Experience = "Experience",
+			Profession = "Profession",
+		},
+		LogEventSource = {
+			ADDON = "TestAddon",
+			WOWEVENT = "WOWEVENT",
+		},
+		LogLevel = {
+			debug = "DEBUG",
+			info = "INFO",
+			warn = "WARN",
+			error = "ERROR",
+		},
+		LogDebug = spy.new(),
+		LogInfo = spy.new(),
+		LogWarn = spy.new(),
+		LogError = spy.new(),
 	}
 
 	return ns
@@ -99,7 +159,23 @@ function common_stubs.stub_WoWGlobals(spy)
 	common_stubs.stub_Unit_Funcs()
 	common_stubs.stub_Money_Funcs()
 
+	_G.Enum = {
+		ItemClass = {},
+		ItemMiscellaneousSubclass = {},
+		ItemQuality = {},
+	}
+
 	_G.MEMBERS_PER_RAID_GROUP = 5
+	_G.GetNumGroupMembers = function()
+		return 1
+	end
+
+	_G.C_CVar = {
+		SetCVar = function() end,
+	}
+	_G.EventRegistry = {
+		RegisterCallback = function() end,
+	}
 
 	_G.unpack = table.unpack
 	_G.handledError = function(err)
@@ -160,6 +236,9 @@ function common_stubs.stub_C_Item()
 		end,
 		GetItemInfo = function(itemLink)
 			return 18803, "Finkle's Lava Dredger", 2, 60, 1, "INV_AXE_33"
+		end,
+		GetItemIDForItemInfo = function(itemLink)
+			return 18803
 		end,
 	}
 end

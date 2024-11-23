@@ -59,12 +59,12 @@ function Money:OnEnable()
 end
 
 function Money:PLAYER_ENTERING_WORLD(eventName)
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName)
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName)
 	self.startingMoney = GetMoney()
 end
 
 function Money:PLAYER_MONEY(eventName)
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName)
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName)
 	self:fn(function()
 		local newMoney = GetMoney()
 		local amountInCopper = newMoney - self.startingMoney

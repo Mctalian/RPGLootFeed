@@ -11,7 +11,7 @@ describe("Queue module", function()
 		-- Define the global G_RLF
 		ns = ns or {}
 		-- Load the Queue module before each test
-		assert(loadfile("Queue.lua"))("TestAddon", ns)
+		assert(loadfile("utils/Queue.lua"))("TestAddon", ns)
 
 		Queue = ns.Queue
 	end)

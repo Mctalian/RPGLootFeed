@@ -25,10 +25,6 @@ function G_RLF.InitializeLootDisplayProperties(self)
 
 	self.isLink = false
 
-	self.getLogger = function()
-		return G_RLF.RLF:GetModule("Logger")
-	end
-
 	self.isPassingFilter = function()
 		return true
 	end
@@ -49,7 +45,7 @@ function G_RLF.InitializeLootDisplayProperties(self)
 			amountLogText = format("%s (diff: %s%s)", amount, sign, math.abs(self.quantity))
 		end
 
-		self:getLogger():Info(self.type .. "Shown", addonName, self.type, self.key, text, amountLogText, new)
+		G_RLF:LogInfo(self.type .. "Shown", addonName, self.type, self.key, text, amountLogText, new)
 	end
 end
 

@@ -6,9 +6,9 @@ local logger
 local allItemsInitialized = false
 local isLootDisplayReady = false
 local pendingRequests = {}
-local testItems = {}
-local testCurrencies = {}
-local testFactions = {
+TestMode.testItems = {}
+TestMode.testCurrencies = {}
+TestMode.testFactions = {
 	"Undercity",
 	"Thunder Bluff",
 	"Orgrimmar",
@@ -35,12 +35,10 @@ local function anyPendingRequests()
 	return false
 end
 
-local function runSmokeTestIfReady()
-	if allItemsInitialized and isLootDisplayReady then
+local function signalIntegrationTestReady()
+	if not TestMode.integrationTestReady and allItemsInitialized and isLootDisplayReady then
 		--@alpha@
-		RunNextFrame(function()
-			TestMode:SmokeTest(testItems, testCurrencies, testFactions)
-		end)
+		TestMode:IntegrationTestReady()
 		--@end-alpha@
 	end
 end
@@ -50,9 +48,9 @@ local function getItem(id)
 	local info = G_RLF.ItemInfo:new(id, C_Item.GetItemInfo(id))
 	local isCached = info ~= nil
 	if isCached then
-		if not idExistsInTable(id, testItems) then
+		if not idExistsInTable(id, TestMode.testItems) then
 			pendingRequests[id] = nil
-			table.insert(testItems, info)
+			table.insert(TestMode.testItems, info)
 		end
 	else
 		pendingRequests[id] = true
@@ -65,9 +63,9 @@ local function initializeTestItems()
 		getItem(id)
 	end
 
-	if #testItems == #testItemIds then
+	if #TestMode.testItems == #testItemIds then
 		allItemsInitialized = true
-		runSmokeTestIfReady()
+		signalIntegrationTestReady()
 		return
 	end
 end
@@ -75,17 +73,16 @@ end
 local testCurrencyIds = { 2245, 1191, 1828, 1792, 1755, 1580, 1273, 1166, 515, 241, 1813, 2778, 3089, 1101, 1704 }
 local function initializeTestCurrencies()
 	for _, id in pairs(testCurrencyIds) do
-		if not idExistsInTable(id, testCurrencies) then
+		if not idExistsInTable(id, TestMode.testCurrencies) then
 			local info = C_CurrencyInfo.GetCurrencyInfo(id)
 			local link = C_CurrencyInfo.GetCurrencyLink(id)
 			local basicInfo = C_CurrencyInfo.GetBasicCurrencyInfo(id, 100)
-			local ratio = basicInfo.displayAmount / 100
 			if info and link and info.currencyID and info.iconFileID then
-				table.insert(testCurrencies, {
+				table.insert(TestMode.testCurrencies, {
 					id = info.currencyID,
 					link = link,
 					icon = info.iconFileID,
-					quantity = info.quantity * (ratio or 1),
+					quantity = info.quantity,
 					quality = info.quality,
 					totalEarned = info.totalEarned,
 					maxQuantity = info.maxQuantity,
@@ -98,15 +95,24 @@ end
 function TestMode:OnInitialize()
 	isLootDisplayReady = false
 	allItemsInitialized = false
-	testCurrencies = {}
-	testItems = {}
+	self.testCurrencies = {}
+	self.testItems = {}
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:InitializeTestData()
+	--@alpha@
+	RunNextFrame(function()
+		self:SmokeTest()
+	end)
+	--@end-alpha@
+end
+
+function TestMode:IntegrationTestReady()
+	self.integrationTestReady = true
 end
 
 function TestMode:OnLootDisplayReady()
 	isLootDisplayReady = true
-	runSmokeTestIfReady()
+	signalIntegrationTestReady()
 end
 
 local failedRetrievals = {}
@@ -128,18 +134,18 @@ function TestMode:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
 	G_RLF:ProfileFunction(getItem, "getItem")(itemID)
 	-- getItem(itemID)
 
-	if #testItems == #testItemIds and not anyPendingRequests() then
+	if #self.testItems == #testItemIds and not anyPendingRequests() then
 		allItemsInitialized = true
-		runSmokeTestIfReady()
+		signalIntegrationTestReady()
 	end
 end
 
 local function generateRandomLoot()
-	if #testItems ~= #testItemIds then
+	if #TestMode.testItems ~= #testItemIds then
 		initializeTestItems()
 	end
 
-	if #testCurrencies ~= #testCurrencyIds then
+	if #TestMode.testCurrencies ~= #testCurrencyIds then
 		initializeTestCurrencies()
 	end
 	-- Randomly decide whether to generate an item or currency
@@ -163,7 +169,7 @@ local function generateRandomLoot()
 
 		-- 50% chance to show items
 		if rng > 0.2 and rng <= 0.7 then
-			local info = testItems[math.random(#testItems)]
+			local info = TestMode.testItems[math.random(#TestMode.testItems)]
 			local amountLooted = math.random(1, 5)
 			local module = G_RLF.RLF:GetModule("ItemLoot")
 			local e = module.Element:new(info, amountLooted, false)
@@ -179,7 +185,7 @@ local function generateRandomLoot()
 
 			-- 15% chance to show currency
 		elseif rng > 0.7 and rng <= 0.85 then
-			local currency = testCurrencies[math.random(#testCurrencies)]
+			local currency = TestMode.testCurrencies[math.random(#TestMode.testCurrencies)]
 			local amountLooted = math.random(1, 500)
 			local module = G_RLF.RLF:GetModule("Currency")
 			local e = module.Element:new(
@@ -197,7 +203,7 @@ local function generateRandomLoot()
 			-- 10% chance to show reputation (least frequent)
 		elseif rng > 0.85 then
 			local reputationGained = math.random(10, 100)
-			local factionName = testFactions[math.random(#testFactions)]
+			local factionName = TestMode.testFactions[math.random(#TestMode.testFactions)]
 			local module = G_RLF.RLF:GetModule("Reputation")
 			local e = module.Element:new(reputationGained, factionName)
 			e:Show()
@@ -209,23 +215,6 @@ function TestMode:InitializeTestData()
 	G_RLF:fn(initializeTestItems)
 	G_RLF:fn(initializeTestCurrencies)
 end
-
---@alpha@
-function dump(o)
-	if type(o) == "table" then
-		local s = "{ "
-		for k, v in pairs(o) do
-			if type(k) ~= "number" then
-				k = '"' .. k .. '"'
-			end
-			s = s .. "[" .. k .. "] = " .. dump(v) .. ","
-		end
-		return s .. "} "
-	else
-		return tostring(o)
-	end
-end
---@end-alpha@
 
 function TestMode:ToggleTestMode()
 	if not logger then

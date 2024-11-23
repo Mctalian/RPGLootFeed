@@ -1,6 +1,6 @@
 local common_stubs = require("spec/common_stubs")
 
-describe("TestMode module", function()
+describe("SmokeTest module", function()
 	local ns
 	before_each(function()
 		_G.LibStub = function()
@@ -12,7 +12,7 @@ describe("TestMode module", function()
 		ns = ns or common_stubs.setup_G_RLF(spy)
 
 		-- Load the module before each test
-		assert(loadfile("TestMode.lua"))("TestAddon", ns)
+		assert(loadfile("GameTesting/SmokeTest.lua"))("TestAddon", ns)
 	end)
 
 	it("TODO", function()

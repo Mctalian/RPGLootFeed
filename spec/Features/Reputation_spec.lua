@@ -56,8 +56,8 @@ describe("Reputation module", function()
 
 		assert.spy(newElement).was.called_with(_, 100, "Faction B", nil, nil, nil, nil, nil, nil)
 		assert.stub(ns.SendMessage).was.called()
-		assert.spy(RepModule:getLogger().Warn).was.called()
-		assert.spy(RepModule:getLogger().Warn).was.called_with(_, "Faction B is STILL not cached for enUS", _, _)
+		assert.spy(ns.LogWarn).was.called()
+		assert.spy(ns.LogWarn).was.called_with(_, "Faction B is STILL not cached for enUS", _, _)
 	end)
 
 	it("handles delve companion experience gains", function()

@@ -79,10 +79,10 @@ function Currency:OnEnable()
 end
 
 function Currency:Process(eventName, currencyType, quantityChange)
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, currencyType, eventName, quantityChange)
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, currencyType, eventName, quantityChange)
 
 	if currencyType == nil or not quantityChange or quantityChange <= 0 then
-		self:getLogger():Debug(
+		G_RLF:LogDebug(
 			"Skip showing currency",
 			addonName,
 			self.moduleName,
@@ -94,7 +94,7 @@ function Currency:Process(eventName, currencyType, quantityChange)
 	end
 
 	if isHiddenCurrency(currencyType) then
-		self:getLogger():Debug(
+		G_RLF:LogDebug(
 			"Skip showing currency",
 			addonName,
 			self.moduleName,
@@ -107,7 +107,7 @@ function Currency:Process(eventName, currencyType, quantityChange)
 
 	local info = C_CurrencyInfo.GetCurrencyInfo(currencyType)
 	if info == nil or info.description == "" or info.iconFileID == nil then
-		self:getLogger():Debug(
+		G_RLF:LogDebug(
 			"Skip showing currency",
 			addonName,
 			self.moduleName,
@@ -120,13 +120,12 @@ function Currency:Process(eventName, currencyType, quantityChange)
 
 	self:fn(function()
 		local basicInfo = C_CurrencyInfo.GetBasicCurrencyInfo(currencyType, quantityChange)
-		local ratio = basicInfo.displayAmount / quantityChange
 		local e = self.Element:new(
 			info.currencyID,
 			C_CurrencyInfo.GetCurrencyLink(currencyType),
 			info.iconFileID,
 			basicInfo.displayAmount,
-			info.quantity * ratio,
+			info.quantity,
 			info.quality,
 			info.totalEarned,
 			info.maxQuantity
@@ -142,10 +141,16 @@ function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
 end
 
 function Currency:PERKS_PROGRAM_CURRENCY_AWARDED(eventName, quantityChange)
-	local currencyType = 2032 -- https://www.wowhead.com/currency=2032/traders-tender
+	local currencyType = Constants.CurrencyConsts.CURRENCY_ID_PERKS_PROGRAM_DISPLAY_INFO
 
 	self:Process(eventName, currencyType, quantityChange)
 end
+
+-- Handle Lifetime Honor
+-- LIFETIME_HONOR
+-- Constants.CurrencyConsts.ACCOUNT_WIDE_HONOR_CURRENCY_ID
+-- print(UnitHonorLevel("player"))
+-- print(UnitHonor("player") .. "/" .. UnitHonorMax("player"))
 
 hiddenCurrencies = {
 	[2918] = true,

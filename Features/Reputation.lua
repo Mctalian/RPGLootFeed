@@ -279,12 +279,12 @@ function Rep:ParseFactionChangeMessage(message)
 end
 
 function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
-	self:getLogger():Info(eventName .. " " .. message, "WOWEVENT", self.moduleName)
+	G_RLF:LogInfo(eventName .. " " .. message, "WOWEVENT", self.moduleName)
 	return self:fn(function()
 		local faction, repChange, isDelveCompanion = self:ParseFactionChangeMessage(message)
 
 		if not faction or not repChange then
-			self:getLogger():Error(
+			G_RLF:LogError(
 				"Could not determine faction and/or rep change from message",
 				addonName,
 				self.moduleName,
@@ -298,7 +298,7 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 		local r, g, b, color
 		if G_RLF.db.global.factionMaps[locale][faction] == nil then
 			-- attempt to find the missing faction's ID
-			self:getLogger():Debug(faction .. " not cached for " .. locale, addonName, self.moduleName)
+			G_RLF:LogDebug(faction .. " not cached for " .. locale, addonName, self.moduleName)
 			buildFactionLocaleMap(faction)
 		end
 
@@ -353,7 +353,7 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 					C_Reputation.GetFactionParagonInfo(fId)
 			end
 		else
-			self:getLogger():Warn(faction .. " is STILL not cached for " .. locale, addonName, self.moduleName)
+			G_RLF:LogWarn(faction .. " is STILL not cached for " .. locale, addonName, self.moduleName)
 		end
 
 		if color then

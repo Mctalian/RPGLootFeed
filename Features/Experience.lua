@@ -65,19 +65,19 @@ function Xp:OnEnable()
 end
 
 function Xp:PLAYER_ENTERING_WORLD(eventName)
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName)
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName)
 	self:fn(initXpValues)
 end
 
 function Xp:PLAYER_XP_UPDATE(eventName, unitTarget)
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, unitTarget)
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, unitTarget)
 	self:fn(function()
 		if unitTarget == "player" then
 			local newLevel = UnitLevel(unitTarget)
 			local newCurrentXP = UnitXP(unitTarget)
 			local delta = 0
 			if newLevel == nil then
-				self:getLogger():Warn("Could not get player level", addonName, self.moduleName)
+				G_RLF:LogWarn("Could not get player level", addonName, self.moduleName)
 				return
 			end
 			currentLevel = currentLevel or newLevel
@@ -93,7 +93,7 @@ function Xp:PLAYER_XP_UPDATE(eventName, unitTarget)
 				local e = self.Element:new(delta)
 				e:Show()
 			else
-				self:getLogger():Warn(eventName .. " fired but delta was not positive", addonName, self.moduleName)
+				G_RLF:LogWarn(eventName .. " fired but delta was not positive", addonName, self.moduleName)
 			end
 		end
 	end)

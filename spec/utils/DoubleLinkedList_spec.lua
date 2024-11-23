@@ -11,7 +11,7 @@ describe("List module", function()
 		-- Define the global G_RLF
 		ns = ns or {}
 		-- Load the list module before each test
-		assert(loadfile("DoubleLinkedList.lua"))("TestAddon", ns)
+		assert(loadfile("utils/DoubleLinkedList.lua"))("TestAddon", ns)
 
 		list = ns.list
 	end)

@@ -1,26 +1,70 @@
-describe("Core module", function()
-	local ns
-	before_each(function()
-		_G.LibStub = function()
-			return {
-				NewAddon = function()
-					return {
-						SetDefaultModuleState = function() end,
-						SetDefaultModulePrototype = function() end,
-					}
-				end,
-			}
-		end
+local common_stubs = require("spec/common_stubs")
 
-		ns = {}
-		-- Load the list module before each test
-		assert(loadfile("Core.lua"))("TestAddon", ns)
+describe("Core module", function()
+	local ns, RLF
+	before_each(function()
+		ns = ns or common_stubs.setup_G_RLF(spy)
+		ns.L = {
+			Welcome = "Welcome",
+		}
+		ns.LootDisplay = {
+			SetBoundingBoxVisibility = function() end,
+			HideLoot = function() end,
+		}
+		RLF = assert(loadfile("Core.lua"))("TestAddon", ns)
+		RLF.GetModule = function(_, moduleName)
+			if moduleName == "TestMode" then
+				return {}
+			end
+		end
+		RLF.Hook = spy.new()
+		RLF.Unhook = spy.new()
+		RLF.RegisterEvent = spy.new()
+		RLF.UnregisterEvent = spy.new()
+		RLF.RegisterChatCommand = spy.new()
+		RLF.Print = spy.new()
+		RLF.ScheduleTimer = function() end
 	end)
 
-	describe("RGBAToHexFormat", function()
-		it("converts RGBA01 to WoW's hex color format", function()
-			local result = ns:RGBAToHexFormat(0.1, 0.2, 0.3, 0.4)
-			assert.are.equal(result, "|c6619334C")
+	describe("addon initialization", function()
+		it("should initialize correctly", function()
+			spy.on(RLF, "OnInitialize")
+			RLF:OnInitialize()
+			assert.spy(RLF.OnInitialize).was.called()
+		end)
+	
+		it("should handle slash commands correctly", function()
+			local TestMode = {
+				ToggleTestMode = function() end,
+			}
+			spy.on(TestMode, "ToggleTestMode")
+			RLF.GetModule = function(_, moduleName)
+				if moduleName == "TestMode" then
+					return TestMode
+				end
+			end
+	
+			RLF:OnInitialize()
+			RLF:SlashCommand("test")
+			assert.spy(TestMode.ToggleTestMode).was.called()
+		end)
+	
+		it("should handle PLAYER_ENTERING_WORLD event correctly", function()
+			spy.on(RLF, "PLAYER_ENTERING_WORLD")
+			RLF:PLAYER_ENTERING_WORLD("PLAYER_ENTERING_WORLD", true, false)
+			assert.spy(RLF.PLAYER_ENTERING_WORLD).was.called()
+		end)
+	
+		it("should open options correctly", function()
+			spy.on(RLF, "OnOptionsOpen")
+			RLF:OnOptionsOpen(nil, "TestAddon", nil, nil)
+			assert.spy(RLF.OnOptionsOpen).was.called()
+		end)
+	
+		it("should close options correctly", function()
+			spy.on(RLF, "OnOptionsClose")
+			RLF:OnOptionsClose()
+			assert.spy(RLF.OnOptionsClose).was.called()
 		end)
 	end)
 end)

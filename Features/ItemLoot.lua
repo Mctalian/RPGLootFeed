@@ -8,54 +8,18 @@ ItemLoot.SecondaryTextOption = {
 	["iLvl"] = "Item Level",
 }
 
+local armorClassMapping = G_RLF.armorClassMapping
 local cachedArmorClass = nil
 local function GetHighestArmorClass()
 	if cachedArmorClass then
 		return cachedArmorClass
 	end
 	local _, playerClass = UnitClass("player")
-	local armorClassMapping = {
-		WARRIOR = Enum.ItemArmorSubclass.Plate,
-		PALADIN = Enum.ItemArmorSubclass.Plate,
-		DEATHKNIGHT = Enum.ItemArmorSubclass.Plate,
-		HUNTER = Enum.ItemArmorSubclass.Mail,
-		SHAMAN = Enum.ItemArmorSubclass.Mail,
-		EVOKER = Enum.ItemArmorSubclass.Mail,
-		ROGUE = Enum.ItemArmorSubclass.Leather,
-		DRUID = Enum.ItemArmorSubclass.Leather,
-		DEMONHUNTER = Enum.ItemArmorSubclass.Leather,
-		MONK = Enum.ItemArmorSubclass.Leather,
-		PRIEST = Enum.ItemArmorSubclass.Cloth,
-		MAGE = Enum.ItemArmorSubclass.Cloth,
-		WARLOCK = Enum.ItemArmorSubclass.Cloth,
-	}
 	cachedArmorClass = armorClassMapping[playerClass]
 	return cachedArmorClass
 end
 
-local equipSlotMap = {
-	INVTYPE_HEAD = 1,
-	INVTYPE_NECK = 2,
-	INVTYPE_SHOULDER = 3,
-	INVTYPE_BODY = 4,
-	INVTYPE_CHEST = 5,
-	INVTYPE_WAIST = 6,
-	INVTYPE_LEGS = 7,
-	INVTYPE_FEET = 8,
-	INVTYPE_WRIST = 9,
-	INVTYPE_HAND = 10,
-	INVTYPE_FINGER = { 11, 12 }, -- Rings
-	INVTYPE_TRINKET = { 13, 14 }, -- Trinkets
-	INVTYPE_CLOAK = 15,
-	INVTYPE_WEAPON = { 16, 17 }, -- One-handed weapons
-	INVTYPE_SHIELD = 17, -- Off-hand
-	INVTYPE_2HWEAPON = 16, -- Two-handed weapons
-	INVTYPE_WEAPONMAINHAND = 16,
-	INVTYPE_WEAPONOFFHAND = 17,
-	INVTYPE_HOLDABLE = 17, -- Off-hand items
-	INVTYPE_RANGED = 18, -- Bows, guns, wands
-	INVTYPE_TABARD = 19,
-}
+local equipSlotMap = G_RLF.equipSlotMap
 
 ItemLoot.Element = {}
 
@@ -94,6 +58,28 @@ function ItemLoot:SetNameUnitMap()
 	end
 end
 
+local function IsMount(info)
+	-- Highlight Mounts
+	if
+		info.classID == Enum.ItemClass.Miscellaneous
+		and info.subclassID == Enum.ItemMiscellaneousSubclass.Mount
+		and G_RLF.db.global.itemHighlights.mounts
+	then
+		return true
+	end
+
+	return false
+end
+
+local function IsLegendary(info)
+	-- Highlight Legendary Items
+	if info.itemQuality == Enum.ItemQuality.Legendary and G_RLF.db.global.itemHighlights.legendary then
+		return true
+	end
+
+	return false
+end
+
 function ItemLoot.Element:new(...)
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
@@ -119,7 +105,7 @@ function ItemLoot.Element:new(...)
 
 	function element:isPassingFilter(itemName, itemQuality)
 		if not G_RLF.db.global.itemQualityFilter[itemQuality] then
-			element:getLogger():Debug(
+			G_RLF:LogDebug(
 				itemName .. " ignored by quality: " .. ItemLoot:ItemQualityName(itemQuality),
 				addonName,
 				"ItemLoot",
@@ -156,20 +142,9 @@ function ItemLoot.Element:new(...)
 	end
 
 	function element:SetHighlight()
-		-- Highlight Mounts
-		if
-			info.classID == Enum.ItemClass.Miscellaneous
-			and info.subclassID == Enum.ItemMiscellaneousSubclass.Mount
-			and G_RLF.db.global.itemHighlights.mounts
-		then
-			self.highlight = true
-			return
-		end
-		-- Highlight Legendary Items
-		if info.itemQuality == Enum.ItemQuality.Legendary and G_RLF.db.global.itemHighlights.legendary then
-			self.highlight = true
-			return
-		end
+		self.highlight = IsMount(info) or
+			IsLegendary(info)
+		
 		-- Highlight Better Than Equipped
 		if G_RLF.db.global.itemHighlights.betterThanEquipped and info.classID == Enum.ItemClass.Armor then
 			local armorClass = GetHighestArmorClass()
@@ -311,17 +286,17 @@ end
 function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 	local msg, playerName, _, _, playerName2, _, _, _, _, _, _, guid = ...
 	local raidLoot = msg:match("HlootHistory:")
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, nil, eventName .. " " .. msg)
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, nil, eventName .. " " .. msg)
 	if raidLoot then
 		-- Ignore this message as it's a raid loot message
-		self:getLogger():Debug("Raid Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
+		G_RLF:LogDebug("Raid Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
 		return
 	end
 
 	local me = guid == GetPlayerGuid()
 	if not me then
 		if not G_RLF.db.global.enablePartyLoot then
-			self:getLogger():Debug("Party Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
+			G_RLF:LogDebug("Party Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
 			return
 		end
 		local sanitizedPlayerName = (playerName or playerName2):gsub("%-.+", "")
@@ -343,7 +318,7 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 end
 
 function ItemLoot:GROUP_ROSTER_UPDATE(eventName, ...)
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, nil, eventName)
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, nil, eventName)
 
 	self:SetNameUnitMap()
 end

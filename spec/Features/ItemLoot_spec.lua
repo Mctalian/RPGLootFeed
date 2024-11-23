@@ -62,9 +62,8 @@ describe("ItemLoot module", function()
 	end)
 
 	it("should handle GROUP_ROSTER_UPDATE event", function()
-		spy.on(LootModule, "getLogger")
 		LootModule:GROUP_ROSTER_UPDATE("GROUP_ROSTER_UPDATE")
-		assert.spy(LootModule.getLogger).was.called()
+		assert.spy(ns.LogInfo).was.called()
 	end)
 
 	it("should show party loot", function()
@@ -74,6 +73,7 @@ describe("ItemLoot module", function()
 		local amount = 1
 		local itemId = 18803
 		ns.db.global.enablePartyLoot = true
+		LootModule.nameUnitMap = { PartyMember = "party1" }
 
 		LootModule:CHAT_MSG_LOOT(
 			"CHAT_MSG_LOOT",

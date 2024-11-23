@@ -1,6 +1,6 @@
 local addonName, G_RLF = ...
 
-local Logger = G_RLF.RLF:NewModule("Logger", "AceEvent-3.0")
+local Logger = G_RLF.RLF:NewModule("Logger", "AceBucket-3.0", "AceEvent-3.0")
 local gui = LibStub("AceGUI-3.0")
 
 local loggerName = addonName .. "Logger"
@@ -11,10 +11,10 @@ local defaults = {
 
 local updateContent
 local getLogger
-local WOWEVENT = "WOWEVENT"
+local WOWEVENT = G_RLF.LogEventSource.WOWEVENT
 
 local eventSource = {
-	[addonName] = true,
+	[G_RLF.LogEventSource.ADDON] = true,
 	[WOWEVENT] = false,
 }
 local function OnEventSourceChange(_, _, k, v)
@@ -22,10 +22,10 @@ local function OnEventSourceChange(_, _, k, v)
 	updateContent()
 end
 
-local debug = "DEBUG"
-local info = "INFO"
-local warn = "WARN"
-local error = "ERROR"
+local debug = G_RLF.LogLevel.debug
+local info = G_RLF.LogLevel.info
+local warn = G_RLF.LogLevel.warn
+local error = G_RLF.LogLevel.error
 local eventLevel = {
 	[debug] = false,
 	[info] = true,
@@ -37,17 +37,19 @@ local function OnEventLevelChange(_, _, k, v)
 	updateContent()
 end
 
-local ItemLoot = "ItemLoot"
-local Currency = "Currency"
-local Money = "Money"
-local Reputation = "Reputation"
-local Experience = "Experience"
+local ItemLoot = G_RLF.FeatureModule.ItemLoot
+local Currency = G_RLF.FeatureModule.Currency
+local Money = G_RLF.FeatureModule.Money
+local Reputation = G_RLF.FeatureModule.Reputation
+local Experience = G_RLF.FeatureModule.Experience
+local Profession = G_RLF.FeatureModule.Profession
 local eventType = {
 	[ItemLoot] = true,
 	[Currency] = true,
 	[Money] = true,
 	[Reputation] = true,
 	[Experience] = true,
+	[Profession] = true,
 }
 local function OnEventTypeChange(_, _, k, v)
 	eventType[k] = v
@@ -150,6 +152,7 @@ end
 
 function Logger:OnInitialize()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterBucketMessage("RLF_LOG", 0.5, "ProcessLogs")
 end
 
 function Logger:PLAYER_ENTERING_WORLD(_, isLogin, isReload)
@@ -186,6 +189,7 @@ local function getType(logEntry)
 		[Money] = "|cFFC0C0C0[GOLD]|r", -- Silver/Gray for money
 		[Reputation] = "|cFF1E90FF[REPU]|r", -- Blue for reputation
 		[Experience] = "|cFF9932CC[EXPR]|r", -- Purple for experience
+		[Profession] = "|cFF8B4513[PROF]|r", -- Brown for profession
 	}
 
 	-- Return an empty string for "General" and the corresponding value for others
@@ -295,6 +299,12 @@ local function addLogEntry(level, message, source, type, id, content, amount, is
 	--@end-non-alpha@]===]
 	if frame and frame:IsShown() then
 		updateContent()
+	end
+end
+
+function Logger:ProcessLogs(logs)
+	for log, _ in pairs(logs) do
+		addLogEntry(unpack(log))
 	end
 end
 

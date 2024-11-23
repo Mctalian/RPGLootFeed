@@ -1,54 +1,16 @@
 local addonName, G_RLF = ...
 
--- Define the global scope early so that the whole addon can use it
-local dbName = addonName .. "DB"
-local localeName = addonName .. "Locale"
+G_RLF.addonVersion = "@project-version@-@project-revision@-@project-abbreviated-hash@"
 
-local xpcall = xpcall
-
-local function errorhandler(err)
-	local suffix = "\n\n==== Addon Info " .. addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
-	suffix = suffix .. G_RLF.L["Issues"] .. "\n\n"
-
-	return geterrorhandler()(err .. suffix)
-end
-
-local ItemInfo = {}
-ItemInfo.__index = ItemInfo
-function ItemInfo:new(...)
-	local self = {}
-	setmetatable(self, ItemInfo)
-	self.itemId, self.itemName, self.itemLink, self.itemQuality, self.itemLevel, self.itemMinLevel, self.itemType, self.itemSubType, self.itemStackCount, self.itemEquipLoc, self.itemTexture, self.sellPrice, self.classID, self.subclassID, self.bindType, self.expansionID, self.setID, self.isCraftingReagent =
-		...
-	if not self.itemName then
-		return nil
-	end
-	if not self.itemId then
-		self.itemId = C_Item.GetItemIDForItemInfo(self.itemLink)
-	end
-	return self
-end
-
-G_RLF.ItemInfo = ItemInfo
-
-function G_RLF:fn(func, ...)
-	-- Borrowed from AceAddon-3.0
-	if type(func) == "function" then
-		return xpcall(func, errorhandler, ...)
-	end
-end
-
-G_RLF.RLF = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
-G_RLF.RLF:SetDefaultModuleState(true)
-G_RLF.RLF:SetDefaultModulePrototype({
-	getLogger = function(self)
-		return G_RLF.RLF:GetModule("Logger")
-	end,
+local RLF = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
+RLF:SetDefaultModuleState(true)
+RLF:SetDefaultModulePrototype({
 	fn = function(s, func, ...)
 		local function errorhandler(err)
 			local suffix = "\n\n==== Addon Info " .. addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
 			local status, trace = pcall(function()
-				return s:getLogger():Trace(s.moduleName)
+				local logger = RLF:GetModule("Logger")
+				return logger:Trace(s.moduleName)
 			end)
 			if status then
 				suffix = suffix .. "Log traces related to " .. s.moduleName .. "\n"
@@ -62,71 +24,108 @@ G_RLF.RLF:SetDefaultModulePrototype({
 		end
 
 		-- Borrowed from AceAddon-3.0
-		if type(func) == "function" then
-			return xpcall(func, errorhandler, ...)
-		end
+		return G_RLF:fn(func, ...)
 	end,
 })
-G_RLF.dbName = dbName
-G_RLF.localeName = localeName
-G_RLF.addonVersion = "@project-version@-@project-revision@-@project-abbreviated-hash@"
-G_RLF.DisableBossBanner = {
-	ENABLED = 0,
-	FULLY_DISABLE = 1,
-	DISABLE_LOOT = 2,
-	DISABLE_MY_LOOT = 3,
-	DISABLE_GROUP_LOOT = 4,
-}
 
+G_RLF.localeName = addonName .. "Locale"
 G_RLF.lsm = LibStub("LibSharedMedia-3.0")
 G_RLF.Masque = LibStub and LibStub("Masque", true)
 G_RLF.iconGroup = Masque and Masque:Group(addonName)
+local dbName = addonName .. "DB"
+local acd = LibStub("AceConfigDialog-3.0")
+local TestMode
+function RLF:OnInitialize()
+	G_RLF.db = LibStub("AceDB-3.0"):New(dbName, G_RLF.defaults, true)
+	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
+	local lsm = G_RLF.lsm
+	lsm:Register(lsm.MediaType.FONT, "BAR SADY Regular", "Interface\\AddOns\\RPGLootFeed\\Fonts\\BAR_SADY_Variable.ttf")
+	self:Hook(acd, "Open", "OnOptionsOpen")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterChatCommand("rlf", "SlashCommand")
+	self:RegisterChatCommand("RLF", "SlashCommand")
+	self:RegisterChatCommand("rpglootfeed", "SlashCommand")
+	self:RegisterChatCommand("rpgLootFeed", "SlashCommand")
 
-G_RLF.WrapCharEnum = {
-	DEFAULT = 0,
-	SPACE = 1,
-	PARENTHESIS = 2,
-	BRACKET = 3,
-	BRACE = 4,
-	ANGLE = 5,
-}
+	if EditModeManagerFrame then
+		EventRegistry:RegisterCallback("EditMode.Enter", function()
+			G_RLF.LootDisplay:SetBoundingBoxVisibility(true)
+		end)
+		EventRegistry:RegisterCallback("EditMode.Exit", function()
+			G_RLF.LootDisplay:SetBoundingBoxVisibility(false)
+		end)
+	end
 
-local acr = LibStub("AceConfigRegistry-3.0")
-
-function G_RLF:NotifyChange(...)
-	acr:NotifyChange(...)
+	TestMode = self:GetModule("TestMode")
 end
 
-function G_RLF:SendMessage(...)
-	G_RLF.RLF:SendMessage(...)
-end
-
-function G_RLF:Print(...)
-	G_RLF.RLF:Print(...)
-end
-
-function G_RLF:RGBAToHexFormat(r, g, b, a)
-	local red = string.format("%02X", math.floor(r * 255))
-	local green = string.format("%02X", math.floor(g * 255))
-	local blue = string.format("%02X", math.floor(b * 255))
-	local alpha = string.format("%02X", math.floor((a or 1) * 255)) -- Default alpha to 1 if not provided
-
-	-- Return in WoW format with |c prefix
-	return "|c" .. alpha .. red .. green .. blue
-end
-
---@alpha@
-function G_RLF:ProfileFunction(func, funcName)
-	return function(...)
-		local startTime = debugprofilestop()
-		local result = { func(...) }
-		local endTime = debugprofilestop()
-		local duration = endTime - startTime
-		if duration > 0.3 then
-			G_RLF:Print(string.format("%s took %.2f ms", funcName, endTime - startTime))
+function RLF:SlashCommand(msg, editBox)
+	G_RLF:fn(function()
+		if msg == "test" then
+			TestMode:ToggleTestMode()
+		--@alpha@
+		elseif msg == "i" then
+			TestMode:IntegrationTest()
+		--@end-alpha@
+		elseif msg == "clear" then
+			G_RLF.LootDisplay:HideLoot()
+		elseif msg == "log" then
+			self:GetModule("Logger"):Show()
+		else
+			acd:Open(addonName)
 		end
+	end)
+end
 
-		return unpack(result)
+local currentVersion = "@project-version@"
+function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
+	if self.optionsFrame == nil then
+		self.optionsFrame = acd:AddToBlizOptions(addonName, addonName)
+	end
+
+	local isNewVersion = currentVersion ~= G_RLF.db.global.lastVersionLoaded
+	if isLogin and isReload == false and isNewVersion then
+		G_RLF.db.global.lastVersionLoaded = currentVersion
+		self:Print(G_RLF.L["Welcome"] .. " (" .. currentVersion .. ")")
+		if G_RLF.db.global.enableAutoLoot then
+			C_CVar.SetCVar("autoLootDefault", "1")
+		end
 	end
 end
---@end-alpha@
+
+local optionsFrame
+local isOpen = false
+function RLF:OnOptionsOpen(...)
+	local _, name, container, path = ...
+	G_RLF:fn(function()
+		if container then
+			return
+		end
+		if name == addonName and not isOpen then
+			isOpen = true
+			G_RLF.LootDisplay:SetBoundingBoxVisibility(true)
+			self:ScheduleTimer(function()
+				optionsFrame = acd.OpenFrames[name]
+				if self:IsHooked(optionsFrame, "Hide") then
+					self:Unhook(optionsFrame, "Hide")
+				end
+				if optionsFrame and optionsFrame.Hide then
+					self:Hook(optionsFrame, "Hide", "OnOptionsClose", true)
+				end
+			end, 0.25)
+		end
+	end)
+end
+
+function RLF:OnOptionsClose(...)
+	G_RLF:fn(function()
+		isOpen = false
+		G_RLF.LootDisplay:SetBoundingBoxVisibility(false)
+		self:Unhook(optionsFrame, "Hide")
+		optionsFrame = nil
+	end)
+end
+
+G_RLF.RLF = RLF
+
+return RLF

@@ -3,14 +3,13 @@ local addonName, G_RLF = ...
 --@alpha@
 -- trunk-ignore-begin(no-invalid-prints/invalid-print)
 local TestMode = G_RLF.RLF:GetModule("TestMode")
-local testItems, testCurrencies, testFactions, testItem
 
 local tests = {}
 local prints = ""
 local successCount = 0
 local failureCount = 0
 
-local function assertEqual(actual, expected, testName, err)
+function TestMode.assertEqual(actual, expected, testName, err)
 	tests[testName] = {
 		result = actual == expected,
 		expected = expected,
@@ -26,8 +25,9 @@ local function assertEqual(actual, expected, testName, err)
 	end
 end
 
+local assertEqual = TestMode.assertEqual
+
 local function testGetItemInfo(id)
-	-- Get the id of the last element in testItems
 	local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, _, isCraftingReagent =
 		C_Item.GetItemInfo(id)
 	assertEqual(itemName ~= nil, true, "Global: C_Item.GetItemInfo(" .. id .. ").itemName")
@@ -84,12 +84,13 @@ local function testWoWGlobals()
 	assertEqual(type(UnitLevel), "function", "Global: UnitLevel")
 	assertEqual(type(GetPlayerGuid), "function", "Global: GetPlayerGuid")
 	assertEqual(type(C_Item.GetItemInfo), "function", "Global: C_Item.GetItemInfo")
-	local id = testItems[#testItems].itemId
-	local isCached = C_Item.GetItemInfo(id) ~= nil
+	assertEqual(type(GetInventoryItemLink), "function", "Global: GetInventoryItemLink")
+	local link = GetInventoryItemLink("player", G_RLF.equipSlotMap["INVTYPE_CHEST"])
+	local isCached = C_Item.GetItemInfo(link) ~= nil
 	if not isCached then
 		G_RLF:Print("Item not cached, skipping GetItemInfo test")
 	else
-		testGetItemInfo(id)
+		testGetItemInfo(link)
 	end
 	assertEqual(type(GetMoney), "function", "Global: GetMoney")
 	assertEqual(type(C_CurrencyInfo.GetCoinTextureString), "function", "Global: C_CurrencyInfo.GetCoinTextureString")
@@ -126,78 +127,6 @@ local function testWoWGlobals()
 	assertEqual(type(FACTION_BAR_COLORS), "table", "Global: FACTION_BAR_COLORS")
 end
 
-local function runTestSafely(testFunction, testName, ...)
-	local success, err = pcall(testFunction, ...)
-	assertEqual(success, true, testName, err)
-end
-
-local function runExperienceSmokeTest()
-	local module = G_RLF.RLF:GetModule("Experience")
-	local e = module.Element:new(1337)
-	runTestSafely(e.Show, "LootDisplay: Experience")
-end
-
-local function runMoneySmokeTest()
-	local module = G_RLF.RLF:GetModule("Money")
-	local e = module.Element:new(12345)
-	runTestSafely(e.Show, "LootDisplay: Money")
-end
-
-local function runItemLootSmokeTest()
-	local module = G_RLF.RLF:GetModule("ItemLoot")
-	local info = testItems[2]
-	local amountLooted = 1
-	local e = module.Element:new(info, amountLooted, false)
-	if info.itemName == nil then
-		G_RLF:Print("Item not cached, skipping ItemLoot test")
-	else
-		runTestSafely(e.Show, "LootDisplay: Item", e, info.itemName, info.itemQuality)
-		e = module.Element:new(info, amountLooted, false)
-		e.highlight = true
-		runTestSafely(e.Show, "LootDisplay: Item Quantity Update", e, info.itemName, info.itemQuality)
-		e = module.Element:new(info, amountLooted, "player")
-		runTestSafely(e.Show, "LootDisplay: Item Unit", e, info.itemName, info.itemQuality)
-	end
-end
-
-local function runCurrencySmokeTest()
-	local module = G_RLF.RLF:GetModule("Currency")
-	local testObj = testCurrencies[2]
-	local amountLooted = 1
-	local e = module.Element:new(
-		testObj.id,
-		testObj.link,
-		testObj.icon,
-		amountLooted,
-		testObj.quantity,
-		testObj.quality,
-		testObj.totalEarned,
-		testObj.maxQuantity
-	)
-	runTestSafely(e.Show, "LootDisplay: Currency")
-	e = module.Element:new(
-		testObj.id,
-		testObj.link,
-		testObj.icon,
-		amountLooted,
-		testObj.quantity,
-		testObj.quality,
-		testObj.totalEarned,
-		testObj.maxQuantity
-	)
-	runTestSafely(e.Show, "LootDisplay: Currency Quantity Update")
-end
-
-local function runReputationSmokeTest()
-	local module = G_RLF.RLF:GetModule("Reputation")
-	local testObj = testFactions[2]
-	local amountLooted = 664
-	local e = module.Element:new(amountLooted, testObj)
-	runTestSafely(e.Show, "LootDisplay: Reputation")
-	e = module.Element:new(amountLooted, testObj)
-	runTestSafely(e.Show, "LootDisplay: Reputation Quantity Update")
-end
-
 local function displayResults()
 	G_RLF:Print("Smoke Test")
 	print(prints)
@@ -228,30 +157,13 @@ local function displayResults()
 	end
 end
 
-local function testLootDisplay()
-	runExperienceSmokeTest()
-	runMoneySmokeTest()
-	runItemLootSmokeTest()
-	runCurrencySmokeTest()
-	runReputationSmokeTest()
-
-	local frame = LootDisplayFrame
-	assertEqual(frame ~= nil, true, "LootDisplayFrame")
-	C_Timer.After(G_RLF.db.global.fadeOutDelay + 3, function()
-		assertEqual(#frame.rowHistory, 6, "LootDisplayFrame: rowHistory")
-		displayResults()
-	end)
-end
-
-function TestMode:SmokeTest(...)
-	testItems, testCurrencies, testFactions, testItem = ...
-
+function TestMode:SmokeTest()
 	tests = {}
 	prints = ""
 	successCount = 0
 	failureCount = 0
 	testWoWGlobals()
-	testLootDisplay()
+	displayResults()
 end
 
 -- trunk-ignore-end(no-invalid-prints/invalid-print)

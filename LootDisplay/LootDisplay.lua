@@ -109,7 +109,7 @@ function LootDisplay:UpdateFadeDelay()
 end
 
 function LootDisplay:BAG_UPDATE_DELAYED()
-	self:getLogger():Info("BAG_UPDATE_DELAYED", "WOWEVENT", self.moduleName, nil, "BAG_UPDATE_DELAYED")
+	G_RLF:LogInfo("BAG_UPDATE_DELAYED", "WOWEVENT", self.moduleName, nil, "BAG_UPDATE_DELAYED")
 
 	frame:UpdateRowItemCounts()
 end
@@ -259,7 +259,7 @@ processFromQueue = function()
 	local snapshotQueueSize = elementQueue:size()
 	if snapshotQueueSize > 0 then
 		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.maxRows)
-		LootDisplay:getLogger():Debug("Processing " .. rowsToProcess .. " items from element queue")
+		G_RLF:LogDebug("Processing " .. rowsToProcess .. " items from element queue")
 		for i = 1, rowsToProcess do
 			if elementQueue:isEmpty() then
 				return
