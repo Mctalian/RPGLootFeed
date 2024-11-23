@@ -9,7 +9,7 @@ local prints = ""
 local successCount = 0
 local failureCount = 0
 
-function TestMode.assertEqual(actual, expected, testName, err)
+local function assertEqual(actual, expected, testName, err)
 	tests[testName] = {
 		result = actual == expected,
 		expected = expected,
@@ -24,8 +24,6 @@ function TestMode.assertEqual(actual, expected, testName, err)
 		failureCount = failureCount + 1
 	end
 end
-
-local assertEqual = TestMode.assertEqual
 
 local function testGetItemInfo(id)
 	local itemName, itemLink, itemQuality, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, sellPrice, classID, subclassID, bindType, expansionID, _, isCraftingReagent =

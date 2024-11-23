@@ -231,12 +231,12 @@ function TestMode:ToggleTestMode()
 			self.testTimer = nil
 		end
 		G_RLF:Print(G_RLF.L["Test Mode Disabled"])
-		logger:Debug("Test Mode Disabled", addonName)
+		G_RLF:LogDebug("Test Mode Disabled", addonName)
 	else
 		-- Start test mode
 		self.testMode = true
 		G_RLF:Print(G_RLF.L["Test Mode Enabled"])
-		logger:Debug("Test Mode Enabled", addonName)
+		G_RLF:LogDebug("Test Mode Enabled", addonName)
 		self.testTimer = C_Timer.NewTicker(1.5, function()
 			G_RLF:fn(generateRandomLoot)
 		end)

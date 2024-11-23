@@ -1,18 +1,31 @@
 local addonName, G_RLF = ...
 
-local xpcall = xpcall
-
-local function errorhandler(err)
-	local suffix = "\n\n==== Addon Info " .. addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
-	suffix = suffix .. G_RLF.L["Issues"] .. "\n\n"
-
-	return geterrorhandler()(err .. suffix)
-end
-
 function G_RLF:fn(func, ...)
+	local s = self
+	local function errorhandler(err)
+		local suffix = "\n\n==== Addon Info " .. addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
+		local status, trace = pcall(function()
+			local logger = G_RLF.RLF:GetModule("Logger")
+			if s.moduleName then
+				return logger:Trace(s.moduleName)
+			end
+			return nil
+		end)
+		if status and trace then
+			suffix = suffix .. "Log traces related to " .. s.moduleName .. "\n"
+			suffix = suffix .. "-------------------------------------------------\n"
+			suffix = suffix .. trace
+			suffix = suffix .. "-------------------------------------------------\n\n"
+		end
+		suffix = suffix .. G_RLF.L["Issues"] .. "\n\n"
+
+		return geterrorhandler()(err .. suffix)
+	end
 	-- Borrowed from AceAddon-3.0
 	if type(func) == "function" then
 		return xpcall(func, errorhandler, ...)
+	else
+		error("fn: func is not a function")
 	end
 end
 

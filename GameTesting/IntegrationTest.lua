@@ -8,7 +8,22 @@ local prints = ""
 local successCount = 0
 local failureCount = 0
 
-local assertEqual = TestMode.assertEqual
+local function assertEqual(actual, expected, testName, err)
+	tests[testName] = {
+		result = actual == expected,
+		expected = expected,
+		actual = actual,
+		err = err,
+	}
+	if actual == expected then
+		prints = prints .. "|cff00ff00•|r"
+		successCount = successCount + 1
+	else
+		prints = prints .. "|cffff0000x|r"
+		failureCount = failureCount + 1
+	end
+end
+
 local function runTestSafely(testFunction, testName, ...)
 	local success, err = pcall(testFunction, ...)
 	assertEqual(success, true, testName, err)
@@ -58,7 +73,7 @@ end
 
 local function runItemLootIntegrationTest()
 	local module = G_RLF.RLF:GetModule("ItemLoot")
-	local info = testItems[2]
+	local info = TestMode.testItems[2]
 	local amountLooted = 1
 	local e = module.Element:new(info, amountLooted, false)
 	if info.itemName == nil then
@@ -75,7 +90,7 @@ end
 
 local function runCurrencyIntegrationTest()
 	local module = G_RLF.RLF:GetModule("Currency")
-	local testObj = testCurrencies[2]
+	local testObj = TestMode.testCurrencies[2]
 	local amountLooted = 1
 	local e = module.Element:new(
 		testObj.id,
@@ -103,7 +118,7 @@ end
 
 local function runReputationIntegrationTest()
 	local module = G_RLF.RLF:GetModule("Reputation")
-	local testObj = testFactions[2]
+	local testObj = TestMode.testFactions[2]
 	local amountLooted = 664
 	local e = module.Element:new(amountLooted, testObj)
 	runTestSafely(e.Show, "LootDisplay: Reputation")

@@ -6,25 +6,7 @@ local RLF = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEv
 RLF:SetDefaultModuleState(true)
 RLF:SetDefaultModulePrototype({
 	fn = function(s, func, ...)
-		local function errorhandler(err)
-			local suffix = "\n\n==== Addon Info " .. addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
-			local status, trace = pcall(function()
-				local logger = RLF:GetModule("Logger")
-				return logger:Trace(s.moduleName)
-			end)
-			if status then
-				suffix = suffix .. "Log traces related to " .. s.moduleName .. "\n"
-				suffix = suffix .. "-------------------------------------------------\n"
-				suffix = suffix .. trace
-				suffix = suffix .. "-------------------------------------------------\n\n"
-			end
-			suffix = suffix .. G_RLF.L["Issues"] .. "\n\n"
-
-			return geterrorhandler()(err .. suffix)
-		end
-
-		-- Borrowed from AceAddon-3.0
-		return G_RLF:fn(func, ...)
+		return G_RLF.fn(s, func, ...)
 	end,
 })
 

@@ -164,7 +164,7 @@ function Logger:PLAYER_ENTERING_WORLD(_, isLogin, isReload)
 			tremove(G_RLF.db.global.logger.logs, 1)
 			G_RLF.db.global.logger.sessionsLogged = G_RLF.db.global.logger.sessionsLogged - 1
 		end
-		self:Debug("Logger is ready", addonName)
+		G_RLF:LogDebug("Logger is ready", addonName)
 	end
 end
 
@@ -306,22 +306,6 @@ function Logger:ProcessLogs(logs)
 	for log, _ in pairs(logs) do
 		addLogEntry(unpack(log))
 	end
-end
-
-function Logger:Debug(message, source, type, id, content, amount, isNew)
-	addLogEntry(debug, message, source, type, id, content, amount, isNew)
-end
-
-function Logger:Info(message, source, type, id, content, amount, isNew)
-	addLogEntry(info, message, source, type, id, content, amount, isNew)
-end
-
-function Logger:Warn(message, source, type, id, content, amount, isNew)
-	addLogEntry(warn, message, source, type, id, content, amount, isNew)
-end
-
-function Logger:Error(message, source, type, id, content, amount, isNew)
-	addLogEntry(error, message, source, type, id, content, amount, isNew)
 end
 
 function Logger:Trace(type, traceSize)

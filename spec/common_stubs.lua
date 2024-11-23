@@ -66,12 +66,16 @@ function common_stubs.setup_G_RLF(spy)
 		Error = spy.new(),
 	}
 	local ns = {
+		addonVersion = "1.0.0",
 		db = {
 			global = {
 				currencyFeed = true,
 				factionMaps = {},
 				itemHighlights = {},
 			},
+		},
+		L = {
+			Issues = "Issues",
 		},
 		LootDisplay = {},
 		list = function()
@@ -98,10 +102,17 @@ function common_stubs.setup_G_RLF(spy)
 				return module
 			end,
 			GetModule = function(_, name)
-				return {
-					Enable = function() end,
-					Disable = function() end,
+				local module = {
+					Enable = spy.new(),
+					Disable = spy.new(),
 				}
+				if name == "Logger" then
+					module.Trace = function()
+						return "Trace"
+					end
+				end
+
+				return module
 			end,
 		},
 		SendMessage = spy.new(),
