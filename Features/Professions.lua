@@ -34,23 +34,28 @@ function Professions.Element:new(...)
 	return element
 end
 
+local segments
+local localeString = _G.SKILL_RANK_UP
 function Professions:OnInitialize()
 	self.professions = {}
-	self.isRegisteredSkillLinesChanged = false
+	self.profNameIconMap = {}
+	self.profLocaleBaseNames = {}
 	if G_RLF.db.global.profFeed then
 		self:Enable()
 	else
 		self:Disable()
 	end
+	segments = G_RLF:CreatePatternSegmentsForStringNumber(localeString)
 end
 
 function Professions:OnDisable()
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
-	self:UnregisterEvent("SKILL_LINES_CHANGED")
+	self:UnregisterEvent("CHAT_MSG_SKILL")
 end
 
 function Professions:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("CHAT_MSG_SKILL")
 end
 
 function Professions:InitializeProfessions()
@@ -58,64 +63,48 @@ function Professions:InitializeProfessions()
 	local profs = { primaryId, secondaryId, archId, fishingId, cookingId }
 	for i = 1, #profs do
 		if profs[i] then
-			local name, icon, level, maxLevel, _, _, _, _, _, _, expansionName = GetProfessionInfo(profs[i])
-			self.professions[profs[i]] = {
-				name = name,
-			}
-			self.professions[profs[i]][expansionName or name] = {
-				icon = icon,
-				level = level,
-				maxLevel = maxLevel,
-				expansionName = expansionName,
-			}
+			local name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset, a, b = GetProfessionInfo(profs[i])
+			if name and icon then
+				self.profNameIconMap[name] = icon
+			end
 		end
+	end
+
+	for k, v in pairs(self.profNameIconMap) do
+		table.insert(self.profLocaleBaseNames, k)
 	end
 end
 
 function Professions:PLAYER_ENTERING_WORLD()
-	self:InitializeProfessions()
-	if self.isRegisteredSkillLinesChanged == false then
-		self.isRegisteredSkillLinesChanged = true
-		self:RegisterEvent("SKILL_LINES_CHANGED")
-	end
+	Professions:InitializeProfessions()
 end
 
-function Professions:SKILL_LINES_CHANGED()
-	local primaryId, secondaryId, archId, fishingId, cookingId = GetProfessions()
-	local profs = { primaryId, secondaryId, archId, fishingId, cookingId }
-	for i = 1, #profs do
-		if profs[i] then
-			local name, icon, level, maxLevel, _, _, _, _, _, _, expansionName = GetProfessionInfo(profs[i])
-			if self.professions[profs[i]] then
-				if self.professions[profs[i]][expansionName] then
-					local expansionDetails = self.professions[profs[i]][expansionName]
-					local delta = level - expansionDetails.level
-					if delta > 0 then
-						expansionDetails.level = level
-						expansionDetails.maxLevel = maxLevel
-						local e = self.Element:new(profs[i], expansionName, icon, level, maxLevel, delta)
-						e:Show()
-					end
-				else
-					self.professions[profs[i]][expansionName or name] = {
-						icon = icon,
-						level = level,
-						maxLevel = maxLevel,
-						expansionName = expansionName,
-					}
+function Professions:CHAT_MSG_SKILL(event, message)
+	G_RLF:LogInfo(event, "WOWEVENT", self.moduleName, nil, message)
+
+	local skillName, skillLevel = G_RLF:ExtractDynamicsFromPattern(message, segments)
+	if skillName and skillLevel then
+		if not self.professions[skillName] then
+			self.professions[skillName] = {
+				name = skillName,
+				lastSkillLevel = skillLevel,
+			}
+		end
+		local icon
+		if self.profNameIconMap[skillName] then
+			icon = self.profNameIconMap[skillName]
+		else
+			for i = 1, #self.profLocaleBaseNames do
+				if skillName:find(self.profLocaleBaseNames[i]) then
+					icon = self.profNameIconMap[self.profLocaleBaseNames[i]]
+					self.profNameIconMap[skillName] = icon
+					break
 				end
-			else
-				self.professions[profs[i]] = {
-					name = name,
-				}
-				self.professions[profs[i]][expansionName or name] = {
-					icon = icon,
-					level = level,
-					maxLevel = maxLevel,
-					expansionName = expansionName,
-				}
 			end
 		end
+		local e = self.Element:new(skillName, skillName, icon, skillLevel, nil, skillLevel - self.professions[skillName].lastSkillLevel)
+		e:Show()
+		self.professions[skillName].lastSkillLevel = skillLevel
 	end
 end
 

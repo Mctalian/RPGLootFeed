@@ -26,7 +26,7 @@ G_RLF.FeatureModule = {
   Money = "Money",
   Reputation = "Reputation",
   Experience = "Experience",
-  Profession = "Profession",
+  Profession = "Professions",
 }
 
 G_RLF.WrapCharEnum = {

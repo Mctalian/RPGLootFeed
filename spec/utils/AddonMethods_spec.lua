@@ -10,6 +10,7 @@ end
 assert:register("matcher", "contains_string", contains_string)
 
 describe("AddonMethods", function()
+  local _ = match._
   local ns, errorHandlerSpy
   before_each(function()
     errorHandlerSpy = spy.new()
@@ -52,10 +53,82 @@ describe("AddonMethods", function()
     end)
   end)
 
+  describe("SendMessage", function()
+    it("sends a message to the addon channel", function()
+      ns.RLF.SendMessage = spy.new()
+      ns:SendMessage("TEST_TOPIC", "test message", 1)
+      assert.spy(ns.RLF.SendMessage).was.called_with(_, "TEST_TOPIC", "test message", 1)
+    end)
+  end)
+
+  describe("logging", function()
+    it("logs a debug message", function()
+      ns.SendMessage = spy.new()
+      ns:LogDebug("test debug message")
+      assert.spy(ns.SendMessage).was.called_with(_, "RLF_LOG", { "DEBUG", "test debug message" })
+    end)
+
+    it("logs an info message", function()
+      ns.SendMessage = spy.new()
+      ns:LogInfo("test info message")
+      assert.spy(ns.SendMessage).was.called_with(_, "RLF_LOG", { "INFO", "test info message" })
+    end)
+
+    it("logs a warning message", function()
+      ns.SendMessage = spy.new()
+      ns:LogWarn("test warning message")
+      assert.spy(ns.SendMessage).was.called_with(_, "RLF_LOG", { "WARN", "test warning message" })
+    end)
+
+    it("logs an error message", function()
+      ns.SendMessage = spy.new()
+      ns:LogError("test error message")
+      assert.spy(ns.SendMessage).was.called_with(_, "RLF_LOG", { "ERROR", "test error message" })
+    end)
+  end)
+
   describe("RGBAToHexFormat", function()
     it("converts RGBA01 to WoW's hex color format", function()
       local result = ns:RGBAToHexFormat(0.1, 0.2, 0.3, 0.4)
       assert.are.equal(result, "|c6619334C")
+    end)
+  end)
+
+  describe("Print", function()
+    it("prints a message using RLF's Print method", function()
+      ns.RLF.Print = spy.new()
+      ns:Print("test message")
+      assert.spy(ns.RLF.Print).was.called_with(_, "test message")
+    end)
+  end)
+  
+  describe("CreatePatternSegmentsForStringNumber", function()
+    it("creates pattern segments for a string with a number", function()
+      local segments = ns:CreatePatternSegmentsForStringNumber("Hello %s, you have %d messages")
+      assert.are.same(segments, { "Hello ", ", you have ", " messages" })
+    end)
+  end)
+  
+  describe("ExtractDynamicsFromPattern", function()
+    it("extracts dynamic parts from a pattern", function()
+      local segments = { "Hello ", ", you have ", " messages" }
+      local str, num = ns:ExtractDynamicsFromPattern("Hello John, you have 5 messages", segments)
+      assert.are.equal(str, "John")
+      assert.are.equal(num, 5)
+    end)
+
+    it("extracts dynamic parts from a pattern that ends with a number", function()
+      local segments = { "Hello ", ", you got ", "" }
+      local str, num = ns:ExtractDynamicsFromPattern("Hello John, you got 5", segments)
+      assert.are.equal(str, "John")
+      assert.are.equal(num, 5)
+    end)
+  
+    it("returns nil if the pattern does not match", function()
+      local segments = { "Hello ", ", you have ", " messages" }
+      local str, num = ns:ExtractDynamicsFromPattern("Goodbye John, you have 5 messages", segments)
+      assert.is_nil(str)
+      assert.is_nil(num)
     end)
   end)
 end)

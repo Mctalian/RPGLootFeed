@@ -21,7 +21,6 @@ function ItemInfo:IsMount()
 	if
 		self.classID == Enum.ItemClass.Miscellaneous
 		and self.subclassID == Enum.ItemMiscellaneousSubclass.Mount
-		and G_RLF.db.global.itemHighlights.mounts
 	then
 		return true
 	end
@@ -31,11 +30,46 @@ end
 
 function ItemInfo:IsLegendary()
 	-- Highlight Legendary Items
-	if self.itemQuality == Enum.ItemQuality.Legendary and G_RLF.db.global.itemHighlights.legendary then
+	if self.itemQuality == Enum.ItemQuality.Legendary then
 		return true
 	end
 
 	return false
+end
+
+local function GetHighestArmorClass()
+	if G_RLF.cachedArmorClass then
+		return G_RLF.cachedArmorClass
+	end
+	local _, playerClass = UnitClass("player")
+	G_RLF.cachedArmorClass = G_RLF.armorClassMapping[playerClass]
+	return G_RLF.cachedArmorClass
+end
+
+function ItemInfo:IsEligibleEquipment()
+	if self.classID ~= Enum.ItemClass.Armor then
+		return false
+	end
+
+	if not self.itemEquipLoc then
+		return false
+	end
+
+	local armorClass = GetHighestArmorClass()
+	if not armorClass then
+		return false
+	end
+
+	if self.subclassID ~= armorClass and self.subclassID ~= Enum.ItemArmorSubclass.Generic then
+		return false
+	end
+
+	local slot = G_RLF.equipSlotMap[self.itemEquipLoc]
+	if not slot then
+		return false
+	end
+
+	return true
 end
 
 G_RLF.ItemInfo = ItemInfo

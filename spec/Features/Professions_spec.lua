@@ -20,27 +20,13 @@ describe("Professions Module", function()
 
 	it("should initialize professions correctly", function()
 		Professions:InitializeProfessions()
-		assert.are.same(Professions.professions[1].name, "Profession1")
-		assert.are.same(Professions.professions[1]["Expansion1"].level, 10)
-		assert.are.same(Professions.professions[1]["Expansion1"].maxLevel, 20)
+		assert.are.same(Professions.profNameIconMap["Profession1"], "icon1")
 	end)
 
 	it("should handle PLAYER_ENTERING_WORLD event", function()
 		spy.on(Professions, "RegisterEvent")
 		Professions:PLAYER_ENTERING_WORLD()
-		assert.is_true(Professions.isRegisteredSkillLinesChanged)
-		assert.are.same(Professions.professions[1].name, "Profession1")
-		assert.spy(Professions.RegisterEvent).was.called_with(_, "SKILL_LINES_CHANGED")
-	end)
-
-	it("should handle SKILL_LINES_CHANGED event", function()
-		Professions:InitializeProfessions()
-		_G.GetProfessionInfo = function(id)
-			return "Profession" .. id, "icon" .. id, id * 15, id * 25, nil, nil, nil, nil, nil, nil, "Expansion" .. id
-		end
-		Professions:SKILL_LINES_CHANGED()
-		assert.are.same(Professions.professions[1]["Expansion1"].level, 15)
-		assert.are.same(Professions.professions[1]["Expansion1"].maxLevel, 25)
+		assert.equal(#Professions.profLocaleBaseNames, 5)
 	end)
 
 	describe("Element", function()

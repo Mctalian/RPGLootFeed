@@ -26,42 +26,54 @@ describe("Reputation module", function()
 	end)
 
 	it("does not show rep if the faction and/or repChange can't be determined from the message", function()
+		ns.ExtractDynamicsFromPattern = function()
+			return nil, nil
+		end
 		local success =
 			RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE("CHAT_MSG_COMBAT_FACTION_CHANGE", "10x Reputation with Faction A")
 
 		assert.is_true(success)
 
-		assert.stub(ns.SendMessage).was.not_called()
+		assert.spy(ns.SendMessage).was.not_called()
 	end)
 
 	it("handles rep increases", function()
 		local newElement = spy.on(RepModule.Element, "new")
+		ns.ExtractDynamicsFromPattern = function()
+			return "Faction A", 10
+		end
 		local success =
 			RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE("CHAT_MSG_COMBAT_FACTION_CHANGE", "Rep with Faction A inc by 10.")
 
 		assert.is_true(success)
 
 		assert.spy(newElement).was.called_with(_, 10, "Faction A", 1, 0, 0, 1, _, 3)
-		assert.stub(ns.SendMessage).was.called()
+		assert.spy(ns.SendMessage).was.called()
 		-- Successfully populates the locale cache
 		assert.equal(ns.db.global.factionMaps.enUS["Faction A"], 1)
 	end)
 
 	it("handles rep increases despite locale cache miss", function()
 		local newElement = spy.on(RepModule.Element, "new")
+		ns.ExtractDynamicsFromPattern = function()
+			return "Faction B", 100
+		end
 		local success =
 			RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE("CHAT_MSG_COMBAT_FACTION_CHANGE", "Rep with Faction B inc by 100.")
 
 		assert.is_true(success)
 
 		assert.spy(newElement).was.called_with(_, 100, "Faction B", nil, nil, nil, nil, nil, nil)
-		assert.stub(ns.SendMessage).was.called()
+		assert.spy(ns.SendMessage).was.called()
 		assert.spy(ns.LogWarn).was.called()
 		assert.spy(ns.LogWarn).was.called_with(_, "Faction B is STILL not cached for enUS", _, _)
 	end)
 
 	it("handles delve companion experience gains", function()
 		local newElement = spy.on(RepModule.Element, "new")
+		ns.ExtractDynamicsFromPattern = function()
+			return nil, nil
+		end
 		local success = RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE(
 			"CHAT_MSG_COMBAT_FACTION_CHANGE",
 			"Brann Bronzebeard has gained 313 experience."
@@ -70,7 +82,7 @@ describe("Reputation module", function()
 		assert.is_true(success)
 
 		assert.spy(newElement).was.called_with(_, 313, "Brann Bronzebeard", 0, 1, 0, 2640, _, 4)
-		assert.stub(ns.SendMessage).was.called()
+		assert.spy(ns.SendMessage).was.called()
 		-- Successfully populates the locale cache
 		assert.equal(ns.db.global.factionMaps.enUS["Brann Bronzebeard"], 2640)
 	end)

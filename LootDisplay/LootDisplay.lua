@@ -56,7 +56,7 @@ function LootDisplay:OnEnable()
 	self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnPlayerCombatChange")
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnPlayerCombatChange")
 	self:RegisterBucketEvent("BAG_UPDATE_DELAYED", 0.5, "BAG_UPDATE_DELAYED")
-	self:RegisterBucketMessage("RLF_NEW_LOOT", 0.1, "OnLootReady")
+	self:RegisterMessage("RLF_NEW_LOOT", "OnLootReady")
 	self:RegisterBucketMessage("RLF_ROW_RETURNED", 0.3, "OnRowReturn")
 
 	RunNextFrame(function()
@@ -241,12 +241,10 @@ local function processRow(element)
 	row:ResetFadeOut()
 end
 
-function LootDisplay:OnLootReady(elements)
-	for element, n in pairs(elements) do
-		RunNextFrame(function()
-			processRow(element)
-		end)
-	end
+function LootDisplay:OnLootReady(_, element)
+	RunNextFrame(function()
+		processRow(element)
+	end)
 end
 
 function LootDisplay:OnRowReturn()

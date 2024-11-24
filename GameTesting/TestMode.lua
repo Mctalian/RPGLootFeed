@@ -4,15 +4,13 @@ local TestMode = G_RLF.RLF:NewModule("TestMode", "AceEvent-3.0")
 
 local logger
 local allItemsInitialized = false
+local allCurrenciesInitialized = false
+local allFactionsInitialized = false
 local isLootDisplayReady = false
 local pendingRequests = {}
 TestMode.testItems = {}
 TestMode.testCurrencies = {}
-TestMode.testFactions = {
-	"Undercity",
-	"Thunder Bluff",
-	"Orgrimmar",
-}
+TestMode.testFactions = {}
 
 local function idExistsInTable(id, table)
 	for _, item in pairs(table) do
@@ -36,7 +34,12 @@ local function anyPendingRequests()
 end
 
 local function signalIntegrationTestReady()
-	if not TestMode.integrationTestReady and allItemsInitialized and isLootDisplayReady then
+	if not TestMode.integrationTestReady
+		and allItemsInitialized
+		and isLootDisplayReady
+		and allCurrenciesInitialized
+		and allFactionsInitialized
+	then
 		--@alpha@
 		TestMode:IntegrationTestReady()
 		--@end-alpha@
@@ -90,6 +93,21 @@ local function initializeTestCurrencies()
 			end
 		end
 	end
+
+	allCurrenciesInitialized = true
+	signalIntegrationTestReady()
+end
+
+local numTestFactions = 3
+local function initializeTestFactions()
+	for i = 1, numTestFactions do
+		local factionInfo = C_Reputation.GetFactionDataByIndex(i)
+		if factionInfo and factionInfo.name then
+			table.insert(TestMode.testFactions, factionInfo.name)
+		end
+	end
+	allFactionsInitialized = true
+	signalIntegrationTestReady()
 end
 
 function TestMode:OnInitialize()
@@ -97,8 +115,11 @@ function TestMode:OnInitialize()
 	allItemsInitialized = false
 	self.testCurrencies = {}
 	self.testItems = {}
+	self.testFactions = {}
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
-	self:InitializeTestData()
+	RunNextFrame(function()
+		self:InitializeTestData()
+	end)
 	--@alpha@
 	RunNextFrame(function()
 		self:SmokeTest()
@@ -214,6 +235,7 @@ end
 function TestMode:InitializeTestData()
 	G_RLF:fn(initializeTestItems)
 	G_RLF:fn(initializeTestCurrencies)
+	G_RLF:fn(initializeTestFactions)
 end
 
 function TestMode:ToggleTestMode()

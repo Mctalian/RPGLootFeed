@@ -3,6 +3,10 @@ local common_stubs = {}
 
 local function embedLibs(addonOrModule, ...)
 	for _, lib in ipairs({ ... }) do
+		if lib == "AceBucket-3.0" then
+			addonOrModule.RegisterBucketMessage = function(self, bucket, delay, handler) end
+			addonOrModule.UnregisterBucket = function(self, bucket) end
+		end
 		if lib == "AceEvent-3.0" then
 			addonOrModule.RegisterEvent = function(self, event, handler) end
 			addonOrModule.UnregisterEvent = function(self, event) end
@@ -28,35 +32,6 @@ local function embedLibs(addonOrModule, ...)
 end
 
 function common_stubs.setup_G_RLF(spy)
-	_G.LibStub = function(lib)
-		if lib == "AceAddon-3.0" then
-			return {
-				NewAddon = function(...)
-					local addon = {}
-					embedLibs(addon, ...)
-					addon.SetDefaultModuleState = function() end
-					addon.SetDefaultModulePrototype = function() end
-					return addon
-				end,
-			}
-		end
-		if lib == "LibSharedMedia-3.0" then
-			return {
-				Register = spy.new(),
-				MediaType = {
-					FONT = "font",
-				},
-			}
-		end
-		return {
-			GetLocale = function() end,
-			New = function()
-				return { global = {} }
-			end,
-			RegisterOptionsTable = function() end,
-			AddToBlizOptions = function() end,
-		}
-	end
 	common_stubs.stub_WoWGlobals(spy)
 
 	local logger = {
@@ -71,7 +46,10 @@ function common_stubs.setup_G_RLF(spy)
 			global = {
 				currencyFeed = true,
 				factionMaps = {},
-				itemHighlights = {},
+				itemHighlights = {
+					mounts = true,
+					legendary = true,
+				},
 			},
 		},
 		L = {
@@ -123,6 +101,12 @@ function common_stubs.setup_G_RLF(spy)
 		ProfileFunction = function(_, name, func)
 			return func
 		end,
+		CreatePatternSegmentsForStringNumber = spy.new(function()
+			return {1, 2, 3}
+		end),
+		ExtractDynamicsFromPattern = spy.new(function()
+			return "Test", 3
+		end),
 		RGBAToHexFormat = function(_, r, g, b, a)
 			local f = math.floor
 			return string.format("|c%02x%02x%02x%02x", f(a * 255), f(r * 255), f(g * 255), f(b * 255))
@@ -136,6 +120,15 @@ function common_stubs.setup_G_RLF(spy)
 					itemId = 18803,
 					itemName = "Finkle's Lava Dredger",
 					itemQuality = 2,
+					IsMount = function()
+						return true
+					end,
+					IsLegendary = function()
+						return true
+					end,
+					IsEligibleEquipment = function()
+						return true
+					end,
 				}
 			end,
 		},
@@ -163,6 +156,105 @@ function common_stubs.setup_G_RLF(spy)
 		LogError = spy.new(),
 	}
 
+	ns.LibStubReturn = {}
+	_G.LibStub = function(lib)
+		ns.LibStubReturn[lib] = {}
+		if lib == "AceAddon-3.0" then
+			ns.LibStubReturn[lib] = {
+				NewAddon = function(...)
+					local addon = {}
+					embedLibs(addon, ...)
+					addon.SetDefaultModuleState = spy.new()
+					addon.SetDefaultModulePrototype = spy.new()
+					return addon
+				end,
+			}
+		elseif lib == "AceConfig-3.0" then
+			ns.LibStubReturn[lib] = {
+				RegisterOptionsTable = spy.new(),
+			}
+		elseif lib == "AceConfigDialog-3.0" then
+			ns.LibStubReturn[lib] = {
+				AddToBlizOptions = spy.new(),
+				Close = spy.new(),
+				Open = spy.new(),
+			}
+		elseif lib == "AceConfigRegistry-3.0" then
+			ns.LibStubReturn[lib] = {
+				NotifyChange = spy.new(),
+			}
+		elseif lib == "AceDB-3.0" then
+			ns.LibStubReturn[lib] = {
+				New = function()
+					return { global = {} }
+				end,
+			}
+		elseif lib == "AceGUI-3.0" then
+			ns.LibStubReturn[lib] = {
+				Create = function()
+					return {
+						AddChild = spy.new(),
+						DisableButton = spy.new(),
+						DoLayout = spy.new(),
+						EnableResize = spy.new(),
+						IsShown = function()
+							return true
+						end,
+						SetLayout = spy.new(),
+						SetTitle = spy.new(),
+						SetStatusText = spy.new(),
+						SetCallback = spy.new(),
+						SetText = spy.new(),
+						SetValue = spy.new(),
+						SetColor = spy.new(),
+						SetDisabled = spy.new(),
+						SetFullWidth = spy.new(),
+						SetFullHeight = spy.new(),
+						SetItemValue = spy.new(),
+						SetRelativeWidth = spy.new(),
+						SetRelativeHeight = spy.new(),
+						SetList = spy.new(),
+						SetMultiselect = spy.new(),
+						SetNumLines = spy.new(),
+						SetPoint = spy.new(),
+						SetWidth = spy.new(),
+						SetHeight = spy.new(),
+						SetLabel = spy.new(),
+						SetImage = spy.new(),
+						SetImageSize = spy.new(),
+						SetImageCoords = spy.new(),
+						Show = spy.new(),
+						Hide = spy.new(),
+					}
+				end,
+			}
+		elseif lib == "AceLocale-3.0" then
+			ns.LibStubReturn[lib] = {
+				GetLocale = function()
+					return ns.L
+				end,
+			}
+		elseif lib == "LibSharedMedia-3.0" then
+			ns.LibStubReturn[lib] = {
+				Register = spy.new(),
+				MediaType = {
+					FONT = "font",
+				},
+			}
+		elseif lib == "Masque" then
+			ns.LibStubReturn[lib] = {
+				Group = function()
+					return {
+						ReSkin = spy.new(),
+					}
+				end,
+			}
+		else
+			error("Unmocked library: " .. lib)
+		end
+		return ns.LibStubReturn[lib]
+	end
+
 	return ns
 end
 
@@ -171,24 +263,32 @@ function common_stubs.stub_WoWGlobals(spy)
 	common_stubs.stub_Money_Funcs()
 
 	_G.Enum = {
-		ItemClass = {},
-		ItemMiscellaneousSubclass = {},
-		ItemQuality = {},
+		ItemArmorSubclass = {
+			Plate = 4,
+		},
+		ItemClass = { Armor = 4, Miscellaneous = 15 },
+		ItemMiscellaneousSubclass = { Mount = 5 },
+		ItemQuality = { Legendary = 5 },
 	}
-
-	_G.MEMBERS_PER_RAID_GROUP = 5
-	_G.GetNumGroupMembers = function()
-		return 1
-	end
 
 	_G.C_CVar = {
 		SetCVar = function() end,
+	}
+
+	_G.EditModeManagerFrame = {
+		IsInMode = function() end,
 	}
 	_G.EventRegistry = {
 		RegisterCallback = function() end,
 	}
 
-	_G.unpack = table.unpack
+	_G.date = function()
+		return "2023-01-01 12:00:00"
+	end
+	_G.debugprofilestop = function()
+		return 0
+	end
+	_G.format = string.format
 	_G.handledError = function(err)
 		print("\n")
 		print(err)
@@ -197,6 +297,7 @@ function common_stubs.stub_WoWGlobals(spy)
 		print("\n")
 		return false
 	end
+	_G.unpack = table.unpack
 
 	_G.RunNextFrame = function(func)
 		func()
@@ -204,6 +305,15 @@ function common_stubs.stub_WoWGlobals(spy)
 
 	_G.IsInRaid = function()
 		return false
+	end
+
+	_G.IsInInstance = function()
+		return false, ""
+	end
+
+	_G.MEMBERS_PER_RAID_GROUP = 5
+	_G.GetNumGroupMembers = function()
+		return 1
 	end
 
 	_G.GetPlayerGuid = function()

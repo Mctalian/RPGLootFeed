@@ -8,18 +8,8 @@ ItemLoot.SecondaryTextOption = {
 	["iLvl"] = "Item Level",
 }
 
-local armorClassMapping = G_RLF.armorClassMapping
 local cachedArmorClass = nil
-local function GetHighestArmorClass()
-	if cachedArmorClass then
-		return cachedArmorClass
-	end
-	local _, playerClass = UnitClass("player")
-	cachedArmorClass = armorClassMapping[playerClass]
-	return cachedArmorClass
-end
-
-local equipSlotMap = G_RLF.equipSlotMap
+local onlyEpicPartyLoot = false
 
 ItemLoot.Element = {}
 
@@ -58,26 +48,78 @@ function ItemLoot:SetNameUnitMap()
 	end
 end
 
-local function IsMount(info)
-	-- Highlight Mounts
-	if
-		info.classID == Enum.ItemClass.Miscellaneous
-		and info.subclassID == Enum.ItemMiscellaneousSubclass.Mount
-		and G_RLF.db.global.itemHighlights.mounts
-	then
-		return true
+function ItemLoot:SetPartyLootFilters()
+	if IsInRaid() then
+		onlyEpicPartyLoot = true
+		return
 	end
 
-	return false
+	if IsInInstance() then
+		onlyEpicPartyLoot = true
+		return
+	end
+
+	onlyEpicPartyLoot = false
+end
+
+local function IsMount(info)
+	if G_RLF.db.global.itemHighlights.mounts then
+		return info:IsMount()
+	end
 end
 
 local function IsLegendary(info)
-	-- Highlight Legendary Items
-	if info.itemQuality == Enum.ItemQuality.Legendary and G_RLF.db.global.itemHighlights.legendary then
-		return true
+	if G_RLF.db.global.itemHighlights.legendaries then
+		return info:IsLegendary()
 	end
+end
 
-	return false
+local function IsBetterThanEquipped(info)
+	-- Highlight Better Than Equipped
+	if G_RLF.db.global.itemHighlights.betterThanEquipped then 
+		
+
+		local equippedLink
+		if type(slot) == "table" then
+			for _, s in ipairs(slot) do
+				equippedLink = GetInventoryItemLink("player", s)
+				if equippedLink then
+					break
+				end
+			end
+		else
+			equippedLink = GetInventoryItemLink("player", slot)
+		end
+
+		if not equippedLink then
+			return
+		end
+
+		local equippedId = C_Item.GetItemIDForItemInfo(equippedLink)
+		local equippedInfo = ItemInfo:new(equippedId, C_Item.GetItemInfo(equippedLink))
+		if not equippedInfo then
+			return
+		end
+
+		if equippedInfo.itemLevel and equippedInfo.itemLevel < info.itemLevel then
+			self.highlight = true
+			return
+		elseif equippedInfo.itemLevel == info.itemLevel then
+			local statDelta = C_Item.GetItemStatDelta(equippedLink, info.itemLink)
+			for k, v in pairs(statDelta) do
+				-- Has a Tertiary Stat
+				if k:find("ITEM_MOD_CR_") and v > 0 then
+					self.highlight = true
+					return
+				end
+				-- Has a Gem Socket
+				if k:find("EMPTY_SOCKET_") and v > 0 then
+					self.highlight = true
+					return
+				end
+			end
+		end
+	end
 end
 
 function ItemLoot.Element:new(...)
@@ -129,6 +171,9 @@ function ItemLoot.Element:new(...)
 	element.secondaryTextFn = function(...)
 		if element.unit then
 			local name, server = UnitName(element.unit)
+			if not name then
+				return "A former party member"
+			end
 			if server then
 				return "    " .. name .. "-" .. server
 			end
@@ -143,54 +188,8 @@ function ItemLoot.Element:new(...)
 
 	function element:SetHighlight()
 		self.highlight = IsMount(info) or
-			IsLegendary(info)
-		
-		-- Highlight Better Than Equipped
-		if G_RLF.db.global.itemHighlights.betterThanEquipped and info.classID == Enum.ItemClass.Armor then
-			local armorClass = GetHighestArmorClass()
-			if
-				(armorClass and info.subclassID == armorClass)
-				or (info.subclassID == Enum.ItemArmorSubclass.Generic and info.itemEquipLoc)
-			then
-				local slot = equipSlotMap[info.itemEquipLoc]
-				if not slot then
-					return
-				end
-				local equippedLink
-				if type(slot) == "table" then
-					for _, s in ipairs(slot) do
-						equippedLink = GetInventoryItemLink("player", s)
-						if equippedLink then
-							break
-						end
-					end
-				else
-					equippedLink = GetInventoryItemLink("player", slot)
-				end
-				if not equippedLink then
-					return
-				end
-				local equippedId = C_Item.GetItemIDForItemInfo(equippedLink)
-				local equippedInfo = ItemInfo:new(nil, C_Item.GetItemInfo(equippedLink))
-				if equippedInfo and equippedInfo.itemLevel and equippedInfo.itemLevel < info.itemLevel then
-					self.highlight = true
-					return
-				elseif equippedInfo and equippedInfo.itemLevel == info.itemLevel then
-					local statDelta = C_Item.GetItemStatDelta(equippedLink, info.itemLink)
-					for k, v in pairs(statDelta) do
-						-- Has a Tertiary Stat
-						if k:find("ITEM_MOD_CR_") and v > 0 then
-							self.highlight = true
-							return
-						end
-						if k:find("EMPTY_SOCKET_") and v > 0 then
-							self.highlight = true
-							return
-						end
-					end
-				end
-			end
-		end
+			IsLegendary(info) or
+			IsBetterThanEquipped(info)
 	end
 
 	return element
@@ -230,6 +229,9 @@ end
 
 function ItemLoot:OnPartyReadyToShow(info, amount, unit)
 	if not unit then
+		return
+	end
+	if onlyEpicPartyLoot and info.itemQuality < Enum.ItemQuality.Epic then
 		return
 	end
 	self.pendingPartyRequests[info.itemId] = nil
@@ -321,6 +323,7 @@ function ItemLoot:GROUP_ROSTER_UPDATE(eventName, ...)
 	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, nil, eventName)
 
 	self:SetNameUnitMap()
+	self:SetPartyLootFilters()
 end
 
 return ItemLoot

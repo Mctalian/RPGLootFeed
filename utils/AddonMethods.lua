@@ -34,6 +34,10 @@ function G_RLF:NotifyChange(...)
 	acr:NotifyChange(...)
 end
 
+function G_RLF:Print(...)
+	G_RLF.RLF:Print(...)
+end
+
 function G_RLF:SendMessage(...)
 	local args = {...}
 	RunNextFrame(function()
@@ -41,9 +45,6 @@ function G_RLF:SendMessage(...)
 	end)
 end
 
-function G_RLF:Print(...)
-	G_RLF.RLF:Print(...)
-end
 
 function G_RLF:RGBAToHexFormat(r, g, b, a)
 	local red = string.format("%02X", math.floor(r * 255))
@@ -73,4 +74,37 @@ end
 
 function G_RLF:LogError(...)
 	log(G_RLF.LogLevel.error , ...)
+end
+
+function G_RLF:CreatePatternSegmentsForStringNumber(localeString)
+	local preStart, preEnd = string.find(localeString, "%%s")
+	local prePattern = string.sub(localeString, 1, preStart - 1)
+	local midStart, midEnd = string.find(localeString, "%%d", preEnd + 1)
+	local midPattern = string.sub(localeString, preEnd + 1, midStart - 1)
+	local postPattern = string.sub(localeString, midEnd + 1)
+	return { prePattern, midPattern, postPattern }
+end
+
+function G_RLF:ExtractDynamicsFromPattern(localeString, segments)
+	local prePattern, midPattern, postPattern = unpack(segments)
+	local preMatchStart, preMatchEnd = string.find(localeString, prePattern, 1, true)
+	if preMatchStart then
+		local msgLoop = localeString:sub(preMatchEnd + 1)
+		local midMatchStart, midMatchEnd = string.find(msgLoop, midPattern, 1, true)
+		if midMatchStart then
+			local postMatchStart, postMatchEnd = string.find(msgLoop, postPattern, midMatchEnd, true)
+			if postMatchStart then
+				local str = msgLoop:sub(1, midMatchStart - 1)
+				local num
+				if midMatchEnd == postMatchStart then
+					num = msgLoop:sub(midMatchEnd + 1)
+				else
+					num = msgLoop:sub(midMatchEnd + 1, postMatchStart - 1)
+				end
+				return str, tonumber(num)
+			end
+		end
+	end
+
+	return nil, nil
 end
