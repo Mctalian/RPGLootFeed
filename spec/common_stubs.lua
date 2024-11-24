@@ -102,7 +102,7 @@ function common_stubs.setup_G_RLF(spy)
 			return func
 		end,
 		CreatePatternSegmentsForStringNumber = spy.new(function()
-			return {1, 2, 3}
+			return { 1, 2, 3 }
 		end),
 		ExtractDynamicsFromPattern = spy.new(function()
 			return "Test", 3

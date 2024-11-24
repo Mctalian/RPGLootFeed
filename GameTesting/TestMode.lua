@@ -34,7 +34,8 @@ local function anyPendingRequests()
 end
 
 local function signalIntegrationTestReady()
-	if not TestMode.integrationTestReady
+	if
+		not TestMode.integrationTestReady
 		and allItemsInitialized
 		and isLootDisplayReady
 		and allCurrenciesInitialized

@@ -76,9 +76,7 @@ end
 
 local function IsBetterThanEquipped(info)
 	-- Highlight Better Than Equipped
-	if G_RLF.db.global.itemHighlights.betterThanEquipped then 
-		
-
+	if G_RLF.db.global.itemHighlights.betterThanEquipped then
 		local equippedLink
 		if type(slot) == "table" then
 			for _, s in ipairs(slot) do
@@ -187,9 +185,7 @@ function ItemLoot.Element:new(...)
 	end
 
 	function element:SetHighlight()
-		self.highlight = IsMount(info) or
-			IsLegendary(info) or
-			IsBetterThanEquipped(info)
+		self.highlight = IsMount(info) or IsLegendary(info) or IsBetterThanEquipped(info)
 	end
 
 	return element

@@ -35,7 +35,7 @@ describe("Core module", function()
 			assert.spy(RLF.OnInitialize).was.called()
 		end)
 	end)
-	
+
 	describe("OnSlashCommand", function()
 		it("should handle test mode command correctly", function()
 			local TestMode = {
@@ -47,7 +47,7 @@ describe("Core module", function()
 					return TestMode
 				end
 			end
-	
+
 			RLF:OnInitialize()
 			RLF:SlashCommand("test")
 			assert.spy(TestMode.ToggleTestMode).was.called()
@@ -61,7 +61,7 @@ describe("Core module", function()
 			assert.spy(acd.Open).was.called_with(_, "TestAddon")
 		end)
 	end)
-	
+
 	describe("PLAYER_ENTERING_WORLD", function()
 		it("should handle PLAYER_ENTERING_WORLD event correctly", function()
 			ns.db.global.enableAutoLoot = true
@@ -79,7 +79,7 @@ describe("Core module", function()
 			assert.spy(RLF.ScheduleTimer).was.called()
 			assert.spy(ns.LootDisplay.SetBoundingBoxVisibility).was_called_with(_, true)
 		end)
-	
+
 		it("does nothing if the options are already open", function()
 			spy.on(RLF, "ScheduleTimer")
 			spy.on(ns.LootDisplay, "SetBoundingBoxVisibility")

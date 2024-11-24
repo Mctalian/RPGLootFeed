@@ -63,7 +63,8 @@ function Professions:InitializeProfessions()
 	local profs = { primaryId, secondaryId, archId, fishingId, cookingId }
 	for i = 1, #profs do
 		if profs[i] then
-			local name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset, a, b = GetProfessionInfo(profs[i])
+			local name, icon, skillLevel, maxSkillLevel, numAbilities, spellOffset, skillLine, skillModifier, specializationIndex, specializationOffset, a, b =
+				GetProfessionInfo(profs[i])
 			if name and icon then
 				self.profNameIconMap[name] = icon
 			end
@@ -102,7 +103,14 @@ function Professions:CHAT_MSG_SKILL(event, message)
 				end
 			end
 		end
-		local e = self.Element:new(skillName, skillName, icon, skillLevel, nil, skillLevel - self.professions[skillName].lastSkillLevel)
+		local e = self.Element:new(
+			skillName,
+			skillName,
+			icon,
+			skillLevel,
+			nil,
+			skillLevel - self.professions[skillName].lastSkillLevel
+		)
 		e:Show()
 		self.professions[skillName].lastSkillLevel = skillLevel
 	end

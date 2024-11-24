@@ -18,10 +18,7 @@ end
 
 function ItemInfo:IsMount()
 	-- Highlight Mounts
-	if
-		self.classID == Enum.ItemClass.Miscellaneous
-		and self.subclassID == Enum.ItemMiscellaneousSubclass.Mount
-	then
+	if self.classID == Enum.ItemClass.Miscellaneous and self.subclassID == Enum.ItemMiscellaneousSubclass.Mount then
 		return true
 	end
 

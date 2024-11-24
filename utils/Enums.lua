@@ -9,24 +9,24 @@ G_RLF.DisableBossBanner = {
 }
 
 G_RLF.LogEventSource = {
-  ADDON = addonName,
-  WOWEVENT = "WOWEVENT",
+	ADDON = addonName,
+	WOWEVENT = "WOWEVENT",
 }
 
 G_RLF.LogLevel = {
-  debug = "DEBUG",
-  info = "INFO",
-  warn = "WARN",
-  error = "ERROR",
+	debug = "DEBUG",
+	info = "INFO",
+	warn = "WARN",
+	error = "ERROR",
 }
 
 G_RLF.FeatureModule = {
-  ItemLoot = "ItemLoot",
-  Currency = "Currency",
-  Money = "Money",
-  Reputation = "Reputation",
-  Experience = "Experience",
-  Profession = "Professions",
+	ItemLoot = "ItemLoot",
+	Currency = "Currency",
+	Money = "Money",
+	Reputation = "Reputation",
+	Experience = "Experience",
+	Profession = "Professions",
 }
 
 G_RLF.WrapCharEnum = {

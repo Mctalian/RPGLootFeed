@@ -39,12 +39,11 @@ function G_RLF:Print(...)
 end
 
 function G_RLF:SendMessage(...)
-	local args = {...}
+	local args = { ... }
 	RunNextFrame(function()
 		G_RLF.RLF:SendMessage(unpack(args))
 	end)
 end
-
 
 function G_RLF:RGBAToHexFormat(r, g, b, a)
 	local red = string.format("%02X", math.floor(r * 255))
@@ -57,23 +56,23 @@ function G_RLF:RGBAToHexFormat(r, g, b, a)
 end
 
 local function log(...)
-	G_RLF:SendMessage("RLF_LOG", {...})
+	G_RLF:SendMessage("RLF_LOG", { ... })
 end
 
 function G_RLF:LogDebug(...)
-	log(G_RLF.LogLevel.debug , ...)
+	log(G_RLF.LogLevel.debug, ...)
 end
 
 function G_RLF:LogInfo(...)
-	log(G_RLF.LogLevel.info , ...)
+	log(G_RLF.LogLevel.info, ...)
 end
 
 function G_RLF:LogWarn(...)
-	log(G_RLF.LogLevel.warn , ...)
+	log(G_RLF.LogLevel.warn, ...)
 end
 
 function G_RLF:LogError(...)
-	log(G_RLF.LogLevel.error , ...)
+	log(G_RLF.LogLevel.error, ...)
 end
 
 function G_RLF:CreatePatternSegmentsForStringNumber(localeString)
