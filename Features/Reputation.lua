@@ -152,8 +152,15 @@ function Rep.Element:new(...)
 				end
 			end
 		else
-			if factionData.currentStanding >= 0 and factionData.currentReactionThreshold > 0 then
-				str = str .. factionData.currentStanding .. "/" .. factionData.currentReactionThreshold
+			if
+				factionData.currentStanding ~= 0
+				or factionData.currentReactionThreshold ~= 0
+				or factionData.nextReactionThreshold ~= 0
+			then
+				str = str
+					.. (factionData.currentStanding - factionData.currentReactionThreshold)
+					.. "/"
+					.. (factionData.nextReactionThreshold - factionData.currentReactionThreshold)
 			end
 		end
 
