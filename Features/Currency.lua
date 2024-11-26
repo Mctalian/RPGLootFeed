@@ -16,7 +16,8 @@ function Currency.Element:new(...)
 	element.isLink = true
 
 	local t
-	element.key, t, element.icon, element.quantity = ...
+	element.key, t, element.icon, element.quantity, element.totalCount, element.quality, element.totalEarned, element.cappedQuantity =
+		...
 
 	element.textFn = function(existingQuantity, truncatedLink)
 		if not truncatedLink then
@@ -25,28 +26,15 @@ function Currency.Element:new(...)
 		return truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
 	end
 
-	local info = C_CurrencyInfo.GetCurrencyInfo(element.key)
-
-	element.quality = info.quality
-	element.currentTotal = info.quantity
-	element.totalEarned = info.totalEarned
-	element.cappedQuantity = info.maxQuantity
-
 	element.secondaryTextFn = function(...)
-		if element.currentTotal == 0 then
-			return ""
-		end
-
-		local str = "    |cFFBABABA" .. element.currentTotal .. "|r"
-
-		if element.cappedQuantity > 0 then
+		if element.cappedQuantity and element.cappedQuantity > 0 then
 			local percentage, numerator
 			if element.totalEarned > 0 then
 				numerator = element.totalEarned
 				percentage = element.totalEarned / element.cappedQuantity
 			else
-				numerator = element.currentTotal
-				percentage = element.currentTotal / element.cappedQuantity
+				numerator = element.totalCount
+				percentage = element.totalCount / element.cappedQuantity
 			end
 			local color
 			if percentage < 0.7 then
@@ -57,10 +45,10 @@ function Currency.Element:new(...)
 				color = "|cFFFF0000"
 			end
 
-			str = str .. "  " .. color .. "(" .. numerator .. " / " .. element.cappedQuantity .. ")|r"
+			return "    " .. color .. numerator .. " / " .. element.cappedQuantity .. "|r"
 		end
 
-		return str
+		return ""
 	end
 
 	return element
@@ -91,10 +79,10 @@ function Currency:OnEnable()
 end
 
 function Currency:Process(eventName, currencyType, quantityChange)
-	self:getLogger():Info(eventName, "WOWEVENT", self.moduleName, currencyType, eventName, quantityChange)
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, currencyType, eventName, quantityChange)
 
 	if currencyType == nil or not quantityChange or quantityChange <= 0 then
-		self:getLogger():Debug(
+		G_RLF:LogDebug(
 			"Skip showing currency",
 			addonName,
 			self.moduleName,
@@ -106,7 +94,7 @@ function Currency:Process(eventName, currencyType, quantityChange)
 	end
 
 	if isHiddenCurrency(currencyType) then
-		self:getLogger():Debug(
+		G_RLF:LogDebug(
 			"Skip showing currency",
 			addonName,
 			self.moduleName,
@@ -119,7 +107,7 @@ function Currency:Process(eventName, currencyType, quantityChange)
 
 	local info = C_CurrencyInfo.GetCurrencyInfo(currencyType)
 	if info == nil or info.description == "" or info.iconFileID == nil then
-		self:getLogger():Debug(
+		G_RLF:LogDebug(
 			"Skip showing currency",
 			addonName,
 			self.moduleName,
@@ -136,7 +124,11 @@ function Currency:Process(eventName, currencyType, quantityChange)
 			info.currencyID,
 			C_CurrencyInfo.GetCurrencyLink(currencyType),
 			info.iconFileID,
-			basicInfo.displayAmount
+			basicInfo.displayAmount,
+			info.quantity,
+			info.quality,
+			info.totalEarned,
+			info.maxQuantity
 		)
 		e:Show()
 	end)
@@ -149,10 +141,16 @@ function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
 end
 
 function Currency:PERKS_PROGRAM_CURRENCY_AWARDED(eventName, quantityChange)
-	local currencyType = 2032 -- https://www.wowhead.com/currency=2032/traders-tender
+	local currencyType = Constants.CurrencyConsts.CURRENCY_ID_PERKS_PROGRAM_DISPLAY_INFO
 
 	self:Process(eventName, currencyType, quantityChange)
 end
+
+-- Handle Lifetime Honor
+-- LIFETIME_HONOR
+-- Constants.CurrencyConsts.ACCOUNT_WIDE_HONOR_CURRENCY_ID
+-- print(UnitHonorLevel("player"))
+-- print(UnitHonor("player") .. "/" .. UnitHonorMax("player"))
 
 hiddenCurrencies = {
 	[2918] = true,
