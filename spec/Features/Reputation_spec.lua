@@ -139,7 +139,8 @@ describe("Reputation module", function()
 					factionId = 1,
 					factionName = "Faction A",
 					currentStanding = 20,
-					currentReactionThreshold = 3000,
+					currentReactionThreshold = 0,
+					nextReactionThreshold = 3000,
 				}
 				local element = RepModule.Element:new(10, "Faction A", 1, 0, 0, 1, factionData, 3)
 				local text = element.secondaryTextFn()

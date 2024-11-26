@@ -408,7 +408,8 @@ function common_stubs.stub_C_Reputation()
 					factionID = 1,
 					reaction = 1,
 					currentStanding = 20,
-					currentReactionThreshold = 3000,
+					currentReactionThreshold = 0,
+					nextReactionThreshold = 3000,
 				}
 			end
 			if id == 2640 then

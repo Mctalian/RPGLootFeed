@@ -15,7 +15,7 @@ describe("ItemLoot module", function()
 			end
 		end
 		-- Load the list module before each test
-		LootModule = assert(loadfile("Features/ItemLoot.lua"))("TestAddon", ns)
+		LootModule = assert(loadfile("Features/ItemLoot/ItemLoot.lua"))("TestAddon", ns)
 		LootModule:OnInitialize()
 	end)
 

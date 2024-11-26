@@ -131,9 +131,9 @@ function ItemLoot.Element:new(...)
 
 	element.isLink = true
 
-	local t, info
+	local itemLink, info
 	info, element.quantity, element.unit = ...
-	t = info.itemLink
+	itemLink = info.itemLink
 
 	element.key = info.itemId
 	element.icon = info.itemTexture
@@ -161,7 +161,7 @@ function ItemLoot.Element:new(...)
 
 	element.textFn = function(existingQuantity, truncatedLink)
 		if not truncatedLink then
-			return t
+			return itemLink
 		end
 		return truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
 	end
@@ -178,10 +178,23 @@ function ItemLoot.Element:new(...)
 			return "    " .. name
 		end
 		local quantity = ...
-		if not element.sellPrice or element.sellPrice == 0 then
-			return ""
+		local atlasIconSize = G_RLF.db.global.fontSize * 1.5
+		if G_RLF.db.global.pricesForSellableItems == G_RLF.PricesEnum.Vendor then
+			if not element.sellPrice or element.sellPrice == 0 then
+				return ""
+			end
+			local sellAtlasStr = "|A:spellicon-256x256-selljunk:" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a  "
+			return "    " .. sellAtlasStr .. C_CurrencyInfo.GetCoinTextureString(element.sellPrice * (quantity or 1))
+		elseif G_RLF.db.global.pricesForSellableItems == G_RLF.PricesEnum.AH then
+			local marketPrice = G_RLF.AuctionIntegrations.activeIntegration:GetAHPrice(itemLink)
+			if not marketPrice or marketPrice == 0 then
+				return ""
+			end
+			local ahAtlasStr = "|A:auctioneer:" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a  "
+			return "    " .. ahAtlasStr .. C_CurrencyInfo.GetCoinTextureString(marketPrice * (quantity or 1))
 		end
-		return "    " .. C_CurrencyInfo.GetCoinTextureString(element.sellPrice * (quantity or 1))
+
+		return ""
 	end
 
 	function element:SetHighlight()

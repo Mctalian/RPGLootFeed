@@ -29,6 +29,12 @@ G_RLF.FeatureModule = {
 	Profession = "Professions",
 }
 
+G_RLF.PricesEnum = {
+	None = "none",
+	Vendor = "vendor",
+	AH = "ah",
+}
+
 G_RLF.WrapCharEnum = {
 	DEFAULT = 0,
 	SPACE = 1,

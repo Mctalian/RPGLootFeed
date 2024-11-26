@@ -2,6 +2,8 @@ local addonName, G_RLF = ...
 
 local ItemConfig = {}
 
+local PricesEnum = G_RLF.PricesEnum
+
 G_RLF.defaults.global.itemQualityFilter = {
 	[Enum.ItemQuality.Poor] = true,
 	[Enum.ItemQuality.Common] = true,
@@ -12,6 +14,8 @@ G_RLF.defaults.global.itemQualityFilter = {
 	[Enum.ItemQuality.Artifact] = true,
 	[Enum.ItemQuality.Heirloom] = true,
 }
+G_RLF.defaults.global.auctionHouseSource = G_RLF.L["None"]
+G_RLF.defaults.global.pricesForSellableItems = PricesEnum.Vendor
 G_RLF.defaults.global.itemHighlights = {
 	boe = false,
 	bop = false,
@@ -46,6 +50,114 @@ G_RLF.options.args.features.args.itemLootConfig = {
 			get = "GetPartyLootStatus",
 			set = "SetPartyLootStatus",
 			order = 1.1,
+		},
+		itemSecondaryTextOptions = {
+			type = "group",
+			name = G_RLF.L["Item Secondary Text Options"],
+			inline = true,
+			order = 1.2,
+			args = {
+				pricesForSellableItems = {
+					type = "select",
+					name = G_RLF.L["Prices for Sellable Items"],
+					desc = G_RLF.L["PricesForSellableItemsDesc"],
+					values = function()
+						local values = {
+							[PricesEnum.None] = G_RLF.L["None"],
+							[PricesEnum.Vendor] = G_RLF.L["Vendor Price"],
+						}
+
+						if G_RLF.AuctionIntegrations.numActiveIntegrations > 0 then
+							values[PricesEnum.AH] = G_RLF.L["Auction Price"]
+						end
+
+						return values
+					end,
+					sorting = {
+						PricesEnum.None,
+						PricesEnum.Vendor,
+						PricesEnum.AH,
+					},
+					get = function(info)
+						if
+							G_RLF.db.global.pricesForSellableItems == PricesEnum.AH
+							and G_RLF.AuctionIntegrations.numActiveIntegrations == 0
+						then
+							G_RLF.db.global.pricesForSellableItems = PricesEnum.Vendor
+						end
+						return G_RLF.db.global.pricesForSellableItems
+					end,
+					set = function(info, value)
+						G_RLF.db.global.pricesForSellableItems = value
+					end,
+					order = 1,
+				},
+				auctionHouseSource = {
+					type = "select",
+					name = G_RLF.L["Auction House Source"],
+					desc = G_RLF.L["AuctionHouseSourceDesc"],
+					values = function()
+						local values = {}
+						values[G_RLF.AuctionIntegrations.nilIntegration:ToString()] =
+							G_RLF.AuctionIntegrations.nilIntegration:ToString()
+
+						local activeIntegrations = G_RLF.AuctionIntegrations.activeIntegrations
+						local numActiveIntegrations = G_RLF.AuctionIntegrations.numActiveIntegrations
+						if activeIntegrations and numActiveIntegrations >= 1 then
+							for k, _ in pairs(activeIntegrations) do
+								values[k] = k
+							end
+						end
+						return values
+					end,
+					sorting = function()
+						local values = {}
+						values[1] = G_RLF.AuctionIntegrations.nilIntegration:ToString()
+
+						local activeIntegrations = G_RLF.AuctionIntegrations.activeIntegrations
+						local numActiveIntegrations = G_RLF.AuctionIntegrations.numActiveIntegrations
+						if activeIntegrations and numActiveIntegrations >= 1 then
+							local i = 2
+							for k, _ in pairs(activeIntegrations) do
+								values[i] = k
+								i = i + 1
+							end
+						end
+						return values
+					end,
+					hidden = function()
+						local activeIntegrations = G_RLF.AuctionIntegrations.activeIntegrations
+						local numActiveIntegrations = G_RLF.AuctionIntegrations.numActiveIntegrations
+						local hide = not activeIntegrations or numActiveIntegrations == 0
+						if hide then
+							G_RLF.db.global.auctionHouseSource = G_RLF.AuctionIntegrations.nilIntegration:ToString()
+						end
+						return hide
+					end,
+					get = function(info)
+						local activeIntegrations = G_RLF.AuctionIntegrations.activeIntegrations
+						local numActiveIntegrations = G_RLF.AuctionIntegrations.numActiveIntegrations
+						if
+							not activeIntegrations
+							or not activeIntegrations[G_RLF.db.global.auctionHouseSource]
+							or numActiveIntegrations == 0
+						then
+							G_RLF.db.global.auctionHouseSource = G_RLF.AuctionIntegrations.nilIntegration:ToString()
+						end
+						return G_RLF.db.global.auctionHouseSource
+					end,
+					set = function(info, value)
+						G_RLF.db.global.auctionHouseSource = value
+						if value ~= G_RLF.AuctionIntegrations.nilIntegration:ToString() then
+							G_RLF.AuctionIntegrations.activeIntegration =
+								G_RLF.AuctionIntegrations.activeIntegrations[value]
+						else
+							G_RLF.AuctionIntegrations.activeIntegration = G_RLF.AuctionIntegrations.nilIntegration
+						end
+					end,
+					order = 2,
+				},
+			},
 		},
 		itemQualityFilter = {
 			type = "multiselect",

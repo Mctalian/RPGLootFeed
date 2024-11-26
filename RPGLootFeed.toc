@@ -16,8 +16,8 @@ embeds.xml
 Core.lua
 utils/utils.xml
 locale/locales.xml
-BlizzOverrides/overrides.xml
 config/config.xml
+BlizzOverrides/overrides.xml
 Features/features.xml
 LootDisplay/LootDisplay.xml
 GameTesting/testing.xml
