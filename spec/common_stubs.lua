@@ -64,6 +64,9 @@ function common_stubs.setup_G_RLF(spy)
 				return {}
 			end,
 		},
+		AuctionIntegrations = {
+			Init = spy.new(),
+		},
 		RLF = {
 			NewModule = function(_, name, ...)
 				local module = {
