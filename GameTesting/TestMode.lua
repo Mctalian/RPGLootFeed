@@ -83,13 +83,9 @@ local function initializeTestCurrencies()
 			local basicInfo = C_CurrencyInfo.GetBasicCurrencyInfo(id, 100)
 			if info and link and info.currencyID and info.iconFileID then
 				table.insert(TestMode.testCurrencies, {
-					id = info.currencyID,
 					link = link,
-					icon = info.iconFileID,
-					quantity = info.quantity,
-					quality = info.quality,
-					totalEarned = info.totalEarned,
-					maxQuantity = info.maxQuantity,
+					info = info,
+					basicInfo = basicInfo,
 				})
 			end
 		end
@@ -153,8 +149,7 @@ function TestMode:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
 		end
 	end
 
-	G_RLF:ProfileFunction(getItem, "getItem")(itemID)
-	-- getItem(itemID)
+	getItem(itemID)
 
 	if #self.testItems == #testItemIds and not anyPendingRequests() then
 		allItemsInitialized = true
@@ -210,16 +205,7 @@ local function generateRandomLoot()
 			local currency = TestMode.testCurrencies[math.random(#TestMode.testCurrencies)]
 			local amountLooted = math.random(1, 500)
 			local module = G_RLF.RLF:GetModule("Currency")
-			local e = module.Element:new(
-				currency.id,
-				currency.link,
-				currency.icon,
-				amountLooted,
-				currency.quantity,
-				currency.quality,
-				currency.totalEarned,
-				currency.maxQuantity
-			)
+			local e = module.Element:new(currency.link, currency.info, currency.basicInfo)
 			e:Show()
 
 			-- 10% chance to show reputation (least frequent)

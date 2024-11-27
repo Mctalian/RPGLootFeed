@@ -274,6 +274,12 @@ function common_stubs.stub_WoWGlobals(spy)
 		ItemQuality = { Legendary = 5 },
 	}
 
+	_G.Constants = {
+		CurrencyConsts = {
+			ACCOUNT_WIDE_HONOR_CURRENCY_ID = 1585,
+		},
+	}
+
 	_G.C_CVar = {
 		SetCVar = function() end,
 	}

@@ -71,21 +71,37 @@ describe("Currency module", function()
 
 	it("shows loot if the currency info is valid", function()
 		ns.db.global.currencyFeed = true
+		local info = {
+			currencyID = 123,
+			description = "An awesome currency",
+			iconFileID = 123456,
+			quantity = 5,
+			quality = 2,
+		}
+		local link = "|c12345678|Hcurrency:123|r"
+		local basicInfo = {
+			name = "Best Coin",
+			description = "An awesome currency",
+			icon = 123456,
+			quality = 2,
+			displayAmount = 2,
+			actualAmount = 2,
+		}
 		_G.C_CurrencyInfo.GetCurrencyInfo = function()
-			return {
-				currencyID = 123,
-				description = "An awesome currency",
-				iconFileID = 123456,
-				quantity = 5,
-				quality = 2,
-			}
+			return info
+		end
+		_G.GetCurrencyLink = function(currencyType)
+			return link
+		end
+		_G.GetBasicCurrencyInfo = function(currencyType, quantity)
+			return basicInfo
 		end
 
 		local newElement = spy.on(CurrencyModule.Element, "new")
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, 5, 2)
 
-		assert.spy(newElement).was.called_with(_, 123, "|c12345678|Hcurrency:123|r", 123456, 2, 5, 2, nil, nil)
+		assert.spy(newElement).was.called_with(_, "|c12345678|Hcurrency:123|r", info, basicInfo)
 		assert.stub(ns.SendMessage).was.called()
 	end)
 end)
