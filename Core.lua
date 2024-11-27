@@ -13,7 +13,7 @@ RLF:SetDefaultModulePrototype({
 G_RLF.localeName = addonName .. "Locale"
 G_RLF.lsm = LibStub("LibSharedMedia-3.0")
 G_RLF.Masque = LibStub and LibStub("Masque", true)
-G_RLF.iconGroup = Masque and Masque:Group(addonName)
+G_RLF.iconGroup = G_RLF.Masque and G_RLF.Masque:Group(addonName)
 local dbName = addonName .. "DB"
 local acd = LibStub("AceConfigDialog-3.0")
 local TestMode
