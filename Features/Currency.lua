@@ -15,13 +15,30 @@ function Currency.Element:new(...)
 
 	element.isLink = true
 
-	local t
-	element.key, t, element.icon, element.quantity, element.totalCount, element.quality, element.totalEarned, element.cappedQuantity =
-		...
+	local currencyLink, currencyInfo, basicInfo = ...
+
+	if not currencyLink or not currencyInfo or not basicInfo then
+		return
+	end
+
+	element.key = currencyInfo.currencyID
+	element.icon = currencyInfo.iconFileID
+	element.quantity = basicInfo.displayAmount
+	element.totalCount = currencyInfo.quantity
+	element.quality = currencyInfo.quality
+	element.totalEarned = currencyInfo.totalEarned
+	element.cappedQuantity = currencyInfo.maxQuantity
+
+	if element.key == Constants.CurrencyConsts.ACCOUNT_WIDE_HONOR_CURRENCY_ID then
+		element.totalCount = UnitHonorLevel("player")
+		element.cappedQuantity = UnitHonorMax("player")
+		element.totalEarned = UnitHonor("player")
+		currencyLink = currencyLink:gsub(currencyInfo.name, _G.LIFETIME_HONOR)
+	end
 
 	element.textFn = function(existingQuantity, truncatedLink)
 		if not truncatedLink then
-			return t
+			return currencyLink
 		end
 		return truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
 	end
@@ -36,13 +53,15 @@ function Currency.Element:new(...)
 				numerator = element.totalCount
 				percentage = element.totalCount / element.cappedQuantity
 			end
-			local color
-			if percentage < 0.7 then
-				color = "|cFFFFFFFF"
-			elseif percentage >= 0.7 and percentage < 0.9 then
-				color = "|cFFFF9B00"
-			else
-				color = "|cFFFF0000"
+			local color = "|cFFFFFFFF"
+			if element.key ~= Constants.CurrencyConsts.ACCOUNT_WIDE_HONOR_CURRENCY_ID then
+				if percentage < 0.7 then
+					color = "|cFFFFFFFF"
+				elseif percentage >= 0.7 and percentage < 0.9 then
+					color = "|cFFFF9B00"
+				else
+					color = "|cFFFF0000"
+				end
 			end
 
 			return "    " .. color .. numerator .. " / " .. element.cappedQuantity .. "|r"
@@ -120,16 +139,7 @@ function Currency:Process(eventName, currencyType, quantityChange)
 
 	self:fn(function()
 		local basicInfo = C_CurrencyInfo.GetBasicCurrencyInfo(currencyType, quantityChange)
-		local e = self.Element:new(
-			info.currencyID,
-			C_CurrencyInfo.GetCurrencyLink(currencyType),
-			info.iconFileID,
-			basicInfo.displayAmount,
-			info.quantity,
-			info.quality,
-			info.totalEarned,
-			info.maxQuantity
-		)
+		local e = self.Element:new(C_CurrencyInfo.GetCurrencyLink(currencyType), info, basicInfo)
 		e:Show()
 	end)
 end
@@ -145,12 +155,6 @@ function Currency:PERKS_PROGRAM_CURRENCY_AWARDED(eventName, quantityChange)
 
 	self:Process(eventName, currencyType, quantityChange)
 end
-
--- Handle Lifetime Honor
--- LIFETIME_HONOR
--- Constants.CurrencyConsts.ACCOUNT_WIDE_HONOR_CURRENCY_ID
--- print(UnitHonorLevel("player"))
--- print(UnitHonor("player") .. "/" .. UnitHonorMax("player"))
 
 hiddenCurrencies = {
 	[2918] = true,
