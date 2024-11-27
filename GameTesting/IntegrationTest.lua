@@ -92,27 +92,10 @@ local function runCurrencyIntegrationTest()
 	local module = G_RLF.RLF:GetModule("Currency")
 	local testObj = TestMode.testCurrencies[2]
 	local amountLooted = 1
-	local e = module.Element:new(
-		testObj.id,
-		testObj.link,
-		testObj.icon,
-		amountLooted,
-		testObj.quantity,
-		testObj.quality,
-		testObj.totalEarned,
-		testObj.maxQuantity
-	)
+	testObj.basicInfo.displayAmount = amountLooted
+	local e = module.Element:new(testObj.link, testObj.info, testObj.basicInfo)
 	runTestSafely(e.Show, "LootDisplay: Currency")
-	e = module.Element:new(
-		testObj.id,
-		testObj.link,
-		testObj.icon,
-		amountLooted,
-		testObj.quantity,
-		testObj.quality,
-		testObj.totalEarned,
-		testObj.maxQuantity
-	)
+	e = module.Element:new(testObj.link, testObj.info, testObj.basicInfo)
 	runTestSafely(e.Show, "LootDisplay: Currency Quantity Update")
 end
 
