@@ -45,4 +45,3 @@ RPGLootFeed is licensed under the MIT License. See the [LICENSE](LICENSE) file f
 ![Animation showing loot being added and removed from the feed](RLF_test_mode.gif)
 
 ![Example screenshot of RPGLootFeed's loot history feature](example-loot-history.png)
-
