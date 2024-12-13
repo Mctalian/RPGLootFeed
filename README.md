@@ -6,6 +6,10 @@
 
 RPGLootFeed is a World of Warcraft addon designed to declutter your chat and enhance your looting experience by providing a dynamic and immersive loot feed. Keep your chat just for chat and let RPGLootFeed handle the rest.
 
+As featured in SoulSoBreezy's _11 Useful Addons for Patch 11.0.7_
+
+[![Alt text](https://img.youtube.com/vi/GFr01R3TkmE/hqdefault.jpg)](https://youtu.be/GFr01R3TkmE?si=Wgw5F3AtenWdC08U&t=84)
+
 ## Features
 
 - **Declutter Your Chat**: Keep your chat window free from loot spam. RPGLootFeed displays all your looted items, currencies, reputation gains, and even profession skill-ups in a sleek, scrolling feed.
@@ -33,3 +37,12 @@ We welcome contributions from the community! If you encounter any issues or have
 ## License
 
 RPGLootFeed is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.
+
+## Screenshots
+
+![Example screenshot of RPGLootFeed with currency, XP, money, Party Loot, highlighted item loot, and reputation](example-feed.png)
+
+![Animation showing loot being added and removed from the feed](RLF_test_mode.gif)
+
+![Example screenshot of RPGLootFeed's loot history feature](example-loot-history.png)
+
