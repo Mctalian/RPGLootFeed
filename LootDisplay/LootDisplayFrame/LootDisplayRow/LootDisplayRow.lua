@@ -372,7 +372,9 @@ function LootDisplayRowMixin:Reset()
 	self.BottomBorder:SetAlpha(0)
 	self.LeftBorder:SetAlpha(0)
 
-	self.Icon:Reset()
+	if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+		self.Icon:Reset()
+	end
 
 	if self.glowAnimationGroup then
 		self.glowAnimationGroup:Stop()
@@ -585,7 +587,7 @@ end
 
 function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 	-- Only update if the icon has changed
-	if icon and self.icon ~= icon then
+	if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE and icon and self.icon ~= icon then
 		self.icon = icon
 
 		RunNextFrame(function()

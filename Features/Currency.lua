@@ -1,5 +1,7 @@
 local addonName, G_RLF = ...
 
+local C = LibStub("C_Everywhere")
+
 local Currency = G_RLF.RLF:NewModule("Currency", "AceEvent-3.0")
 
 Currency.Element = {}
@@ -80,7 +82,7 @@ local function isHiddenCurrency(id)
 end
 
 function Currency:OnInitialize()
-	if G_RLF.db.global.currencyFeed then
+	if G_RLF.db.global.currencyFeed and GetExpansionLevel() >= 8 then
 		self:Enable()
 	else
 		self:Disable()
@@ -89,12 +91,17 @@ end
 
 function Currency:OnDisable()
 	self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE")
-	self:UnregisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
+	if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+		self:UnregisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
+	end
 end
 
 function Currency:OnEnable()
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
-	self:RegisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
+	if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+		self:RegisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
+	end
+	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
 function Currency:Process(eventName, currencyType, quantityChange)
@@ -124,7 +131,7 @@ function Currency:Process(eventName, currencyType, quantityChange)
 		return
 	end
 
-	local info = C_CurrencyInfo.GetCurrencyInfo(currencyType)
+	local info = C.CurrencyInfo.GetCurrencyInfo(currencyType)
 	if info == nil or info.description == "" or info.iconFileID == nil then
 		G_RLF:LogDebug(
 			"Skip showing currency",
@@ -138,8 +145,8 @@ function Currency:Process(eventName, currencyType, quantityChange)
 	end
 
 	self:fn(function()
-		local basicInfo = C_CurrencyInfo.GetBasicCurrencyInfo(currencyType, quantityChange)
-		local e = self.Element:new(C_CurrencyInfo.GetCurrencyLink(currencyType), info, basicInfo)
+		local basicInfo = C.CurrencyInfo.GetBasicCurrencyInfo(currencyType, quantityChange)
+		local e = self.Element:new(C.CurrencyInfo.GetCurrencyLink(currencyType), info, basicInfo)
 		e:Show()
 	end)
 end

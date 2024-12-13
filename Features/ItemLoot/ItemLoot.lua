@@ -227,6 +227,7 @@ function ItemLoot:OnEnable()
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:RegisterEvent("GROUP_ROSTER_UPDATE")
 	self:SetNameUnitMap()
+	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
 function ItemLoot:OnItemReadyToShow(info, amount)
@@ -304,7 +305,13 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 		return
 	end
 
-	local me = guid == GetPlayerGuid()
+	local me = false
+	if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+		me = guid == GetPlayerGuid()
+	elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+		me = playerName2 == UnitName("player")
+	end
+
 	if not me then
 		if not G_RLF.db.global.enablePartyLoot then
 			G_RLF:LogDebug("Party Loot Ignored", "WOWEVENT", self.moduleName, "", msg)

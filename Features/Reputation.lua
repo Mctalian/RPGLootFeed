@@ -177,6 +177,10 @@ end
 local increasePatterns, decreasePatterns
 function Rep:OnInitialize()
 	locale = GetLocale()
+	if GetExpansionLevel() < 10 then
+		self:Disable()
+		return
+	end
 	-- TODO: Move this to db defaults
 	G_RLF.db.global.factionMaps = G_RLF.db.global.factionMaps or {}
 	G_RLF.db.global.factionMaps[locale] = G_RLF.db.global.factionMaps[locale] or {}
@@ -246,6 +250,7 @@ end
 
 function Rep:OnEnable()
 	self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
+	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
 function Rep:ParseFactionChangeMessage(message)
