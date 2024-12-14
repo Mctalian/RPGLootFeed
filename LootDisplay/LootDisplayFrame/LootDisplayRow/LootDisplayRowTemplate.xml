@@ -56,8 +56,5 @@
                 </Texture>
             </Layer>
         </Layers>
-        <Frames>
-            <ItemButton parentKey="Icon" />
-        </Frames>
     </Frame>
 </Ui>

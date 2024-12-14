@@ -179,19 +179,37 @@ function ItemLoot.Element:new(...)
 		end
 		local quantity = ...
 		local atlasIconSize = G_RLF.db.global.fontSize * 1.5
+		local atlasIcon
+		local unitPrice
 		if G_RLF.db.global.pricesForSellableItems == G_RLF.PricesEnum.Vendor then
 			if not element.sellPrice or element.sellPrice == 0 then
 				return ""
 			end
-			local sellAtlasStr = "|A:spellicon-256x256-selljunk:" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a  "
-			return "    " .. sellAtlasStr .. C_CurrencyInfo.GetCoinTextureString(element.sellPrice * (quantity or 1))
+			if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+				atlasIcon = "spellicon-256x256-selljunk"
+			elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+				atlasIcon = "bags-junkcoin"
+			end
+			unitPrice = element.sellPrice
 		elseif G_RLF.db.global.pricesForSellableItems == G_RLF.PricesEnum.AH then
 			local marketPrice = G_RLF.AuctionIntegrations.activeIntegration:GetAHPrice(itemLink)
 			if not marketPrice or marketPrice == 0 then
 				return ""
 			end
-			local ahAtlasStr = "|A:auctioneer:" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a  "
-			return "    " .. ahAtlasStr .. C_CurrencyInfo.GetCoinTextureString(marketPrice * (quantity or 1))
+			unitPrice = marketPrice
+			if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+				atlasIcon = "auctioneer"
+			elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+				atlasIcon = "Auctioneer"
+			end
+		end
+		if unitPrice then
+			local str = "    "
+			if atlasIcon then
+				str = str .. "|A:" .. atlasIcon .. ":" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a  "
+			end
+			str = str .. C_CurrencyInfo.GetCoinTextureString(unitPrice * (quantity or 1))
+			return str
 		end
 
 		return ""
