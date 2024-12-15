@@ -50,6 +50,29 @@ function common_stubs.setup_G_RLF(spy)
 					mounts = true,
 					legendary = true,
 				},
+				prof = {
+					skillColor = { 1, 1, 1, 1 },
+				},
+				partyLoot = {
+					itemQualityFilter = {
+						[1] = true,
+						[2] = true,
+						[3] = true,
+						[4] = true,
+						[5] = true,
+						[6] = true,
+					},
+				},
+				xp = {
+					experienceTextColor = { 1, 1, 1, 1 },
+				},
+				rep = {
+					defaultRepColor = { 0.5, 0.5, 1 },
+					secondaryTextAlpha = 0.7,
+					enableRepLevel = true,
+					repLevelColor = { 0.5, 0.5, 1, 1 },
+					repLevelTextWrapChar = 5,
+				},
 			},
 		},
 		L = {
@@ -157,6 +180,56 @@ function common_stubs.setup_G_RLF(spy)
 		LogInfo = spy.new(),
 		LogWarn = spy.new(),
 		LogError = spy.new(),
+		Expansion = {
+			CLASSIC = 0,
+			TBC = 1,
+			WOTLK = 2,
+			CATA = 3,
+			MOP = 4,
+			WOD = 5,
+			LEGION = 6,
+			BFA = 7,
+			SL = 8,
+			DF = 9,
+			TWW = 10,
+		},
+		DisableBossBanner = {
+			ENABLED = 0,
+			FULLY_DISABLE = 1,
+			DISABLE_LOOT = 2,
+			DISABLE_MY_LOOT = 3,
+			DISABLE_GROUP_LOOT = 4,
+		},
+		ItemQualEnum = {
+			Poor = 0,
+			Common = 1,
+			Uncommon = 2,
+			Rare = 3,
+			Epic = 4,
+			Legendary = 5,
+			Artifact = 6,
+			Heirloom = 7,
+		},
+		PricesEnum = {
+			None = "none",
+			Vendor = "vendor",
+			AH = "ah",
+		},
+		WrapCharEnum = {
+			DEFAULT = 0,
+			SPACE = 1,
+			PARENTHESIS = 2,
+			BRACKET = 3,
+			BRACE = 4,
+			ANGLE = 5,
+			BAR = 6,
+		},
+		IsRetail = spy.new(function()
+			return true
+		end),
+		IsClassic = spy.new(function()
+			return false
+		end),
 	}
 
 	ns.LibStubReturn = {}
@@ -252,6 +325,11 @@ function common_stubs.setup_G_RLF(spy)
 					}
 				end,
 			}
+		elseif lib == "C_Everywhere" then
+			ns.LibStubReturn[lib] = {
+				CurrencyInfo = _G.C_CurrencyInfo,
+				Item = _G.C_Item,
+			}
 		else
 			error("Unmocked library: " .. lib)
 		end
@@ -264,6 +342,10 @@ end
 function common_stubs.stub_WoWGlobals(spy)
 	common_stubs.stub_Unit_Funcs()
 	common_stubs.stub_Money_Funcs()
+
+	_G.GetExpansionLevel = function()
+		return 10
+	end
 
 	_G.Enum = {
 		ItemArmorSubclass = {

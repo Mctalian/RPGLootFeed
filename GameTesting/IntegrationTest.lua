@@ -62,19 +62,22 @@ end
 local function runExperienceIntegrationTest()
 	local module = G_RLF.RLF:GetModule("Experience")
 	local e = module.Element:new(1337)
-	runTestSafely(e.Show, "LootDisplay: Experience")
+	runTestSafely(e.Show, "LootDisplay: Experience", e)
+	return 1
 end
 
 local function runMoneyIntegrationTest()
 	local module = G_RLF.RLF:GetModule("Money")
 	local e = module.Element:new(12345)
-	runTestSafely(e.Show, "LootDisplay: Money")
+	runTestSafely(e.Show, "LootDisplay: Money", e)
+	return 1
 end
 
 local function runItemLootIntegrationTest()
 	local module = G_RLF.RLF:GetModule("ItemLoot")
 	local info = TestMode.testItems[2]
 	local amountLooted = 1
+	local rowsShown = 0
 	local e = module.Element:new(info, amountLooted, false)
 	if info.itemName == nil then
 		G_RLF:Print("Item not cached, skipping ItemLoot test")
@@ -83,9 +86,16 @@ local function runItemLootIntegrationTest()
 		e = module.Element:new(info, amountLooted, false)
 		e.highlight = true
 		runTestSafely(e.Show, "LootDisplay: Item Quantity Update", e, info.itemName, info.itemQuality)
-		e = module.Element:new(info, amountLooted, "player")
-		runTestSafely(e.Show, "LootDisplay: Item Unit", e, info.itemName, info.itemQuality)
+		rowsShown = rowsShown + 1
+		if G_RLF.db.global.enablePartyLoot then
+			e = module.Element:new(info, amountLooted, "player")
+			runTestSafely(e.Show, "LootDisplay: Item Party", e, info.itemName, info.itemQuality)
+			rowsShown = rowsShown + 1
+		else
+			G_RLF:Print("Party loot disabled, skipping ItemLoot Party test")
+		end
 	end
+	return rowsShown
 end
 
 local function runCurrencyIntegrationTest()
@@ -94,9 +104,10 @@ local function runCurrencyIntegrationTest()
 	local amountLooted = 1
 	testObj.basicInfo.displayAmount = amountLooted
 	local e = module.Element:new(testObj.link, testObj.info, testObj.basicInfo)
-	runTestSafely(e.Show, "LootDisplay: Currency")
+	runTestSafely(e.Show, "LootDisplay: Currency", e)
 	e = module.Element:new(testObj.link, testObj.info, testObj.basicInfo)
-	runTestSafely(e.Show, "LootDisplay: Currency Quantity Update")
+	runTestSafely(e.Show, "LootDisplay: Currency Quantity Update", e)
+	return 1
 end
 
 local function runReputationIntegrationTest()
@@ -104,9 +115,10 @@ local function runReputationIntegrationTest()
 	local testObj = TestMode.testFactions[2]
 	local amountLooted = 664
 	local e = module.Element:new(amountLooted, testObj)
-	runTestSafely(e.Show, "LootDisplay: Reputation")
+	runTestSafely(e.Show, "LootDisplay: Reputation", e)
 	e = module.Element:new(amountLooted, testObj)
-	runTestSafely(e.Show, "LootDisplay: Reputation Quantity Update")
+	runTestSafely(e.Show, "LootDisplay: Reputation Quantity Update", e)
+	return 1
 end
 
 function TestMode:IntegrationTest()
@@ -119,17 +131,22 @@ function TestMode:IntegrationTest()
 	prints = ""
 	successCount = 0
 	failureCount = 0
-
-	runExperienceIntegrationTest()
-	runMoneyIntegrationTest()
-	runItemLootIntegrationTest()
-	runCurrencyIntegrationTest()
-	runReputationIntegrationTest()
-
 	local frame = LootDisplayFrame
+	local snapshotRowHistory = #frame.rowHistory or 0
+
+	local newRowsExpected = 0
+	newRowsExpected = newRowsExpected + runExperienceIntegrationTest()
+	newRowsExpected = newRowsExpected + runMoneyIntegrationTest()
+	newRowsExpected = newRowsExpected + runItemLootIntegrationTest()
+	if GetExpansionLevel() >= G_RLF.Expansion.SL then
+		newRowsExpected = newRowsExpected + runCurrencyIntegrationTest()
+	end
+	newRowsExpected = newRowsExpected + runReputationIntegrationTest()
+
 	assertEqual(frame ~= nil, true, "LootDisplayFrame")
 	C_Timer.After(G_RLF.db.global.fadeOutDelay + 3, function()
-		assertEqual(#frame.rowHistory, 6, "LootDisplayFrame: rowHistory")
+		local newHistoryRows = #frame.rowHistory - snapshotRowHistory
+		assertEqual(newHistoryRows, newRowsExpected, "LootDisplayFrame: rowHistory")
 		displayResults()
 	end)
 end

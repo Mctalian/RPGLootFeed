@@ -1,6 +1,6 @@
 local addonName, G_RLF = ...
 
-local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
+local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0", "AceHook-3.0")
 
 local lsm = G_RLF.lsm
 
@@ -42,8 +42,6 @@ elementQueue.dequeue = updateTestLabelsWrapper(elementQueue.dequeue)
 --@end-alpha@
 
 -- Public methods
-local logger
-
 function LootDisplay:OnInitialize()
 	frame = LootDisplayFrame
 	frame:Load()
@@ -62,6 +60,29 @@ function LootDisplay:OnEnable()
 	RunNextFrame(function()
 		G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
 	end)
+
+	if G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+		self:RawHook(ItemButtonMixin, "SetItemButtonTexture", function(self, texture)
+			if SetItemButtonTexture_Base then
+				SetItemButtonTexture_Base(texture)
+			else
+				-- Handle the case where SetItemButtonTexture_Base doesn't exist
+				self.icon:SetTexture(texture)
+			end
+		end, true)
+
+		self:RawHook(ItemButtonMixin, "SetItemButtonQuality", function(self, quality, itemIDOrLink)
+			if SetItemButtonQuality_Base then
+				SetItemButtonQuality_Base(quality, itemIDOrLink)
+			else
+				if quality then
+					-- Handle the case where SetItemButtonQuality_Base doesn't exist
+					local r, g, b = C_Item.GetItemQualityColor(quality)
+					self.IconBorder:SetVertexColor(r, g, b)
+				end
+			end
+		end, true)
+	end
 end
 
 function LootDisplay:OnPlayerCombatChange()
@@ -196,36 +217,43 @@ local function processRow(element)
 		row:UpdateSecondaryText(secondaryTextFn)
 	end
 
-	if element.type == "ItemLoot" and not element.unit then
+	if element.type == "ItemLoot" and not element.unit and G_RLF.db.global.item.itemCountTextEnabled then
 		RunNextFrame(function()
 			local itemCount = C_Item.GetItemCount(element.key, true, false, true, true)
-			row:ShowItemCountText(itemCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
+			row:ShowItemCountText(itemCount, {
+				color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.item.itemCountTextColor)),
+				wrapChar = G_RLF.db.global.item.itemCountTextWrapChar,
+			})
 		end)
 	end
 
-	if element.type == "Currency" then
-		row:ShowItemCountText(element.totalCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
+	if element.type == "Currency" and G_RLF.db.global.currency.currencyTotalTextEnabled then
+		row:ShowItemCountText(element.totalCount, {
+			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.currencyTotalTextColor)),
+			wrapChar = G_RLF.db.global.currency.currencyTotalTextWrapChar,
+		})
 	end
 
-	if element.type == "Reputation" and element.repLevel then
-		row:ShowItemCountText(
-			element.repLevel,
-			{ color = G_RLF:RGBAToHexFormat(0.5, 0.5, 1, 1), wrapChar = G_RLF.WrapCharEnum.ANGLE }
-		)
+	if element.type == "Reputation" and element.repLevel and G_RLF.db.global.rep.enableRepLevel then
+		row:ShowItemCountText(element.repLevel, {
+			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.rep.repLevelColor)),
+			wrapChar = G_RLF.db.global.rep.repLevelTextWrapChar,
+		})
 	end
 
-	if element.type == "Experience" and element.currentLevel then
-		row:ShowItemCountText(
-			element.currentLevel,
-			{ color = G_RLF:RGBAToHexFormat(0.749, 0.737, 0.012, 1), wrapChar = G_RLF.WrapCharEnum.ANGLE }
-		)
+	if element.type == "Experience" and element.currentLevel and G_RLF.db.global.xp.showCurrentLevel then
+		row:ShowItemCountText(element.currentLevel, {
+			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.xp.currentLevelColor)),
+			wrapChar = G_RLF.db.global.xp.currentLevelTextWrapChar,
+		})
 	end
 
-	if element.type == "Professions" then
-		row:ShowItemCountText(
-			row.amount,
-			{ color = "|cFF5555FF", wrapChar = G_RLF.WrapCharEnum.BRACKET, showSign = true }
-		)
+	if element.type == "Professions" and G_RLF.db.global.prof.showSkillChange then
+		row:ShowItemCountText(row.amount, {
+			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.prof.skillColor)),
+			wrapChar = G_RLF.db.global.prof.skillTextWrapChar,
+			showSign = true,
+		})
 	end
 
 	row:ShowText(text, r, g, b, a)

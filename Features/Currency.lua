@@ -1,5 +1,7 @@
 local addonName, G_RLF = ...
 
+local C = LibStub("C_Everywhere")
+
 local Currency = G_RLF.RLF:NewModule("Currency", "AceEvent-3.0")
 
 Currency.Element = {}
@@ -53,14 +55,16 @@ function Currency.Element:new(...)
 				numerator = element.totalCount
 				percentage = element.totalCount / element.cappedQuantity
 			end
-			local color = "|cFFFFFFFF"
+			local color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.lowestColor))
+			local lowThreshold = G_RLF.db.global.currency.lowerThreshold
+			local upperThreshold = G_RLF.db.global.currency.upperThreshold
 			if element.key ~= Constants.CurrencyConsts.ACCOUNT_WIDE_HONOR_CURRENCY_ID then
-				if percentage < 0.7 then
-					color = "|cFFFFFFFF"
-				elseif percentage >= 0.7 and percentage < 0.9 then
-					color = "|cFFFF9B00"
+				if percentage < lowThreshold then
+					color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.lowestColor))
+				elseif percentage >= lowThreshold and percentage < upperThreshold then
+					color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.midColor))
 				else
-					color = "|cFFFF0000"
+					color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.upperColor))
 				end
 			end
 
@@ -80,7 +84,7 @@ local function isHiddenCurrency(id)
 end
 
 function Currency:OnInitialize()
-	if G_RLF.db.global.currencyFeed then
+	if G_RLF.db.global.currencyFeed and GetExpansionLevel() >= G_RLF.Expansion.SL then
 		self:Enable()
 	else
 		self:Disable()
@@ -88,13 +92,24 @@ function Currency:OnInitialize()
 end
 
 function Currency:OnDisable()
+	if GetExpansionLevel() < G_RLF.Expansion.SL then
+		return
+	end
 	self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE")
-	self:UnregisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
+	if G_RLF:IsRetail() then
+		self:UnregisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
+	end
 end
 
 function Currency:OnEnable()
+	if GetExpansionLevel() < G_RLF.Expansion.SL then
+		return
+	end
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
-	self:RegisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
+	if G_RLF:IsRetail() then
+		self:RegisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
+	end
+	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
 function Currency:Process(eventName, currencyType, quantityChange)
@@ -124,7 +139,7 @@ function Currency:Process(eventName, currencyType, quantityChange)
 		return
 	end
 
-	local info = C_CurrencyInfo.GetCurrencyInfo(currencyType)
+	local info = C.CurrencyInfo.GetCurrencyInfo(currencyType)
 	if info == nil or info.description == "" or info.iconFileID == nil then
 		G_RLF:LogDebug(
 			"Skip showing currency",
@@ -138,8 +153,8 @@ function Currency:Process(eventName, currencyType, quantityChange)
 	end
 
 	self:fn(function()
-		local basicInfo = C_CurrencyInfo.GetBasicCurrencyInfo(currencyType, quantityChange)
-		local e = self.Element:new(C_CurrencyInfo.GetCurrencyLink(currencyType), info, basicInfo)
+		local basicInfo = C.CurrencyInfo.GetBasicCurrencyInfo(currencyType, quantityChange)
+		local e = self.Element:new(C.CurrencyInfo.GetCurrencyLink(currencyType), info, basicInfo)
 		e:Show()
 	end)
 end
