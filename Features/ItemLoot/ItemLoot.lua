@@ -2,13 +2,6 @@ local addonName, G_RLF = ...
 
 local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 
-ItemLoot.SecondaryTextOption = {
-	["None"] = "None",
-	["SellPrice"] = "Sell Price",
-	["iLvl"] = "Item Level",
-}
-
-local cachedArmorClass = nil
 local onlyEpicPartyLoot = false
 
 ItemLoot.Element = {}
@@ -44,17 +37,19 @@ function ItemLoot:SetNameUnitMap()
 		local name, server = UnitName(unit)
 		if name then
 			self.nameUnitMap[name] = unit
+		else
+			G_RLF:LogError("Failed to get name for unit: " .. unit, addonName, self.moduleName)
 		end
 	end
 end
 
 function ItemLoot:SetPartyLootFilters()
-	if IsInRaid() then
+	if IsInRaid() and G_RLF.db.global.partyLoot.onlyEpicAndAboveInRaid then
 		onlyEpicPartyLoot = true
 		return
 	end
 
-	if IsInInstance() then
+	if IsInInstance() and G_RLF.db.global.partyLoot.onlyEpicAndAboveInInstance then
 		onlyEpicPartyLoot = true
 		return
 	end
@@ -76,8 +71,9 @@ end
 
 local function IsBetterThanEquipped(info)
 	-- Highlight Better Than Equipped
-	if G_RLF.db.global.itemHighlights.betterThanEquipped then
+	if G_RLF.db.global.itemHighlights.betterThanEquipped and info:IsEligibleEquipment() then
 		local equippedLink
+		local slot = G_RLF.equipSlotMap[info.itemEquipLoc]
 		if type(slot) == "table" then
 			for _, s in ipairs(slot) do
 				equippedLink = GetInventoryItemLink("player", s)
@@ -100,20 +96,17 @@ local function IsBetterThanEquipped(info)
 		end
 
 		if equippedInfo.itemLevel and equippedInfo.itemLevel < info.itemLevel then
-			self.highlight = true
-			return
+			return true
 		elseif equippedInfo.itemLevel == info.itemLevel then
 			local statDelta = C_Item.GetItemStatDelta(equippedLink, info.itemLink)
 			for k, v in pairs(statDelta) do
 				-- Has a Tertiary Stat
 				if k:find("ITEM_MOD_CR_") and v > 0 then
-					self.highlight = true
-					return
+					return true
 				end
 				-- Has a Gem Socket
 				if k:find("EMPTY_SOCKET_") and v > 0 then
-					self.highlight = true
-					return
+					return true
 				end
 			end
 		end
@@ -179,19 +172,37 @@ function ItemLoot.Element:new(...)
 		end
 		local quantity = ...
 		local atlasIconSize = G_RLF.db.global.fontSize * 1.5
+		local atlasIcon
+		local unitPrice
 		if G_RLF.db.global.pricesForSellableItems == G_RLF.PricesEnum.Vendor then
 			if not element.sellPrice or element.sellPrice == 0 then
 				return ""
 			end
-			local sellAtlasStr = "|A:spellicon-256x256-selljunk:" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a  "
-			return "    " .. sellAtlasStr .. C_CurrencyInfo.GetCoinTextureString(element.sellPrice * (quantity or 1))
+			if G_RLF:IsRetail() then
+				atlasIcon = "spellicon-256x256-selljunk"
+			elseif G_RLF:IsClassic() then
+				atlasIcon = "bags-junkcoin"
+			end
+			unitPrice = element.sellPrice
 		elseif G_RLF.db.global.pricesForSellableItems == G_RLF.PricesEnum.AH then
 			local marketPrice = G_RLF.AuctionIntegrations.activeIntegration:GetAHPrice(itemLink)
 			if not marketPrice or marketPrice == 0 then
 				return ""
 			end
-			local ahAtlasStr = "|A:auctioneer:" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a  "
-			return "    " .. ahAtlasStr .. C_CurrencyInfo.GetCoinTextureString(marketPrice * (quantity or 1))
+			unitPrice = marketPrice
+			if G_RLF:IsRetail() then
+				atlasIcon = "auctioneer"
+			elseif G_RLF:IsClassic() then
+				atlasIcon = "Auctioneer"
+			end
+		end
+		if unitPrice then
+			local str = "    "
+			if atlasIcon then
+				str = str .. "|A:" .. atlasIcon .. ":" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a  "
+			end
+			str = str .. C_CurrencyInfo.GetCoinTextureString(unitPrice * (quantity or 1))
+			return str
 		end
 
 		return ""
@@ -204,7 +215,6 @@ function ItemLoot.Element:new(...)
 	return element
 end
 
-local logger
 function ItemLoot:OnInitialize()
 	self.pendingItemRequests = {}
 	self.pendingPartyRequests = {}
@@ -227,6 +237,7 @@ function ItemLoot:OnEnable()
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:RegisterEvent("GROUP_ROSTER_UPDATE")
 	self:SetNameUnitMap()
+	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
 function ItemLoot:OnItemReadyToShow(info, amount)
@@ -241,6 +252,9 @@ function ItemLoot:OnPartyReadyToShow(info, amount, unit)
 		return
 	end
 	if onlyEpicPartyLoot and info.itemQuality < Enum.ItemQuality.Epic then
+		return
+	end
+	if G_RLF.db.global.partyLoot.itemQualityFilter[info.itemQuality] == false then
 		return
 	end
 	self.pendingPartyRequests[info.itemId] = nil
@@ -304,15 +318,32 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 		return
 	end
 
-	local me = guid == GetPlayerGuid()
+	local me = false
+	if G_RLF:IsRetail() then
+		me = guid == GetPlayerGuid()
+	elseif G_RLF:IsClassic() then
+		me = playerName2 == UnitName("player")
+	end
+
 	if not me then
 		if not G_RLF.db.global.enablePartyLoot then
 			G_RLF:LogDebug("Party Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
 			return
 		end
-		local sanitizedPlayerName = (playerName or playerName2):gsub("%-.+", "")
+		local name = playerName
+		if name == "" or name == nil then
+			name = playerName2
+		end
+		local sanitizedPlayerName = name:gsub("%-.+", "")
 		local unit = self.nameUnitMap[sanitizedPlayerName]
 		if not unit then
+			G_RLF:LogDebug(
+				"Party Loot Ignored - no matching party member (" .. sanitizedPlayerName .. ")",
+				"WOWEVENT",
+				self.moduleName,
+				"",
+				msg
+			)
 			return
 		end
 		local itemLink = msg:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
