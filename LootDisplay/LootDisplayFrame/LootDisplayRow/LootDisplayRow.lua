@@ -2,19 +2,20 @@ local addonName, G_RLF = ...
 
 LootDisplayRowMixin = {}
 
-local function rowBackground(row)
+function LootDisplayRowMixin:StyleBackground()
 	local changed = false
+
 	if
-		row.cachedGradientStart ~= G_RLF.db.global.rowBackgroundGradientStart
-		or row.cachedGradientEnd ~= G_RLF.db.global.rowBackgroundGradientEnd
+		self.cachedGradientStart ~= G_RLF.db.global.rowBackgroundGradientStart
+		or self.cachedGradientEnd ~= G_RLF.db.global.rowBackgroundGradientEnd
 	then
-		row.cachedGradientStart = G_RLF.db.global.rowBackgroundGradientStart
-		row.cachedGradientEnd = G_RLF.db.global.rowBackgroundGradientEnd
+		self.cachedGradientStart = G_RLF.db.global.rowBackgroundGradientStart
+		self.cachedGradientEnd = G_RLF.db.global.rowBackgroundGradientEnd
 		changed = true
 	end
 
-	if row.cachedBackgoundLeftAlign ~= G_RLF.db.global.leftAlign then
-		row.cachedBackgoundLeftAlign = G_RLF.db.global.leftAlign
+	if self.cachedBackgoundLeftAlign ~= G_RLF.db.global.leftAlign then
+		self.cachedBackgoundLeftAlign = G_RLF.db.global.leftAlign
 		changed = true
 	end
 
@@ -24,7 +25,7 @@ local function rowBackground(row)
 		if not G_RLF.db.global.leftAlign then
 			leftColor, rightColor = rightColor, leftColor
 		end
-		row.Background:SetGradient("HORIZONTAL", leftColor, rightColor)
+		self.Background:SetGradient("HORIZONTAL", leftColor, rightColor)
 	end
 end
 
@@ -331,7 +332,7 @@ end
 
 local function rowStyles(row)
 	row:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
-	rowBackground(row)
+	row:StyleBackground()
 	rowIcon(row, row.icon)
 	RunNextFrame(function()
 		rowHighlightIcon(row)
@@ -344,7 +345,6 @@ end
 
 --@alpha@
 rowStyles = G_RLF:ProfileFunction(rowStyles, "rowStyles")
-rowBackground = G_RLF:ProfileFunction(rowBackground, "rowBackground")
 rowIcon = G_RLF:ProfileFunction(rowIcon, "rowIcon")
 rowUnitPortrait = G_RLF:ProfileFunction(rowUnitPortrait, "rowUnitPortrait")
 rowText = G_RLF:ProfileFunction(rowText, "rowPrimaryText")
@@ -373,6 +373,10 @@ function LootDisplayRowMixin:Reset()
 	self.LeftBorder:SetAlpha(0)
 
 	self.Icon:Reset()
+	self.Icon:SetScript("OnEnter", nil)
+	self.Icon:SetScript("OnLeave", nil)
+	self.Icon:SetScript("OnMouseUp", nil)
+	self.Icon:SetScript("OnEvent", nil)
 
 	if self.glowAnimationGroup then
 		self.glowAnimationGroup:Stop()
@@ -385,15 +389,49 @@ function LootDisplayRowMixin:Reset()
 	self.SecondaryText:SetText(nil)
 	self.ItemCountText:SetText(nil)
 	self.ItemCountText:Hide()
+	self.ClickableButton:Hide()
+	local textures = { self.ClickableButton:GetRegions() }
+	for _, region in ipairs(textures) do
+		if region:GetObjectType() == "Texture" then
+			region:Hide()
+		end
+	end
 
-	-- Reset amount text behavior
-	self.PrimaryText:SetScript("OnEnter", nil)
-	self.PrimaryText:SetScript("OnLeave", nil)
+	self.ClickableButton:SetScript("OnEnter", nil)
+	self.ClickableButton:SetScript("OnLeave", nil)
+	self.ClickableButton:SetScript("OnMouseUp", nil)
+	self.ClickableButton:SetScript("OnEvent", nil)
+
+	self.isHistoryMode = false
 
 	self.PrimaryText:SetTextColor(unpack(defaultColor))
-	rowBackground(self)
+	self:StyleBackground()
 	rowHighlightBorder(self)
 	rowFadeOutAnimation(self)
+	self:SetUpHideOnRightClick()
+	RunNextFrame(function()
+		self:SetUpHoverEffect()
+	end)
+end
+
+function LootDisplayRowMixin:SetUpHideOnRightClick()
+	self:SetScript("OnMouseUp", function(_, button)
+		if button == "RightButton" and not self.isHistoryMode then
+			if not self.FadeOutAnimation then
+				return
+			end
+			-- Stop any ongoing animation
+			if self.FadeOutAnimation:IsPlaying() then
+				self.FadeOutAnimation:Stop()
+			end
+
+			-- Remove the delay for immediate fade-out
+			self.FadeOutAnimation.fadeOut:SetStartDelay(0)
+
+			-- Start the fade-out animation
+			self.FadeOutAnimation:Play()
+		end
+	end)
 end
 
 function LootDisplayRowMixin:UpdateStyles()
@@ -458,31 +496,130 @@ function LootDisplayRowMixin:UpdateNeighborPositions(frame)
 end
 
 function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
+	-- Dynamically size the button to match the PrimaryText width
+	self.ClickableButton:ClearAllPoints()
+	self.ClickableButton:SetPoint("LEFT", self.PrimaryText, "LEFT")
+	self.ClickableButton:SetSize(self.PrimaryText:GetStringWidth(), self.PrimaryText:GetStringHeight())
+	self.ClickableButton:Show()
 	-- Add Tooltip
-	self.PrimaryText:SetScript("OnEnter", function()
-		if not isHistoryFrame then
-			self.FadeOutAnimation:Stop()
-			self.HighlightAnimation:Stop()
-			self:ResetHighlightBorder()
+	-- Tooltip logic
+	local function showTooltip()
+		if not G_RLF.db.global.tooltip then
+			return
 		end
 		if G_RLF.db.global.tooltipOnShift and not IsShiftKeyDown() then
 			return
 		end
 		local inCombat = UnitAffectingCombat("player")
 		if inCombat then
-			GameTooltip:Hide()
 			return
 		end
-		GameTooltip:SetOwner(self.PrimaryText, "ANCHOR_RIGHT")
+		GameTooltip:SetOwner(self.ClickableButton, "ANCHOR_RIGHT")
 		GameTooltip:SetHyperlink(self.link) -- Use the item's link to show the tooltip
 		GameTooltip:Show()
+	end
+
+	local function hideTooltip()
+		GameTooltip:Hide()
+	end
+
+	-- OnEnter: Show tooltip or listen for Shift changes
+	self.ClickableButton:SetScript("OnEnter", function()
+		if not isHistoryFrame then
+			self.FadeOutAnimation:Stop()
+			self.HighlightAnimation:Stop()
+			self:ResetHighlightBorder()
+		end
+		showTooltip()
+
+		-- Start listening for Shift key changes
+		self.ClickableButton:RegisterEvent("MODIFIER_STATE_CHANGED")
 	end)
-	self.PrimaryText:SetScript("OnLeave", function()
+
+	-- OnLeave: Hide tooltip and stop listening for Shift changes
+	self.ClickableButton:SetScript("OnLeave", function()
 		if not isHistoryFrame then
 			self.FadeOutAnimation:Play()
 		end
-		GameTooltip:Hide()
+		hideTooltip()
+
+		-- Stop listening for Shift key changes
+		self.ClickableButton:UnregisterEvent("MODIFIER_STATE_CHANGED")
 	end)
+
+	-- Handle Shift key changes
+	self.ClickableButton:SetScript("OnEvent", function(_, event, key, state)
+		if event == "MODIFIER_STATE_CHANGED" and key == "LSHIFT" then
+			if state == 1 then
+				showTooltip()
+			else
+				hideTooltip()
+			end
+		end
+	end)
+
+	local function handleClick(button)
+		if button == "LeftButton" and not IsModifiedClick() then
+			-- Open the ItemRefTooltip to mimic in-game chat behavior
+			if self.link then
+				SetItemRef(self.link, self.link, button, self.ClickableButton)
+			end
+		elseif button == "LeftButton" and IsShiftKeyDown() then
+			-- Custom behavior for right click, if needed
+			if ChatEdit_GetActiveWindow() then
+				ChatEdit_InsertLink(self.link)
+			else
+				ChatFrame_OpenChat(self.link)
+			end
+		elseif button == "RightButton" and not self.isHistoryMode then
+			-- Stop any ongoing animation
+			if self.FadeOutAnimation:IsPlaying() then
+				self.FadeOutAnimation:Stop()
+			end
+
+			-- Remove the delay for immediate fade-out
+			self.FadeOutAnimation.fadeOut:SetStartDelay(0)
+
+			-- Start the fade-out animation
+			self.FadeOutAnimation:Play()
+		end
+	end
+
+	-- Add Click Handling for ItemRefTooltip
+	self.ClickableButton:SetScript("OnMouseUp", function(_, button)
+		handleClick(button)
+	end)
+
+	if self.Icon then
+		self.Icon:SetScript("OnEnter", function()
+			if not isHistoryFrame then
+				self.FadeOutAnimation:Stop()
+				self.HighlightAnimation:Stop()
+				self:ResetHighlightBorder()
+			end
+			showTooltip()
+			self.Icon:RegisterEvent("MODIFIER_STATE_CHANGED")
+		end)
+		self.Icon:SetScript("OnLeave", function()
+			if not isHistoryFrame then
+				self.FadeOutAnimation:Play()
+			end
+			hideTooltip()
+			self.Icon:UnregisterEvent("MODIFIER_STATE_CHANGED")
+		end)
+		self.Icon:SetScript("OnEvent", function(_, event, key, state)
+			if event == "MODIFIER_STATE_CHANGED" and key == "LSHIFT" then
+				if state == 1 then
+					showTooltip()
+				else
+					hideTooltip()
+				end
+			end
+		end)
+		self.Icon:SetScript("OnMouseUp", function(_, button)
+			handleClick(button)
+		end)
+	end
 end
 
 function LootDisplayRowMixin:IsFading()
@@ -573,6 +710,10 @@ function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 		r, g, b, a = unpack(defaultColor)
 	end
 
+	if self.link then
+		self.ClickableButton:SetSize(self.PrimaryText:GetStringWidth(), self.PrimaryText:GetStringHeight())
+	end
+
 	self.PrimaryText:SetTextColor(r, g, b, a)
 
 	if G_RLF.db.global.enabledSecondaryRowText and self.secondaryText ~= nil and self.secondaryText ~= "" then
@@ -616,6 +757,39 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 	end
 end
 
+function LootDisplayRowMixin:SetUpHoverEffect()
+	self:SetScript("OnEnter", function()
+		-- Lighten the colors by increasing RGB values (clamped to 1.0)
+		local function lightenColor(r, g, b, amount)
+			return math.min(r + amount, 1), math.min(g + amount, 1), math.min(b + amount, 1)
+		end
+
+		local originalStartColor = CreateColor(unpack(self.cachedGradientStart))
+		local originalEndColor = CreateColor(unpack(self.cachedGradientEnd))
+
+		local lightenAmount = 0.2 -- Adjust this for the desired lightening effect
+		local startR, startG, startB =
+			lightenColor(originalStartColor.r, originalStartColor.g, originalStartColor.b, lightenAmount)
+		local endR, endG, endB = lightenColor(originalEndColor.r, originalEndColor.g, originalEndColor.b, lightenAmount)
+
+		-- Apply the lightened gradient
+		self.Background:SetGradient(
+			"HORIZONTAL",
+			CreateColor(startR, startG, startB, originalStartColor.a),
+			CreateColor(endR, endG, endB, originalEndColor.a)
+		)
+	end)
+
+	self:SetScript("OnLeave", function()
+		local originalStartColor = CreateColor(unpack(self.cachedGradientStart))
+		local originalEndColor = CreateColor(unpack(self.cachedGradientEnd))
+		-- Restore the original gradient
+		if originalStartColor and originalEndColor then
+			self.Background:SetGradient("HORIZONTAL", originalStartColor, originalEndColor)
+		end
+	end)
+end
+
 function LootDisplayRowMixin:HighlightIcon()
 	RunNextFrame(function()
 		-- Show the glow texture and play the animation
@@ -640,6 +814,7 @@ end
 
 function LootDisplayRowMixin:UpdateWithHistoryData(data)
 	self:Reset()
+	self.isHistoryMode = true
 	self.key = data.key
 	self.amount = data.amount
 	self.link = data.link

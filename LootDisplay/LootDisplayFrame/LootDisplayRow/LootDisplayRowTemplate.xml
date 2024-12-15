@@ -57,6 +57,7 @@
             </Layer>
         </Layers>
         <Frames>
+            <Button parentKey="ClickableButton" inherits="UIPanelButtonTemplate" hidden="true" />
             <ItemButton parentKey="Icon" />
         </Frames>
     </Frame>
