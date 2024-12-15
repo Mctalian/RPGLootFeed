@@ -30,6 +30,7 @@ function G_RLF.InitializeLootDisplayProperties(self)
 	end
 
 	self.Show = function(element, itemName, itemQuality)
+		G_RLF:LogDebug("Show", addonName, element.type, element.key, nil, element.quantity)
 		if self:isPassingFilter(itemName, itemQuality) then
 			G_RLF:SendMessage("RLF_NEW_LOOT", self)
 		end

@@ -157,6 +157,25 @@ function common_stubs.setup_G_RLF(spy)
 		LogInfo = spy.new(),
 		LogWarn = spy.new(),
 		LogError = spy.new(),
+		Expansion = {
+			CLASSIC = 0,
+			TBC = 1,
+			WOTLK = 2,
+			CATA = 3,
+			MOP = 4,
+			WOD = 5,
+			LEGION = 6,
+			BFA = 7,
+			SL = 8,
+			DF = 9,
+			TWW = 10,
+		},
+		IsRetail = spy.new(function()
+			return true
+		end),
+		IsClassic = spy.new(function()
+			return false
+		end),
 	}
 
 	ns.LibStubReturn = {}
@@ -252,6 +271,11 @@ function common_stubs.setup_G_RLF(spy)
 					}
 				end,
 			}
+		elseif lib == "C_Everywhere" then
+			ns.LibStubReturn[lib] = {
+				CurrencyInfo = _G.C_CurrencyInfo,
+				Item = _G.C_Item,
+			}
 		else
 			error("Unmocked library: " .. lib)
 		end
@@ -264,6 +288,10 @@ end
 function common_stubs.stub_WoWGlobals(spy)
 	common_stubs.stub_Unit_Funcs()
 	common_stubs.stub_Money_Funcs()
+
+	_G.GetExpansionLevel = function()
+		return 10
+	end
 
 	_G.Enum = {
 		ItemArmorSubclass = {

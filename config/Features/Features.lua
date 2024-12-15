@@ -76,6 +76,9 @@ G_RLF.options.args.features = {
 			width = "double",
 			get = "GetCurrencyStatus",
 			set = "SetCurrencyStatus",
+			hidden = function()
+				return GetExpansionLevel() < G_RLF.Expansion.SL
+			end,
 			order = 2.2,
 		},
 		enableTooltip = {

@@ -13,6 +13,17 @@
                 </Texture>
             </Layer>
 
+            <!-- Highlight BG Layer -->
+            <Layer level="BORDER">
+                <Texture parentKey="HighlightBGOverlay" file="Interface/Buttons/WHITE8x8" alpha="0">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="0.5" /> <!-- Light white with 50% opacity -->
+                </Texture>
+            </Layer>
+
             <!-- Amount Text Layer -->
             <Layer level="ARTWORK">
                 <Texture parentKey="UnitPortrait" />
@@ -57,6 +68,7 @@
             </Layer>
         </Layers>
         <Frames>
+            <Button parentKey="ClickableButton" inherits="UIPanelButtonTemplate" hidden="true" />
             <ItemButton parentKey="Icon" />
         </Frames>
     </Frame>
