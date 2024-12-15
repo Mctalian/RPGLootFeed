@@ -24,5 +24,7 @@ ignore:
   - "*.ps1"
   - "*.md"
   - "*.rockspec"
+  - "*.gif"
+  - "example*.png"
   - requirements.txt
 

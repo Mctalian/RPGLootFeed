@@ -35,8 +35,14 @@ local function countMappedFactions()
 end
 
 local function buildFactionLocaleMap(findName)
+	-- Classic:GetFactionInfo(factionIndex)
 	local mappedFactions = countMappedFactions()
-	local hasMoreFactions = C_Reputation.GetFactionDataByIndex(mappedFactions + 1) ~= nil
+	local hasMoreFactions = false
+	if G_RLF:IsRetail() then
+		hasMoreFactions = C_Reputation.GetFactionDataByIndex(mappedFactions + 1) ~= nil
+	elseif G_RLF:IsClassic() then
+		hasMoreFactions = GetFactionInfo(mappedFactions + 1) ~= nil
+	end
 	if not hasMoreFactions and not findName then
 		return
 	end
@@ -49,7 +55,13 @@ local function buildFactionLocaleMap(findName)
 		for bucket = 1, buckets do
 			RunNextFrame(function()
 				for i = 1 + (bucket - 1) * bucketSize, bucket * bucketSize do
-					local factionData = C_Reputation.GetFactionDataByIndex(i)
+					---@type FactionData | nil
+					local factionData
+					if G_RLF:IsRetail() then
+						factionData = C_Reputation.GetFactionDataByIndex(i)
+					elseif G_RLF:IsClassic() then
+						factionData = G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(i)
+					end
 					if factionData and factionData.name then
 						if not G_RLF.db.global.factionMaps[locale][factionData.name] then
 							G_RLF.db.global.factionMaps[locale][factionData.name] = factionData.factionID
@@ -177,33 +189,37 @@ end
 local increasePatterns, decreasePatterns
 function Rep:OnInitialize()
 	locale = GetLocale()
-	if GetExpansionLevel() < 10 then
-		self:Disable()
-		return
-	end
 	-- TODO: Move this to db defaults
 	G_RLF.db.global.factionMaps = G_RLF.db.global.factionMaps or {}
 	G_RLF.db.global.factionMaps[locale] = G_RLF.db.global.factionMaps[locale] or {}
 
-	self.companionFactionId = C_DelvesUI.GetFactionForCompanion(BRANN_COMPANION_INFO_ID)
-	local factionData = C_Reputation.GetFactionDataByID(self.companionFactionId)
-	if factionData then
-		self.companionFactionName = factionData.name
+	if GetExpansionLevel() >= G_RLF.Expansion.TWW then
+		self.companionFactionId = C_DelvesUI.GetFactionForCompanion(BRANN_COMPANION_INFO_ID)
+		local factionData = C_Reputation.GetFactionDataByID(self.companionFactionId)
+		if factionData then
+			self.companionFactionName = factionData.name
+		end
 	end
 
-	increasePatterns = precomputePatternSegments({
+	local increase_consts = {
 		FACTION_STANDING_INCREASED,
-		FACTION_STANDING_INCREASED_ACCOUNT_WIDE,
 		FACTION_STANDING_INCREASED_ACH_BONUS,
-		FACTION_STANDING_INCREASED_ACH_BONUS_ACCOUNT_WIDE,
 		FACTION_STANDING_INCREASED_BONUS,
 		FACTION_STANDING_INCREASED_DOUBLE_BONUS,
-	})
+	}
 
-	decreasePatterns = precomputePatternSegments({
+	local decrease_consts = {
 		FACTION_STANDING_DECREASED,
-		FACTION_STANDING_DECREASED_ACCOUNT_WIDE,
-	})
+	}
+
+	if G_RLF:IsRetail() then
+		table.insert(increase_consts, FACTION_STANDING_INCREASED_ACCOUNT_WIDE)
+		table.insert(increase_consts, FACTION_STANDING_INCREASED_ACH_BONUS_ACCOUNT_WIDE)
+		table.insert(decrease_consts, FACTION_STANDING_DECREASED_ACCOUNT_WIDE)
+	end
+
+	increasePatterns = precomputePatternSegments(increase_consts)
+	decreasePatterns = precomputePatternSegments(decrease_consts)
 
 	RunNextFrame(function()
 		buildFactionLocaleMap()
@@ -298,12 +314,20 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 		local repType, fId, factionData
 		if G_RLF.db.global.factionMaps[locale][faction] then
 			fId = G_RLF.db.global.factionMaps[locale][faction]
-			if C_Reputation.IsMajorFaction(fId) then
+			if G_RLF:IsRetail() and C_Reputation.IsMajorFaction(fId) then
 				color = ACCOUNT_WIDE_FONT_COLOR
 				repType = RepType.MajorFaction
 				factionData = C_MajorFactions.GetMajorFactionRenownInfo(fId)
-			elseif isDelveCompanion then
+			elseif G_RLF:IsRetail() and isDelveCompanion then
 				factionData = C_Reputation.GetFactionDataByID(fId)
+				if not factionData then
+					G_RLF:LogWarn(
+						faction .. " (supposed companion) faction data could not be retrieved by ID",
+						addonName,
+						self.moduleName
+					)
+					return
+				end
 				local ranks = C_GossipInfo.GetFriendshipReputationRanks(fId)
 				local info = C_GossipInfo.GetFriendshipReputation(fId)
 				if factionData.reaction then
@@ -316,7 +340,15 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 				repType = RepType.DelveCompanion
 			else
 				local friendInfo = C_GossipInfo.GetFriendshipReputation(fId)
-				factionData = C_Reputation.GetFactionDataByID(fId)
+				if G_RLF:IsRetail() then
+					factionData = C_Reputation.GetFactionDataByID(fId)
+				elseif G_RLF:IsClassic() then
+					factionData = G_RLF.ClassicToRetail:ConvertFactionInfoByID(fId)
+				end
+				if not factionData then
+					G_RLF:LogWarn(faction .. " faction data could not be retrieved by ID", addonName, self.moduleName)
+					return
+				end
 				if factionData.reaction then
 					color = FACTION_BAR_COLORS[factionData.reaction]
 				end
@@ -338,7 +370,7 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 				end
 			end
 
-			if C_Reputation.IsFactionParagon(fId) then
+			if GetExpansionLevel() >= G_RLF.Expansion.LEGION and C_Reputation.IsFactionParagon(fId) then
 				color = color or FACTION_GREEN_COLOR
 				repType = RepType.Paragon
 				factionData = factionData or {}

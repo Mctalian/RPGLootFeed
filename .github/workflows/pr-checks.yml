@@ -23,14 +23,19 @@ jobs:
         with:
           python-version: 3.x
 
-      - name: Install Python dependencies
-        run: pip install -r requirements.txt
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          poetry-version: 1.8.5
+
+      - name: Install dependencies
+        run: poetry install
 
       - name: Run translation check script
-        run: python .scripts/missing_translation_check.py
+        run: poetry run python .scripts/missing_translation_check.py
 
       - name: Check for Hard-coded strings
-        run: python .scripts/hardcode_string_check.py
+        run: poetry run python .scripts/hardcode_string_check.py
 
   run_tests:
     runs-on: ubuntu-latest

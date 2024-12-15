@@ -34,6 +34,8 @@ Pair RPGLootFeed with Speedy AutoLoot by Yuyuli for an even better looting exper
 
 We welcome contributions from the community! If you encounter any issues or have suggestions for improvements, please open an issue on [GitHub](https://github.com/Mctalian/RPGLootFeed/issues). Or head over to [Discussions](https://github.com/Mctalian/RPGLootFeed/discussions) if you have any questions or want to show off your UI.
 
+If you're interested in contributing code, please see our [Contributing Guidelines](CONTRIBUTING.md) for more information.
+
 ## License
 
 RPGLootFeed is licensed under the MIT License. See the [LICENSE](LICENSE) file for more information.

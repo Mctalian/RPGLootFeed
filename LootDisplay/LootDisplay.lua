@@ -1,6 +1,6 @@
 local addonName, G_RLF = ...
 
-local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0")
+local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0", "AceHook-3.0")
 
 local lsm = G_RLF.lsm
 
@@ -62,6 +62,29 @@ function LootDisplay:OnEnable()
 	RunNextFrame(function()
 		G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
 	end)
+
+	if G_RLF:IsClassic() then
+		self:RawHook(ItemButtonMixin, "SetItemButtonTexture", function(self, texture)
+			if SetItemButtonTexture_Base then
+				SetItemButtonTexture_Base(texture)
+			else
+				-- Handle the case where SetItemButtonTexture_Base doesn't exist
+				self.icon:SetTexture(texture)
+			end
+		end, true)
+
+		self:RawHook(ItemButtonMixin, "SetItemButtonQuality", function(self, quality, itemIDOrLink)
+			if SetItemButtonQuality_Base then
+				SetItemButtonQuality_Base(quality, itemIDOrLink)
+			else
+				if quality then
+					-- Handle the case where SetItemButtonQuality_Base doesn't exist
+					local r, g, b = C_Item.GetItemQualityColor(quality)
+					self.IconBorder:SetVertexColor(r, g, b)
+				end
+			end
+		end, true)
+	end
 end
 
 function LootDisplay:OnPlayerCombatChange()

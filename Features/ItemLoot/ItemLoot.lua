@@ -185,9 +185,9 @@ function ItemLoot.Element:new(...)
 			if not element.sellPrice or element.sellPrice == 0 then
 				return ""
 			end
-			if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+			if G_RLF:IsRetail() then
 				atlasIcon = "spellicon-256x256-selljunk"
-			elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+			elseif G_RLF:IsClassic() then
 				atlasIcon = "bags-junkcoin"
 			end
 			unitPrice = element.sellPrice
@@ -197,9 +197,9 @@ function ItemLoot.Element:new(...)
 				return ""
 			end
 			unitPrice = marketPrice
-			if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+			if G_RLF:IsRetail() then
 				atlasIcon = "auctioneer"
-			elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+			elseif G_RLF:IsClassic() then
 				atlasIcon = "Auctioneer"
 			end
 		end
@@ -324,9 +324,9 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 	end
 
 	local me = false
-	if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+	if G_RLF:IsRetail() then
 		me = guid == GetPlayerGuid()
-	elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+	elseif G_RLF:IsClassic() then
 		me = playerName2 == UnitName("player")
 	end
 

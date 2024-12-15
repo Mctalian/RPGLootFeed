@@ -64,7 +64,7 @@ local function getItem(id)
 end
 
 local testItemIds = { 50818, 2589, 2592, 1515, 730, 128827, 219325, 34494 }
-if WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
+if G_RLF:IsClassic() then
 	testItemIds = { 2589, 2592, 1515, 730, 233620 }
 end
 local function initializeTestItems()
@@ -85,7 +85,7 @@ local function initializeTestCurrencies()
 		if not idExistsInTable(id, TestMode.testCurrencies) then
 			local info = C.CurrencyInfo.GetCurrencyInfo(id)
 			local link
-			if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+			if G_RLF:IsRetail() then
 				link = C.CurrencyInfo.GetCurrencyLink(id)
 			else
 				link = C.CurrencyInfo.GetCurrencyLink(id, 100)
@@ -107,12 +107,15 @@ end
 
 local numTestFactions = 3
 local function initializeTestFactions()
-	if GetExpansionLevel() >= 10 then
-		for i = 1, numTestFactions do
-			local factionInfo = C.Reputation.GetFactionDataByIndex(i)
-			if factionInfo and factionInfo.name then
-				table.insert(TestMode.testFactions, factionInfo.name)
-			end
+	for i = 1, numTestFactions do
+		local factionInfo
+		if G_RLF:IsRetail() then
+			factionInfo = C.Reputation.GetFactionDataByIndex(i)
+		elseif G_RLF:IsClassic() then
+			factionInfo = G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(i)
+		end
+		if factionInfo and factionInfo.name then
+			table.insert(TestMode.testFactions, factionInfo.name)
 		end
 	end
 
@@ -221,7 +224,7 @@ local function generateRandomLoot()
 
 			-- 15% chance to show currency
 		elseif rng > 0.7 and rng <= 0.85 then
-			if GetExpansionLevel() >= 8 then
+			if GetExpansionLevel() >= G_RLF.Expansion.SL then
 				local currency = TestMode.testCurrencies[math.random(#TestMode.testCurrencies)]
 				local amountLooted = math.random(1, 500)
 				local module = G_RLF.RLF:GetModule("Currency")
@@ -232,14 +235,12 @@ local function generateRandomLoot()
 
 			-- 10% chance to show reputation (least frequent)
 		elseif rng > 0.85 then
-			if GetExpansionLevel() >= 10 then
-				local reputationGained = math.random(10, 100)
-				local factionName = TestMode.testFactions[math.random(#TestMode.testFactions)]
-				local module = G_RLF.RLF:GetModule("Reputation")
-				local e = module.Element:new(reputationGained, factionName)
-				e:Show()
-				G_RLF:LogDebug("Reputation gained: " .. reputationGained, addonName)
-			end
+			local reputationGained = math.random(10, 100)
+			local factionName = TestMode.testFactions[math.random(#TestMode.testFactions)]
+			local module = G_RLF.RLF:GetModule("Reputation")
+			local e = module.Element:new(reputationGained, factionName)
+			e:Show()
+			G_RLF:LogDebug("Reputation gained: " .. reputationGained, addonName)
 		end
 	end
 end

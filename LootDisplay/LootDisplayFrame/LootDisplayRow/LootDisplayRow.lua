@@ -43,12 +43,10 @@ local function rowIcon(row, icon)
 	if changed then
 		row.Icon:ClearAllPoints()
 		row.Icon:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
-		if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
-			row.Icon.IconBorder:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
-			row.Icon.NormalTexture:SetTexture(nil)
-			row.Icon.HighlightTexture:SetTexture(nil)
-			row.Icon.PushedTexture:SetTexture(nil)
-		end
+		row.Icon.IconBorder:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
+		row.Icon.NormalTexture:SetTexture(nil)
+		row.Icon.HighlightTexture:SetTexture(nil)
+		row.Icon.PushedTexture:SetTexture(nil)
 		local anchor, xOffset = "LEFT", G_RLF.db.global.iconSize / 4
 		if not G_RLF.db.global.leftAlign then
 			anchor, xOffset = "RIGHT", -xOffset
@@ -290,12 +288,7 @@ end
 local function rowHighlightIcon(row)
 	if not row.glowTexture then
 		-- Create the glow texture
-		if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
-			row.glowTexture = row.Icon:CreateTexture(nil, "OVERLAY")
-		elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
-			row.glowTexture = row:CreateTexture(nil, "OVERLAY")
-		end
-
+		row.glowTexture = row.Icon:CreateTexture(nil, "OVERLAY")
 		row.glowTexture:SetDrawLayer("OVERLAY", 7)
 		row.glowTexture:SetTexture("Interface\\SpellActivationOverlay\\IconAlert")
 		row.glowTexture:SetPoint("CENTER", row.Icon, "CENTER", 0, 0)
@@ -379,17 +372,7 @@ function LootDisplayRowMixin:Reset()
 	self.BottomBorder:SetAlpha(0)
 	self.LeftBorder:SetAlpha(0)
 
-	if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
-		if not self.Icon then
-			self.Icon = CreateFrame("Button", nil, self, "ItemButtonTemplate")
-		end
-		self.Icon:Reset()
-	elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
-		if not self.Icon then
-			self.Icon = self:CreateTexture(nil, "ARTWORK")
-		end
-		self.Icon:SetTexture(nil)
-	end
+	self.Icon:Reset()
 
 	if self.glowAnimationGroup then
 		self.glowAnimationGroup:Stop()
@@ -605,35 +588,31 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 	if icon and self.icon ~= icon then
 		self.icon = icon
 
-		if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
-			RunNextFrame(function()
-				-- Handle quality logic
-				if not quality then
-					self.Icon:SetItem(self.link)
-				else
-					self.Icon:SetItemButtonTexture(icon)
-					self.Icon:SetItemButtonQuality(quality, self.link)
-				end
+		RunNextFrame(function()
+			-- Handle quality logic
+			if not quality then
+				self.Icon:SetItem(self.link)
+			else
+				self.Icon:SetItemButtonTexture(icon)
+				self.Icon:SetItemButtonQuality(quality, self.link)
+			end
 
-				if self.Icon.IconOverlay then
-					self.Icon.IconOverlay:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
-				end
-				if self.Icon.ProfessionQualityOverlay then
-					self.Icon.ProfessionQualityOverlay:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
-				end
+			if self.Icon.IconOverlay then
+				self.Icon.IconOverlay:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
+			end
+			if self.Icon.ProfessionQualityOverlay then
+				self.Icon.ProfessionQualityOverlay:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
+			end
 
-				self.Icon.NormalTexture:SetTexture(nil)
-				self.Icon.HighlightTexture:SetTexture(nil)
-				self.Icon.PushedTexture:SetTexture(nil)
+			self.Icon.NormalTexture:SetTexture(nil)
+			self.Icon.HighlightTexture:SetTexture(nil)
+			self.Icon.PushedTexture:SetTexture(nil)
 
-				-- Masque reskinning (may be costly, consider reducing frequency)
-				if G_RLF.Masque and G_RLF.iconGroup then
-					G_RLF.iconGroup:ReSkin(self.Icon)
-				end
-			end)
-		elseif WOW_PROJECT_ID == WOW_PROJECT_CLASSIC then
-			self.Icon:SetTexture(icon)
-		end
+			-- Masque reskinning (may be costly, consider reducing frequency)
+			if G_RLF.Masque and G_RLF.iconGroup then
+				G_RLF.iconGroup:ReSkin(self.Icon)
+			end
+		end)
 	end
 end
 

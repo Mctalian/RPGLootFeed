@@ -82,7 +82,7 @@ local function isHiddenCurrency(id)
 end
 
 function Currency:OnInitialize()
-	if G_RLF.db.global.currencyFeed and GetExpansionLevel() >= 8 then
+	if G_RLF.db.global.currencyFeed and GetExpansionLevel() >= G_RLF.Expansion.SL then
 		self:Enable()
 	else
 		self:Disable()
@@ -90,15 +90,21 @@ function Currency:OnInitialize()
 end
 
 function Currency:OnDisable()
+	if GetExpansionLevel() < G_RLF.Expansion.SL then
+		return
+	end
 	self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE")
-	if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+	if G_RLF:IsRetail() then
 		self:UnregisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
 	end
 end
 
 function Currency:OnEnable()
+	if GetExpansionLevel() < G_RLF.Expansion.SL then
+		return
+	end
 	self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
-	if WOW_PROJECT_ID == WOW_PROJECT_MAINLINE then
+	if G_RLF:IsRetail() then
 		self:RegisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
 	end
 	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)

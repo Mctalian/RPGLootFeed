@@ -69,21 +69,21 @@ local function testWoWGlobals()
 	assertEqual(type(Enum.ItemQuality), "table", "Global: Enum.ItemQuality")
 	assertEqual(type(GetFonts), "function", "Global: GetFonts")
 
-	if GetExpansionLevel() > 0 then
+	if GetExpansionLevel() > G_RLF.Expansion.CLASSIC then
 		assertEqual(type(GetPlayerGuid), "function", "Global: GetPlayerGuid")
 	end
 
-	if GetExpansionLevel() >= 9 then
+	if GetExpansionLevel() >= G_RLF.Expansion.DF then
 		assertEqual(type(GetNameAndServerNameFromGUID), "function", "Global: GetNameAndServerNameFromGUID")
 	end
 
-	if GetExpansionLevel() >= 5 then
+	if GetExpansionLevel() >= G_RLF.Expansion.WOD then
 		assertEqual(type(BossBanner), "table", "Global: BossBanner")
 	end
 
 	assertEqual(type(LootAlertSystem.AddAlert), "function", "Global: LootAlertSystem.AddAlert")
 
-	if GetExpansionLevel() >= 8 then
+	if GetExpansionLevel() >= G_RLF.Expansion.SL then
 		assertEqual(type(C.CurrencyInfo.GetCurrencyInfo), "function", "Global: C.CurrencyInfo.GetCurrencyInfo")
 		local info = C.CurrencyInfo.GetCurrencyInfo(1813)
 		assertEqual(info ~= nil, true, "Global: C.CurrencyInfo.GetCurrencyInfo(1813)")
@@ -117,7 +117,7 @@ local function testWoWGlobals()
 	)
 	assertEqual(type(FACTION_STANDING_DECREASED), "string", "Global: FACTION_STANDING_DECREASED")
 
-	if GetExpansionLevel() >= 8 then
+	if GetExpansionLevel() >= G_RLF.Expansion.SL then
 		assertEqual(
 			type(FACTION_STANDING_INCREASED_ACCOUNT_WIDE),
 			"string",
@@ -130,7 +130,7 @@ local function testWoWGlobals()
 		)
 	end
 
-	if GetExpansionLevel() >= 10 then
+	if GetExpansionLevel() >= G_RLF.Expansion.TWW then
 		assertEqual(
 			type(FACTION_STANDING_INCREASED_ACH_BONUS_ACCOUNT_WIDE),
 			"string",
@@ -140,16 +140,16 @@ local function testWoWGlobals()
 
 	assertEqual(type(C.Reputation), "table", "Global: C.Reputation")
 
-	if GetExpansionLevel() >= 9 then
+	if GetExpansionLevel() >= G_RLF.Expansion.DF then
 		assertEqual(type(C.Reputation.IsMajorFaction), "function", "Global: C.Reputation.IsMajorFaction")
 		assertEqual(type(ACCOUNT_WIDE_FONT_COLOR), "table", "Global: ACCOUNT_WIDE_FONT_COLOR")
 	end
 
-	if GetExpansionLevel() >= 6 then
+	if GetExpansionLevel() >= G_RLF.Expansion.LEGION then
 		assertEqual(type(C.Reputation.IsFactionParagon), "function", "Global: C.Reputation.IsFactionParagon")
 	end
 
-	if GetExpansionLevel() >= 10 then
+	if GetExpansionLevel() >= G_RLF.Expansion.TWW then
 		assertEqual(type(C.Reputation.GetFactionDataByID), "function", "Global: C.Reputation.GetFactionDataByID")
 	end
 

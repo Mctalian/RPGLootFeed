@@ -6,7 +6,7 @@ local PricesEnum = G_RLF.PricesEnum
 
 local ItemQualEnum = {}
 
-if GetExpansionLevel() >= 7 then
+if GetExpansionLevel() >= G_RLF.Expansion.BFA then
 	ItemQualEnum = Enum.ItemQuality
 else
 	ItemQualEnum = {

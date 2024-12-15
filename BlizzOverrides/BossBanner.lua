@@ -3,7 +3,7 @@ local addonName, G_RLF = ...
 local BossBannerOverride = G_RLF.RLF:NewModule("BossBanner", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 
 function BossBannerOverride:OnInitialize()
-	if GetExpansionLevel() >= 5 then
+	if GetExpansionLevel() >= G_RLF.Expansion.WOD then
 		self:RegisterEvent("PLAYER_ENTERING_WORLD", "BossBannerHook")
 	end
 end
