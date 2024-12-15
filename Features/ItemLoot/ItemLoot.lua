@@ -179,19 +179,37 @@ function ItemLoot.Element:new(...)
 		end
 		local quantity = ...
 		local atlasIconSize = G_RLF.db.global.fontSize * 1.5
+		local atlasIcon
+		local unitPrice
 		if G_RLF.db.global.pricesForSellableItems == G_RLF.PricesEnum.Vendor then
 			if not element.sellPrice or element.sellPrice == 0 then
 				return ""
 			end
-			local sellAtlasStr = "|A:spellicon-256x256-selljunk:" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a  "
-			return "    " .. sellAtlasStr .. C_CurrencyInfo.GetCoinTextureString(element.sellPrice * (quantity or 1))
+			if G_RLF:IsRetail() then
+				atlasIcon = "spellicon-256x256-selljunk"
+			elseif G_RLF:IsClassic() then
+				atlasIcon = "bags-junkcoin"
+			end
+			unitPrice = element.sellPrice
 		elseif G_RLF.db.global.pricesForSellableItems == G_RLF.PricesEnum.AH then
 			local marketPrice = G_RLF.AuctionIntegrations.activeIntegration:GetAHPrice(itemLink)
 			if not marketPrice or marketPrice == 0 then
 				return ""
 			end
-			local ahAtlasStr = "|A:auctioneer:" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a  "
-			return "    " .. ahAtlasStr .. C_CurrencyInfo.GetCoinTextureString(marketPrice * (quantity or 1))
+			unitPrice = marketPrice
+			if G_RLF:IsRetail() then
+				atlasIcon = "auctioneer"
+			elseif G_RLF:IsClassic() then
+				atlasIcon = "Auctioneer"
+			end
+		end
+		if unitPrice then
+			local str = "    "
+			if atlasIcon then
+				str = str .. "|A:" .. atlasIcon .. ":" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a  "
+			end
+			str = str .. C_CurrencyInfo.GetCoinTextureString(unitPrice * (quantity or 1))
+			return str
 		end
 
 		return ""
@@ -227,6 +245,7 @@ function ItemLoot:OnEnable()
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	self:RegisterEvent("GROUP_ROSTER_UPDATE")
 	self:SetNameUnitMap()
+	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
 function ItemLoot:OnItemReadyToShow(info, amount)
@@ -304,7 +323,13 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 		return
 	end
 
-	local me = guid == GetPlayerGuid()
+	local me = false
+	if G_RLF:IsRetail() then
+		me = guid == GetPlayerGuid()
+	elseif G_RLF:IsClassic() then
+		me = playerName2 == UnitName("player")
+	end
+
 	if not me then
 		if not G_RLF.db.global.enablePartyLoot then
 			G_RLF:LogDebug("Party Loot Ignored", "WOWEVENT", self.moduleName, "", msg)

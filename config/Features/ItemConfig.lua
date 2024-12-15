@@ -4,15 +4,32 @@ local ItemConfig = {}
 
 local PricesEnum = G_RLF.PricesEnum
 
+local ItemQualEnum = {}
+
+if GetExpansionLevel() >= G_RLF.Expansion.BFA then
+	ItemQualEnum = Enum.ItemQuality
+else
+	ItemQualEnum = {
+		Poor = 0,
+		Common = 1,
+		Uncommon = 2,
+		Rare = 3,
+		Epic = 4,
+		Legendary = 5,
+		Artifact = 6,
+		Heirloom = 7,
+	}
+end
+
 G_RLF.defaults.global.itemQualityFilter = {
-	[Enum.ItemQuality.Poor] = true,
-	[Enum.ItemQuality.Common] = true,
-	[Enum.ItemQuality.Uncommon] = true,
-	[Enum.ItemQuality.Rare] = true,
-	[Enum.ItemQuality.Epic] = true,
-	[Enum.ItemQuality.Legendary] = true,
-	[Enum.ItemQuality.Artifact] = true,
-	[Enum.ItemQuality.Heirloom] = true,
+	[ItemQualEnum.Poor] = true,
+	[ItemQualEnum.Common] = true,
+	[ItemQualEnum.Uncommon] = true,
+	[ItemQualEnum.Rare] = true,
+	[ItemQualEnum.Epic] = true,
+	[ItemQualEnum.Legendary] = true,
+	[ItemQualEnum.Artifact] = true,
+	[ItemQualEnum.Heirloom] = true,
 }
 G_RLF.defaults.global.auctionHouseSource = G_RLF.L["None"]
 G_RLF.defaults.global.pricesForSellableItems = PricesEnum.Vendor
@@ -164,14 +181,14 @@ G_RLF.options.args.features.args.itemLootConfig = {
 			name = G_RLF.L["Item Quality Filter"],
 			desc = G_RLF.L["ItemQualityFilterDesc"],
 			values = {
-				[Enum.ItemQuality.Poor] = G_RLF.L["Poor"],
-				[Enum.ItemQuality.Common] = G_RLF.L["Common"],
-				[Enum.ItemQuality.Uncommon] = G_RLF.L["Uncommon"],
-				[Enum.ItemQuality.Rare] = G_RLF.L["Rare"],
-				[Enum.ItemQuality.Epic] = G_RLF.L["Epic"],
-				[Enum.ItemQuality.Legendary] = G_RLF.L["Legendary"],
-				[Enum.ItemQuality.Artifact] = G_RLF.L["Artifact"],
-				[Enum.ItemQuality.Heirloom] = G_RLF.L["Heirloom"],
+				[ItemQualEnum.Poor] = G_RLF.L["Poor"],
+				[ItemQualEnum.Common] = G_RLF.L["Common"],
+				[ItemQualEnum.Uncommon] = G_RLF.L["Uncommon"],
+				[ItemQualEnum.Rare] = G_RLF.L["Rare"],
+				[ItemQualEnum.Epic] = G_RLF.L["Epic"],
+				[ItemQualEnum.Legendary] = G_RLF.L["Legendary"],
+				[ItemQualEnum.Artifact] = G_RLF.L["Artifact"],
+				[ItemQualEnum.Heirloom] = G_RLF.L["Heirloom"],
 			},
 			width = "double",
 			get = "GetItemQualityFilter",

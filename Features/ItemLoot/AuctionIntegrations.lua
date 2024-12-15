@@ -14,6 +14,7 @@ function AuctionIntegrations:Init()
 	local possibleIntegrations = { Integ_Auctionator, Integ_TSM }
 	self.nilIntegration = Integ_Nil
 	self.activeIntegrations = {}
+	self.activeIntegration = nil
 
 	self.numActiveIntegrations = 0
 	for _, integration in ipairs(possibleIntegrations) do
@@ -39,7 +40,7 @@ function AuctionIntegrations:Init()
 		end
 	end
 
-	if G_RLF.db.global.auctionHouseSource ~= self.activeIntegration:ToString() then
+	if self.activeIntegration and G_RLF.db.global.auctionHouseSource ~= self.activeIntegration:ToString() then
 		G_RLF.db.global.auctionHouseSource = self.activeIntegration:ToString()
 	end
 end
