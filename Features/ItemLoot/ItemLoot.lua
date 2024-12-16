@@ -76,8 +76,9 @@ end
 
 local function IsBetterThanEquipped(info)
 	-- Highlight Better Than Equipped
-	if G_RLF.db.global.itemHighlights.betterThanEquipped then
+	if G_RLF.db.global.itemHighlights.betterThanEquipped and info:IsEligibleEquipment() then
 		local equippedLink
+		local slot = G_RLF.equipSlotMap[info.itemEquipLoc]
 		if type(slot) == "table" then
 			for _, s in ipairs(slot) do
 				equippedLink = GetInventoryItemLink("player", s)
@@ -100,20 +101,17 @@ local function IsBetterThanEquipped(info)
 		end
 
 		if equippedInfo.itemLevel and equippedInfo.itemLevel < info.itemLevel then
-			self.highlight = true
-			return
+			return true
 		elseif equippedInfo.itemLevel == info.itemLevel then
 			local statDelta = C_Item.GetItemStatDelta(equippedLink, info.itemLink)
 			for k, v in pairs(statDelta) do
 				-- Has a Tertiary Stat
 				if k:find("ITEM_MOD_CR_") and v > 0 then
-					self.highlight = true
-					return
+					return true
 				end
 				-- Has a Gem Socket
 				if k:find("EMPTY_SOCKET_") and v > 0 then
-					self.highlight = true
-					return
+					return true
 				end
 			end
 		end
@@ -338,6 +336,13 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 		local sanitizedPlayerName = (playerName or playerName2):gsub("%-.+", "")
 		local unit = self.nameUnitMap[sanitizedPlayerName]
 		if not unit then
+			G_RLF:LogDebug(
+				"Party Loot Ignored - no	matching party member (" .. sanitizedPlayerName .. ")",
+				"WOWEVENT",
+				self.moduleName,
+				"",
+				msg
+			)
 			return
 		end
 		local itemLink = msg:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
