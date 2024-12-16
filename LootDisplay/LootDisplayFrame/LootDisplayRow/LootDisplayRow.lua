@@ -757,36 +757,87 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 	end
 end
 
-function LootDisplayRowMixin:SetUpHoverEffect()
-	self:SetScript("OnEnter", function()
-		-- Lighten the colors by increasing RGB values (clamped to 1.0)
-		local function lightenColor(r, g, b, amount)
-			return math.min(r + amount, 1), math.min(g + amount, 1), math.min(b + amount, 1)
+-- Utility function to check if the mouse is over the parent or any of its children
+local function isMouseOverSelfOrChildren(frame)
+	if frame:IsMouseOver() then
+		return true
+	end
+
+	for _, child in ipairs({ frame:GetChildren() }) do
+		if child:IsMouseOver() then
+			return true
 		end
+	end
 
-		local originalStartColor = CreateColor(unpack(self.cachedGradientStart))
-		local originalEndColor = CreateColor(unpack(self.cachedGradientEnd))
+	return false
+end
 
-		local lightenAmount = 0.2 -- Adjust this for the desired lightening effect
-		local startR, startG, startB =
-			lightenColor(originalStartColor.r, originalStartColor.g, originalStartColor.b, lightenAmount)
-		local endR, endG, endB = lightenColor(originalEndColor.r, originalEndColor.g, originalEndColor.b, lightenAmount)
+function LootDisplayRowMixin:SetUpHoverEffect()
+	local highlightedAlpha = 0.25
+	-- Fade-in animation group
+	if not self.HighlightFadeIn then
+		self.HighlightFadeIn = self.HighlightBGOverlay:CreateAnimationGroup()
 
-		-- Apply the lightened gradient
-		self.Background:SetGradient(
-			"HORIZONTAL",
-			CreateColor(startR, startG, startB, originalStartColor.a),
-			CreateColor(endR, endG, endB, originalEndColor.a)
-		)
+		local fadeIn = self.HighlightFadeIn:CreateAnimation("Alpha")
+		local startingAlpha = self.HighlightBGOverlay:GetAlpha()
+		fadeIn:SetFromAlpha(startingAlpha) -- Start from the current alpha
+		fadeIn:SetToAlpha(highlightedAlpha) -- Target alpha for the highlight
+		local duration = 0.3 * (highlightedAlpha - startingAlpha) / highlightedAlpha
+		fadeIn:SetDuration(duration)
+		fadeIn:SetSmoothing("OUT")
+
+		-- Ensure alpha is held at target level after animation finishes
+		self.HighlightFadeIn:SetScript("OnFinished", function()
+			self.HighlightBGOverlay:SetAlpha(highlightedAlpha) -- Hold at target alpha
+		end)
+	end
+
+	-- Fade-out animation group
+	if not self.HighlightFadeOut then
+		self.HighlightFadeOut = self.HighlightBGOverlay:CreateAnimationGroup()
+
+		local fadeOut = self.HighlightFadeOut:CreateAnimation("Alpha")
+		local startingAlpha = self.HighlightBGOverlay:GetAlpha()
+		fadeOut:SetFromAlpha(startingAlpha) -- Start from the target alpha of the fade-in
+		fadeOut:SetToAlpha(0) -- Return to original alpha
+		local duration = 0.3 * startingAlpha / highlightedAlpha
+		fadeOut:SetDuration(duration)
+		fadeOut:SetSmoothing("IN")
+		-- fadeOut:SetStartDelay(0.15) -- Delay before starting the fade-out
+
+		-- Ensure alpha is fully reset after animation finishes
+		self.HighlightFadeOut:SetScript("OnFinished", function()
+			self.HighlightBGOverlay:SetAlpha(0) -- Reset to invisible
+		end)
+	end
+
+	-- OnEnter: Play fade-in animation
+	self:SetScript("OnEnter", function()
+		if self.hasMouseOver then
+			return
+		end
+		self.hasMouseOver = true
+		-- Stop fade-out if it’s playing
+		if self.HighlightFadeOut:IsPlaying() then
+			self.HighlightFadeOut:Stop()
+		end
+		-- Play fade-in
+		self.HighlightFadeIn:Play()
 	end)
 
+	-- OnLeave: Play fade-out animation
 	self:SetScript("OnLeave", function()
-		local originalStartColor = CreateColor(unpack(self.cachedGradientStart))
-		local originalEndColor = CreateColor(unpack(self.cachedGradientEnd))
-		-- Restore the original gradient
-		if originalStartColor and originalEndColor then
-			self.Background:SetGradient("HORIZONTAL", originalStartColor, originalEndColor)
+		-- Prevent OnLeave from firing if the mouse is still over the row or any of its children
+		if isMouseOverSelfOrChildren(self) or not self.hasMouseOver then
+			return
 		end
+		self.hasMouseOver = false
+		-- Stop fade-in if it’s playing
+		if self.HighlightFadeIn:IsPlaying() then
+			self.HighlightFadeIn:Stop()
+		end
+		-- Play fade-out
+		self.HighlightFadeOut:Play()
 	end)
 end
 
