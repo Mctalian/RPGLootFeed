@@ -157,6 +157,8 @@ local function rowText(row, icon)
 			if icon then
 				if row.unit then
 					row.SecondaryText:SetPoint(anchor, row.UnitPortrait, iconAnchor, xOffset, 0)
+					local classColor = C_ClassColor.GetClassColor(select(2, UnitClass(row.unit)))
+					row.SecondaryText:SetTextColor(classColor.r, classColor.g, classColor.b, 1)
 				else
 					row.SecondaryText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
 				end
@@ -171,46 +173,6 @@ local function rowText(row, icon)
 
 		row.ItemCountText:SetPoint(anchor, row.PrimaryText, iconAnchor, xOffset, 0)
 	end
-end
-
-local function updateBorderPositions(row)
-	if row.borderCachedWidth ~= row:GetWidth() or row.borderCachedHeight ~= row:GetHeight() then
-		row.borderCachedWidth = row:GetWidth()
-		row.borderCachedHeight = row:GetHeight()
-	else
-		return
-	end
-	-- Adjust the Top border
-	row.TopBorder:ClearAllPoints()
-	row.TopBorder:SetWidth(row:GetWidth())
-	row.TopBorder:SetHeight(4)
-	row.TopBorder:SetTexCoord(0, 1, 1, 0)
-	row.TopBorder:SetPoint("TOPLEFT", row, "TOPLEFT", 0, 2)
-	row.TopBorder:SetPoint("TOPRIGHT", row, "TOPRIGHT", 0, 2)
-
-	-- Adjust the Left border
-	row.LeftBorder:ClearAllPoints()
-	row.LeftBorder:SetHeight(row:GetHeight())
-	row.LeftBorder:SetWidth(4)
-	row.LeftBorder:SetTexCoord(1, 0, 0, 1)
-	row.LeftBorder:SetPoint("TOPLEFT", row, "TOPLEFT", -2, 0)
-	row.LeftBorder:SetPoint("BOTTOMLEFT", row, "BOTTOMLEFT", -2, 0)
-
-	-- Adjust the Bottom border
-	row.BottomBorder:ClearAllPoints()
-	row.BottomBorder:SetWidth(row:GetWidth())
-	row.BottomBorder:SetHeight(4)
-	row.BottomBorder:SetTexCoord(0, 1, 0, 1)
-	row.BottomBorder:SetPoint("BOTTOMLEFT", row, "BOTTOMLEFT", 0, -2)
-	row.BottomBorder:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", 0, -2)
-
-	-- Adjust the Right border
-	row.RightBorder:ClearAllPoints()
-	row.RightBorder:SetHeight(row:GetHeight())
-	row.RightBorder:SetWidth(4)
-	row.RightBorder:SetTexCoord(0, 1, 0, 1)
-	row.RightBorder:SetPoint("TOPRIGHT", row, "TOPRIGHT", 2, 0)
-	row.RightBorder:SetPoint("BOTTOMRIGHT", row, "BOTTOMRIGHT", 2, 0)
 end
 
 local function rowHighlightBorder(row)
@@ -253,7 +215,6 @@ local function rowHighlightBorder(row)
 		end
 
 		function row.HighlightAnimation:Play()
-			updateBorderPositions(row)
 			row.TopBorder.HighlightAnimation:Play()
 			row.RightBorder.HighlightAnimation:Play()
 			row.BottomBorder.HighlightAnimation:Play()
@@ -340,6 +301,7 @@ local function rowStyles(row)
 	rowUnitPortrait(row)
 	rowText(row, row.icon)
 	rowHighlightBorder(row)
+	row:SetRowBorders()
 	rowFadeOutAnimation(row)
 end
 
@@ -438,6 +400,47 @@ function LootDisplayRowMixin:UpdateStyles()
 	rowStyles(self)
 	if self.icon and G_RLF.iconGroup then
 		G_RLF.iconGroup:ReSkin(self.Icon)
+	end
+end
+
+function LootDisplayRowMixin:SetRowBorders()
+	if not G_RLF.db.global.enableRowBorder then
+		self.StaticTopBorder:Hide()
+		self.StaticRightBorder:Hide()
+		self.StaticBottomBorder:Hide()
+		self.StaticLeftBorder:Hide()
+	end
+
+	if self.cachedBorderSize ~= G_RLF.db.global.rowBorderSize then
+		self.cachedBorderSize = G_RLF.db.global.rowBorderSize
+		self.StaticTopBorder:SetSize(0, G_RLF.db.global.rowBorderSize)
+		self.StaticRightBorder:SetSize(G_RLF.db.global.rowBorderSize, 0)
+		self.StaticBottomBorder:SetSize(0, G_RLF.db.global.rowBorderSize)
+		self.StaticLeftBorder:SetSize(G_RLF.db.global.rowBorderSize, 0)
+	end
+
+	if self.cacheBorderColor ~= G_RLF.db.global.rowBorderColor or G_RLF.db.global.rowBorderClassColors then
+		self.cacheBorderColor = G_RLF.db.global.rowBorderColor
+		if G_RLF.db.global.rowBorderClassColors then
+			local classColor = C_ClassColor.GetClassColor(select(2, UnitClass(self.unit or "player")))
+			self.StaticTopBorder:SetColorTexture(classColor.r, classColor.g, classColor.b, 1)
+			self.StaticRightBorder:SetColorTexture(classColor.r, classColor.g, classColor.b, 1)
+			self.StaticBottomBorder:SetColorTexture(classColor.r, classColor.g, classColor.b, 1)
+			self.StaticLeftBorder:SetColorTexture(classColor.r, classColor.g, classColor.b, 1)
+		else
+			local r, g, b, a = unpack(G_RLF.db.global.rowBorderColor)
+			self.StaticTopBorder:SetColorTexture(r, g, b, a)
+			self.StaticRightBorder:SetColorTexture(r, g, b, a)
+			self.StaticBottomBorder:SetColorTexture(r, g, b, a)
+			self.StaticLeftBorder:SetColorTexture(r, g, b, a)
+		end
+	end
+
+	if G_RLF.db.global.enableRowBorder then
+		self.StaticTopBorder:Show()
+		self.StaticRightBorder:Show()
+		self.StaticBottomBorder:Show()
+		self.StaticLeftBorder:Show()
 	end
 end
 
