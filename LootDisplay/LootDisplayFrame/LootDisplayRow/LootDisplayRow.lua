@@ -157,7 +157,12 @@ local function rowText(row, icon)
 			if icon then
 				if row.unit then
 					row.SecondaryText:SetPoint(anchor, row.UnitPortrait, iconAnchor, xOffset, 0)
-					local classColor = C_ClassColor.GetClassColor(select(2, UnitClass(row.unit)))
+					local classColor
+					if GetExpansionLevel() >= G_RLF.Expansion.BFA then
+						classColor = C_ClassColor.GetClassColor(select(2, UnitClass(row.unit)))
+					else
+						classColor = RAID_CLASS_COLORS[select(2, UnitClass(row.unit))]
+					end
 					row.SecondaryText:SetTextColor(classColor.r, classColor.g, classColor.b, 1)
 				else
 					row.SecondaryText:SetPoint(anchor, row.Icon, iconAnchor, xOffset, 0)
@@ -422,7 +427,12 @@ function LootDisplayRowMixin:SetRowBorders()
 	if self.cacheBorderColor ~= G_RLF.db.global.rowBorderColor or G_RLF.db.global.rowBorderClassColors then
 		self.cacheBorderColor = G_RLF.db.global.rowBorderColor
 		if G_RLF.db.global.rowBorderClassColors then
-			local classColor = C_ClassColor.GetClassColor(select(2, UnitClass(self.unit or "player")))
+			local classColor
+			if GetExpansionLevel() >= G_RLF.Expansion.BFA then
+				classColor = C_ClassColor.GetClassColor(select(2, UnitClass(self.unit or "player")))
+			else
+				classColor = RAID_CLASS_COLORS[select(2, UnitClass(self.unit or "player"))]
+			end
 			self.StaticTopBorder:SetColorTexture(classColor.r, classColor.g, classColor.b, 1)
 			self.StaticRightBorder:SetColorTexture(classColor.r, classColor.g, classColor.b, 1)
 			self.StaticBottomBorder:SetColorTexture(classColor.r, classColor.g, classColor.b, 1)
