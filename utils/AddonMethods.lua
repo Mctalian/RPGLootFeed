@@ -38,6 +38,14 @@ function G_RLF:Print(...)
 	G_RLF.RLF:Print(...)
 end
 
+function G_RLF:IsRetail()
+	return WOW_PROJECT_ID == WOW_PROJECT_MAINLINE
+end
+
+function G_RLF:IsClassic()
+	return WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
+end
+
 function G_RLF:SendMessage(...)
 	local args = { ... }
 	RunNextFrame(function()

@@ -56,6 +56,7 @@ function Money:OnEnable()
 	self:RegisterEvent("PLAYER_MONEY")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self.startingMoney = GetMoney()
+	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
 function Money:PLAYER_ENTERING_WORLD(eventName)

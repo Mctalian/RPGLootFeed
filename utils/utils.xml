@@ -5,6 +5,7 @@
   <!--@end-alpha@-->
   <Script file="DoubleLinkedList.lua"/>
   <Script file="Enums.lua"/>
+  <Script file="GameVersionHelpers.lua"/>
   <Script file="ItemInfo.lua"/>
   <Script file="Logger.lua"/>
   <Script file="Maps.lua"/>

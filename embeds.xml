@@ -13,4 +13,5 @@
   <Include file="Libs\AceLocale-3.0\AceLocale-3.0.xml"/>
   <Include file="Libs\LibSharedMedia-3.0\lib.xml"/>
   <Include file="Libs\AceGUI-3.0-SharedMediaWidgets\widget.xml"/>
+  <Include file="Libs\C_Everywhere\C_Everywhere.lua"/>
 </Ui>

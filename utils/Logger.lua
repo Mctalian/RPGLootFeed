@@ -68,30 +68,26 @@ local function OnClearLog()
 	updateContent()
 end
 
-local frame, contentBox
+local contentBox
 function Logger:InitializeFrame()
-	if not frame then
-		frame = gui:Create("Frame")
-		frame:Hide()
+	if not self.frame then
+		self.frame = gui:Create("Frame")
+		self.frame:Hide()
 		RunNextFrame(function()
-			frame:SetTitle("Loot Log")
-			frame:EnableResize(false)
-			frame:SetCallback("OnClose", function(widget)
-				gui:Release(widget)
-				frame = nil
-			end)
-			frame:SetLayout("Flow")
+			self.frame:SetTitle("Loot Log")
+			self.frame:EnableResize(false)
 		end)
+		self.frame:SetLayout("Flow")
 
 		local filterBar = gui:Create("SimpleGroup")
-		frame:AddChild(filterBar)
+		self.frame:AddChild(filterBar)
 		RunNextFrame(function()
 			filterBar:SetFullWidth(true)
 			filterBar:SetLayout("Flow")
 		end)
 
 		contentBox = gui:Create("MultiLineEditBox")
-		frame:AddChild(contentBox)
+		self.frame:AddChild(contentBox)
 		RunNextFrame(function()
 			contentBox:SetLabel("Logs")
 			contentBox:DisableButton(true)
@@ -161,7 +157,7 @@ function Logger:InitializeFrame()
 		end)
 
 		RunNextFrame(function()
-			frame:DoLayout()
+			self.frame:DoLayout()
 		end)
 	end
 end
@@ -236,7 +232,7 @@ local function getContent(logEntry)
 	if logEntry.content == "" then
 		return logEntry.message
 	end
-	return logEntry.content
+	return logEntry.content .. " MSG: " .. logEntry.message
 end
 
 local function getAmount(logEntry)
@@ -290,10 +286,12 @@ updateContent = function()
 			end
 		end
 	end
-	contentBox:SetText(text)
+	RunNextFrame(function()
+		contentBox:SetText(text)
+	end)
 end
 
-local function addLogEntry(level, message, source, type, id, content, amount, isNew)
+function Logger:addLogEntry(level, message, source, type, id, content, amount, isNew)
 	local entry = {
 		timestamp = date("%Y-%m-%d %H:%M:%S"),
 		level = level,
@@ -316,14 +314,14 @@ local function addLogEntry(level, message, source, type, id, content, amount, is
 		table.remove(logTable, 1)
 	end
 	--@end-non-alpha@]===]
-	if frame and frame:IsShown() then
+	if self.frame and self.frame:IsShown() then
 		updateContent()
 	end
 end
 
 function Logger:ProcessLogs(logs)
 	for log, _ in pairs(logs) do
-		addLogEntry(unpack(log))
+		self:addLogEntry(unpack(log))
 	end
 end
 
@@ -346,16 +344,18 @@ function Logger:Trace(type, traceSize)
 end
 
 function Logger:Show()
-	if frame:IsShown() then
+	if self.frame:IsShown() then
 		self:Hide()
 	else
 		updateContent()
-		frame:Show()
+		RunNextFrame(function()
+			self.frame:Show()
+		end)
 	end
 end
 
 function Logger:Hide()
-	frame:Hide()
+	self.frame:Hide()
 end
 
 return Logger

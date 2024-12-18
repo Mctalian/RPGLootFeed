@@ -57,6 +57,7 @@ function Xp:OnDisable()
 end
 
 function Xp:OnEnable()
+	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_XP_UPDATE")
 	if currentXP == nil then

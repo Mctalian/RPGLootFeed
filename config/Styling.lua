@@ -10,6 +10,10 @@ G_RLF.defaults.global.growUp = true
 G_RLF.defaults.global.rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 } -- Default to dark grey with 80% opacity
 G_RLF.defaults.global.rowBackgroundGradientEnd = { 0.1, 0.1, 0.1, 0 } -- Default to dark grey with 0% opacity
 G_RLF.defaults.global.disableRowHighlight = false
+G_RLF.defaults.global.enableRowBorder = false
+G_RLF.defaults.global.rowBorderSize = 1
+G_RLF.defaults.global.rowBorderColor = { 0, 0, 0, 1 }
+G_RLF.defaults.global.rowBorderClassColors = false
 G_RLF.defaults.global.useFontObjects = true
 G_RLF.defaults.global.font = "GameFontNormalSmall"
 G_RLF.defaults.global.fontFace = "Friz Quadrata TT"
@@ -60,14 +64,63 @@ G_RLF.options.args.styles = {
 			set = "SetGradientEndColor",
 			order = 4,
 		},
-		rowHighlight = {
-			type = "toggle",
-			name = G_RLF.L["Disable Row Highlight"],
-			desc = G_RLF.L["DisableRowHighlightDesc"],
-			width = "double",
-			get = "GetRowHighlight",
-			set = "SetRowHighlight",
+		rowBorders = {
+			type = "group",
+			name = G_RLF.L["Row Borders"],
+			desc = G_RLF.L["RowBordersDesc"],
+			inline = true,
 			order = 5,
+			args = {
+				rowHighlight = {
+					type = "toggle",
+					name = G_RLF.L["Disable Row Highlight"],
+					desc = G_RLF.L["DisableRowHighlightDesc"],
+					width = "double",
+					get = "GetRowHighlight",
+					set = "SetRowHighlight",
+					order = 1,
+				},
+				rowBordersEnabled = {
+					type = "toggle",
+					name = G_RLF.L["Enable Row Borders"],
+					desc = G_RLF.L["EnableRowBordersDesc"],
+					width = "double",
+					get = "GetRowBorders",
+					set = "SetRowBorders",
+					order = 2,
+				},
+				rowBorderThickness = {
+					type = "range",
+					name = G_RLF.L["Row Border Thickness"],
+					desc = G_RLF.L["RowBorderThicknessDesc"],
+					min = 1,
+					max = 10,
+					step = 1,
+					disabled = "DisableRowBorders",
+					get = "GetRowBorderThickness",
+					set = "SetRowBorderThickness",
+					order = 3,
+				},
+				rowBorderColor = {
+					type = "color",
+					name = G_RLF.L["Row Border Color"],
+					desc = G_RLF.L["RowBorderColorDesc"],
+					hasAlpha = true,
+					disabled = "DisableRowColor",
+					get = "GetRowBorderColor",
+					set = "SetRowBorderColor",
+					order = 4,
+				},
+				rowBorderClassColors = {
+					type = "toggle",
+					name = G_RLF.L["Use Class Colors for Borders"],
+					desc = G_RLF.L["UseClassColorsForBordersDesc"],
+					set = "SetRowBorderClassColors",
+					get = "GetRowBorderClassColors",
+					disabled = "DisableRowBorders",
+					order = 5,
+				},
+			},
 		},
 		enableSecondaryRowText = {
 			type = "toggle",
@@ -277,4 +330,49 @@ end
 
 function Styling:GetRowFont(info, value)
 	return G_RLF.db.global.font
+end
+
+function Styling:GetRowBorders(info, value)
+	return G_RLF.db.global.enableRowBorder
+end
+
+function Styling:SetRowBorders(info, value)
+	G_RLF.db.global.enableRowBorder = value
+	G_RLF.LootDisplay:UpdateRowStyles()
+end
+
+function Styling:GetRowBorderThickness(info, value)
+	return G_RLF.db.global.rowBorderSize
+end
+
+function Styling:SetRowBorderThickness(info, value)
+	G_RLF.db.global.rowBorderSize = value
+	G_RLF.LootDisplay:UpdateRowStyles()
+end
+
+function Styling:GetRowBorderColor(info, value)
+	local r, g, b, a = unpack(G_RLF.db.global.rowBorderColor)
+	return r, g, b, a
+end
+
+function Styling:SetRowBorderColor(info, r, g, b, a)
+	G_RLF.db.global.rowBorderColor = { r, g, b, a }
+	G_RLF.LootDisplay:UpdateRowStyles()
+end
+
+function Styling:DisableRowBorders(info, value)
+	return G_RLF.db.global.enableRowBorder == false
+end
+
+function Styling:DisableRowColor(info, value)
+	return G_RLF.db.global.enableRowBorder == false or G_RLF.db.global.rowBorderClassColors
+end
+
+function Styling:GetRowBorderClassColors(info, value)
+	return G_RLF.db.global.rowBorderClassColors
+end
+
+function Styling:SetRowBorderClassColors(info, value)
+	G_RLF.db.global.rowBorderClassColors = value
+	G_RLF.LootDisplay:UpdateRowStyles()
 end

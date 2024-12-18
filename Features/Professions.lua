@@ -56,6 +56,7 @@ end
 function Professions:OnEnable()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("CHAT_MSG_SKILL")
+	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
 function Professions:InitializeProfessions()

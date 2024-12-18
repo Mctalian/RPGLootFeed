@@ -18,13 +18,21 @@ $scriptDirectory = Split-Path -Parent $MyInvocation.MyCommand.Path
 $addonName = Get-ChildItem -Path $scriptDirectory -Filter *.toc | Select-Object -First 1 | ForEach-Object { $_.BaseName }
 
 $sourcePath = "$scriptDirectory\.release\$addonName"
-$destPath = "C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\$addonName"
+$destPaths = @(
+    "C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\$addonName",
+    "C:\Program Files (x86)\World of Warcraft\_classic_era_\Interface\AddOns\$addonName"
+)
 
 Write-Host $sourcePath
 
-if (Test-Path $destPath) {
-    Remove-Item $destPath -Recurse -Force
-    Write-Host "Directory deleted: $destPath"
-}
+foreach ($destPath in $destPaths) {
+    if (Test-Path (Split-Path -Parent $destPath)) {
+        if (Test-Path $destPath) {
+            Remove-Item $destPath -Recurse -Force
+            Write-Host "Directory deleted: $destPath"
+        }
 
-New-Item -ItemType SymbolicLink -Target "$sourcePath" -Path "$destPath"
+        New-Item -ItemType SymbolicLink -Target "$sourcePath" -Path "$destPath"
+        Write-Host "Symbolic link created from $sourcePath to $destPath"
+    }
+}

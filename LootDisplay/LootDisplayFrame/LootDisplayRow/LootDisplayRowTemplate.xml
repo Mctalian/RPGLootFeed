@@ -13,6 +13,66 @@
                 </Texture>
             </Layer>
 
+            <!-- Highlight BG Layer -->
+            <Layer level="BORDER">
+                <Texture parentKey="HighlightBGOverlay" file="Interface/Buttons/WHITE8x8" alpha="0" >
+                    <Anchors>
+                        <Anchor point="TOPLEFT" />
+                        <Anchor point="BOTTOMRIGHT" />
+                    </Anchors>
+                    <Color r="1" g="1" b="1" a="0.5" /> <!-- Light white with 50% opacity -->
+                </Texture>
+
+                <!-- Static Row Borders -->
+                <!-- Top Border -->
+                <Texture name="$parentStaticTopBorder" parentKey="StaticTopBorder" hidden="true">
+                    <Color r="0" g="0" b="0" a="1" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" />
+                        <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" />
+                    </Anchors>
+                    <Size>
+                        <AbsDimension x="0" y="1" />
+                    </Size>
+                </Texture>
+
+                <!-- Bottom Border -->
+                <Texture name="$parentStaticBottomBorder" parentKey="StaticBottomBorder" hidden="true">
+                    <Color r="0" g="0" b="0" a="1" />
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" />
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" />
+                    </Anchors>
+                    <Size>
+                        <AbsDimension x="0" y="1" />
+                    </Size>
+                </Texture>
+
+                <!-- Left Border -->
+                <Texture name="$parentStaticLeftBorder" parentKey="StaticLeftBorder" hidden="true">
+                    <Color r="0" g="0" b="0" a="1" />
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" />
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" />
+                    </Anchors>
+                    <Size>
+                        <AbsDimension x="1" y="0" />
+                    </Size>
+                </Texture>
+
+                <!-- Right Border -->
+                <Texture name="$parentStaticRightBorder" parentKey="StaticRightBorder" hidden="true">
+                    <Color r="0" g="0" b="0" a="1" />
+                    <Anchors>
+                        <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" />
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" />
+                    </Anchors>
+                    <Size>
+                        <AbsDimension x="1" y="0" />
+                    </Size>
+                </Texture>
+            </Layer>
+
             <!-- Amount Text Layer -->
             <Layer level="ARTWORK">
                 <Texture parentKey="UnitPortrait" />
@@ -23,40 +83,53 @@
 
             <!-- Highlight Border Layer -->
             <Layer level="OVERLAY">
-                <Texture name="$parentTopBorder" file="Interface/COMMON/ThinBorder2-Top"
-                    parentKey="TopBorder" horizTile="true" alpha="0">
+                <Texture name="$parentTopBorder" parentKey="TopBorder" alpha="0">
+                    <Color r="1" g="1" b="1" a="1" />
                     <Anchors>
-                        <Anchor point="TOPLEFT" />
-                        <Anchor point="TOPRIGHT" />
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" />
+                        <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" />
                     </Anchors>
+                    <Size>
+                        <AbsDimension x="0" y="1" />
+                    </Size>
                 </Texture>
 
-                <Texture name="$parentLeftBorder" file="Interface/COMMON/ThinBorder2-Left"
-                    parentKey="LeftBorder" vertTile="true" alpha="0">
+                <Texture name="$parentLeftBorder" parentKey="LeftBorder" alpha="0">
+                    <Color r="1" g="1" b="1" a="1" />
                     <Anchors>
-                        <Anchor point="TOPLEFT" />
-                        <Anchor point="BOTTOMLEFT" />
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" />
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" />
                     </Anchors>
+                    <Size>
+                        <AbsDimension x="1" y="0" />
+                    </Size>
                 </Texture>
 
-                <Texture name="$parentBottomBorder" file="Interface/COMMON/ThinBorder2-Top"
-                    parentKey="BottomBorder" horizTile="true" alpha="0">
+                <Texture name="$parentBottomBorder" parentKey="BottomBorder" alpha="0">
+                    <Color r="1" g="1" b="1" a="1" />
                     <Anchors>
-                        <Anchor point="BOTTOMLEFT" />
-                        <Anchor point="BOTTOMRIGHT" />
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" />
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" />
                     </Anchors>
+                    <Size>
+                        <AbsDimension x="0" y="1" />
+                    </Size>
                 </Texture>
 
-                <Texture name="$parentRightBorder" file="Interface/COMMON/ThinBorder2-Left"
-                    parentKey="RightBorder" vertTile="true" alpha="0">
+                <Texture name="$parentRightBorder" parentKey="RightBorder" alpha="0">
+                    <Color r="1" g="1" b="1" a="1" />
                     <Anchors>
-                        <Anchor point="TOPRIGHT" />
-                        <Anchor point="BOTTOMRIGHT" />
+                        <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" />
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" />
                     </Anchors>
+                    <Size>
+                        <AbsDimension x="1" y="0" />
+                    </Size>
                 </Texture>
             </Layer>
         </Layers>
         <Frames>
+            <Button parentKey="ClickableButton" inherits="UIPanelButtonTemplate" hidden="true" />
             <ItemButton parentKey="Icon" />
         </Frames>
     </Frame>

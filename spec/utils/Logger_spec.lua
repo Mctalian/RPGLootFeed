@@ -2,6 +2,7 @@ local common_stubs = require("spec/common_stubs")
 
 describe("Logger module", function()
 	local ns, Logger
+	local _ = match._
 
 	before_each(function()
 		-- Define the global G_RLF
@@ -21,8 +22,8 @@ describe("Logger module", function()
 			spy.on(Logger, "RegisterBucketMessage")
 			spy.on(Logger, "InitializeFrame")
 			Logger:OnInitialize()
-			assert.spy(Logger.RegisterEvent).was.called_with(Logger, "PLAYER_ENTERING_WORLD")
-			assert.spy(Logger.RegisterBucketMessage).was.called_with(Logger, "RLF_LOG", 0.5, "ProcessLogs")
+			assert.spy(Logger.RegisterEvent).was.called_with(_, "PLAYER_ENTERING_WORLD")
+			assert.spy(Logger.RegisterBucketMessage).was.called_with(_, "RLF_LOG", 0.5, "ProcessLogs")
 			assert.spy(Logger.InitializeFrame).was.called()
 		end)
 
