@@ -8,7 +8,6 @@ ItemLoot.SecondaryTextOption = {
 	["iLvl"] = "Item Level",
 }
 
-local cachedArmorClass = nil
 local onlyEpicPartyLoot = false
 
 ItemLoot.Element = {}
@@ -44,17 +43,19 @@ function ItemLoot:SetNameUnitMap()
 		local name, server = UnitName(unit)
 		if name then
 			self.nameUnitMap[name] = unit
+		else
+			G_RLF:LogError("Failed to get name for unit: " .. unit, addonName, self.moduleName)
 		end
 	end
 end
 
 function ItemLoot:SetPartyLootFilters()
-	if IsInRaid() then
+	if IsInRaid() and G_RLF.db.global.partyLoot.onlyEpicAndAboveInRaid then
 		onlyEpicPartyLoot = true
 		return
 	end
 
-	if IsInInstance() then
+	if IsInInstance() and G_RLF.db.global.partyLoot.onlyEpicAndAboveInInstance then
 		onlyEpicPartyLoot = true
 		return
 	end
@@ -258,6 +259,9 @@ function ItemLoot:OnPartyReadyToShow(info, amount, unit)
 		return
 	end
 	if onlyEpicPartyLoot and info.itemQuality < Enum.ItemQuality.Epic then
+		return
+	end
+	if G_RLF.db.global.partyLoot.itemQualityFilter[info.itemQuality] == false then
 		return
 	end
 	self.pendingPartyRequests[info.itemId] = nil

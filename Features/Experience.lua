@@ -16,7 +16,7 @@ function Xp.Element:new(...)
 
 	element.key = "EXPERIENCE"
 	element.quantity = ...
-	element.r, element.g, element.b, element.a = 1, 0, 1, 0.8
+	element.r, element.g, element.b, element.a = unpack(G_RLF.db.global.xp.experienceTextColor)
 	element.textFn = function(existingXP)
 		return "+" .. ((existingXP or 0) + element.quantity) .. " " .. G_RLF.L["XP"]
 	end

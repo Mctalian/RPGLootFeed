@@ -42,8 +42,6 @@ elementQueue.dequeue = updateTestLabelsWrapper(elementQueue.dequeue)
 --@end-alpha@
 
 -- Public methods
-local logger
-
 function LootDisplay:OnInitialize()
 	frame = LootDisplayFrame
 	frame:Load()
@@ -237,11 +235,11 @@ local function processRow(element)
 		)
 	end
 
-	if element.type == "Experience" and element.currentLevel then
-		row:ShowItemCountText(
-			element.currentLevel,
-			{ color = G_RLF:RGBAToHexFormat(0.749, 0.737, 0.012, 1), wrapChar = G_RLF.WrapCharEnum.ANGLE }
-		)
+	if element.type == "Experience" and element.currentLevel and G_RLF.db.global.xp.showCurrentLevel then
+		row:ShowItemCountText(element.currentLevel, {
+			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.xp.currentLevelColor)),
+			wrapChar = G_RLF.WrapCharEnum.ANGLE,
+		})
 	end
 
 	if element.type == "Professions" then
