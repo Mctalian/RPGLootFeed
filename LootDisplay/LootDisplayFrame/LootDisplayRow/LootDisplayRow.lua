@@ -354,6 +354,7 @@ function LootDisplayRowMixin:Reset()
 
 	self.UnitPortrait:SetTexture(nil)
 	self.SecondaryText:SetText(nil)
+	self.SecondaryText:SetTextColor(unpack(defaultColor))
 	self.ItemCountText:SetText(nil)
 	self.ItemCountText:Hide()
 	self.ClickableButton:Hide()
