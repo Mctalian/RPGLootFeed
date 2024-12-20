@@ -4,8 +4,6 @@ local Professions = G_RLF.RLF:NewModule("Professions", "AceEvent-3.0")
 
 Professions.Element = {}
 
-local color = "|cFF5555FF"
-
 function Professions.Element:new(...)
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
@@ -22,6 +20,8 @@ function Professions.Element:new(...)
 	element.quality = Enum.ItemQuality.Rare
 
 	element.key = keyPrefix .. key
+
+	local color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.prof.skillColor))
 
 	element.textFn = function()
 		return color .. element.name .. " " .. element.level .. "|r"

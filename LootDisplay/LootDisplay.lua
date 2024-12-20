@@ -242,7 +242,7 @@ local function processRow(element)
 		})
 	end
 
-	if element.type == "Professions" then
+	if element.type == "Professions" and G_RLF.db.global.prof.showSkillChange then
 		row:ShowItemCountText(
 			row.amount,
 			{ color = "|cFF5555FF", wrapChar = G_RLF.WrapCharEnum.BRACKET, showSign = true }

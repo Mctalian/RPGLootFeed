@@ -102,6 +102,10 @@ L["Enable Reputation in Feed"] = true
 L["EnableRepDesc"] = "Show reputation gains in the Loot Feed"
 L["Enable Professions in Feed"] = true
 L["EnableProfDesc"] = "Show profession skill gains in the Loot Feed"
+L["Show Skill Change"] = true
+L["ShowSkillChangeDesc"] = "Show the change in skill levels."
+L["Skill Text Color"] = true
+L["SkillColorDesc"] = "The color of the skill text in the loot feed."
 
 -- ConfigOptions - Positioning Group
 L["Toggle Test Mode"] = true
