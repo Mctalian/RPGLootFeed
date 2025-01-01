@@ -222,7 +222,7 @@ local function processRow(element)
 			local itemCount = C_Item.GetItemCount(element.key, true, false, true, true)
 			row:ShowItemCountText(itemCount, {
 				color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.item.itemCountTextColor)),
-				wrapChar = G_RLF.db.global.item.itemCountWrapChar,
+				wrapChar = G_RLF.db.global.item.itemCountTextWrapChar,
 			})
 		end)
 	end

@@ -671,7 +671,7 @@ function LootDisplayRowMixin:UpdateItemCount()
 			local itemCount = C_Item.GetItemCount(self.id, true, false, true, true)
 
 			if itemCount then
-				self:ShowItemCountText(itemCount, { wrapChar = G_RLF.db.global.item.itemCountWrapChar })
+				self:ShowItemCountText(itemCount, { wrapChar = G_RLF.db.global.item.itemCountTextWrapChar })
 			end
 		end
 	end)

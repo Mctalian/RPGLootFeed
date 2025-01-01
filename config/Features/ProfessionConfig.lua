@@ -15,8 +15,8 @@ G_RLF.options.args.features.args.professionConfig = {
 	args = {
 		enableProfession = {
 			type = "toggle",
-			name = G_RLF.L["Enable Profession in Feed"],
-			desc = G_RLF.L["EnableProfessionDesc"],
+			name = G_RLF.L["Enable Professions in Feed"],
+			desc = G_RLF.L["EnableProfDesc"],
 			width = "double",
 			get = function()
 				return G_RLF.db.global.profFeed

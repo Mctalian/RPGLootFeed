@@ -87,10 +87,15 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							type = "select",
 							name = G_RLF.L["Item Count Text Wrap Character"],
 							desc = G_RLF.L["ItemCountTextWrapCharDesc"],
+							disabled = function()
+								return not G_RLF.db.global.item.itemCountTextEnabled
+							end,
 							values = {
-								[G_RLF.WrapCharEnum.PARENTHESIS] = G_RLF.L["Parenthesis"],
-								[G_RLF.WrapCharEnum.ANGLE] = G_RLF.L["Angle Brackets"],
+								[G_RLF.WrapCharEnum.SPACE] = G_RLF.L["Spaces"],
+								[G_RLF.WrapCharEnum.PARENTHESIS] = G_RLF.L["Parentheses"],
 								[G_RLF.WrapCharEnum.BRACKET] = G_RLF.L["Square Brackets"],
+								[G_RLF.WrapCharEnum.BRACE] = G_RLF.L["Curly Braces"],
+								[G_RLF.WrapCharEnum.ANGLE] = G_RLF.L["Angle Brackets"],
 							},
 							get = function()
 								return G_RLF.db.global.item.itemCountTextWrapChar
@@ -104,12 +109,15 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							type = "color",
 							name = G_RLF.L["Item Count Text Color"],
 							desc = G_RLF.L["ItemCountTextColorDesc"],
+							disabled = function()
+								return not G_RLF.db.global.item.itemCountTextEnabled
+							end,
 							hasAlpha = true,
 							get = function()
-								return G_RLF:HexToRGBATable(G_RLF.db.global.item.itemCountTextColor)
+								return unpack(G_RLF.db.global.item.itemCountTextColor)
 							end,
 							set = function(_, r, g, b, a)
-								G_RLF.db.global.item.itemCountTextColor = G_RLF:RGBAToHexFormat(r, g, b, a)
+								G_RLF.db.global.item.itemCountTextColor = { r, g, b, a }
 							end,
 							order = 3,
 						},

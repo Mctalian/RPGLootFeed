@@ -21,6 +21,13 @@ L["Gold"] = true
 L["Silver"] = true
 L["Copper"] = true
 
+-- Count Text Wrap Character
+L["Spaces"] = " Spaces "
+L["Parentheses"] = "(Parentheses)"
+L["Square Brackets"] = "[Square Brackets]"
+L["Curly Braces"] = "{Curly Braces}"
+L["Angle Brackets"] = "<Angle Brackets>"
+
 -- Experience
 L["XP"] = true
 
@@ -43,6 +50,13 @@ L["Enable Item Loot in Feed"] = true
 L["EnableItemLootDesc"] = "Show looted items in the Loot Feed"
 L["Item Loot Config"] = true
 L["Item Loot Options"] = true
+L["Item Count Text"] = true
+L["Enable Item Count Text"] = true
+L["EnableItemCountTextDesc"] = "Show the your total count (bags, bank, etc.) of the looted item in the Loot Feed"
+L["Item Count Text Wrap Character"] = true
+L["ItemCountTextWrapCharDesc"] = "The character to wrap the item count text with."
+L["Item Count Text Color"] = true
+L["ItemCountTextColorDesc"] = "The color of the item count text in the loot feed."
 L["Item Secondary Text Options"] = true
 L["Prices for Sellable Items"] = true
 L["PricesForSellableItemsDesc"] = "Select which price to show for sellable items in the Loot Feed"
@@ -100,6 +114,8 @@ L["Current Level Color"] = true
 L["CurrentLevelColorDesc"] = "The color of the current level text in the loot feed."
 L["Enable Reputation in Feed"] = true
 L["EnableRepDesc"] = "Show reputation gains in the Loot Feed"
+L["Profession Config"] = true
+L["Profession Options"] = true
 L["Enable Professions in Feed"] = true
 L["EnableProfDesc"] = "Show profession skill gains in the Loot Feed"
 L["Show Skill Change"] = true
