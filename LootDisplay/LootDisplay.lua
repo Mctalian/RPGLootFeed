@@ -217,22 +217,27 @@ local function processRow(element)
 		row:UpdateSecondaryText(secondaryTextFn)
 	end
 
-	if element.type == "ItemLoot" and not element.unit then
+	if element.type == "ItemLoot" and not element.unit and G_RLF.db.global.item.itemCountTextEnabled then
 		RunNextFrame(function()
 			local itemCount = C_Item.GetItemCount(element.key, true, false, true, true)
-			row:ShowItemCountText(itemCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
+			row:ShowItemCountText(itemCount, {
+				color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.item.itemCountTextColor)),
+				wrapChar = G_RLF.db.global.item.itemCountWrapChar,
+			})
 		end)
 	end
 
 	if element.type == "Currency" then
-		row:ShowItemCountText(element.totalCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
+		row:ShowItemCountText(element.totalCount, {
+			wrapChar = G_RLF.WrapCharEnum.PARENTHESIS,
+		})
 	end
 
 	if element.type == "Reputation" and element.repLevel then
-		row:ShowItemCountText(
-			element.repLevel,
-			{ color = G_RLF:RGBAToHexFormat(0.5, 0.5, 1, 1), wrapChar = G_RLF.WrapCharEnum.ANGLE }
-		)
+		row:ShowItemCountText(element.repLevel, {
+			color = G_RLF:RGBAToHexFormat(0.5, 0.5, 1, 1),
+			wrapChar = G_RLF.WrapCharEnum.ANGLE,
+		})
 	end
 
 	if element.type == "Experience" and element.currentLevel and G_RLF.db.global.xp.showCurrentLevel then
@@ -243,10 +248,11 @@ local function processRow(element)
 	end
 
 	if element.type == "Professions" and G_RLF.db.global.prof.showSkillChange then
-		row:ShowItemCountText(
-			row.amount,
-			{ color = "|cFF5555FF", wrapChar = G_RLF.WrapCharEnum.BRACKET, showSign = true }
-		)
+		row:ShowItemCountText(row.amount, {
+			color = G_RLF:RGBAToHexFormat(unpack({ 1, 0.333, 0.333, 1 })),
+			wrapChar = G_RLF.WrapCharEnum.BRACKET,
+			showSign = true,
+		})
 	end
 
 	row:ShowText(text, r, g, b, a)

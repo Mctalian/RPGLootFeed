@@ -671,7 +671,7 @@ function LootDisplayRowMixin:UpdateItemCount()
 			local itemCount = C_Item.GetItemCount(self.id, true, false, true, true)
 
 			if itemCount then
-				self:ShowItemCountText(itemCount, { wrapChar = G_RLF.WrapCharEnum.PARENTHESIS })
+				self:ShowItemCountText(itemCount, { wrapChar = G_RLF.db.global.item.itemCountWrapChar })
 			end
 		end
 	end)
@@ -680,7 +680,7 @@ end
 function LootDisplayRowMixin:ShowItemCountText(itemCount, options)
 	local WrapChar = G_RLF.WrapCharEnum
 	options = options or {}
-	local color = options.color or "|cFFBCBCBC"
+	local color = options.color or G_RLF:RGBAToHexFormat(unpack({ 0.737, 0.737, 0.737, 1 }))
 	local wrapChar = options.wrapChar or WrapChar.DEFAULT
 	local showSign = options.showSign or false
 

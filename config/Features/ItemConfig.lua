@@ -4,6 +4,11 @@ local ItemConfig = {}
 
 local PricesEnum = G_RLF.PricesEnum
 
+G_RLF.defaults.global.item = {
+	itemCountTextEnabled = true,
+	itemCountTextColor = { 0.737, 0.737, 0.737, 1 },
+	itemCountTextWrapChar = G_RLF.WrapCharEnum.PARENTHESIS,
+}
 G_RLF.defaults.global.itemQualityFilter = {
 	[G_RLF.ItemQualEnum.Poor] = true,
 	[G_RLF.ItemQualEnum.Common] = true,
@@ -59,6 +64,57 @@ G_RLF.options.args.features.args.itemLootConfig = {
 			end,
 			order = 1.1,
 			args = {
+				itemCountText = {
+					type = "group",
+					name = G_RLF.L["Item Count Text"],
+					inline = true,
+					order = 1.1,
+					args = {
+						itemCountTextEnabled = {
+							type = "toggle",
+							name = G_RLF.L["Enable Item Count Text"],
+							desc = G_RLF.L["EnableItemCountTextDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.item.itemCountTextEnabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemCountTextEnabled = value
+							end,
+							order = 1,
+						},
+						itemCountTextWrapChar = {
+							type = "select",
+							name = G_RLF.L["Item Count Text Wrap Character"],
+							desc = G_RLF.L["ItemCountTextWrapCharDesc"],
+							values = {
+								[G_RLF.WrapCharEnum.PARENTHESIS] = G_RLF.L["Parenthesis"],
+								[G_RLF.WrapCharEnum.ANGLE] = G_RLF.L["Angle Brackets"],
+								[G_RLF.WrapCharEnum.BRACKET] = G_RLF.L["Square Brackets"],
+							},
+							get = function()
+								return G_RLF.db.global.item.itemCountTextWrapChar
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemCountTextWrapChar = value
+							end,
+							order = 2,
+						},
+						itemCountTextColor = {
+							type = "color",
+							name = G_RLF.L["Item Count Text Color"],
+							desc = G_RLF.L["ItemCountTextColorDesc"],
+							hasAlpha = true,
+							get = function()
+								return G_RLF:HexToRGBATable(G_RLF.db.global.item.itemCountTextColor)
+							end,
+							set = function(_, r, g, b, a)
+								G_RLF.db.global.item.itemCountTextColor = G_RLF:RGBAToHexFormat(r, g, b, a)
+							end,
+							order = 3,
+						},
+					},
+				},
 				itemSecondaryTextOptions = {
 					type = "group",
 					name = G_RLF.L["Item Secondary Text Options"],

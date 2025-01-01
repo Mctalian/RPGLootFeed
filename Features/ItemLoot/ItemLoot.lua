@@ -2,12 +2,6 @@ local addonName, G_RLF = ...
 
 local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 
-ItemLoot.SecondaryTextOption = {
-	["None"] = "None",
-	["SellPrice"] = "Sell Price",
-	["iLvl"] = "Item Level",
-}
-
 local onlyEpicPartyLoot = false
 
 ItemLoot.Element = {}
@@ -221,7 +215,6 @@ function ItemLoot.Element:new(...)
 	return element
 end
 
-local logger
 function ItemLoot:OnInitialize()
 	self.pendingItemRequests = {}
 	self.pendingPartyRequests = {}
