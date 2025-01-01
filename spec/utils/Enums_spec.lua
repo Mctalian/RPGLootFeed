@@ -1,29 +1,30 @@
+local common_stubs = require("spec.common_stubs")
+
 describe("Enums", function()
-	local G_RLF
+	local ns
 
 	before_each(function()
-		G_RLF = {}
-		_G.G_RLF = G_RLF
-		assert(loadfile("utils/Enums.lua"))("TestAddon", G_RLF)
+		ns = common_stubs.setup_G_RLF(spy)
+		assert(loadfile("utils/Enums.lua"))("TestAddon", ns)
 	end)
 
 	it("defines DisableBossBanner enum", function()
-		assert.is_not_nil(G_RLF.DisableBossBanner)
+		assert.is_not_nil(ns.DisableBossBanner)
 	end)
 
 	it("defines LogEventSource enum", function()
-		assert.is_not_nil(G_RLF.LogEventSource)
+		assert.is_not_nil(ns.LogEventSource)
 	end)
 
 	it("defines LogLevel enum", function()
-		assert.is_not_nil(G_RLF.LogLevel)
+		assert.is_not_nil(ns.LogLevel)
 	end)
 
 	it("defines FeatureModule enum", function()
-		assert.is_not_nil(G_RLF.FeatureModule)
+		assert.is_not_nil(ns.FeatureModule)
 	end)
 
 	it("defines WrapCharEnum enum", function()
-		assert.is_not_nil(G_RLF.WrapCharEnum)
+		assert.is_not_nil(ns.WrapCharEnum)
 	end)
 end)
