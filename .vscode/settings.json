@@ -1,0 +1,49 @@
+{
+  "Lua.diagnostics.globals": [
+    "spy",
+    "describe",
+    "RunNextFrame",
+    "ChatFrame_RemoveMessageGroup",
+    "ChatFrameUtil",
+    "CreateFramePool",
+    "ItemButtonMixin",
+    "ClearItemButtonOverlay",
+    "SetItemButtonQuality_Base",
+    "SetItemButtonTexture_Base",
+    "LootDisplayFrame",
+    "FACTION_STANDING_INCREASED",
+    "FACTION_STANDING_INCREASED_ACCOUNT_WIDE",
+    "FACTION_STANDING_INCREASED_ACH_BONUS",
+    "FACTION_STANDING_INCREASED_ACH_BONUS_ACCOUNT_WIDE",
+    "FACTION_STANDING_INCREASED_BONUS",
+    "FACTION_STANDING_INCREASED_DOUBLE_BONUS",
+    "FACTION_STANDING_DECREASED",
+    "FACTION_STANDING_DECREASED_ACCOUNT_WIDE",
+    "FACTION_BAR_COLORS",
+    "ChatEdit_GetActiveWindow",
+    "ChatEdit_InsertLink",
+    "ChatFrame_OpenChat",
+    "SetItemRef",
+    "ItemRefTooltip",
+    "GameTooltip_Hide"
+  ],
+  "Lua.workspace.library": [
+    "${addons}/busted/module/library",
+    "${3rd}/luassert/library",
+    "${addons}/luassert/module/library",
+    "~/.vscode-server/extensions/ketho.wow-api-0.18.1/Annotations"
+  ],
+  "Lua.workspace.checkThirdParty": false,
+  "Lua.runtime.version": "Lua 5.1",
+  "Lua.runtime.builtin": {
+    "basic": "disable",
+    "debug": "disable",
+    "io": "disable",
+    "math": "disable",
+    "os": "disable",
+    "package": "disable",
+    "string": "disable",
+    "table": "disable",
+    "utf8": "disable"
+  }
+}
