@@ -1,4 +1,4 @@
-.PHONY: all_checks hardcode_string_check missing_translation_check missing_locale_key_check test test-ci local
+.PHONY: all_checks hardcode_string_check missing_translation_check missing_locale_key_check test test-ci local check_untracked_files
 
 all_checks: hardcode_string_check missing_translation_check missing_locale_key_check
 
@@ -27,5 +27,16 @@ lua_deps:
 	@luarocks install luacov --local
 	@luarocks install luacov-html --local
 
-local:
+check_untracked_files:
+	@if [ -n "$$(git ls-files --others --exclude-standard)" ]; then \
+		echo "You have untracked files:"; \
+		git ls-files --others --exclude-standard; \
+		echo
+		echo "This may cause errors in game. Please stage or remove them."; \
+		exit 1; \
+	else \
+		echo "No untracked files."; \
+	fi
+
+local: missing_locale_key_check check_untracked_files
 	@.release/local.sh -D
