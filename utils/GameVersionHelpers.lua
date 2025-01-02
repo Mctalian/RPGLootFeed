@@ -37,7 +37,7 @@ function G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(index)
 	return ConvertFactionInfo(legacyFactionData)
 end
 
-if G_RLF:IsClassic() then
+if G_RLF:IsClassic() or G_RLF:IsCataClassic() then
 	if not ClearItemButtonOverlay then
 		function ClearItemButtonOverlay(button)
 			-- Dummy function to avoid errors

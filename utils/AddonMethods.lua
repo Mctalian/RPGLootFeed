@@ -46,6 +46,10 @@ function G_RLF:IsClassic()
 	return WOW_PROJECT_ID == WOW_PROJECT_CLASSIC
 end
 
+function G_RLF:IsCataClassic()
+	return WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
+end
+
 function G_RLF:SendMessage(...)
 	local args = { ... }
 	RunNextFrame(function()

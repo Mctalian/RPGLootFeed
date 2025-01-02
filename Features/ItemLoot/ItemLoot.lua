@@ -180,7 +180,7 @@ function ItemLoot.Element:new(...)
 			end
 			if G_RLF:IsRetail() then
 				atlasIcon = "spellicon-256x256-selljunk"
-			elseif G_RLF:IsClassic() then
+			elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
 				atlasIcon = "bags-junkcoin"
 			end
 			unitPrice = element.sellPrice
@@ -192,7 +192,7 @@ function ItemLoot.Element:new(...)
 			unitPrice = marketPrice
 			if G_RLF:IsRetail() then
 				atlasIcon = "auctioneer"
-			elseif G_RLF:IsClassic() then
+			elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
 				atlasIcon = "Auctioneer"
 			end
 		end
@@ -321,7 +321,7 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 	local me = false
 	if G_RLF:IsRetail() then
 		me = guid == GetPlayerGuid()
-	elseif G_RLF:IsClassic() then
+	elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
 		me = playerName2 == UnitName("player")
 	end
 

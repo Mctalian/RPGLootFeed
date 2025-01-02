@@ -61,7 +61,7 @@ function LootDisplay:OnEnable()
 		G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
 	end)
 
-	if G_RLF:IsClassic() then
+	if G_RLF:IsClassic() or G_RLF:IsCataClassic() then
 		self:RawHook(ItemButtonMixin, "SetItemButtonTexture", function(self, texture)
 			if SetItemButtonTexture_Base then
 				SetItemButtonTexture_Base(texture)
