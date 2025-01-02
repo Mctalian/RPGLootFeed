@@ -46,9 +46,10 @@ def check_missing_keys():
 
     missing_keys = locale_keys - defined_keys
     if missing_keys:
-        print("Missing locale keys in enUS.lua:")
+        print("Missing locale keys in enUS.lua:\n")
         for key in missing_keys:
-            print(f'  "{key}"')
+            print(f'L["{key}"]')
+        print("\nPlease define the missing keys in enUS.lua")
         exit(1)
     else:
         print("All locale keys are defined in enUS.lua")

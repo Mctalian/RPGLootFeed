@@ -98,7 +98,8 @@ function Rep.Element:new(...)
 
 	local factionName, factionData, rL, gL, bL
 	element.quantity, factionName, rL, gL, bL, element.factionId, factionData, element.repType = ...
-	element.r, element.g, element.b = rL or 0.5, gL or 0.5, bL or 1
+	local rDef, gDef, bDef = unpack(G_RLF.db.global.rep.defaultRepColor)
+	element.r, element.g, element.b = rL or rDef, gL or gDef, bL or bDef
 	element.a = 1
 	element.key = "REP_" .. factionName
 	element.textFn = function(existingRep)
@@ -126,7 +127,7 @@ function Rep.Element:new(...)
 			return str
 		end
 
-		local color = G_RLF:RGBAToHexFormat(element.r, element.g, element.b, 0.7)
+		local color = G_RLF:RGBAToHexFormat(element.r, element.g, element.b, G_RLF.db.global.rep.secondaryTextAlpha)
 
 		if element.repType == RepType.DelveCompanion and factionData then
 			str = math.floor((factionData.currentXp / factionData.nextLevelAt) * 10000) / 100 .. "%"

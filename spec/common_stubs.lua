@@ -66,6 +66,13 @@ function common_stubs.setup_G_RLF(spy)
 				xp = {
 					experienceTextColor = { 1, 1, 1, 1 },
 				},
+				rep = {
+					defaultRepColor = { 0.5, 0.5, 1 },
+					secondaryTextAlpha = 0.7,
+					enableRepLevel = true,
+					repLevelColor = { 0.5, 0.5, 1, 1 },
+					repLevelTextWrapChar = 5,
+				},
 			},
 		},
 		L = {

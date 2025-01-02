@@ -234,10 +234,10 @@ local function processRow(element)
 		})
 	end
 
-	if element.type == "Reputation" and element.repLevel then
+	if element.type == "Reputation" and element.repLevel and G_RLF.db.global.rep.enableRepLevel then
 		row:ShowItemCountText(element.repLevel, {
-			color = G_RLF:RGBAToHexFormat(0.5, 0.5, 1, 1),
-			wrapChar = G_RLF.WrapCharEnum.ANGLE,
+			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.rep.repLevelColor)),
+			wrapChar = G_RLF.db.global.rep.repLevelTextWrapChar,
 		})
 	end
 

@@ -83,6 +83,23 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							end,
 							order = 1,
 						},
+						itemCountTextColor = {
+							type = "color",
+							name = G_RLF.L["Item Count Text Color"],
+							desc = G_RLF.L["ItemCountTextColorDesc"],
+							width = "double",
+							disabled = function()
+								return not G_RLF.db.global.item.itemCountTextEnabled
+							end,
+							hasAlpha = true,
+							get = function()
+								return unpack(G_RLF.db.global.item.itemCountTextColor)
+							end,
+							set = function(_, r, g, b, a)
+								G_RLF.db.global.item.itemCountTextColor = { r, g, b, a }
+							end,
+							order = 2,
+						},
 						itemCountTextWrapChar = {
 							type = "select",
 							name = G_RLF.L["Item Count Text Wrap Character"],
@@ -96,22 +113,6 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							end,
 							set = function(_, value)
 								G_RLF.db.global.item.itemCountTextWrapChar = value
-							end,
-							order = 2,
-						},
-						itemCountTextColor = {
-							type = "color",
-							name = G_RLF.L["Item Count Text Color"],
-							desc = G_RLF.L["ItemCountTextColorDesc"],
-							disabled = function()
-								return not G_RLF.db.global.item.itemCountTextEnabled
-							end,
-							hasAlpha = true,
-							get = function()
-								return unpack(G_RLF.db.global.item.itemCountTextColor)
-							end,
-							set = function(_, r, g, b, a)
-								G_RLF.db.global.item.itemCountTextColor = { r, g, b, a }
 							end,
 							order = 3,
 						},

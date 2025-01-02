@@ -50,48 +50,59 @@ G_RLF.options.args.features.args.experienceConfig = {
 					end,
 					order = 1,
 				},
-				showCurrentLevel = {
-					type = "toggle",
-					name = G_RLF.L["Show Current Level"],
-					desc = G_RLF.L["ShowCurrentLevelDesc"],
-					width = "double",
-					get = function()
-						return G_RLF.db.global.xp.showCurrentLevel
-					end,
-					set = function(_, value)
-						G_RLF.db.global.xp.showCurrentLevel = value
-					end,
+				currentLevelOptions = {
+					type = "group",
+					inline = true,
+					name = G_RLF.L["Current Level Options"],
 					order = 2,
-				},
-				currentLevelColor = {
-					type = "color",
-					name = G_RLF.L["Current Level Color"],
-					desc = G_RLF.L["CurrentLevelColorDesc"],
-					disabled = function()
-						return not G_RLF.db.global.xp.showCurrentLevel
-					end,
-					width = "double",
-					get = function()
-						return unpack(G_RLF.db.global.xp.currentLevelColor)
-					end,
-					set = function(_, r, g, b, a)
-						G_RLF.db.global.xp.currentLevelColor = { r, g, b, a }
-					end,
-					order = 3,
-				},
-				currentLevelTextWrapChar = {
-					type = "select",
-					name = G_RLF.L["Current Level Text Wrap Character"],
-					desc = G_RLF.L["CurrentLevelTextWrapCharDesc"],
-					get = function()
-						return G_RLF.db.global.xp.currentLevelTextWrapChar
-					end,
-					set = function(_, value)
-						G_RLF.db.global.xp.currentLevelTextWrapChar = value
-					end,
-					values = G_RLF.WrapCharOptions,
-					style = "dropdown",
-					order = 4,
+					args = {
+						showCurrentLevel = {
+							type = "toggle",
+							name = G_RLF.L["Show Current Level"],
+							desc = G_RLF.L["ShowCurrentLevelDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.xp.showCurrentLevel
+							end,
+							set = function(_, value)
+								G_RLF.db.global.xp.showCurrentLevel = value
+							end,
+							order = 2,
+						},
+						currentLevelColor = {
+							type = "color",
+							name = G_RLF.L["Current Level Color"],
+							desc = G_RLF.L["CurrentLevelColorDesc"],
+							disabled = function()
+								return not G_RLF.db.global.xp.showCurrentLevel
+							end,
+							width = "double",
+							get = function()
+								return unpack(G_RLF.db.global.xp.currentLevelColor)
+							end,
+							set = function(_, r, g, b, a)
+								G_RLF.db.global.xp.currentLevelColor = { r, g, b, a }
+							end,
+							order = 3,
+						},
+						currentLevelTextWrapChar = {
+							type = "select",
+							name = G_RLF.L["Current Level Text Wrap Character"],
+							desc = G_RLF.L["CurrentLevelTextWrapCharDesc"],
+							disabled = function()
+								return not G_RLF.db.global.xp.showCurrentLevel
+							end,
+							get = function()
+								return G_RLF.db.global.xp.currentLevelTextWrapChar
+							end,
+							set = function(_, value)
+								G_RLF.db.global.xp.currentLevelTextWrapChar = value
+							end,
+							values = G_RLF.WrapCharOptions,
+							style = "dropdown",
+							order = 4,
+						},
+					},
 				},
 			},
 		},

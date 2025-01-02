@@ -17,7 +17,7 @@ G_RLF.options.args.features.args.currencyConfig = {
 	type = "group",
 	handler = CurrencyConfig,
 	name = G_RLF.L["Currency Config"],
-	order = 2.15,
+	order = 2.2,
 	args = {
 		enableCurrency = {
 			type = "toggle",
@@ -49,42 +49,58 @@ G_RLF.options.args.features.args.currencyConfig = {
 			end,
 			order = 2,
 			args = {
-				currencyTotalTextEnabled = {
-					type = "toggle",
-					name = G_RLF.L["Enable Currency Total Text"],
-					desc = G_RLF.L["EnableCurrencyTotalTextDesc"],
-					get = function()
-						return G_RLF.db.global.currency.currencyTotalTextEnabled
-					end,
-					set = function(_, value)
-						G_RLF.db.global.currency.currencyTotalTextEnabled = value
-					end,
+				totalTextOptions = {
+					type = "group",
+					inline = true,
+					name = G_RLF.L["Currency Total Text Options"],
 					order = 1,
-				},
-				currencyTotalTextColor = {
-					type = "color",
-					name = G_RLF.L["Currency Total Text Color"],
-					desc = G_RLF.L["CurrencyTotalTextColorDesc"],
-					get = function()
-						return unpack(G_RLF.db.global.currency.currencyTotalTextColor)
-					end,
-					set = function(_, r, g, b, a)
-						G_RLF.db.global.currency.currencyTotalTextColor = { r, g, b, a }
-					end,
-					order = 2,
-				},
-				currencyTotalTextWrapChar = {
-					type = "select",
-					name = G_RLF.L["Currency Total Text Wrap Character"],
-					desc = G_RLF.L["CurrencyTotalTextWrapCharDesc"],
-					values = G_RLF.WrapCharOptions,
-					get = function()
-						return G_RLF.db.global.currency.currencyTotalTextWrapChar
-					end,
-					set = function(_, value)
-						G_RLF.db.global.currency.currencyTotalTextWrapChar = value
-					end,
-					order = 3,
+					args = {
+						currencyTotalTextEnabled = {
+							type = "toggle",
+							name = G_RLF.L["Enable Currency Total Text"],
+							desc = G_RLF.L["EnableCurrencyTotalTextDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.currency.currencyTotalTextEnabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.currency.currencyTotalTextEnabled = value
+							end,
+							order = 1,
+						},
+						currencyTotalTextColor = {
+							type = "color",
+							name = G_RLF.L["Currency Total Text Color"],
+							desc = G_RLF.L["CurrencyTotalTextColorDesc"],
+							disabled = function()
+								return not G_RLF.db.global.currency.currencyTotalTextEnabled
+							end,
+							width = "double",
+							get = function()
+								return unpack(G_RLF.db.global.currency.currencyTotalTextColor)
+							end,
+							set = function(_, r, g, b, a)
+								G_RLF.db.global.currency.currencyTotalTextColor = { r, g, b, a }
+							end,
+							order = 2,
+						},
+						currencyTotalTextWrapChar = {
+							type = "select",
+							name = G_RLF.L["Currency Total Text Wrap Character"],
+							desc = G_RLF.L["CurrencyTotalTextWrapCharDesc"],
+							disabled = function()
+								return not G_RLF.db.global.currency.currencyTotalTextEnabled
+							end,
+							values = G_RLF.WrapCharOptions,
+							get = function()
+								return G_RLF.db.global.currency.currencyTotalTextWrapChar
+							end,
+							set = function(_, value)
+								G_RLF.db.global.currency.currencyTotalTextWrapChar = value
+							end,
+							order = 3,
+						},
+					},
 				},
 			},
 		},
