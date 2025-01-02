@@ -31,7 +31,7 @@ check_untracked_files:
 	@if [ -n "$$(git ls-files --others --exclude-standard)" ]; then \
 		echo "You have untracked files:"; \
 		git ls-files --others --exclude-standard; \
-		echo
+		echo ""; \
 		echo "This may cause errors in game. Please stage or remove them."; \
 		exit 1; \
 	else \
