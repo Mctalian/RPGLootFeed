@@ -41,6 +41,8 @@ L["Toggle Loot History"] = true
 -- ConfigOptions - Features Group
 L["Features"] = true
 L["FeaturesDesc"] = "Enable or Disable different RPGLootFeed features"
+L["Loot Feeds"] = true
+L["Miscellaneous"] = true
 L["Enable Loot History"] = true
 L["EnableLootHistoryDesc"] = "Store a history of looted items and display them in a separate frame"
 L["Loot History Size"] = true
