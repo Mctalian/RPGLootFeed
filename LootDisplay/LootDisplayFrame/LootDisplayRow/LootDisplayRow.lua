@@ -686,7 +686,7 @@ function LootDisplayRowMixin:ShowItemCountText(itemCount, options)
 
 	local sChar, eChar
 	if wrapChar == WrapChar.SPACE then
-		sChar, eChar = " ", ""
+		sChar, eChar = " ", " "
 	elseif wrapChar == WrapChar.PARENTHESIS then
 		sChar, eChar = "(", ")"
 	elseif wrapChar == WrapChar.BRACKET then
@@ -695,6 +695,8 @@ function LootDisplayRowMixin:ShowItemCountText(itemCount, options)
 		sChar, eChar = "{", "}"
 	elseif wrapChar == WrapChar.ANGLE then
 		sChar, eChar = "<", ">"
+	elseif wrapChar == WrapChar.BAR then
+		sChar, eChar = "|", "|"
 	else
 		sChar, eChar = "", ""
 	end

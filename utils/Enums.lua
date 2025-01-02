@@ -73,4 +73,5 @@ G_RLF.WrapCharEnum = {
 	BRACKET = 3,
 	BRACE = 4,
 	ANGLE = 5,
+	BAR = 6,
 }

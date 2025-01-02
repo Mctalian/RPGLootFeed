@@ -27,6 +27,7 @@ L["Parentheses"] = "(Parentheses)"
 L["Square Brackets"] = "[Square Brackets]"
 L["Curly Braces"] = "{Curly Braces}"
 L["Angle Brackets"] = "<Angle Brackets>"
+L["Bars"] = "|Bars|"
 
 -- Experience
 L["XP"] = true
@@ -111,6 +112,18 @@ L["Show only when SHIFT is held"] = true
 L["OnlyShiftOnEnterDesc"] = "Only show the tooltip if Shift is held as you mouseover the item/currency."
 L["Enable Money in Feed"] = true
 L["EnableMoneyDesc"] = "Show money, like Gold, Silver, Copper, in the Loot Feed"
+L["Money Config"] = true
+L["Money Options"] = true
+L["Money Total Options"] = true
+L["ShowMoneyTotalDesc"] = "Show the total amount of money on the current character in the Loot Feed"
+L["Abbreviate Total"] = true
+L["AbbreviateTotalDesc"] = "Abbreviate the total money amount in the Loot Feed (for gold over 1000)"
+L["Show Money Total"] = true
+L["BillionAbbrev"] = "B"
+L["MillionAbbrev"] = "M"
+L["ThousandAbbrev"] = "K"
+L["Accountant Mode"] = true
+L["AccountantModeDesc"] = "Show the negative money amounts in parentheses instead of a negative sign."
 L["Enable Experience in Feed"] = true
 L["EnableXPDesc"] = "Show experience gains in the Loot Feed"
 L["Experience Config"] = true

@@ -8,6 +8,7 @@ G_RLF.WrapCharOptions = {
 	[G_RLF.WrapCharEnum.BRACKET] = G_RLF.L["Square Brackets"],
 	[G_RLF.WrapCharEnum.BRACE] = G_RLF.L["Curly Braces"],
 	[G_RLF.WrapCharEnum.ANGLE] = G_RLF.L["Angle Brackets"],
+	[G_RLF.WrapCharEnum.BAR] = G_RLF.L["Bars"],
 }
 
 G_RLF.defaults = {

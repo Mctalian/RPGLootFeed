@@ -222,6 +222,7 @@ function common_stubs.setup_G_RLF(spy)
 			BRACKET = 3,
 			BRACE = 4,
 			ANGLE = 5,
+			BAR = 6,
 		},
 		IsRetail = spy.new(function()
 			return true

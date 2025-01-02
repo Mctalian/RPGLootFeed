@@ -24,13 +24,37 @@ function Money.Element:new(...)
 		if total < 0 then
 			sign = "-"
 		end
-		return sign .. C_CurrencyInfo.GetCoinTextureString(math.abs(total))
+		local coinString = C_CurrencyInfo.GetCoinTextureString(math.abs(total))
+		if G_RLF.db.global.money.accountantMode then
+			return "(" .. coinString .. ")"
+		end
+		return sign .. coinString
+	end
+
+	local function abbreviate(total)
+		if total > 1000000000 then
+			return string.format("%.2f" .. G_RLF.L["BillionAbbrev"], total / 1000000000)
+		elseif total > 1000000 then
+			return string.format("%.2f" .. G_RLF.L["MillionAbbrev"], total / 1000000)
+		elseif total > 1000 then
+			return string.format("%.2f" .. G_RLF.L["ThousandAbbrev"], total / 1000)
+		end
+		return total
 	end
 
 	element.secondaryTextFn = function()
+		if not G_RLF.db.global.money.showMoneyTotal then
+			return
+		end
+
 		local money = GetMoney()
-		if money > 10000000 then
-			money = math.floor(money / 10000) * 10000
+		if money > 10000000 then -- More than 1000 gold
+			money = math.floor(money / 10000) * 10000 -- truncate silver and copper
+			if G_RLF.db.global.money.abbreviateTotal then
+				local goldOnly = math.floor(money / 10000) -- get the gold
+				local coinString = C_CurrencyInfo.GetCoinTextureString(money) -- get the coin string
+				return "    " .. string.gsub(coinString, goldOnly, abbreviate(goldOnly)) -- replace the money with the abbreviated version
+			end
 		end
 		return "    " .. C_CurrencyInfo.GetCoinTextureString(money)
 	end
