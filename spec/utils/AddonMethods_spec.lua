@@ -26,7 +26,7 @@ describe("AddonMethods", function()
 
 	describe("fn", function()
 		it("calls the function with xpcall and errorhandler", function()
-			local funcSpy = spy.new()
+			local funcSpy = spy.new(function() end)
 			local func = function(...)
 				funcSpy(...)
 			end

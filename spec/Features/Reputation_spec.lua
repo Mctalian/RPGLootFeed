@@ -129,7 +129,6 @@ describe("Reputation module", function()
 			}
 			local element = RepModule.Element:new(10, "Brann Bronzebeard", 1, 0, 0, 2640, factionData, 4)
 			local text = element.secondaryTextFn()
-
 			assert.is_not_nil(string.match(text, "23.0%%"))
 		end)
 

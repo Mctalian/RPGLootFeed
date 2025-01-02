@@ -1,5 +1,7 @@
 local addonName, G_RLF = ...
 
+local C = LibStub("C_Everywhere")
+
 local TestMode = G_RLF.RLF:NewModule("TestMode", "AceEvent-3.0")
 
 local logger
@@ -49,7 +51,7 @@ end
 
 local function getItem(id)
 	local name, link, quality, icon, sellPrice, _
-	local info = G_RLF.ItemInfo:new(id, C_Item.GetItemInfo(id))
+	local info = G_RLF.ItemInfo:new(id, C.Item.GetItemInfo(id))
 	local isCached = info ~= nil
 	if isCached then
 		if not idExistsInTable(id, TestMode.testItems) then
@@ -61,7 +63,21 @@ local function getItem(id)
 	end
 end
 
-local testItemIds = { 50818, 2589, 2592, 1515, 730, 128827, 219325, 34494 }
+local function tconcat(t1, t2)
+	for i = 1, #t2 do
+		t1[#t1 + 1] = t2[i]
+	end
+	return t1
+end
+
+local testItemIds = { 2589, 2592, 1515, 730 }
+if G_RLF:IsRetail() then
+	tconcat(testItemIds, { 50818, 2589, 2592, 1515, 730, 128827, 219325, 34494 })
+elseif G_RLF:IsClassic() then
+	tconcat(testItemIds, { 233620 })
+elseif G_RLF:IsCataClassic() then
+	tconcat(testItemIds, { 71086 })
+end
 local function initializeTestItems()
 	for _, id in pairs(testItemIds) do
 		getItem(id)
@@ -78,9 +94,14 @@ local testCurrencyIds = { 2245, 1191, 1828, 1792, 1755, 1580, 1273, 1166, 515, 2
 local function initializeTestCurrencies()
 	for _, id in pairs(testCurrencyIds) do
 		if not idExistsInTable(id, TestMode.testCurrencies) then
-			local info = C_CurrencyInfo.GetCurrencyInfo(id)
-			local link = C_CurrencyInfo.GetCurrencyLink(id)
-			local basicInfo = C_CurrencyInfo.GetBasicCurrencyInfo(id, 100)
+			local info = C.CurrencyInfo.GetCurrencyInfo(id)
+			local link
+			if G_RLF:IsRetail() then
+				link = C.CurrencyInfo.GetCurrencyLink(id)
+			else
+				link = C.CurrencyInfo.GetCurrencyLink(id, 100)
+			end
+			local basicInfo = C.CurrencyInfo.GetBasicCurrencyInfo(id, 100)
 			if info and link and info.currencyID and info.iconFileID then
 				table.insert(TestMode.testCurrencies, {
 					link = link,
@@ -98,11 +119,17 @@ end
 local numTestFactions = 3
 local function initializeTestFactions()
 	for i = 1, numTestFactions do
-		local factionInfo = C_Reputation.GetFactionDataByIndex(i)
+		local factionInfo
+		if G_RLF:IsRetail() then
+			factionInfo = C.Reputation.GetFactionDataByIndex(i)
+		elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+			factionInfo = G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(i)
+		end
 		if factionInfo and factionInfo.name then
 			table.insert(TestMode.testFactions, factionInfo.name)
 		end
 	end
+
 	allFactionsInitialized = true
 	signalIntegrationTestReady()
 end
@@ -170,11 +197,14 @@ local function generateRandomLoot()
 	for i = 1, numberOfRowsToGenerate do
 		local rng = math.random()
 
+		G_RLF:LogDebug("Random number generated: " .. rng, addonName)
+
 		if rng >= 0.8 then
 			local experienceGained = math.random(100, 10000)
 			local module = G_RLF.RLF:GetModule("Experience")
 			local e = module.Element:new(experienceGained)
 			e:Show()
+			G_RLF:LogDebug("Experience gained: " .. experienceGained, addonName)
 		end
 
 		if rng <= 0.2 then
@@ -182,6 +212,7 @@ local function generateRandomLoot()
 			local module = G_RLF.RLF:GetModule("Money")
 			local e = module.Element:new(copper)
 			e:Show()
+			G_RLF:LogDebug("Copper gained: " .. copper, addonName)
 		end
 
 		-- 50% chance to show items
@@ -191,6 +222,7 @@ local function generateRandomLoot()
 			local module = G_RLF.RLF:GetModule("ItemLoot")
 			local e = module.Element:new(info, amountLooted, false)
 			e:Show(info.itemName, info.itemQuality)
+			G_RLF:LogDebug("Item looted: " .. info.itemName, addonName)
 
 			-- 10% chance of iitem loot to show up as a party member
 			if rng < 0.3 then
@@ -198,15 +230,19 @@ local function generateRandomLoot()
 				local module = G_RLF.RLF:GetModule("ItemLoot")
 				local e = module.Element:new(info, amountLooted, unit)
 				e:Show(info.itemName, info.itemQuality)
+				G_RLF:LogDebug("Party Item looted: " .. info.itemName, addonName)
 			end
 
 			-- 15% chance to show currency
 		elseif rng > 0.7 and rng <= 0.85 then
-			local currency = TestMode.testCurrencies[math.random(#TestMode.testCurrencies)]
-			local amountLooted = math.random(1, 500)
-			local module = G_RLF.RLF:GetModule("Currency")
-			local e = module.Element:new(currency.link, currency.info, currency.basicInfo)
-			e:Show()
+			if GetExpansionLevel() >= G_RLF.Expansion.SL then
+				local currency = TestMode.testCurrencies[math.random(#TestMode.testCurrencies)]
+				local amountLooted = math.random(1, 500)
+				local module = G_RLF.RLF:GetModule("Currency")
+				local e = module.Element:new(currency.link, currency.info, currency.basicInfo)
+				e:Show()
+				G_RLF:LogDebug("Currency looted: " .. currency.info.name, addonName)
+			end
 
 			-- 10% chance to show reputation (least frequent)
 		elseif rng > 0.85 then
@@ -215,6 +251,7 @@ local function generateRandomLoot()
 			local module = G_RLF.RLF:GetModule("Reputation")
 			local e = module.Element:new(reputationGained, factionName)
 			e:Show()
+			G_RLF:LogDebug("Reputation gained: " .. reputationGained, addonName)
 		end
 	end
 end
@@ -246,7 +283,7 @@ function TestMode:ToggleTestMode()
 		self.testMode = true
 		G_RLF:Print(G_RLF.L["Test Mode Enabled"])
 		G_RLF:LogDebug("Test Mode Enabled", addonName)
-		self.testTimer = C_Timer.NewTicker(1.5, function()
+		self.testTimer = C.Timer.NewTicker(1.5, function()
 			G_RLF:fn(generateRandomLoot)
 		end)
 	end

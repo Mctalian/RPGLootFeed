@@ -14,6 +14,17 @@ G_RLF.defaults.global.xpFeed = true
 G_RLF.defaults.global.repFeed = true
 G_RLF.defaults.global.profFeed = true
 
+G_RLF.mainFeatureOrder = {
+	ItemLoot = 1,
+	PartyLoot = 2,
+	Currency = 3,
+	Money = 4,
+	XP = 5,
+	Rep = 6,
+	Skills = 7,
+}
+local lastFeature = G_RLF.mainFeatureOrder.Skills
+
 G_RLF.options.args.features = {
 	type = "group",
 	handler = Features,
@@ -21,44 +32,10 @@ G_RLF.options.args.features = {
 	desc = G_RLF.L["FeaturesDesc"],
 	order = 4,
 	args = {
-		enableLootHistory = {
-			type = "toggle",
-			name = G_RLF.L["Enable Loot History"],
-			desc = G_RLF.L["EnableLootHistoryDesc"],
-			width = "double",
-			get = "GetLootHistoryStatus",
-			set = "SetLootHistoryStatus",
-			order = 1,
-		},
-		lootHistorySize = {
-			type = "range",
-			name = G_RLF.L["Loot History Size"],
-			desc = G_RLF.L["LootHistorySizeDesc"],
-			disabled = "LootHistoryDisabled",
-			min = 1,
-			max = 1000,
-			step = 1,
-			get = "GetLootHistorySize",
-			set = "SetLootHistorySize",
-			order = 1.1,
-		},
-		enableSecondaryRowText = {
-			type = "toggle",
-			name = G_RLF.L["Enable Secondary Row Text"],
-			desc = G_RLF.L["EnableSecondaryRowTextDesc"],
-			width = "double",
-			get = "GetSecondaryRowText",
-			set = "SetSecondaryRowText",
-			order = 1.2,
-		},
-		enablePartyLoot = {
-			type = "toggle",
-			name = G_RLF.L["Enable Party Loot in Feed"],
-			desc = G_RLF.L["EnablePartyLootDesc"],
-			width = "double",
-			get = "GetPartyLootStatus",
-			set = "SetPartyLootStatus",
-			order = 1.3,
+		mainFeaturesHeader = {
+			type = "header",
+			name = G_RLF.L["Loot Feeds"],
+			order = G_RLF.mainFeatureOrder.ItemLoot - 0.1,
 		},
 		enableItemLoot = {
 			type = "toggle",
@@ -67,7 +44,16 @@ G_RLF.options.args.features = {
 			width = "double",
 			get = "GetItemLootStatus",
 			set = "SetItemLootStatus",
-			order = 2,
+			order = G_RLF.mainFeatureOrder.ItemLoot,
+		},
+		enablePartyLoot = {
+			type = "toggle",
+			name = G_RLF.L["Enable Party Loot in Feed"],
+			desc = G_RLF.L["EnablePartyLootDesc"],
+			width = "double",
+			get = "GetPartyLootStatus",
+			set = "SetPartyLootStatus",
+			order = G_RLF.mainFeatureOrder.PartyLoot,
 		},
 		enableCurrency = {
 			type = "toggle",
@@ -76,34 +62,10 @@ G_RLF.options.args.features = {
 			width = "double",
 			get = "GetCurrencyStatus",
 			set = "SetCurrencyStatus",
-			order = 2.2,
-		},
-		enableTooltip = {
-			type = "toggle",
-			name = G_RLF.L["Enable Item/Currency Tooltips"],
-			desc = G_RLF.L["EnableTooltipsDesc"],
-			width = "double",
-			get = "GetTooltipStatus",
-			set = "SetTooltipStatus",
-			order = 3,
-		},
-		extraTooltipOptions = {
-			type = "group",
-			name = G_RLF.L["Tooltip Options"],
-			inline = true,
-			order = 4,
-			args = {
-				onlyShiftOnEnter = {
-					type = "toggle",
-					disabled = "TooltipShiftDisabled",
-					name = G_RLF.L["Show only when SHIFT is held"],
-					desc = G_RLF.L["OnlyShiftOnEnterDesc"],
-					width = "double",
-					get = "GetTooltipShiftStatus",
-					set = "SetTooltipShiftStatus",
-					order = 1,
-				},
-			},
+			hidden = function()
+				return GetExpansionLevel() < G_RLF.Expansion.SL
+			end,
+			order = G_RLF.mainFeatureOrder.Currency,
 		},
 		enableMoney = {
 			type = "toggle",
@@ -112,7 +74,7 @@ G_RLF.options.args.features = {
 			width = "double",
 			get = "GetMoneyStatus",
 			set = "SetMoneyStatus",
-			order = 5,
+			order = G_RLF.mainFeatureOrder.Money,
 		},
 		enableXp = {
 			type = "toggle",
@@ -121,7 +83,7 @@ G_RLF.options.args.features = {
 			width = "double",
 			get = "GetXPStatus",
 			set = "SetXPStatus",
-			order = 6,
+			order = G_RLF.mainFeatureOrder.XP,
 		},
 		enableRep = {
 			type = "toggle",
@@ -130,7 +92,7 @@ G_RLF.options.args.features = {
 			width = "double",
 			get = "GetRepStatus",
 			set = "SetRepStatus",
-			order = 7,
+			order = G_RLF.mainFeatureOrder.Rep,
 		},
 		enableProf = {
 			type = "toggle",
@@ -139,7 +101,73 @@ G_RLF.options.args.features = {
 			width = "double",
 			get = "GetProfStatus",
 			set = "SetProfStatus",
-			order = 8,
+			order = G_RLF.mainFeatureOrder.Skills,
+		},
+
+		misc = {
+			type = "group",
+			inline = true,
+			name = G_RLF.L["Miscellaneous"],
+			order = lastFeature + 1,
+			args = {
+
+				enableLootHistory = {
+					type = "toggle",
+					name = G_RLF.L["Enable Loot History"],
+					desc = G_RLF.L["EnableLootHistoryDesc"],
+					get = "GetLootHistoryStatus",
+					set = "SetLootHistoryStatus",
+					order = 1,
+				},
+				lootHistorySize = {
+					type = "range",
+					name = G_RLF.L["Loot History Size"],
+					desc = G_RLF.L["LootHistorySizeDesc"],
+					disabled = "LootHistoryDisabled",
+					min = 1,
+					max = 1000,
+					step = 1,
+					get = "GetLootHistorySize",
+					set = "SetLootHistorySize",
+					order = 2,
+				},
+				enableTooltip = {
+					type = "toggle",
+					name = G_RLF.L["Enable Item/Currency Tooltips"],
+					desc = G_RLF.L["EnableTooltipsDesc"],
+					width = "double",
+					get = "GetTooltipStatus",
+					set = "SetTooltipStatus",
+					order = 3,
+				},
+				extraTooltipOptions = {
+					type = "group",
+					name = G_RLF.L["Tooltip Options"],
+					inline = true,
+					disabled = "TooltipShiftDisabled",
+					order = 4,
+					args = {
+						onlyShiftOnEnter = {
+							type = "toggle",
+							name = G_RLF.L["Show only when SHIFT is held"],
+							desc = G_RLF.L["OnlyShiftOnEnterDesc"],
+							width = "double",
+							get = "GetTooltipShiftStatus",
+							set = "SetTooltipShiftStatus",
+							order = 1,
+						},
+					},
+				},
+				enableSecondaryRowText = {
+					type = "toggle",
+					name = G_RLF.L["Enable Secondary Row Text"],
+					desc = G_RLF.L["EnableSecondaryRowTextDesc"],
+					width = "double",
+					get = "GetSecondaryRowText",
+					set = "SetSecondaryRowText",
+					order = 5,
+				},
+			},
 		},
 	},
 }
