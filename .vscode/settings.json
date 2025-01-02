@@ -26,7 +26,8 @@
     "SetItemRef",
     "ItemRefTooltip",
     "GameTooltip_Hide",
-    "EditModeManagerFrame"
+    "EditModeManagerFrame",
+    "GetPlayerGuid"
   ],
   "Lua.workspace.library": [
     "${addons}/busted/module/library",

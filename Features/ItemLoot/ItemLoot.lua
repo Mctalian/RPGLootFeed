@@ -113,6 +113,12 @@ local function IsBetterThanEquipped(info)
 	end
 end
 
+local function getItemLevels(toLink, fromLink)
+	local toInfo = ItemInfo:new(C_Item.GetItemIDForItemInfo(toLink), C_Item.GetItemInfo(toLink))
+	local fromInfo = ItemInfo:new(C_Item.GetItemIDForItemInfo(fromLink), C_Item.GetItemInfo(fromLink))
+	return toInfo.itemLevel, fromInfo.itemLevel
+end
+
 function ItemLoot.Element:new(...)
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
@@ -124,11 +130,15 @@ function ItemLoot.Element:new(...)
 
 	element.isLink = true
 
-	local itemLink, info
-	info, element.quantity, element.unit = ...
+	local itemLink, info, fromLink
+	info, element.quantity, element.unit, fromLink = ...
 	itemLink = info.itemLink
 
 	element.key = info.itemId
+	if fromLink then
+		element.key = "UPGRADE_" .. element.key
+	end
+
 	element.icon = info.itemTexture
 	element.sellPrice = info.sellPrice
 
@@ -170,6 +180,14 @@ function ItemLoot.Element:new(...)
 			end
 			return "    " .. name
 		end
+
+		if fromLink ~= "" and fromLink ~= nil then
+			local toItemLevel, fromItemLevel = getItemLevels(itemLink, fromLink)
+			local atlasIconSize = G_RLF.db.global.fontSize * 1.5
+			local atlasArrow = "|A:npe_arrowrightglow:" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a"
+			return "    " .. fromItemLevel .. " " .. atlasArrow .. " " .. toItemLevel
+		end
+
 		local quantity = ...
 		local atlasIconSize = G_RLF.db.global.fontSize * 1.5
 		local atlasIcon
@@ -240,9 +258,9 @@ function ItemLoot:OnEnable()
 	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
-function ItemLoot:OnItemReadyToShow(info, amount)
+function ItemLoot:OnItemReadyToShow(info, amount, fromLink)
 	self.pendingItemRequests[info.itemId] = nil
-	local e = ItemLoot.Element:new(info, amount, false)
+	local e = ItemLoot.Element:new(info, amount, false, fromLink)
 	e:SetHighlight()
 	e:Show(info.itemName, info.itemQuality)
 end
@@ -264,13 +282,13 @@ end
 
 function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
 	if self.pendingItemRequests[itemID] then
-		local itemLink, amount = unpack(self.pendingItemRequests[itemID])
+		local itemLink, amount, fromLink = unpack(self.pendingItemRequests[itemID])
 
 		if not success then
 			error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount)
 		else
 			local info = ItemInfo:new(itemID, C_Item.GetItemInfo(itemLink))
-			self:OnItemReadyToShow(info, amount)
+			self:OnItemReadyToShow(info, amount, fromLink)
 		end
 		return
 	end
@@ -298,14 +316,23 @@ function ItemLoot:ShowPartyLoot(msg, itemLink, unit)
 	end
 end
 
-function ItemLoot:ShowItemLoot(msg, itemLink)
+function ItemLoot:ShowItemLoot(msg, itemLink, fromLink)
 	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
 	local itemId = C_Item.GetItemIDForItemInfo(itemLink)
-	self.pendingItemRequests[itemId] = { itemLink, amount }
+	self.pendingItemRequests[itemId] = { itemLink, amount, fromLink }
 	local info = ItemInfo:new(itemId, C_Item.GetItemInfo(itemLink))
 	if info ~= nil then
-		self:OnItemReadyToShow(info, amount)
+		self:OnItemReadyToShow(info, amount, fromLink)
 	end
+end
+
+-- Function to extract item links from the message
+local function extractItemLinks(message)
+	local itemLinks = {}
+	for itemLink in message:gmatch("|c%x+|Hitem:.-|h%[.-%]|h|r") do
+		table.insert(itemLinks, itemLink)
+	end
+	return itemLinks
 end
 
 function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
@@ -323,6 +350,17 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 		me = guid == GetPlayerGuid()
 	elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
 		me = playerName2 == UnitName("player")
+	end
+
+	local itemLink, fromLink = nil, nil
+	local itemLinks = extractItemLinks(msg)
+
+	-- Item Upgrades
+	if #itemLinks == 2 then
+		fromLink = itemLinks[1]
+		itemLink = itemLinks[2]
+	else
+		itemLink = itemLinks[1]
 	end
 
 	if not me then
@@ -346,16 +384,20 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 			)
 			return
 		end
-		local itemLink = msg:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
+
 		if itemLink then
 			self:fn(self.ShowPartyLoot, self, msg, itemLink, unit)
+		end
+		if fromLink then
+			G_RLF:Print(
+				"Party item upgrades are apparently captured in CHAT_MSG_LOOT. TODO: Will need to support this."
+			)
 		end
 		return
 	end
 
-	local itemLink = msg:match("|c%x+|Hitem:.-|h%[.-%]|h|r")
 	if itemLink then
-		self:fn(self.ShowItemLoot, self, msg, itemLink)
+		self:fn(self.ShowItemLoot, self, msg, itemLink, fromLink)
 	end
 end
 
