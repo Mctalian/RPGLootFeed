@@ -132,6 +132,8 @@ L["Show Skill Change"] = true
 L["ShowSkillChangeDesc"] = "Show the change in skill levels."
 L["Skill Text Color"] = true
 L["SkillColorDesc"] = "The color of the skill text in the loot feed."
+L["Skill Text Wrap Character"] = true
+L["SkillTextWrapCharDesc"] = "The characters to wrap the skill text with."
 
 -- ConfigOptions - Positioning Group
 L["Toggle Test Mode"] = true

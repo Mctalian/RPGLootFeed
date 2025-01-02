@@ -37,6 +37,9 @@ jobs:
       - name: Check for Hard-coded strings
         run: poetry run python .scripts/hardcode_string_check.py
 
+      - name: Run missing locale keys script
+        run: poetry run python .scripts/check_for_missing_locale_keys.py
+
   run_tests:
     runs-on: ubuntu-latest
 
@@ -157,3 +160,20 @@ jobs:
                 body: `${commentIdentifier}\n${commentBody}`
               });
             }
+
+  all_pr_checks:
+    name: Passing PR Checks
+    runs-on: ubuntu-latest
+    needs: [check_translations, run_tests, test_package]
+    steps:
+      - name: Check if all jobs passed or were skipped
+        if: ${{ always() }}
+        run: |
+          if [[ "${{ needs.check_translations.result }}" == "success" || "${{ needs.check_translations.result }}" == "skipped" ]] &&
+             [[ "${{ needs.run_tests.result }}" == "success" || "${{ needs.run_tests.result }}" == "skipped" ]] &&
+             [[ "${{ needs.test_package.result }}" == "success" || "${{ needs.test_package.result }}" == "skipped" ]]; then
+            echo "All jobs passed or were skipped."
+          else
+            echo "One or more jobs failed."
+            exit 1
+          fi

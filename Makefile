@@ -1,6 +1,6 @@
-.PHONY: all_checks hardcode_string_check missing_translation_check test test-ci local
+.PHONY: all_checks hardcode_string_check missing_translation_check missing_locale_key_check test test-ci local
 
-all_checks: hardcode_string_check missing_translation_check
+all_checks: hardcode_string_check missing_translation_check missing_locale_key_check
 
 # Variables
 ROCKSBIN := $(HOME)/.luarocks/bin
@@ -12,6 +12,9 @@ hardcode_string_check:
 # Target for running the missing translation checker
 missing_translation_check:
 	@poetry run python .scripts/missing_translation_check.py
+
+missing_locale_key_check:
+	@poetry run python .scripts/check_for_missing_locale_keys.py
 
 test:
 	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage && $(ROCKSBIN)/luacov
