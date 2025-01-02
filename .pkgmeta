@@ -26,5 +26,6 @@ ignore:
   - "*.rockspec"
   - "*.gif"
   - "example*.png"
-  - requirements.txt
+  - "*.toml"
+  - "*.lock"
 
