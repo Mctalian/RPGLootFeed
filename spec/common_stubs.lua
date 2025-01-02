@@ -186,6 +186,36 @@ function common_stubs.setup_G_RLF(spy)
 			DF = 9,
 			TWW = 10,
 		},
+		DisableBossBanner = {
+			ENABLED = 0,
+			FULLY_DISABLE = 1,
+			DISABLE_LOOT = 2,
+			DISABLE_MY_LOOT = 3,
+			DISABLE_GROUP_LOOT = 4,
+		},
+		ItemQualEnum = {
+			Poor = 0,
+			Common = 1,
+			Uncommon = 2,
+			Rare = 3,
+			Epic = 4,
+			Legendary = 5,
+			Artifact = 6,
+			Heirloom = 7,
+		},
+		PricesEnum = {
+			None = "none",
+			Vendor = "vendor",
+			AH = "ah",
+		},
+		WrapCharEnum = {
+			DEFAULT = 0,
+			SPACE = 1,
+			PARENTHESIS = 2,
+			BRACKET = 3,
+			BRACE = 4,
+			ANGLE = 5,
+		},
 		IsRetail = spy.new(function()
 			return true
 		end),

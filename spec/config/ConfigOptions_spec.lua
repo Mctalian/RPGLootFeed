@@ -1,22 +1,9 @@
+local common_stubs = require("spec/common_stubs")
+
 describe("ConfigOptions module", function()
 	before_each(function()
 		-- Define the global G_RLF
-		local ns = {
-			defaults = {
-				global = {},
-			},
-			L = {},
-			options = {
-				args = {},
-			},
-			DisableBossBanner = {
-				ENABLED = 0,
-				FULLY_DISABLE = 1,
-				DISABLE_LOOT = 2,
-				DISABLE_MY_LOOT = 3,
-				DISABLE_GROUP_LOOT = 4,
-			},
-		}
+		local ns = common_stubs.setup_G_RLF(spy)
 		-- Load the list module before each test
 		assert(loadfile("config/ConfigOptions.lua"))("TestAddon", ns)
 	end)
