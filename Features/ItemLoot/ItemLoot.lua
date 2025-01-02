@@ -385,13 +385,14 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 			return
 		end
 
+		if fromLink then
+			G_RLF:LogDebug(
+				"Party item upgrades are apparently captured in CHAT_MSG_LOOT. TODO: may need to support this."
+			)
+			return
+		end
 		if itemLink then
 			self:fn(self.ShowPartyLoot, self, msg, itemLink, unit)
-		end
-		if fromLink then
-			G_RLF:Print(
-				"Party item upgrades are apparently captured in CHAT_MSG_LOOT. TODO: Will need to support this."
-			)
 		end
 		return
 	end
