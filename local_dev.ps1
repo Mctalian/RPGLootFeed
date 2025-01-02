@@ -20,6 +20,7 @@ $addonName = Get-ChildItem -Path $scriptDirectory -Filter *.toc | Select-Object 
 $sourcePath = "$scriptDirectory\.release\$addonName"
 $destPaths = @(
     "C:\Program Files (x86)\World of Warcraft\_retail_\Interface\AddOns\$addonName",
+    "C:\Program Files (x86)\World of Warcraft\_classic_\Interface\AddOns\$addonName",
     "C:\Program Files (x86)\World of Warcraft\_classic_era_\Interface\AddOns\$addonName"
 )
 

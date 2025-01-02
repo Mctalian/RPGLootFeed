@@ -63,9 +63,20 @@ local function getItem(id)
 	end
 end
 
-local testItemIds = { 50818, 2589, 2592, 1515, 730, 128827, 219325, 34494 }
-if G_RLF:IsClassic() then
-	testItemIds = { 2589, 2592, 1515, 730, 233620 }
+local function tconcat(t1, t2)
+	for i = 1, #t2 do
+		t1[#t1 + 1] = t2[i]
+	end
+	return t1
+end
+
+local testItemIds = { 2589, 2592, 1515, 730 }
+if G_RLF:IsRetail() then
+	tconcat(testItemIds, { 50818, 2589, 2592, 1515, 730, 128827, 219325, 34494 })
+elseif G_RLF:IsClassic() then
+	tconcat(testItemIds, { 233620 })
+elseif G_RLF:IsCataClassic() then
+	tconcat(testItemIds, { 71086 })
 end
 local function initializeTestItems()
 	for _, id in pairs(testItemIds) do
@@ -111,7 +122,7 @@ local function initializeTestFactions()
 		local factionInfo
 		if G_RLF:IsRetail() then
 			factionInfo = C.Reputation.GetFactionDataByIndex(i)
-		elseif G_RLF:IsClassic() then
+		elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
 			factionInfo = G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(i)
 		end
 		if factionInfo and factionInfo.name then
