@@ -90,13 +90,7 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							disabled = function()
 								return not G_RLF.db.global.item.itemCountTextEnabled
 							end,
-							values = {
-								[G_RLF.WrapCharEnum.SPACE] = G_RLF.L["Spaces"],
-								[G_RLF.WrapCharEnum.PARENTHESIS] = G_RLF.L["Parentheses"],
-								[G_RLF.WrapCharEnum.BRACKET] = G_RLF.L["Square Brackets"],
-								[G_RLF.WrapCharEnum.BRACE] = G_RLF.L["Curly Braces"],
-								[G_RLF.WrapCharEnum.ANGLE] = G_RLF.L["Angle Brackets"],
-							},
+							values = G_RLF.WrapCharOptions,
 							get = function()
 								return G_RLF.db.global.item.itemCountTextWrapChar
 							end,

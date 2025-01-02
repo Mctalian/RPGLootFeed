@@ -330,11 +330,15 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 			G_RLF:LogDebug("Party Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
 			return
 		end
-		local sanitizedPlayerName = (playerName or playerName2):gsub("%-.+", "")
+		local name = playerName
+		if name == "" or name == nil then
+			name = playerName2
+		end
+		local sanitizedPlayerName = name:gsub("%-.+", "")
 		local unit = self.nameUnitMap[sanitizedPlayerName]
 		if not unit then
 			G_RLF:LogDebug(
-				"Party Loot Ignored - no	matching party member (" .. sanitizedPlayerName .. ")",
+				"Party Loot Ignored - no matching party member (" .. sanitizedPlayerName .. ")",
 				"WOWEVENT",
 				self.moduleName,
 				"",

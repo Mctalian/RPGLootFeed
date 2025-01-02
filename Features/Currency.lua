@@ -55,14 +55,16 @@ function Currency.Element:new(...)
 				numerator = element.totalCount
 				percentage = element.totalCount / element.cappedQuantity
 			end
-			local color = "|cFFFFFFFF"
+			local color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.lowestColor))
+			local lowThreshold = G_RLF.db.global.currency.lowerThreshold
+			local upperThreshold = G_RLF.db.global.currency.upperThreshold
 			if element.key ~= Constants.CurrencyConsts.ACCOUNT_WIDE_HONOR_CURRENCY_ID then
-				if percentage < 0.7 then
-					color = "|cFFFFFFFF"
-				elseif percentage >= 0.7 and percentage < 0.9 then
-					color = "|cFFFF9B00"
+				if percentage < lowThreshold then
+					color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.lowestColor))
+				elseif percentage >= lowThreshold and percentage < upperThreshold then
+					color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.midColor))
 				else
-					color = "|cFFFF0000"
+					color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.upperColor))
 				end
 			end
 

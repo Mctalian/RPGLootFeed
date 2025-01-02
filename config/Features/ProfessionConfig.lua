@@ -5,13 +5,14 @@ local ProfessionConfig = {}
 G_RLF.defaults.global.prof = {
 	showSkillChange = true,
 	skillColor = { 0.333, 0.333, 1.0, 1.0 },
+	skillTextWrapChar = G_RLF.WrapCharEnum.BRACKET,
 }
 
 G_RLF.options.args.features.args.professionConfig = {
 	type = "group",
 	handler = ProfessionConfig,
 	name = G_RLF.L["Profession Config"],
-	order = 2.2,
+	order = 2.4,
 	args = {
 		enableProfession = {
 			type = "toggle",
@@ -63,6 +64,20 @@ G_RLF.options.args.features.args.professionConfig = {
 						G_RLF.db.global.prof.skillColor = { r, g, b, a }
 					end,
 					order = 2,
+				},
+				skillTextWrapChar = {
+					type = "select",
+					name = G_RLF.L["Skill Text Wrap Character"],
+					desc = G_RLF.L["SkillTextWrapCharDesc"],
+					get = function()
+						return G_RLF.db.global.prof.skillTextWrapChar
+					end,
+					set = function(_, value)
+						G_RLF.db.global.prof.skillTextWrapChar = value
+					end,
+					values = G_RLF.WrapCharOptions,
+					style = "dropdown",
+					order = 3,
 				},
 			},
 		},

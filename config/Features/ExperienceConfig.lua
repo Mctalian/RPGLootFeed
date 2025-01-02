@@ -6,6 +6,7 @@ G_RLF.defaults.global.xp = {
 	experienceTextColor = { 1, 0, 1, 0.8 },
 	showCurrentLevel = true,
 	currentLevelColor = { 0.749, 0.737, 0.012, 1 },
+	currentLevelTextWrapChar = G_RLF.WrapCharEnum.ANGLE,
 }
 
 G_RLF.options.args.features.args.experienceConfig = {
@@ -77,6 +78,20 @@ G_RLF.options.args.features.args.experienceConfig = {
 						G_RLF.db.global.xp.currentLevelColor = { r, g, b, a }
 					end,
 					order = 3,
+				},
+				currentLevelTextWrapChar = {
+					type = "select",
+					name = G_RLF.L["Current Level Text Wrap Character"],
+					desc = G_RLF.L["CurrentLevelTextWrapCharDesc"],
+					get = function()
+						return G_RLF.db.global.xp.currentLevelTextWrapChar
+					end,
+					set = function(_, value)
+						G_RLF.db.global.xp.currentLevelTextWrapChar = value
+					end,
+					values = G_RLF.WrapCharOptions,
+					style = "dropdown",
+					order = 4,
 				},
 			},
 		},

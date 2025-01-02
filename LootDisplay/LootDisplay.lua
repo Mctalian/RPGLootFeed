@@ -227,9 +227,10 @@ local function processRow(element)
 		end)
 	end
 
-	if element.type == "Currency" then
+	if element.type == "Currency" and G_RLF.db.global.currency.currencyTotalTextEnabled then
 		row:ShowItemCountText(element.totalCount, {
-			wrapChar = G_RLF.WrapCharEnum.PARENTHESIS,
+			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.currencyTotalTextColor)),
+			wrapChar = G_RLF.db.global.currency.currencyTotalTextWrapChar,
 		})
 	end
 
@@ -243,14 +244,14 @@ local function processRow(element)
 	if element.type == "Experience" and element.currentLevel and G_RLF.db.global.xp.showCurrentLevel then
 		row:ShowItemCountText(element.currentLevel, {
 			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.xp.currentLevelColor)),
-			wrapChar = G_RLF.WrapCharEnum.ANGLE,
+			wrapChar = G_RLF.db.global.xp.currentLevelTextWrapChar,
 		})
 	end
 
 	if element.type == "Professions" and G_RLF.db.global.prof.showSkillChange then
 		row:ShowItemCountText(row.amount, {
-			color = G_RLF:RGBAToHexFormat(unpack({ 1, 0.333, 0.333, 1 })),
-			wrapChar = G_RLF.WrapCharEnum.BRACKET,
+			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.prof.skillColor)),
+			wrapChar = G_RLF.db.global.prof.skillTextWrapChar,
 			showSign = true,
 		})
 	end
