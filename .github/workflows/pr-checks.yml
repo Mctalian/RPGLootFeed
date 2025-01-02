@@ -166,14 +166,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: [check_translations, run_tests, test_package]
     steps:
+      - name: Export needs results as JSON
+        id: export-needs
+        run: echo '${{ toJSON(needs) }}' > needs.json
+
       - name: Check if all jobs passed or were skipped
-        if: ${{ always() }}
         run: |
-          if [[ "${{ needs.check_translations.result }}" == "success" || "${{ needs.check_translations.result }}" == "skipped" ]] &&
-             [[ "${{ needs.run_tests.result }}" == "success" || "${{ needs.run_tests.result }}" == "skipped" ]] &&
-             [[ "${{ needs.test_package.result }}" == "success" || "${{ needs.test_package.result }}" == "skipped" ]]; then
-            echo "All jobs passed or were skipped."
-          else
-            echo "One or more jobs failed."
-            exit 1
-          fi
+          needs=$(cat needs.json)
+          for job in $(echo "$needs" | jq -r 'keys[]'); do
+            result=$(echo "$needs" | jq -r ".\"$job\".result")
+            if [[ "$result" != "success" && "$result" != "skipped" ]]; then
+              echo "Job $job failed."
+              exit 1
+            fi
+          done
+          echo "All jobs passed or were skipped."
+        shell: bash
