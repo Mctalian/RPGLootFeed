@@ -34,12 +34,37 @@ function ItemInfo:IsLegendary()
 	return false
 end
 
+local function ClassicSkillLineCheck()
+	local armorClass = nil
+	for i = 1, GetNumSkillLines() do
+		local skillName, isHeader, a, skillRank, b, c, skillMaxRank = GetSkillLineInfo(i)
+		if not isHeader then
+			if skillName == "Plate Mail" then
+				armorClass = Enum.ItemArmorSubclass.Plate
+			elseif skillName == "Mail" and (armorClass == nil or armorClass < Enum.ItemArmorSubclass.Mail) then
+				armorClass = Enum.ItemArmorSubclass.Mail
+			elseif skillName == "Leather" and (armorClass == nil or armorClass < Enum.ItemArmorSubclass.Leather) then
+				armorClass = Enum.ItemArmorSubclass.Leather
+			elseif skillName == "Cloth" and armorClass == nil then
+				armorClass = Enum.ItemArmorSubclass.Cloth
+			end
+		end
+	end
+	return armorClass
+end
+
 local function GetHighestArmorClass()
-	if G_RLF.cachedArmorClass then
+	if G_RLF.cachedArmorClass and GetExpansionLevel() >= G_RLF.Expansion.CATA then
 		return G_RLF.cachedArmorClass
 	end
 	local _, playerClass = UnitClass("player")
-	G_RLF.cachedArmorClass = G_RLF.armorClassMapping[playerClass]
+
+	if GetExpansionLevel() >= G_RLF.Expansion.CATA then
+		G_RLF.cachedArmorClass = G_RLF.armorClassMapping[playerClass]
+	else
+		G_RLF.cachedArmorClass = ClassicSkillLineCheck()
+	end
+
 	return G_RLF.cachedArmorClass
 end
 

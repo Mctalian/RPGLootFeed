@@ -2,6 +2,8 @@ local addonName, G_RLF = ...
 
 local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 
+local C = LibStub("C_Everywhere")
+
 local onlyEpicPartyLoot = false
 
 ItemLoot.Element = {}
@@ -89,8 +91,8 @@ local function IsBetterThanEquipped(info)
 			return
 		end
 
-		local equippedId = C_Item.GetItemIDForItemInfo(equippedLink)
-		local equippedInfo = ItemInfo:new(equippedId, C_Item.GetItemInfo(equippedLink))
+		local equippedId = C.Item.GetItemIDForItemInfo(equippedLink)
+		local equippedInfo = ItemInfo:new(equippedId, C.Item.GetItemInfo(equippedLink))
 		if not equippedInfo then
 			return
 		end
@@ -98,7 +100,7 @@ local function IsBetterThanEquipped(info)
 		if equippedInfo.itemLevel and equippedInfo.itemLevel < info.itemLevel then
 			return true
 		elseif equippedInfo.itemLevel == info.itemLevel then
-			local statDelta = C_Item.GetItemStatDelta(equippedLink, info.itemLink)
+			local statDelta = C.Item.GetItemStatDelta(equippedLink, info.itemLink)
 			for k, v in pairs(statDelta) do
 				-- Has a Tertiary Stat
 				if k:find("ITEM_MOD_CR_") and v > 0 then
@@ -114,8 +116,8 @@ local function IsBetterThanEquipped(info)
 end
 
 local function getItemLevels(toLink, fromLink)
-	local toInfo = ItemInfo:new(C_Item.GetItemIDForItemInfo(toLink), C_Item.GetItemInfo(toLink))
-	local fromInfo = ItemInfo:new(C_Item.GetItemIDForItemInfo(fromLink), C_Item.GetItemInfo(fromLink))
+	local toInfo = ItemInfo:new(C.Item.GetItemIDForItemInfo(toLink), C.Item.GetItemInfo(toLink))
+	local fromInfo = ItemInfo:new(C.Item.GetItemIDForItemInfo(fromLink), C.Item.GetItemInfo(fromLink))
 	return toInfo.itemLevel, fromInfo.itemLevel
 end
 
@@ -287,7 +289,7 @@ function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
 		if not success then
 			error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount)
 		else
-			local info = ItemInfo:new(itemID, C_Item.GetItemInfo(itemLink))
+			local info = ItemInfo:new(itemID, C.Item.GetItemInfo(itemLink))
 			self:OnItemReadyToShow(info, amount, fromLink)
 		end
 		return
@@ -299,7 +301,7 @@ function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
 		if not success then
 			error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount .. " for " .. unit)
 		else
-			local info = ItemInfo:new(itemID, C_Item.GetItemInfo(itemLink))
+			local info = ItemInfo:new(itemID, C.Item.GetItemInfo(itemLink))
 			self:OnPartyReadyToShow(info, amount, unit)
 		end
 		return
@@ -310,7 +312,7 @@ function ItemLoot:ShowPartyLoot(msg, itemLink, unit)
 	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
 	local itemId = itemLink:match("Hitem:(%d+)")
 	self.pendingPartyRequests[itemId] = { itemLink, amount, unit }
-	local info = ItemInfo:new(itemId, C_Item.GetItemInfo(itemLink))
+	local info = ItemInfo:new(itemId, C.Item.GetItemInfo(itemLink))
 	if info ~= nil then
 		self:OnPartyReadyToShow(info, amount, unit)
 	end
@@ -318,9 +320,9 @@ end
 
 function ItemLoot:ShowItemLoot(msg, itemLink, fromLink)
 	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
-	local itemId = C_Item.GetItemIDForItemInfo(itemLink)
+	local itemId = C.Item.GetItemIDForItemInfo(itemLink)
 	self.pendingItemRequests[itemId] = { itemLink, amount, fromLink }
-	local info = ItemInfo:new(itemId, C_Item.GetItemInfo(itemLink))
+	local info = ItemInfo:new(itemId, C.Item.GetItemInfo(itemLink))
 	if info ~= nil then
 		self:OnItemReadyToShow(info, amount, fromLink)
 	end
