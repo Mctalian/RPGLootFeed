@@ -26,7 +26,21 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.GH_PAT }}
-          title: Update Interface version
-          commit-message: Update Interface version
+          title: "build(RPGLootFeed.toc): updates supported interface versions"
+          body: |
+            ## Requirements
+
+            - [ ] Download test package in the comments below
+            - [ ] Test for all applicable game clients
+              - [ ] Retail
+              - [ ] Retail PTR
+              - [ ] Classic
+              - [ ] Classic PTR
+              - [ ] Classic Era
+              - [ ] Classic Era PTR
+
+            ----------------------------------------------------
+            _This PR was automatically created to update the supported interface versions in RPGLootFeed.toc._
+          commit-message: "build(RPGLootFeed.toc): updates supported interface versions"
           branch: interface-version
           delete-branch: true
