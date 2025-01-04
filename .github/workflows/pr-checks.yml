@@ -195,6 +195,7 @@ jobs:
   all_pr_checks:
     name: Passing PR Checks
     runs-on: ubuntu-latest
+    if: always()
     needs: [check_translations, run_tests, test_package, commitlint]
     steps:
       - name: Export needs results as JSON
