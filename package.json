@@ -1,0 +1,38 @@
+{
+  "name": "rpglootfeed",
+  "version": "1.0.0",
+  "description": "[WOW ADDON] A non-intrusive way to see what you just looted in World of Warcraft.",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test",
+    "semantic-release": "semantic-release"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Mctalian/RPGLootFeed.git"
+  },
+  "keywords": [
+    "world of warcraft",
+    "world of warcraft addon",
+    "wow addon",
+    "retail addon",
+    "classic addon",
+    "classic era addon",
+    "addon",
+    "wow",
+    "loot",
+    "rpg"
+  ],
+  "author": "Rob Anderson \"McTalian\" <McTalian@users.noreply.github.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Mctalian/RPGLootFeed/issues"
+  },
+  "homepage": "https://github.com/Mctalian/RPGLootFeed#readme",
+  "devDependencies": {
+    "@semantic-release/commit-analyzer": "^13.0.1",
+    "@semantic-release/github": "^11.0.1",
+    "@semantic-release/release-notes-generator": "^14.0.3",
+    "semantic-release": "^24.2.1"
+  }
+}
