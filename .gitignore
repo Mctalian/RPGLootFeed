@@ -49,3 +49,5 @@ luac.out
 __pycache__
 
 luacov-html
+
+node_modules

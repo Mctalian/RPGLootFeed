@@ -6,12 +6,14 @@ on:
       - main
 
 permissions:
-  actions: write
-  issues: write
+  contents: read
 
 jobs:
   i18n_translations:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      issues: write
 
     steps:
       - name: Checkout code
@@ -63,3 +65,25 @@ jobs:
         with:
           name: luacov-html
           path: luacov-html/
+
+  release:
+    needs: [run_tests, i18n_translations]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run semantic-release
