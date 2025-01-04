@@ -1,0 +1,33 @@
+name: Conventional Commit Check
+
+on:
+  pull_request:
+  merge_group:
+    types:
+      - checks_requested
+
+jobs:
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install commitlint
+        run: |
+          npm install @commitlint/config-angular @commitlint/cli
+          echo "export default {extends: ['@commitlint/config-angular']};" > commitlint.config.js
+
+      - name: Run commitlint (PR)
+        if: ${{ github.event_name == 'pull_request' }}
+        run: echo "${{ github.event.pull_request.title }}" | npx commitlint
+
+      - name: Run commitlint (Merge Group)
+        if: ${{ github.event_name == 'merge_group' }}
+        run: npx commitlint --last
