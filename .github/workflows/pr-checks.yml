@@ -168,6 +168,8 @@ jobs:
 
   commitlint:
     runs-on: ubuntu-latest
+    env:
+      TITLE: ${{ github.event.pull_request.title }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -185,7 +187,7 @@ jobs:
 
       - name: Run commitlint (PR)
         if: ${{ github.event_name == 'pull_request' }}
-        run: echo "${{ github.event.pull_request.title }}" | npx commitlint
+        run: echo "${TITLE}" | npx commitlint
 
       - name: Run commitlint (Merge Group)
         if: ${{ github.event_name == 'merge_group' }}
