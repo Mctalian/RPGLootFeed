@@ -90,6 +90,8 @@ jobs:
 
       - name: Fetch Latest Release Assets
         id: fetch-release-assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           LATEST_RELEASE=$(gh release view --json assets -q '.assets[] | select(.name | endswith("nolib.zip")) | .size' > nolib_size.txt)
           gh release view --json assets -q '.assets[] | select(.name | endswith(".zip") and contains("nolib") | not) | .size' > libs_size.txt
