@@ -93,10 +93,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          LATEST_RELEASE=$(gh release view --json assets -q '.assets[] | select(.name | endswith("nolib.zip")) | .size' > nolib_size.txt)
-          gh release view --json assets -q '.assets[] | select(.name | endswith(".zip") and contains("nolib") | not) | .size' > libs_size.txt
-          echo "LATEST_RELEASE_NOLIB_SIZE=$(cat nolib_size.txt)" >> $GITHUB_ENV
-          echo "LATEST_RELEASE_LIBS_SIZE=$(cat libs_size.txt)" >> $GITHUB_ENV
+          nolib_size=$(gh release view --json assets -q '.assets[] | select(.name | endswith("nolib.zip")) | .size')
+          echo "$nolib_size"
+          lib_size=$(gh release view --json assets -q '.assets[] | select(.name | endswith(".zip") and contains("nolib") | not) | .size')
+          echo "$lib_size"
+          echo "LATEST_RELEASE_NOLIB_SIZE=$nolib_size" >> $GITHUB_ENV
+          echo "LATEST_RELEASE_LIBS_SIZE=$lib_size" >> $GITHUB_ENV
 
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
