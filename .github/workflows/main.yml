@@ -100,14 +100,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node .scripts/release.js
 
-      - name: Test
+      - name: Package and release
         if: env.RELEASE_CREATED == 'true'
-        run: echo "Test"
-
-      - name: Test 2
-        if: env.RELEASE_CREATED == 'false'
-        run: echo "Test 2"
-
-      # - name: Package and release
-      #   if: env.RELEASE_CREATED == 'true'
-      #   uses: BigWigsMods/packager@v2
+        uses: BigWigsMods/packager@v2
