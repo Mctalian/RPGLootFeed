@@ -95,6 +95,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node .scripts/release.js
 
-      - name: Package and release
+      - name: Trigger packaging
         if: env.RELEASE_CREATED == 'true'
-        uses: ./.github/workflows/release.yml@main
+        uses: ./.github/workflows/release.yml
