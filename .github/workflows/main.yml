@@ -71,6 +71,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      release_created: ${{ steps.check_release.outputs.release_created }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -95,6 +97,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: node .scripts/release.js
 
-      - name: Trigger packaging
-        if: env.RELEASE_CREATED == 'true'
-        uses: ./.github/workflows/release.yml
+      - name: Check release created
+        id: check_release
+        run: echo "release_created=${{ env.RELEASE_CREATED }}" >> $GITHUB_OUTPUT
+
+  trigger_packaging:
+    needs: release
+    if: needs.release.outputs.release_created == 'true'
+    uses: ./.github/workflows/release.yml
