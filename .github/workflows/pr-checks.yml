@@ -119,6 +119,9 @@ jobs:
           args: -d -n {package-name}-pr${{github.event.number}}-{nolib}{classic}
           pandoc: "false"
 
+      - name: Check changelog
+        run: cat .release/RPGLootFeed/CHANGELOG.md
+
       - name: Capture Filenames
         id: capture-filenames
         run: |
