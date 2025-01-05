@@ -88,6 +88,18 @@ jobs:
         if: env.IS_FORK == 'true'
         uses: actions/checkout@v4
 
+      - name: Fetch Latest Release Assets
+        id: fetch-release-assets
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          nolib_size=$(gh release view --json assets -q '.assets[] | select(.name | endswith("nolib.zip")) | .size')
+          echo "NoLibSize: $nolib_size"
+          lib_size=$(gh release view --json assets -q '.assets[] | select(.name | endswith(".zip")) | select(.name | contains("-nolib") | not) | .size')
+          echo "LibSize: $lib_size"
+          echo "LATEST_RELEASE_NOLIB_SIZE=$nolib_size" >> $GITHUB_ENV
+          echo "LATEST_RELEASE_LIBS_SIZE=$lib_size" >> $GITHUB_ENV
+
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
           packages: subversion
@@ -114,6 +126,8 @@ jobs:
           FILE2=$(ls .release/RPGLootFeed-*.zip | grep -v 'nolib')
           echo "FILE1=$FILE1" >> $GITHUB_ENV
           echo "FILE2=$FILE2" >> $GITHUB_ENV
+          echo "TEST_NOLIB_SIZE=$(stat -c%s "$FILE1")" >> $GITHUB_ENV
+          echo "TEST_LIBS_SIZE=$(stat -c%s "$FILE2")" >> $GITHUB_ENV
 
       - name: Upload RPGLootFeed ZIP
         uses: actions/upload-artifact@v4
@@ -134,37 +148,17 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const commentIdentifier = "### Packaged ZIP files"; // Unique phrase to identify the comment
-            const linkStandard = `[RPGLootFeed ZIP (with libs)](${{ steps['upload-zips-standard'].outputs.artifact-url }})`;
-            const linkNolib = `[RPGLootFeed ZIP (nolib)](${{ steps['upload-zips-nolib'].outputs.artifact-url }})`;
-            const lastUpdated = new Date().toLocaleString('en-US', { timeZone: 'UTC', hour12: true });
-            const commentBody = `${linkStandard}\n${linkNolib}\n\nLast Updated: ${lastUpdated} (UTC)`;
-
-            const { data: comments } = await github.rest.issues.listComments({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+            const script = require('./.scripts/post-pkg-comment.cjs');
+            await script({
+              github,
+              context,
+              libsUrl: "${{ steps['upload-zips-standard'].outputs.artifact-url }}",
+              noLibUrl: "${{ steps['upload-zips-nolib'].outputs.artifact-url }}",
+              latestReleaseStandardSize: process.env.LATEST_RELEASE_LIBS_SIZE,
+              testPkgStandardSize: process.env.TEST_LIBS_SIZE,
+              latestReleaseNoLibSize: process.env.LATEST_RELEASE_NOLIB_SIZE,
+              testPkgNoLibSize: process.env.TEST_NOLIB_SIZE
             });
-
-            const existingComment = comments.find(comment => comment.body.includes(commentIdentifier));
-
-            if (existingComment) {
-              // Update the existing comment
-              await github.rest.issues.updateComment({
-                comment_id: existingComment.id,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `${commentIdentifier}\n${commentBody}`
-              });
-            } else {
-              // Create a new comment
-              await github.rest.issues.createComment({
-                issue_number: context.issue.number,
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                body: `${commentIdentifier}\n${commentBody}`
-              });
-            }
 
   commitlint:
     runs-on: ubuntu-latest
