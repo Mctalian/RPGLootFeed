@@ -16,11 +16,11 @@ module.exports = async ({
     ((testPkgStandardSize - latestReleaseStandardSize) /
       latestReleaseStandardSize) *
     100;
-  const standardSize = `(${latestReleaseStandardSize} -> ${testPkgStandardSize}, ${standardSizeDeltaPct.toFixed(2)}%)`;
+  const standardSize = `(${latestReleaseStandardSize} ➡️ ${testPkgStandardSize}, ${standardSizeDeltaPct.toFixed(2)}%)`;
   const noLibSizeDeltaPct =
     ((testPkgNoLibSize - latestReleaseNoLibSize) / latestReleaseNoLibSize) *
     100;
-  const noLibSize = `(${latestReleaseNoLibSize} -> ${testPkgNoLibSize}, ${noLibSizeDeltaPct.toFixed(2)}%)`;
+  const noLibSize = `(${latestReleaseNoLibSize} ➡️ ${testPkgNoLibSize}, ${noLibSizeDeltaPct.toFixed(2)}%)`;
   let stdSizeWarning = "";
   if (standardSizeDeltaPct > 5) {
     stdSizeWarning = "⚠️";
@@ -39,12 +39,12 @@ module.exports = async ({
     timeZone: "UTC",
     hour12: true,
   });
-  const commentBody = ```
+  const commentBody = `
 ${linkStandard} ${standardSize} ${stdSizeWarning}
 ${linkNolib} ${noLibSize} ${noLibSizeWarning}
 
 Last Updated: ${lastUpdated} (UTC)
-```;
+`;
 
   const { data: comments } = await github.rest.issues.listComments({
     issue_number: context.issue.number,
