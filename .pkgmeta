@@ -28,4 +28,5 @@ ignore:
   - "example*.png"
   - "*.toml"
   - "*.lock"
+  - "*.json"
 
