@@ -1,9 +1,9 @@
 name: Package and release
 
 on:
-  push:
-    tags:
-      - v*
+  release:
+    types:
+      - published
 
 permissions:
   contents: write
@@ -20,6 +20,8 @@ jobs:
     steps:
       - name: Clone project
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
