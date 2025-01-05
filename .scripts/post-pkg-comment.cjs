@@ -12,14 +12,39 @@ module.exports = async ({
   const linkStandard = `[RPGLootFeed ZIP (with libs)](${libsUrl})`;
   const linkNolib = `[RPGLootFeed ZIP (nolib)](${noLibUrl})`;
 
-  const standardSize = `(${latestReleaseStandardSize} -> ${testPkgStandardSize})`;
-  const noLibSize = `(${latestReleaseNoLibSize} -> ${testPkgNoLibSize})`;
+  const standardSizeDeltaPct =
+    ((testPkgStandardSize - latestReleaseStandardSize) /
+      latestReleaseStandardSize) *
+    100;
+  const standardSize = `(${latestReleaseStandardSize} -> ${testPkgStandardSize}, ${standardSizeDeltaPct.toFixed(2)}%)`;
+  const noLibSizeDeltaPct =
+    ((testPkgNoLibSize - latestReleaseNoLibSize) / latestReleaseNoLibSize) *
+    100;
+  const noLibSize = `(${latestReleaseNoLibSize} -> ${testPkgNoLibSize}, ${noLibSizeDeltaPct.toFixed(2)}%)`;
+  let stdSizeWarning = "";
+  if (standardSizeDeltaPct > 5) {
+    stdSizeWarning = "⚠️";
+  } else if (standardSizeDeltaPct < 0) {
+    stdSizeWarning = "🟢";
+  }
+
+  let noLibSizeWarning = "";
+  if (noLibSizeDeltaPct > 5) {
+    noLibSizeWarning = "⚠️";
+  } else if (noLibSizeDeltaPct < 0) {
+    noLibSizeWarning = "🟢";
+  }
 
   const lastUpdated = new Date().toLocaleString("en-US", {
     timeZone: "UTC",
     hour12: true,
   });
-  const commentBody = `${linkStandard} ${standardSize}\n${linkNolib} ${noLibSize}\n\nLast Updated: ${lastUpdated} (UTC)`;
+  const commentBody = ```
+${linkStandard} ${standardSize} ${stdSizeWarning}
+${linkNolib} ${noLibSize} ${noLibSizeWarning}
+
+Last Updated: ${lastUpdated} (UTC)
+```;
 
   const { data: comments } = await github.rest.issues.listComments({
     issue_number: context.issue.number,

@@ -97,8 +97,8 @@ jobs:
           echo "NoLibSize: $nolib_size"
           lib_size=$(gh release view --json assets -q '.assets[] | select(.name | endswith(".zip")) | select(.name | contains("-nolib") | not) | .size')
           echo "LibSize: $lib_size"
-          echo "LATEST_RELEASE_NOLIB_SIZE='$nolib_size'" >> $GITHUB_ENV
-          echo "LATEST_RELEASE_LIBS_SIZE='$lib_size'" >> $GITHUB_ENV
+          echo "LATEST_RELEASE_NOLIB_SIZE=$nolib_size" >> $GITHUB_ENV
+          echo "LATEST_RELEASE_LIBS_SIZE=$lib_size" >> $GITHUB_ENV
 
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
