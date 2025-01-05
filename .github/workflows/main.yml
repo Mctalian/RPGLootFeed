@@ -98,7 +98,7 @@ jobs:
       - name: Run semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: node .scipts/release.js
+        run: node .scripts/release.js
 
       - name: Test
         if: env.RELEASE_CREATED == 'true'
