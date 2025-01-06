@@ -66,6 +66,19 @@ G_RLF.PricesEnum = {
 	AH = "ah",
 }
 
+G_RLF.EnterAnimationType = {
+	NONE = "none",
+	FADE = "fade",
+	SLIDE = "slide",
+}
+
+G_RLF.SlideDirection = {
+	UP = "up",
+	DOWN = "down",
+	LEFT = "left",
+	RIGHT = "right",
+}
+
 G_RLF.WrapCharEnum = {
 	DEFAULT = 0,
 	SPACE = 1,

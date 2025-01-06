@@ -82,6 +82,7 @@ local function runItemLootIntegrationTest()
 	if info.itemName == nil then
 		G_RLF:Print("Item not cached, skipping ItemLoot test")
 	else
+		e.highlight = true
 		runTestSafely(e.Show, "LootDisplay: Item", e, info.itemName, info.itemQuality)
 		e = module.Element:new(info, amountLooted, false)
 		e.highlight = true

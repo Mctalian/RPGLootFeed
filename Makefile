@@ -39,4 +39,4 @@ check_untracked_files:
 	fi
 
 local: missing_locale_key_check check_untracked_files
-	@.release/local.sh -D
+	@rm -rf node_modules && .release/local.sh -D

@@ -75,7 +75,13 @@ local function buildFactionLocaleMap(findName)
 	end
 
 	for i = 1, numFactions do
-		local factionData = C_Reputation.GetFactionDataByIndex(i)
+		local factionData
+		if G_RLF:IsRetail() then
+			factionData = C_Reputation.GetFactionDataByIndex(i)
+		elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+			factionData = G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(i)
+		end
+
 		if factionData then
 			if not G_RLF.db.global.factionMaps[locale][factionData.name] then
 				G_RLF.db.global.factionMaps[locale][factionData.name] = factionData.factionID

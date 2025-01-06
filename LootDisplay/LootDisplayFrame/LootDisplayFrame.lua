@@ -165,6 +165,12 @@ function LootDisplayFrameMixin:UpdateFadeDelay()
 	end
 end
 
+function LootDisplayFrameMixin:UpdateEnterAnimationType()
+	for row in rows:iterate() do
+		row:UpdateEnterAnimation()
+	end
+end
+
 function LootDisplayFrameMixin:OnDragStop()
 	self:StopMovingOrSizing()
 
@@ -217,7 +223,7 @@ function LootDisplayFrameMixin:LeaseRow(key)
 	end
 
 	local row = self.rowFramePool:Acquire()
-
+	row:Hide()
 	row.key = key
 
 	local success = rows:push(row)
@@ -228,10 +234,9 @@ function LootDisplayFrameMixin:LeaseRow(key)
 	keyRowMap[key] = row
 	keyRowMap.length = keyRowMap.length + 1
 
-	row:SetPosition(self)
+	row:UpdatePosition(self)
 	RunNextFrame(function()
 		row:ResetHighlightBorder()
-		row:Show()
 	end)
 	self:UpdateTabVisibility()
 
@@ -322,7 +327,7 @@ function LootDisplayFrameMixin:UpdateRowPositions()
 	self.vertDir, self.opposite, self.yOffset = getPositioningDetails()
 	local index = 1
 	for row in rows:iterate() do
-		row:SetPosition(self)
+		row:UpdatePosition(self)
 		if index > getNumberOfRows() + 2 then
 			error("Possible infinite loop detected!: " .. self:Dump())
 		end
@@ -365,6 +370,7 @@ function LootDisplayFrameMixin:UpdateHistoryFrame(offset)
 		if dataIndex <= endIndex then
 			row:UpdateWithHistoryData(self.rowHistory[dataIndex])
 			row:Show()
+			row:ElementsVisible()
 			row:ClearAllPoints()
 			row:SetPoint("TOPLEFT", self.historyFrame, "TOPLEFT", 0, (i - 1) * -rowHeight)
 		else

@@ -125,6 +125,10 @@ function LootDisplay:UpdateRowStyles()
 	frame:UpdateSize()
 end
 
+function LootDisplay:UpdateEnterAnimation()
+	frame:UpdateEnterAnimationType()
+end
+
 function LootDisplay:UpdateFadeDelay()
 	frame:UpdateFadeDelay()
 end
@@ -228,57 +232,64 @@ local function processRow(element)
 	end
 
 	if element.type == "Currency" and G_RLF.db.global.currency.currencyTotalTextEnabled then
-		row:ShowItemCountText(element.totalCount, {
-			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.currencyTotalTextColor)),
-			wrapChar = G_RLF.db.global.currency.currencyTotalTextWrapChar,
-		})
-	end
-
-	if element.type == "Reputation" and element.repLevel and G_RLF.db.global.rep.enableRepLevel then
-		row:ShowItemCountText(element.repLevel, {
-			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.rep.repLevelColor)),
-			wrapChar = G_RLF.db.global.rep.repLevelTextWrapChar,
-		})
-	end
-
-	if element.type == "Experience" and element.currentLevel and G_RLF.db.global.xp.showCurrentLevel then
-		row:ShowItemCountText(element.currentLevel, {
-			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.xp.currentLevelColor)),
-			wrapChar = G_RLF.db.global.xp.currentLevelTextWrapChar,
-		})
-	end
-
-	if element.type == "Professions" and G_RLF.db.global.prof.showSkillChange then
-		row:ShowItemCountText(row.amount, {
-			color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.prof.skillColor)),
-			wrapChar = G_RLF.db.global.prof.skillTextWrapChar,
-			showSign = true,
-		})
-	end
-
-	row:ShowText(text, r, g, b, a)
-
-	if highlight then
 		RunNextFrame(function()
-			row:HighlightIcon()
+			row:ShowItemCountText(element.totalCount, {
+				color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.currencyTotalTextColor)),
+				wrapChar = G_RLF.db.global.currency.currencyTotalTextWrapChar,
+			})
 		end)
 	end
 
-	logFn(text, row.amount, new)
+	if element.type == "Reputation" and element.repLevel and G_RLF.db.global.rep.enableRepLevel then
+		RunNextFrame(function()
+			row:ShowItemCountText(element.repLevel, {
+				color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.rep.repLevelColor)),
+				wrapChar = G_RLF.db.global.rep.repLevelTextWrapChar,
+			})
+		end)
+	end
 
-	row:ResetFadeOut()
+	if element.type == "Experience" and element.currentLevel and G_RLF.db.global.xp.showCurrentLevel then
+		RunNextFrame(function()
+			row:ShowItemCountText(element.currentLevel, {
+				color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.xp.currentLevelColor)),
+				wrapChar = G_RLF.db.global.xp.currentLevelTextWrapChar,
+			})
+		end)
+	end
+
+	if element.type == "Professions" and G_RLF.db.global.prof.showSkillChange then
+		RunNextFrame(function()
+			row:ShowItemCountText(row.amount, {
+				color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.prof.skillColor)),
+				wrapChar = G_RLF.db.global.prof.skillTextWrapChar,
+				showSign = true,
+			})
+		end)
+	end
+
+	RunNextFrame(function()
+		row:ShowText(text, r, g, b, a)
+	end)
+
+	row.highlight = highlight
+	if new then
+		RunNextFrame(function()
+			row:Enter()
+		end)
+	end
+
+	RunNextFrame(function()
+		logFn(text, row.amount, new)
+	end)
 end
 
 function LootDisplay:OnLootReady(_, element)
-	RunNextFrame(function()
-		processRow(element)
-	end)
+	processRow(element)
 end
 
 function LootDisplay:OnRowReturn()
-	RunNextFrame(function()
-		processFromQueue()
-	end)
+	processFromQueue()
 end
 
 processFromQueue = function()
@@ -291,9 +302,7 @@ processFromQueue = function()
 				return
 			end
 			local e = elementQueue:dequeue()
-			RunNextFrame(function()
-				processRow(e)
-			end)
+			processRow(e)
 		end
 	end
 end
