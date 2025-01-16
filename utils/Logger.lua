@@ -11,8 +11,9 @@ local defaults = {
 
 local updateContent
 local function getLogger()
-	if G_RLF.db.global.logger ~= nil and G_RLF.db.global.logger.sessionsLogged > 0 then
-		return G_RLF.db.global.logger.logs[G_RLF.db.global.logger.sessionsLogged]
+	local sessionsLogged = G_RLF.db.global.logger.sessionsLogged or 0
+	if G_RLF.db.global.logger ~= nil and sessionsLogged > 0 then
+		return G_RLF.db.global.logger.logs[sessionsLogged]
 	end
 end
 local WOWEVENT = G_RLF.LogEventSource.WOWEVENT
@@ -173,11 +174,13 @@ end
 function Logger:PLAYER_ENTERING_WORLD(_, isLogin, isReload)
 	if isLogin then
 		G_RLF.db.global.logger.sessionsLogged = (G_RLF.db.global.logger.sessionsLogged or 0) + 1
+		local sessionsLogged = G_RLF.db.global.logger.sessionsLogged
 		G_RLF.db.global.logger.logs = G_RLF.db.global.logger.logs or {}
-		G_RLF.db.global.logger.logs[G_RLF.db.global.logger.sessionsLogged] = {}
-		while G_RLF.db.global.logger.sessionsLogged > 3 do
+		G_RLF.db.global.logger.logs[sessionsLogged] = {}
+		while sessionsLogged > 3 do
 			tremove(G_RLF.db.global.logger.logs, 1)
-			G_RLF.db.global.logger.sessionsLogged = G_RLF.db.global.logger.sessionsLogged - 1
+			sessionsLogged = sessionsLogged - 1
+			G_RLF.db.global.logger.sessionsLogged = sessionsLogged
 		end
 		G_RLF:LogDebug("Logger is ready", addonName)
 	end
@@ -321,7 +324,9 @@ end
 
 function Logger:ProcessLogs(logs)
 	for log, _ in pairs(logs) do
-		self:addLogEntry(unpack(log))
+		RunNextFrame(function()
+			self:addLogEntry(unpack(log))
+		end)
 	end
 end
 

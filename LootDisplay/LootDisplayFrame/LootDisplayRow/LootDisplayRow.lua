@@ -3,16 +3,44 @@ local addonName, G_RLF = ...
 LootDisplayRowMixin = {}
 
 local defaultColor = { 1, 1, 1, 1 }
-function LootDisplayRowMixin:Reset()
-	self:Hide()
-	self:SetAlpha(1)
-	self:ClearAllPoints()
-
+function LootDisplayRowMixin:Init()
 	self.waiting = false
 	if self:IsStaggeredEnter() then
 		self.waiting = true
 	end
 	self.pendingUpdate = false
+
+	self.ClickableButton:Hide()
+	local textures = { self.ClickableButton:GetRegions() }
+	for _, region in ipairs(textures) do
+		if region:GetObjectType() == "Texture" then
+			region:Hide()
+		end
+	end
+
+	self.ClickableButton:SetScript("OnEnter", nil)
+	self.ClickableButton:SetScript("OnLeave", nil)
+	self.ClickableButton:SetScript("OnMouseUp", nil)
+	self.ClickableButton:SetScript("OnEvent", nil)
+
+	self:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
+	self:StyleBackground()
+	self:StyleRowBorders()
+	self:StyleEnterAnimation()
+	self:StyleElementFadeIn()
+	self:StyleFadeOutAnimation()
+	self:StyleHighlightBorder()
+	self:HandlerOnRightClick()
+	RunNextFrame(function()
+		self:SetUpHoverEffect()
+	end)
+end
+
+function LootDisplayRowMixin:Reset()
+	self:Hide()
+	self:SetAlpha(1)
+	self:ClearAllPoints()
+
 	-- Reset row-specific data
 	self.id = nil
 	self.key = nil
@@ -23,6 +51,7 @@ function LootDisplayRowMixin:Reset()
 	self.unit = nil
 	self.type = nil
 	self.highlight = nil
+	self.isHistoryMode = false
 
 	-- Reset UI elements that were part of the template
 	self.TopBorder:SetAlpha(0)
@@ -31,6 +60,9 @@ function LootDisplayRowMixin:Reset()
 	self.LeftBorder:SetAlpha(0)
 
 	self.Icon:Reset()
+	self.Icon.NormalTexture:SetTexture(nil)
+	self.Icon.HighlightTexture:SetTexture(nil)
+	self.Icon.PushedTexture:SetTexture(nil)
 	self.Icon:SetScript("OnEnter", nil)
 	self.Icon:SetScript("OnLeave", nil)
 	self.Icon:SetScript("OnMouseUp", nil)
@@ -65,22 +97,7 @@ function LootDisplayRowMixin:Reset()
 	self.ClickableButton:SetScript("OnLeave", nil)
 	self.ClickableButton:SetScript("OnMouseUp", nil)
 	self.ClickableButton:SetScript("OnEvent", nil)
-
-	self.isHistoryMode = false
-
 	self.PrimaryText:SetTextColor(unpack(defaultColor))
-	self:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
-	self:StyleBackground()
-	self:StyleRowBorders()
-	self:StyleEnterAnimation()
-	self:StyleElementFadeIn()
-	self:StyleFadeOutAnimation()
-	self:HandlerOnRightClick()
-	RunNextFrame(function()
-		self:StyleHighlightBorder()
-		self:SetUpHoverEffect()
-	end)
-	self:ElementsInvisible()
 end
 
 function LootDisplayRowMixin:StyleElementFadeIn()
@@ -92,6 +109,13 @@ function LootDisplayRowMixin:StyleElementFadeIn()
 	if not self.ElementFadeInAnimation then
 		self.ElementFadeInAnimation = self:CreateAnimationGroup()
 		self.ElementFadeInAnimation:SetToFinalAlpha(true)
+		self.ElementFadeInAnimation:SetScript("OnFinished", function()
+			self:HighlightIcon()
+			self:ResetFadeOut()
+			if self.updatePending then
+				self:UpdateQuantity()
+			end
+		end)
 	end
 
 	-- Icon
@@ -103,104 +127,100 @@ function LootDisplayRowMixin:StyleElementFadeIn()
 			Stock = self.ElementFadeInAnimation:CreateAnimation("Alpha"),
 			Count = self.ElementFadeInAnimation:CreateAnimation("Alpha"),
 		}
+		self.Icon.elementFadeIn.icon:SetTarget(self.Icon.icon)
+		self.Icon.elementFadeIn.icon:SetFromAlpha(0)
+		self.Icon.elementFadeIn.icon:SetToAlpha(1)
+		self.Icon.elementFadeIn.icon:SetSmoothing(fadeInSmoothing)
+		self.Icon.elementFadeIn.IconBorder:SetTarget(self.Icon.IconBorder)
+		self.Icon.elementFadeIn.IconBorder:SetFromAlpha(0)
+		self.Icon.elementFadeIn.IconBorder:SetToAlpha(1)
+		self.Icon.elementFadeIn.IconBorder:SetSmoothing(fadeInSmoothing)
+		self.Icon.elementFadeIn.IconOverlay:SetTarget(self.Icon.IconOverlay)
+		self.Icon.elementFadeIn.IconOverlay:SetFromAlpha(0)
+		self.Icon.elementFadeIn.IconOverlay:SetToAlpha(1)
+		self.Icon.elementFadeIn.IconOverlay:SetSmoothing(fadeInSmoothing)
+		self.Icon.elementFadeIn.Stock:SetTarget(self.Icon.Stock)
+		self.Icon.elementFadeIn.Stock:SetFromAlpha(0)
+		self.Icon.elementFadeIn.Stock:SetToAlpha(1)
+		self.Icon.elementFadeIn.Stock:SetSmoothing(fadeInSmoothing)
+		self.Icon.elementFadeIn.Count:SetTarget(self.Icon.Count)
+		self.Icon.elementFadeIn.Count:SetFromAlpha(0)
+		self.Icon.elementFadeIn.Count:SetToAlpha(1)
+		self.Icon.elementFadeIn.Count:SetSmoothing(fadeInSmoothing)
 	end
-	self.Icon.elementFadeIn.icon:SetTarget(self.Icon.icon)
-	self.Icon.elementFadeIn.icon:SetFromAlpha(0)
-	self.Icon.elementFadeIn.icon:SetToAlpha(1)
 	self.Icon.elementFadeIn.icon:SetDuration(fadeInDuration)
-	self.Icon.elementFadeIn.icon:SetSmoothing(fadeInSmoothing)
-	self.Icon.elementFadeIn.IconBorder:SetTarget(self.Icon.IconBorder)
-	self.Icon.elementFadeIn.IconBorder:SetFromAlpha(0)
-	self.Icon.elementFadeIn.IconBorder:SetToAlpha(1)
 	self.Icon.elementFadeIn.IconBorder:SetDuration(fadeInDuration)
-	self.Icon.elementFadeIn.IconBorder:SetSmoothing(fadeInSmoothing)
-	self.Icon.elementFadeIn.IconOverlay:SetTarget(self.Icon.IconOverlay)
-	self.Icon.elementFadeIn.IconOverlay:SetFromAlpha(0)
-	self.Icon.elementFadeIn.IconOverlay:SetToAlpha(1)
 	self.Icon.elementFadeIn.IconOverlay:SetDuration(fadeInDuration)
-	self.Icon.elementFadeIn.IconOverlay:SetSmoothing(fadeInSmoothing)
-	self.Icon.elementFadeIn.Stock:SetTarget(self.Icon.Stock)
-	self.Icon.elementFadeIn.Stock:SetFromAlpha(0)
-	self.Icon.elementFadeIn.Stock:SetToAlpha(1)
 	self.Icon.elementFadeIn.Stock:SetDuration(fadeInDuration)
-	self.Icon.elementFadeIn.Stock:SetSmoothing(fadeInSmoothing)
-	self.Icon.elementFadeIn.Count:SetTarget(self.Icon.Count)
-	self.Icon.elementFadeIn.Count:SetFromAlpha(0)
-	self.Icon.elementFadeIn.Count:SetToAlpha(1)
 	self.Icon.elementFadeIn.Count:SetDuration(fadeInDuration)
-	self.Icon.elementFadeIn.Count:SetSmoothing(fadeInSmoothing)
 
 	-- PrimaryText
 	if not self.PrimaryText.elementFadeIn then
 		self.PrimaryText.elementFadeIn = self.ElementFadeInAnimation:CreateAnimation("Alpha")
+		self.PrimaryText.elementFadeIn:SetTarget(self.PrimaryText)
+		self.PrimaryText.elementFadeIn:SetFromAlpha(0)
+		self.PrimaryText.elementFadeIn:SetToAlpha(1)
+		self.PrimaryText.elementFadeIn:SetSmoothing(fadeInSmoothing)
 	end
-
-	self.PrimaryText.elementFadeIn:SetTarget(self.PrimaryText)
-	self.PrimaryText.elementFadeIn:SetFromAlpha(0)
-	self.PrimaryText.elementFadeIn:SetToAlpha(1)
 	self.PrimaryText.elementFadeIn:SetDuration(fadeInDuration)
-	self.PrimaryText.elementFadeIn:SetSmoothing(fadeInSmoothing)
 
 	-- ItemCountText
 	if not self.ItemCountText.elementFadeIn then
 		self.ItemCountText.elementFadeIn = self.ElementFadeInAnimation:CreateAnimation("Alpha")
+		self.ItemCountText.elementFadeIn:SetTarget(self.ItemCountText)
+		self.ItemCountText.elementFadeIn:SetFromAlpha(0)
+		self.ItemCountText.elementFadeIn:SetToAlpha(1)
+		self.ItemCountText.elementFadeIn:SetSmoothing(fadeInSmoothing)
 	end
-	self.ItemCountText.elementFadeIn:SetTarget(self.ItemCountText)
-	self.ItemCountText.elementFadeIn:SetFromAlpha(0)
-	self.ItemCountText.elementFadeIn:SetToAlpha(1)
 	self.ItemCountText.elementFadeIn:SetDuration(fadeInDuration)
-	self.ItemCountText.elementFadeIn:SetSmoothing(fadeInSmoothing)
 
 	-- SecondaryText
 	if not self.SecondaryText.elementFadeIn then
 		self.SecondaryText.elementFadeIn = self.ElementFadeInAnimation:CreateAnimation("Alpha")
+		self.SecondaryText.elementFadeIn:SetTarget(self.SecondaryText)
+		self.SecondaryText.elementFadeIn:SetFromAlpha(0)
+		self.SecondaryText.elementFadeIn:SetToAlpha(1)
+		self.SecondaryText.elementFadeIn:SetSmoothing(fadeInSmoothing)
 	end
-	self.SecondaryText.elementFadeIn:SetTarget(self.SecondaryText)
-	self.SecondaryText.elementFadeIn:SetFromAlpha(0)
-	self.SecondaryText.elementFadeIn:SetToAlpha(1)
 	self.SecondaryText.elementFadeIn:SetDuration(fadeInDuration)
-	self.SecondaryText.elementFadeIn:SetSmoothing(fadeInSmoothing)
 
 	-- UnitPortrait
 	if not self.UnitPortrait.elementFadeIn then
 		self.UnitPortrait.elementFadeIn = self.ElementFadeInAnimation:CreateAnimation("Alpha")
+		self.UnitPortrait.elementFadeIn:SetTarget(self.UnitPortrait)
+		self.UnitPortrait.elementFadeIn:SetFromAlpha(0)
+		self.UnitPortrait.elementFadeIn:SetToAlpha(1)
+		self.UnitPortrait.elementFadeIn:SetSmoothing(fadeInSmoothing)
 	end
-	self.UnitPortrait.elementFadeIn:SetTarget(self.UnitPortrait)
-	self.UnitPortrait.elementFadeIn:SetFromAlpha(0)
-	self.UnitPortrait.elementFadeIn:SetToAlpha(1)
 	self.UnitPortrait.elementFadeIn:SetDuration(fadeInDuration)
-	self.UnitPortrait.elementFadeIn:SetSmoothing(fadeInSmoothing)
-
-	self.ElementFadeInAnimation:SetScript("OnFinished", function()
-		self:HighlightIcon()
-		self:ResetFadeOut()
-		if self.updatePending then
-			self:UpdateQuantity()
-		end
-	end)
 end
 
 function LootDisplayRowMixin:StyleBackground()
 	local changed = false
 
-	if
-		self.cachedGradientStart ~= G_RLF.db.global.rowBackgroundGradientStart
-		or self.cachedGradientEnd ~= G_RLF.db.global.rowBackgroundGradientEnd
-	then
-		self.cachedGradientStart = G_RLF.db.global.rowBackgroundGradientStart
-		self.cachedGradientEnd = G_RLF.db.global.rowBackgroundGradientEnd
+	local gradientStart = G_RLF.db.global.rowBackgroundGradientStart
+	local gradientEnd = G_RLF.db.global.rowBackgroundGradientEnd
+	local leftAlign = G_RLF.db.global.leftAlign
+
+	if self.cachedGradientStart ~= gradientStart then
+		self.cachedGradientStart = gradientStart
 		changed = true
 	end
 
-	if self.cachedBackgoundLeftAlign ~= G_RLF.db.global.leftAlign then
-		self.cachedBackgoundLeftAlign = G_RLF.db.global.leftAlign
+	if self.cachedGradientEnd ~= gradientEnd then
+		self.cachedGradientEnd = gradientEnd
+		changed = true
+	end
+
+	if self.cachedBackgoundLeftAlign ~= leftAlign then
+		self.cachedBackgoundLeftAlign = leftAlign
 		changed = true
 	end
 
 	if changed then
-		local leftColor = CreateColor(unpack(G_RLF.db.global.rowBackgroundGradientStart))
-		local rightColor = CreateColor(unpack(G_RLF.db.global.rowBackgroundGradientEnd))
-		if not G_RLF.db.global.leftAlign then
+		local leftColor = CreateColor(unpack(gradientStart))
+		local rightColor = CreateColor(unpack(gradientEnd))
+		if not leftAlign then
 			leftColor, rightColor = rightColor, leftColor
 		end
 		self.Background:SetGradient("HORIZONTAL", leftColor, rightColor)
@@ -209,25 +229,26 @@ end
 
 function LootDisplayRowMixin:StyleIcon()
 	local changed = false
-	if self.cachedIconSize ~= G_RLF.db.global.iconSize then
-		self.cachedIconSize = G_RLF.db.global.iconSize
+
+	local iconSize = G_RLF.db.global.iconSize
+	local leftAlign = G_RLF.db.global.leftAlign
+
+	if self.cachedIconSize ~= iconSize then
+		self.cachedIconSize = iconSize
 		changed = true
 	end
 
-	if self.cachedIconLeftAlign ~= G_RLF.db.global.leftAlign then
-		self.cachedIconLeftAlign = G_RLF.db.global.leftAlign
+	if self.cachedIconLeftAlign ~= leftAlign then
+		self.cachedIconLeftAlign = leftAlign
 		changed = true
 	end
 
 	if changed then
 		self.Icon:ClearAllPoints()
-		self.Icon:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
-		self.Icon.IconBorder:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
-		self.Icon.NormalTexture:SetTexture(nil)
-		self.Icon.HighlightTexture:SetTexture(nil)
-		self.Icon.PushedTexture:SetTexture(nil)
-		local anchor, xOffset = "LEFT", G_RLF.db.global.iconSize / 4
-		if not G_RLF.db.global.leftAlign then
+		self.Icon:SetSize(iconSize, iconSize)
+		self.Icon.IconBorder:SetSize(iconSize, iconSize)
+		local anchor, xOffset = "LEFT", iconSize / 4
+		if not leftAlign then
 			anchor, xOffset = "RIGHT", -xOffset
 		end
 		if G_RLF.Masque and G_RLF.iconGroup then
@@ -239,21 +260,36 @@ function LootDisplayRowMixin:StyleIcon()
 end
 
 function LootDisplayRowMixin:StyleUnitPortrait()
+	local sizeChanged = false
+
+	local iconSize = G_RLF.db.global.iconSize
+	local leftAlign = G_RLF.db.global.leftAlign
+
+	if self.cachedUnitIconSize ~= iconSize or self.cachedUnitLeftAlign ~= leftAlign then
+		self.cachedUnitIconSize = iconSize
+		self.cachedUnitLeftAlign = leftAlign
+		sizeChanged = true
+	end
+
+	if sizeChanged then
+		local portraitSize = iconSize * 0.8
+		self.UnitPortrait:SetSize(portraitSize, portraitSize)
+		self.UnitPortrait:ClearAllPoints()
+
+		local anchor, iconAnchor, xOffset = "LEFT", "RIGHT", iconSize / 4
+		if not leftAlign then
+			anchor, iconAnchor, xOffset = "RIGHT", "LEFT", -xOffset
+		end
+
+		self.UnitPortrait:SetPoint(anchor, self.Icon, iconAnchor, xOffset, 0)
+	end
+
 	if self.unit then
 		RunNextFrame(function()
 			if self.unit then
 				SetPortraitTexture(self.UnitPortrait, self.unit)
 			end
 		end)
-		local portraitSize = G_RLF.db.global.iconSize * 0.8
-		self.UnitPortrait:SetSize(portraitSize, portraitSize)
-		self.UnitPortrait:ClearAllPoints()
-		local anchor, iconAnchor, xOffset = "LEFT", "RIGHT", G_RLF.db.global.iconSize / 4
-		if not G_RLF.db.global.leftAlign then
-			anchor, iconAnchor, xOffset = "RIGHT", "LEFT", -xOffset
-		end
-
-		self.UnitPortrait:SetPoint(anchor, self.Icon, iconAnchor, xOffset, 0)
 		self.UnitPortrait:Show()
 	else
 		self.UnitPortrait:Hide()
@@ -262,56 +298,71 @@ end
 
 function LootDisplayRowMixin:StyleText()
 	local fontChanged = false
+
+	local fontFace = G_RLF.db.global.fontFace
+	local useFontObjects = G_RLF.db.global.useFontObjects
+	local font = G_RLF.db.global.font
+	local fontFlags = G_RLF.db.global.fontFlags
+	local fontSize = G_RLF.db.global.fontSize
+	local secondaryFontSize = G_RLF.db.global.secondaryFontSize
+
 	if
-		self.cachedFontFace ~= G_RLF.db.global.fontFace
-		or self.cachedFontSize ~= G_RLF.db.global.fontSize
-		or self.cachedSecondaryFontSize ~= G_RLF.db.global.secondaryFontSize
-		or self.cachedFontFlags ~= G_RLF.defaults.global.fontFlags
+		self.cachedFontFace ~= fontFace
+		or self.cachedFontSize ~= fontSize
+		or self.cachedSecondaryFontSize ~= secondaryFontSize
+		or self.cachedFontFlags ~= fontFlags
 	then
-		self.cachedFontFace = G_RLF.db.global.fontFace
-		self.cachedFontSize = G_RLF.db.global.fontSize
-		self.cachedSecondaryFontSize = G_RLF.db.global.secondaryFontSize
-		self.cachedFontFlags = G_RLF.defaults.global.fontFlags
+		self.cachedFontFace = fontFace
+		self.cachedFontSize = fontSize
+		self.cachedSecondaryFontSize = secondaryFontSize
+		self.cachedFontFlags = fontFlags
 		fontChanged = true
 	end
 
-	if self.cachedUseFontObject ~= G_RLF.db.global.useFontObjects then
-		self.cachedUseFontObject = G_RLF.db.global.useFontObjects
+	if self.cachedUseFontObject ~= useFontObjects then
+		self.cachedUseFontObject = useFontObjects
 		fontChanged = true
 	end
 
 	if fontChanged then
-		if G_RLF.db.global.useFontObjects or not G_RLF.db.global.fontFace then
-			self.PrimaryText:SetFontObject(G_RLF.db.global.font)
-			self.ItemCountText:SetFontObject(G_RLF.db.global.font)
-			self.SecondaryText:SetFontObject(G_RLF.db.global.font)
+		if useFontObjects or not fontFace then
+			self.PrimaryText:SetFontObject(font)
+			self.ItemCountText:SetFontObject(font)
+			self.SecondaryText:SetFontObject(font)
 		else
-			local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, G_RLF.db.global.fontFace)
-			self.PrimaryText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
-			self.ItemCountText:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
-			self.SecondaryText:SetFont(fontPath, G_RLF.db.global.secondaryFontSize, G_RLF.defaults.global.fontFlags)
+			local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, fontFace)
+			self.PrimaryText:SetFont(fontPath, fontSize, fontFlags)
+			self.ItemCountText:SetFont(fontPath, fontSize, fontFlags)
+			self.SecondaryText:SetFont(fontPath, secondaryFontSize, fontFlags)
 		end
 	end
 
+	local leftAlign = G_RLF.db.global.leftAlign
+	local padding = G_RLF.db.global.padding
+	local iconSize = G_RLF.db.global.iconSize
+	local enabledSecondaryRowText = G_RLF.db.global.enabledSecondaryRowText
+
 	if
-		self.cachedRowTextLeftAlign ~= G_RLF.db.global.leftAlign
-		or self.cachedRowTextXOffset ~= G_RLF.db.global.iconSize / 4
+		self.cachedRowTextLeftAlign ~= leftAlign
+		or self.cachedRowTextXOffset ~= iconSize / 4
 		or self.cachedRowTextIcon ~= self.icon
-		or self.cachedEnabledSecondaryText ~= G_RLF.db.global.enabledSecondaryRowText
+		or self.cachedEnabledSecondaryText ~= enabledSecondaryRowText
 		or self.cachedSecondaryText ~= self.secondaryText
-		or self.cachedUnit ~= self.unit
+		or self.cachedUnitText ~= self.unit
+		or self.cachedPaddingText ~= padding
 	then
-		self.cachedRowTextLeftAlign = G_RLF.db.global.leftAlign
-		self.cachedRowTextXOffset = G_RLF.db.global.iconSize / 4
+		self.cachedRowTextLeftAlign = leftAlign
+		self.cachedRowTextXOffset = iconSize / 4
 		self.cachedRowTextIcon = self.icon
-		self.cachedEnabledSecondaryText = G_RLF.db.global.enabledSecondaryRowText
+		self.cachedEnabledSecondaryText = enabledSecondaryRowText
 		self.cachedSecondaryText = self.secondaryText
-		self.cachedUnit = self.unit
+		self.cachedUnitText = self.unit
+		self.cachedPaddingText = padding
 
 		local anchor = "LEFT"
 		local iconAnchor = "RIGHT"
-		local xOffset = G_RLF.db.global.iconSize / 4
-		if not G_RLF.db.global.leftAlign then
+		local xOffset = iconSize / 4
+		if not leftAlign then
 			anchor = "RIGHT"
 			iconAnchor = "LEFT"
 			xOffset = xOffset * -1
@@ -329,7 +380,7 @@ function LootDisplayRowMixin:StyleText()
 			self.PrimaryText:SetPoint(anchor, self.Icon, anchor, 0, 0)
 		end
 
-		if G_RLF.db.global.enabledSecondaryRowText and self.secondaryText ~= nil and self.secondaryText ~= "" then
+		if enabledSecondaryRowText and self.secondaryText ~= nil and self.secondaryText ~= "" then
 			self.SecondaryText:ClearAllPoints()
 			self.SecondaryText:SetJustifyH(anchor)
 			if self.icon then
@@ -348,7 +399,6 @@ function LootDisplayRowMixin:StyleText()
 			else
 				self.SecondaryText:SetPoint(anchor, self.Icon, anchor, 0, 0)
 			end
-			local padding = G_RLF.db.global.padding
 			self.PrimaryText:SetPoint("BOTTOM", self, "CENTER", 0, padding)
 			self.SecondaryText:SetPoint("TOP", self, "CENTER", 0, -padding)
 			self.SecondaryText:SetShown(true)
@@ -359,7 +409,8 @@ function LootDisplayRowMixin:StyleText()
 end
 
 function LootDisplayRowMixin:StyleRowBorders()
-	if not G_RLF.db.global.enableRowBorder then
+	local enableRowBorder = G_RLF.db.global.enableRowBorder
+	if not enableRowBorder then
 		self.StaticTopBorder:Hide()
 		self.StaticRightBorder:Hide()
 		self.StaticBottomBorder:Hide()
@@ -367,14 +418,22 @@ function LootDisplayRowMixin:StyleRowBorders()
 		return
 	end
 
-	self.StaticTopBorder:SetHeight(G_RLF.db.global.rowBorderSize)
-	self.StaticRightBorder:SetWidth(G_RLF.db.global.rowBorderSize)
-	self.StaticBottomBorder:SetHeight(G_RLF.db.global.rowBorderSize)
-	self.StaticLeftBorder:SetWidth(G_RLF.db.global.rowBorderSize)
+	local borderSize = G_RLF.db.global.rowBorderSize
+	local classColors = G_RLF.db.global.rowBorderClassColors
+	local borderColor = G_RLF.db.global.rowBorderColor
 
-	if self.cacheBorderColor ~= G_RLF.db.global.rowBorderColor or G_RLF.db.global.rowBorderClassColors then
-		self.cacheBorderColor = G_RLF.db.global.rowBorderColor
-		if G_RLF.db.global.rowBorderClassColors then
+	if self.cachedBorderSize ~= borderSize then
+		self.cachedBorderSize = borderSize
+		self.StaticTopBorder:SetHeight(borderSize)
+		self.StaticRightBorder:SetWidth(borderSize)
+		self.StaticBottomBorder:SetHeight(borderSize)
+		self.StaticLeftBorder:SetWidth(borderSize)
+	end
+
+	if self.cacheBorderColor ~= borderColor or self.cacheClassColors ~= classColors then
+		self.cacheBorderColor = borderColor
+		self.cacheClassColors = classColors
+		if classColors then
 			local classColor
 			if GetExpansionLevel() >= G_RLF.Expansion.BFA then
 				classColor = C_ClassColor.GetClassColor(select(2, UnitClass(self.unit or "player")))
@@ -386,7 +445,7 @@ function LootDisplayRowMixin:StyleRowBorders()
 			self.StaticBottomBorder:SetColorTexture(classColor.r, classColor.g, classColor.b, 1)
 			self.StaticLeftBorder:SetColorTexture(classColor.r, classColor.g, classColor.b, 1)
 		else
-			local r, g, b, a = unpack(G_RLF.db.global.rowBorderColor)
+			local r, g, b, a = unpack(borderColor)
 			self.StaticTopBorder:SetColorTexture(r, g, b, a)
 			self.StaticRightBorder:SetColorTexture(r, g, b, a)
 			self.StaticBottomBorder:SetColorTexture(r, g, b, a)
@@ -394,7 +453,7 @@ function LootDisplayRowMixin:StyleRowBorders()
 		end
 	end
 
-	if G_RLF.db.global.enableRowBorder then
+	if enableRowBorder then
 		self.StaticTopBorder:Show()
 		self.StaticRightBorder:Show()
 		self.StaticBottomBorder:Show()
@@ -404,6 +463,8 @@ end
 
 function LootDisplayRowMixin:StyleHighlightBorder()
 	if not self.HighlightAnimation then
+		self.HighlightAnimation = self:CreateAnimationGroup()
+		self.HighlightAnimation:SetToFinalAlpha(true)
 		local borders = {
 			self.TopBorder,
 			self.RightBorder,
@@ -412,41 +473,26 @@ function LootDisplayRowMixin:StyleHighlightBorder()
 		}
 
 		for _, b in ipairs(borders) do
-			if not b.HighlightAnimation then
-				b.HighlightAnimation = b:CreateAnimationGroup()
-				local fadeIn = b.HighlightAnimation:CreateAnimation("Alpha")
-				fadeIn:SetFromAlpha(0)
-				fadeIn:SetToAlpha(1)
-				fadeIn:SetDuration(0.2)
-				fadeIn:SetSmoothing("IN_OUT")
-
-				local fadeOut = b.HighlightAnimation:CreateAnimation("Alpha")
-				fadeOut:SetFromAlpha(1)
-				fadeOut:SetToAlpha(0)
-				fadeOut:SetDuration(0.2)
-				fadeOut:SetStartDelay(0.3)
-				fadeOut:SetSmoothing("IN_OUT")
-				fadeOut:SetScript("OnFinished", function()
-					self:ResetHighlightBorder()
-				end)
+			if not b.fadeIn then
+				b.fadeIn = self.HighlightAnimation:CreateAnimation("Alpha")
+				b.fadeIn:SetTarget(b)
+				b.fadeIn:SetOrder(1)
+				b.fadeIn:SetFromAlpha(0)
+				b.fadeIn:SetToAlpha(1)
+				b.fadeIn:SetDuration(0.2)
+				b.fadeIn:SetSmoothing("IN_OUT")
 			end
-		end
 
-		self.HighlightAnimation = {}
-
-		local rowSelf = self
-		function self.HighlightAnimation:Stop()
-			rowSelf.TopBorder.HighlightAnimation:Stop()
-			rowSelf.RightBorder.HighlightAnimation:Stop()
-			rowSelf.BottomBorder.HighlightAnimation:Stop()
-			rowSelf.LeftBorder.HighlightAnimation:Stop()
-		end
-
-		function self.HighlightAnimation:Play()
-			rowSelf.TopBorder.HighlightAnimation:Play()
-			rowSelf.RightBorder.HighlightAnimation:Play()
-			rowSelf.BottomBorder.HighlightAnimation:Play()
-			rowSelf.LeftBorder.HighlightAnimation:Play()
+			if not b.fadeOut then
+				b.fadeOut = self.HighlightAnimation:CreateAnimation("Alpha")
+				b.fadeOut:SetTarget(b)
+				b.fadeOut:SetOrder(2)
+				b.fadeOut:SetFromAlpha(1)
+				b.fadeOut:SetToAlpha(0)
+				b.fadeOut:SetDuration(0.2)
+				b.fadeOut:SetStartDelay(0.1)
+				b.fadeOut:SetSmoothing("IN_OUT")
+			end
 		end
 	end
 end
@@ -479,18 +525,24 @@ end
 function LootDisplayRowMixin:StyleEnterAnimation()
 	local animationChanged = false
 
+	local enterAnimationType = G_RLF.db.global.animations.enter.type
+	local slideDirection = G_RLF.db.global.animations.enter.slide.direction
+	local enterDuration = G_RLF.db.global.animations.enter.duration
+	local feedWidth = G_RLF.db.global.feedWidth
+	local rowHeight = G_RLF.db.global.rowHeight
+
 	if
-		self.cachedEnterAnimationType ~= G_RLF.db.global.animations.enter.type
-		or self.cachedEnterAnimationSlideDirection ~= G_RLF.db.global.animations.enter.slide.direction
-		or self.cachedEnterAnimationDuration ~= G_RLF.db.global.animations.enter.duration
-		or self.cachedEnterAnimationFeedWidth ~= G_RLF.db.global.feedWidth
-		or self.cachedEnterAnimationRowHeight ~= G_RLF.db.global.rowHeight
+		self.cachedEnterAnimationType ~= enterAnimationType
+		or self.cachedEnterAnimationSlideDirection ~= slideDirection
+		or self.cachedEnterAnimationDuration ~= enterDuration
+		or self.cachedEnterAnimationFeedWidth ~= feedWidth
+		or self.cachedEnterAnimationRowHeight ~= rowHeight
 	then
-		self.cachedEnterAnimationType = G_RLF.db.global.animations.enter.type
-		self.cachedEnterAnimationSlideDirection = G_RLF.db.global.animations.enter.slide.direction
-		self.cachedEnterAnimationDuration = G_RLF.db.global.animations.enter.duration
-		self.cachedEnterAnimationFeedWidth = G_RLF.db.global.feedWidth
-		self.cachedEnterAnimationRowHeight = G_RLF.db.global.rowHeight
+		self.cachedEnterAnimationType = enterAnimationType
+		self.cachedEnterAnimationSlideDirection = slideDirection
+		self.cachedEnterAnimationDuration = enterDuration
+		self.cachedEnterAnimationFeedWidth = feedWidth
+		self.cachedEnterAnimationRowHeight = rowHeight
 		animationChanged = true
 	end
 
@@ -519,12 +571,6 @@ function LootDisplayRowMixin:StyleEnterAnimation()
 				end
 			end
 		end)
-
-		local enterAnimationType = G_RLF.db.global.animations.enter.type
-		local enterDuration = G_RLF.db.global.animations.enter.duration
-		local slideDirection = G_RLF.db.global.animations.enter.slide.direction
-		local feedWidth = G_RLF.db.global.feedWidth
-		local rowHeight = G_RLF.db.global.rowHeight
 
 		if enterAnimationType == G_RLF.EnterAnimationType.NONE then
 			self.EnterAnimation.noop = self.EnterAnimation:CreateAnimation()
@@ -611,18 +657,21 @@ function LootDisplayRowMixin:StyleIconHighlight()
 		self.glowTexture:SetDrawLayer("OVERLAY", 7)
 		self.glowTexture:SetTexture("Interface\\SpellActivationOverlay\\IconAlert")
 		self.glowTexture:SetPoint("CENTER", self.Icon, "CENTER", 0, 0)
-		self.glowTexture:SetSize(self.Icon:GetWidth() * 1.75, self.Icon:GetHeight() * 1.75)
 		self.glowTexture:SetBlendMode("ADD") -- "ADD" is often better for glow effects
 		self.glowTexture:SetAlpha(0.75)
 		self.glowTexture:SetTexCoord(0.00781250, 0.50781250, 0.27734375, 0.52734375)
 	end
 
+	self.glowTexture:SetSize(self.Icon:GetWidth() * 1.75, self.Icon:GetHeight() * 1.75)
 	self.glowTexture:Hide()
 
 	-- Create the animation group if it doesn't exist
 	if not self.glowAnimationGroup then
 		self.glowAnimationGroup = self.glowTexture:CreateAnimationGroup()
+		self.glowAnimationGroup:SetLooping("BOUNCE")
+	end
 
+	if not self.glowAnimationGroup.scaleUp then
 		-- -- Scale up animation
 		self.glowAnimationGroup.scaleUp = self.glowAnimationGroup:CreateAnimation("Scale")
 		local factor = 1.1
@@ -630,8 +679,6 @@ function LootDisplayRowMixin:StyleIconHighlight()
 		self.glowAnimationGroup.scaleUp:SetScaleTo(factor, factor)
 		self.glowAnimationGroup.scaleUp:SetDuration(0.5)
 		self.glowAnimationGroup.scaleUp:SetSmoothing("OUT_IN")
-
-		self.glowAnimationGroup:SetLooping("BOUNCE")
 	end
 end
 
@@ -642,6 +689,72 @@ function LootDisplayRowMixin:Styles()
 	end)
 	self:StyleUnitPortrait()
 	self:StyleText()
+end
+
+function LootDisplayRowMixin:BootstrapFromElement(element)
+	local key = element.key
+	local textFn = element.textFn
+	local secondaryTextFn = element.secondaryTextFn or function()
+		return ""
+	end
+	local icon = element.icon
+	local quantity = element.quantity
+	local quality = element.quality
+	local r, g, b, a = element.r, element.g, element.b, element.a
+	local logFn = element.logFn
+	local isLink = element.isLink
+	local unit = element.unit
+	local itemCount = element.itemCount
+	local highlight = element.highlight
+
+	if unit then
+		key = unit .. "_" .. key
+		self.unit = unit
+	end
+
+	self.id = key
+	self.amount = quantity
+	self.type = element.type
+
+	if isLink then
+		local extraWidthStr = " x" .. self.amount
+		if itemCount then
+			extraWidthStr = extraWidthStr .. " (" .. itemCount .. ")"
+		end
+
+		local extraWidth = G_RLF:CalculateTextWidth(extraWidthStr)
+		if self.unit then
+			local portraitSize = G_RLF.db.global.iconSize * 0.8
+			extraWidth = extraWidth + portraitSize - (portraitSize / 2)
+		end
+		self.link = G_RLF:TruncateItemLink(textFn(), extraWidth)
+		self.quality = quality
+		text = textFn(0, self.link)
+		self:SetupTooltip()
+	else
+		text = textFn()
+	end
+
+	if icon then
+		self:UpdateIcon(key, icon, quality)
+	end
+
+	self:UpdateSecondaryText(secondaryTextFn)
+	self:UpdateStyles()
+	self:ShowText(text, r, g, b, a)
+	self.highlight = highlight
+	RunNextFrame(function()
+		self:Enter()
+	end)
+	self:LogRow(logFn, text, true)
+end
+
+function LootDisplayRowMixin:LogRow(logFn, text, new)
+	if logFn then
+		RunNextFrame(function()
+			logFn(text, self.amount, new)
+		end)
+	end
 end
 
 function LootDisplayRowMixin:ElementsVisible()
@@ -665,12 +778,12 @@ function LootDisplayRowMixin:FadeInElements()
 end
 
 function LootDisplayRowMixin:IsStaggeredEnter()
+	local enterAnimationType = G_RLF.db.global.animations.enter.type
+	local slideDirection = G_RLF.db.global.animations.enter.slide.direction
+
 	if
-		G_RLF.db.global.animations.enter.type == G_RLF.EnterAnimationType.SLIDE
-		and (
-			G_RLF.db.global.animations.enter.slide.direction == G_RLF.SlideDirection.UP
-			or G_RLF.db.global.animations.enter.slide.direction == G_RLF.SlideDirection.DOWN
-		)
+		enterAnimationType == G_RLF.EnterAnimationType.SLIDE
+		and (slideDirection == G_RLF.SlideDirection.UP or slideDirection == G_RLF.SlideDirection.DOWN)
 	then
 		return true
 	end
@@ -698,16 +811,20 @@ function LootDisplayRowMixin:Enter()
 	self.ElementFadeInAnimation:Stop()
 	self.FadeOutAnimation:Stop()
 	if not self:IsStaggeredEnter() or not self.waiting then
-		self:Show()
-		self.EnterAnimation:Play()
+		RunNextFrame(function()
+			self:Show()
+			self.EnterAnimation:Play()
+		end)
 		return
 	end
 	if self:IsPreviousRowEntering() then
 		self:Hide()
 		return
 	end
-	self:Show()
-	self.EnterAnimation:Play()
+	RunNextFrame(function()
+		self:Show()
+		self.EnterAnimation:Play()
+	end)
 end
 
 function LootDisplayRowMixin:HandlerOnRightClick()
@@ -758,7 +875,16 @@ function LootDisplayRowMixin:UpdateSecondaryText(secondaryTextFn)
 	end
 end
 
-function LootDisplayRowMixin:UpdateQuantity()
+function LootDisplayRowMixin:UpdateQuantity(element)
+	-- Update existing entry
+	local text = element.textFn(self.amount, self.link)
+	self.amount = self.amount + element.quantity
+	local r, g, b, a = element.r, element.g, element.b, element.a
+
+	self:UpdateSecondaryText(element.secondaryTextFn)
+	self:UpdateItemCount(element)
+	self:ShowText(text, r, g, b, a)
+
 	if self.PrimaryText:GetAlpha() < 1 then
 		self.updatePending = true
 		return
@@ -779,6 +905,83 @@ function LootDisplayRowMixin:UpdateQuantity()
 	if self.FadeOutAnimation:IsPlaying() then
 		self.FadeOutAnimation:Stop()
 		self.FadeOutAnimation:Play()
+	end
+
+	self:LogRow(logFn, text, false)
+end
+
+function LootDisplayRowMixin:UpdateItemCount(element)
+	if element.type == "ItemLoot" and not element.unit then
+		local itemDb = G_RLF.db.global.item
+		if not itemDb.itemCountTextEnabled then
+			return
+		end
+
+		RunNextFrame(function()
+			local itemCount = C_Item.GetItemCount(element.key, true, false, true, true)
+			row:ShowItemCountText(itemCount, {
+				color = G_RLF:RGBAToHexFormat(unpack(itemDb.itemCountTextColor)),
+				wrapChar = itemDb.itemCountTextWrapChar,
+			})
+		end)
+		return
+	end
+
+	if element.type == "Currency" then
+		local currencyDb = G_RLF.db.global.currency
+		if not currencyDb.currencyTotalTextEnabled then
+			return
+		end
+		RunNextFrame(function()
+			row:ShowItemCountText(element.totalCount, {
+				color = G_RLF:RGBAToHexFormat(unpack(currencyDb.currencyTotalTextColor)),
+				wrapChar = currencyDb.currencyTotalTextWrapChar,
+			})
+		end)
+		return
+	end
+
+	if element.type == "Reputation" and element.repLevel then
+		local repDb = G_RLF.db.global.rep
+		if not repDb.repLevelTextEnabled then
+			return
+		end
+		RunNextFrame(function()
+			row:ShowItemCountText(element.repLevel, {
+				color = G_RLF:RGBAToHexFormat(unpack(repDb.repLevelColor)),
+				wrapChar = repDb.repLevelTextWrapChar,
+			})
+		end)
+		return
+	end
+
+	if element.type == "Experience" and element.currentLevel then
+		local xpDb = G_RLF.db.global.xp
+		if not xpDb.currentLevelTextEnabled then
+			return
+		end
+		RunNextFrame(function()
+			row:ShowItemCountText(element.currentLevel, {
+				color = G_RLF:RGBAToHexFormat(unpack(xpDb.currentLevelColor)),
+				wrapChar = xpDb.currentLevelTextWrapChar,
+			})
+		end)
+		return
+	end
+
+	if element.type == "Professions" then
+		local profDb = G_RLF.db.global.prof
+		if not profDb.skillTextEnabled then
+			return
+		end
+		RunNextFrame(function()
+			row:ShowItemCountText(row.amount, {
+				color = G_RLF:RGBAToHexFormat(unpack(profDb.skillColor)),
+				wrapChar = profDb.skillTextWrapChar,
+				showSign = true,
+			})
+		end)
+		return
 	end
 end
 
@@ -1065,6 +1268,7 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 		self.icon = icon
 
 		RunNextFrame(function()
+			local iconSize = G_RLF.db.global.iconSize
 			-- Handle quality logic
 			if not quality then
 				self.Icon:SetItem(self.link)
@@ -1074,10 +1278,10 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 			end
 
 			if self.Icon.IconOverlay then
-				self.Icon.IconOverlay:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
+				self.Icon.IconOverlay:SetSize(iconSize, iconSize)
 			end
 			if self.Icon.ProfessionQualityOverlay then
-				self.Icon.ProfessionQualityOverlay:SetSize(G_RLF.db.global.iconSize, G_RLF.db.global.iconSize)
+				self.Icon.ProfessionQualityOverlay:SetSize(iconSize, iconSize)
 			end
 
 			self.Icon.NormalTexture:SetTexture(nil)

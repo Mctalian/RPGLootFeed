@@ -6,7 +6,8 @@ local rows = G_RLF.list()
 local keyRowMap
 
 local function getFrameHeight()
-	return G_RLF.db.global.maxRows * (G_RLF.db.global.rowHeight + G_RLF.db.global.padding) - G_RLF.db.global.padding
+	local padding = G_RLF.db.global.padding
+	return G_RLF.db.global.maxRows * (G_RLF.db.global.rowHeight + padding) - padding
 end
 
 local function getNumberOfRows()
@@ -14,11 +15,12 @@ local function getNumberOfRows()
 end
 
 local function getPositioningDetails()
+	local growUp = G_RLF.db.global.growUp
 	-- Position the new row at the bottom (or top if growing down)
-	local vertDir = G_RLF.db.global.growUp and "BOTTOM" or "TOP"
-	local opposite = G_RLF.db.global.growUp and "TOP" or "BOTTOM"
+	local vertDir = growUp and "BOTTOM" or "TOP"
+	local opposite = growUp and "TOP" or "BOTTOM"
 	local yOffset = G_RLF.db.global.padding
-	if not G_RLF.db.global.growUp then
+	if not growUp then
 		yOffset = -yOffset
 	end
 
@@ -120,10 +122,7 @@ function LootDisplayFrameMixin:Load()
 		length = 0,
 	}
 	self.rowHistory = {}
-	self.rowFramePool = CreateFramePool("Frame", self, "LootDisplayRowTemplate", function(pool, row)
-		row:Reset()
-		row:SetParent(self)
-	end)
+	self.rowFramePool = CreateFramePool("Frame", self, "LootDisplayRowTemplate")
 	self.vertDir, self.opposite, self.yOffset = getPositioningDetails()
 	self:UpdateSize()
 	self:SetPoint(
@@ -223,13 +222,18 @@ function LootDisplayFrameMixin:LeaseRow(key)
 	end
 
 	local row = self.rowFramePool:Acquire()
-	row:Hide()
+	RunNextFrame(function()
+		row:Hide()
+	end)
 	row.key = key
 
 	local success = rows:push(row)
 	if not success then
 		error("Tried to push a row that already exists in the list")
 	end
+
+	row:Init()
+	row:SetParent(self)
 
 	keyRowMap[key] = row
 	keyRowMap.length = keyRowMap.length + 1
@@ -258,6 +262,10 @@ function LootDisplayFrameMixin:ReleaseRow(row)
 	row:UpdateNeighborPositions(self)
 	rows:remove(row)
 	row:SetParent(nil)
+
+	RunNextFrame(function()
+		row:Reset()
+	end)
 
 	self.rowFramePool:Release(row)
 	G_RLF:SendMessage("RLF_ROW_RETURNED")
@@ -358,10 +366,12 @@ end
 
 function LootDisplayFrameMixin:UpdateHistoryFrame(offset)
 	offset = offset or 0
-	local rowHeight = G_RLF.db.global.rowHeight + G_RLF.db.global.padding
+	local padding = G_RLF.db.global.padding
+	local feedWidth = G_RLF.db.global.feedWidth
+	local rowHeight = G_RLF.db.global.rowHeight + padding
 	local visibleRows = G_RLF.db.global.maxRows
 	local totalRows = #self.rowHistory
-	local contentSize = totalRows * rowHeight - G_RLF.db.global.padding
+	local contentSize = totalRows * rowHeight - padding
 	local startIndex = math.floor(offset / rowHeight) + 1
 	local endIndex = math.min(startIndex + visibleRows - 1, totalRows)
 
@@ -378,8 +388,8 @@ function LootDisplayFrameMixin:UpdateHistoryFrame(offset)
 		end
 	end
 
-	self.historyFrame:SetSize(G_RLF.db.global.feedWidth, getFrameHeight() + rowHeight)
-	self.historyContent:SetSize(G_RLF.db.global.feedWidth, contentSize)
+	self.historyFrame:SetSize(feedWidth, getFrameHeight() + rowHeight)
+	self.historyContent:SetSize(feedWidth, contentSize)
 end
 
 function LootDisplayFrameMixin:ToggleHistoryFrame()

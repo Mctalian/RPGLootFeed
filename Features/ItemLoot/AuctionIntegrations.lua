@@ -26,21 +26,23 @@ function AuctionIntegrations:Init()
 
 	G_RLF:LogDebug("Active AH integrations: " .. self.numActiveIntegrations)
 
+	local ahSource = G_RLF.db.global.auctionHouseSource
+
 	if self.numActiveIntegrations == 1 then
 		for _, integration in pairs(self.activeIntegrations) do
 			self.activeIntegration = integration
 		end
-	elseif G_RLF.db.global.auctionHouseSource then
-		if G_RLF.db.global.auctionHouseSource == Integ_Nil:ToString() then
+	elseif ahSource then
+		if ahSource == Integ_Nil:ToString() then
 			self.activeIntegration = self.nilIntegration
 		end
-		self.activeIntegration = self.activeIntegrations[G_RLF.db.global.auctionHouseSource]
+		self.activeIntegration = self.activeIntegrations[ahSource]
 		if not self.activeIntegration then
 			self.activeIntegration = self.nilIntegration
 		end
 	end
 
-	if self.activeIntegration and G_RLF.db.global.auctionHouseSource ~= self.activeIntegration:ToString() then
+	if self.activeIntegration and ahSource ~= self.activeIntegration:ToString() then
 		G_RLF.db.global.auctionHouseSource = self.activeIntegration:ToString()
 	end
 end

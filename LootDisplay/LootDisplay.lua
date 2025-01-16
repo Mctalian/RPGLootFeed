@@ -6,13 +6,11 @@ local lsm = G_RLF.lsm
 
 -- Private method declaration
 local processFromQueue
-local getTextWidth
-local truncateItemLink
 
 -- Private variable declaration
 local frame = nil
-local tempFontString = nil
 local elementQueue = G_RLF.Queue:new()
+G_RLF.tempFontString = nil
 
 --@alpha@
 local TestLabelQueueSize
@@ -46,8 +44,8 @@ function LootDisplay:OnInitialize()
 	frame = LootDisplayFrame
 	frame:Load()
 
-	tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
-	tempFontString:Hide() -- Prevent it from showing up
+	G_RLF.tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
+	G_RLF.tempFontString:Hide() -- Prevent it from showing up
 end
 
 function LootDisplay:OnEnable()
@@ -145,35 +143,17 @@ local function processRow(element)
 	end
 
 	local key = element.key
-	local textFn = element.textFn
-	local secondaryTextFn = element.secondaryTextFn or function()
-		return ""
-	end
-	local icon = element.icon
-	local quantity = element.quantity
-	local quality = element.quality
-	local r, g, b, a = element.r, element.g, element.b, element.a
-	local logFn = element.logFn
-	local isLink = element.isLink
 	local unit = element.unit
-	local itemCount = element.itemCount
-	local highlight = element.highlight
 
 	if unit then
 		key = unit .. "_" .. key
 	end
 
-	local new = true
-	local text
-
 	local row = frame:GetRow(key)
 	if row then
-		-- Update existing entry
-		new = false
-		text = textFn(row.amount, row.link)
-		row.amount = row.amount + quantity
-
-		row:UpdateQuantity()
+		RunNextFrame(function()
+			row:UpdateQuantity(element)
+		end)
 	else
 		-- New row
 		row = frame:LeaseRow(key)
@@ -182,106 +162,8 @@ local function processRow(element)
 			return
 		end
 
-		if unit then
-			row.unit = unit
-		end
-
-		row.id = element.key
-		row.amount = quantity
-		row.type = element.type
-
-		if isLink then
-			local extraWidthStr = " x" .. row.amount
-			if element.itemCount then
-				extraWidthStr = extraWidthStr .. " (" .. element.itemCount .. ")"
-			end
-
-			local extraWidth = getTextWidth(extraWidthStr)
-			if row.unit then
-				local portraitSize = G_RLF.db.global.iconSize * 0.8
-				extraWidth = extraWidth + portraitSize - (portraitSize / 2)
-			end
-			row.link = truncateItemLink(textFn(), extraWidth)
-			row.quality = quality
-			text = textFn(0, row.link)
-			row:SetupTooltip()
-		else
-			text = textFn()
-		end
-
-		if icon then
-			row:UpdateIcon(key, icon, quality)
-		end
-
-		row:UpdateSecondaryText(secondaryTextFn)
-		row:UpdateStyles()
+		row:BootstrapFromElement(element)
 	end
-
-	if not new then
-		row:UpdateSecondaryText(secondaryTextFn)
-	end
-
-	if element.type == "ItemLoot" and not element.unit and G_RLF.db.global.item.itemCountTextEnabled then
-		RunNextFrame(function()
-			local itemCount = C_Item.GetItemCount(element.key, true, false, true, true)
-			row:ShowItemCountText(itemCount, {
-				color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.item.itemCountTextColor)),
-				wrapChar = G_RLF.db.global.item.itemCountTextWrapChar,
-			})
-		end)
-	end
-
-	if element.type == "Currency" and G_RLF.db.global.currency.currencyTotalTextEnabled then
-		RunNextFrame(function()
-			row:ShowItemCountText(element.totalCount, {
-				color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.currency.currencyTotalTextColor)),
-				wrapChar = G_RLF.db.global.currency.currencyTotalTextWrapChar,
-			})
-		end)
-	end
-
-	if element.type == "Reputation" and element.repLevel and G_RLF.db.global.rep.enableRepLevel then
-		RunNextFrame(function()
-			row:ShowItemCountText(element.repLevel, {
-				color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.rep.repLevelColor)),
-				wrapChar = G_RLF.db.global.rep.repLevelTextWrapChar,
-			})
-		end)
-	end
-
-	if element.type == "Experience" and element.currentLevel and G_RLF.db.global.xp.showCurrentLevel then
-		RunNextFrame(function()
-			row:ShowItemCountText(element.currentLevel, {
-				color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.xp.currentLevelColor)),
-				wrapChar = G_RLF.db.global.xp.currentLevelTextWrapChar,
-			})
-		end)
-	end
-
-	if element.type == "Professions" and G_RLF.db.global.prof.showSkillChange then
-		RunNextFrame(function()
-			row:ShowItemCountText(row.amount, {
-				color = G_RLF:RGBAToHexFormat(unpack(G_RLF.db.global.prof.skillColor)),
-				wrapChar = G_RLF.db.global.prof.skillTextWrapChar,
-				showSign = true,
-			})
-		end)
-	end
-
-	RunNextFrame(function()
-		row:ShowText(text, r, g, b, a)
-	end)
-
-	row.highlight = highlight
-	if new then
-		RunNextFrame(function()
-			row:Enter()
-		end)
-	end
-
-	RunNextFrame(function()
-		logFn(text, row.amount, new)
-	end)
 end
 
 function LootDisplay:OnLootReady(_, element)
@@ -320,19 +202,20 @@ end
 
 G_RLF.LootDisplay = LootDisplay
 
-getTextWidth = function(text)
-	if G_RLF.db.global.useFontObjects or not G_RLF.db.global.fontFace then
-		tempFontString:SetFontObject(G_RLF.db.global.font)
+function G_RLF:CalculateTextWidth(text)
+	local fontFace = G_RLF.db.global.fontFace
+	if G_RLF.db.global.useFontObjects or not fontFace then
+		G_RLF.tempFontString:SetFontObject(G_RLF.db.global.font)
 	else
-		local fontPath = lsm:Fetch(lsm.MediaType.FONT, G_RLF.db.global.fontFace)
-		tempFontString:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
+		local fontPath = lsm:Fetch(lsm.MediaType.FONT, fontFace)
+		G_RLF.tempFontString:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
 	end
-	tempFontString:SetText(text)
-	local width = tempFontString:GetStringWidth()
+	G_RLF.tempFontString:SetText(text)
+	local width = G_RLF.tempFontString:GetStringWidth()
 	return width
 end
 
-truncateItemLink = function(itemLink, extraWidth)
+function G_RLF:TruncateItemLink(itemLink, extraWidth)
 	local originalLink = itemLink .. ""
 	local itemName = string.match(itemLink, "%[(.-)%]")
 	local begIndex, endIndex = string.find(originalLink, itemName, 1, true)
@@ -342,19 +225,16 @@ truncateItemLink = function(itemLink, extraWidth)
 	local linkStart = string.sub(originalLink, 0, begIndex - 1)
 	local linkEnd = string.sub(originalLink, endIndex + 1)
 
-	local maxWidth = G_RLF.db.global.feedWidth
-		- G_RLF.db.global.iconSize
-		- (G_RLF.db.global.iconSize / 4)
-		- (G_RLF.db.global.iconSize / 2)
-		- extraWidth
+	local iconSize = G_RLF.db.global.iconSize
+	local maxWidth = G_RLF.db.global.feedWidth - iconSize - (iconSize / 4) - (iconSize / 2) - extraWidth
 
 	-- Calculate the width of the item name plus the link start and end
-	local itemNameWidth = getTextWidth("[" .. itemName .. "]")
+	local itemNameWidth = G_RLF:CalculateTextWidth("[" .. itemName .. "]")
 
 	-- If the width exceeds maxWidth, truncate and add ellipses
 	if itemNameWidth > maxWidth then
 		-- Approximate truncation by progressively shortening the name
-		while getTextWidth("[" .. itemName .. "...]") > maxWidth and #itemName > 0 do
+		while G_RLF:CalculateTextWidth("[" .. itemName .. "...]") > maxWidth and #itemName > 0 do
 			itemName = string.sub(itemName, 1, -2)
 		end
 		itemName = itemName .. "..."

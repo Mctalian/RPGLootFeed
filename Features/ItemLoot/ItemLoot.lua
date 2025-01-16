@@ -183,18 +183,21 @@ function ItemLoot.Element:new(...)
 			return "    " .. name
 		end
 
+		local fontSize = G_RLF.db.global.fontSize
+
 		if fromLink ~= "" and fromLink ~= nil then
 			local toItemLevel, fromItemLevel = getItemLevels(itemLink, fromLink)
-			local atlasIconSize = G_RLF.db.global.fontSize * 1.5
+			local atlasIconSize = fontSize * 1.5
 			local atlasArrow = "|A:npe_arrowrightglow:" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a"
 			return "    " .. fromItemLevel .. " " .. atlasArrow .. " " .. toItemLevel
 		end
 
 		local quantity = ...
-		local atlasIconSize = G_RLF.db.global.fontSize * 1.5
+		local atlasIconSize = fontSize * 1.5
 		local atlasIcon
 		local unitPrice
-		if G_RLF.db.global.pricesForSellableItems == G_RLF.PricesEnum.Vendor then
+		local pricesForSellableItems = G_RLF.db.global.pricesForSellableItems
+		if pricesForSellableItems == G_RLF.PricesEnum.Vendor then
 			if not element.sellPrice or element.sellPrice == 0 then
 				return ""
 			end
@@ -204,7 +207,7 @@ function ItemLoot.Element:new(...)
 				atlasIcon = "bags-junkcoin"
 			end
 			unitPrice = element.sellPrice
-		elseif G_RLF.db.global.pricesForSellableItems == G_RLF.PricesEnum.AH then
+		elseif pricesForSellableItems == G_RLF.PricesEnum.AH then
 			local marketPrice = G_RLF.AuctionIntegrations.activeIntegration:GetAHPrice(itemLink)
 			if not marketPrice or marketPrice == 0 then
 				return ""
