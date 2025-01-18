@@ -162,7 +162,9 @@ local function processRow(element)
 			return
 		end
 
-		row:BootstrapFromElement(element)
+		RunNextFrame(function()
+			row:BootstrapFromElement(element)
+		end)
 	end
 end
 

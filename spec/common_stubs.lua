@@ -130,7 +130,7 @@ function common_stubs.setup_G_RLF(spy)
 			return func(...)
 		end,
 		Print = function(msg) end,
-		ProfileFunction = function(_, name, func)
+		ProfileFunction = function(_, func, name)
 			return func
 		end,
 		CreatePatternSegmentsForStringNumber = spy.new(function()

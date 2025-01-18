@@ -222,10 +222,10 @@ function LootDisplayFrameMixin:LeaseRow(key)
 	end
 
 	local row = self.rowFramePool:Acquire()
+	row.key = key
 	RunNextFrame(function()
 		row:Hide()
 	end)
-	row.key = key
 
 	local success = rows:push(row)
 	if not success then
@@ -262,11 +262,8 @@ function LootDisplayFrameMixin:ReleaseRow(row)
 	row:UpdateNeighborPositions(self)
 	rows:remove(row)
 	row:SetParent(nil)
-
-	RunNextFrame(function()
-		row:Reset()
-	end)
-
+	row.key = nil
+	row:Reset()
 	self.rowFramePool:Release(row)
 	G_RLF:SendMessage("RLF_ROW_RETURNED")
 	self:UpdateTabVisibility()
@@ -418,7 +415,7 @@ end
 function LootDisplayFrameMixin:UpdateRowItemCounts()
 	for row in rows:iterate() do
 		if row.id and row.type == "ItemLoot" and not row.unit then
-			row:UpdateItemCount()
+			row:UpdateItemCount(row)
 		end
 	end
 end

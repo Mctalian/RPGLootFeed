@@ -8,7 +8,8 @@ function LootDisplayRowMixin:Init()
 	if self:IsStaggeredEnter() then
 		self.waiting = true
 	end
-	self.pendingUpdate = false
+	self.updatePending = false
+	self.pendingElement = nil
 
 	self.ClickableButton:Hide()
 	local textures = { self.ClickableButton:GetRegions() }
@@ -30,7 +31,6 @@ function LootDisplayRowMixin:Init()
 	self:StyleElementFadeIn()
 	self:StyleFadeOutAnimation()
 	self:StyleHighlightBorder()
-	self:HandlerOnRightClick()
 	RunNextFrame(function()
 		self:SetUpHoverEffect()
 	end)
@@ -43,7 +43,6 @@ function LootDisplayRowMixin:Reset()
 
 	-- Reset row-specific data
 	self.id = nil
-	self.key = nil
 	self.amount = nil
 	self.icon = nil
 	self.link = nil
@@ -52,6 +51,9 @@ function LootDisplayRowMixin:Reset()
 	self.type = nil
 	self.highlight = nil
 	self.isHistoryMode = false
+	self.pendingElement = nil
+	self.updatePending = false
+	self.waiting = false
 
 	-- Reset UI elements that were part of the template
 	self.TopBorder:SetAlpha(0)
@@ -113,7 +115,7 @@ function LootDisplayRowMixin:StyleElementFadeIn()
 			self:HighlightIcon()
 			self:ResetFadeOut()
 			if self.updatePending then
-				self:UpdateQuantity()
+				self:UpdateQuantity(self.pendingElement)
 			end
 		end)
 	end
@@ -454,10 +456,12 @@ function LootDisplayRowMixin:StyleRowBorders()
 	end
 
 	if enableRowBorder then
-		self.StaticTopBorder:Show()
-		self.StaticRightBorder:Show()
-		self.StaticBottomBorder:Show()
-		self.StaticLeftBorder:Show()
+		RunNextFrame(function()
+			self.StaticTopBorder:Show()
+			self.StaticRightBorder:Show()
+			self.StaticBottomBorder:Show()
+			self.StaticLeftBorder:Show()
+		end)
 	end
 end
 
@@ -562,7 +566,7 @@ function LootDisplayRowMixin:StyleEnterAnimation()
 			self:HighlightIcon()
 			self:ResetFadeOut()
 			if self.updatePending then
-				self:UpdateQuantity()
+				self:UpdateQuantity(self.pendingElement)
 			end
 			if self:IsStaggeredEnter() then
 				if self._next then
@@ -683,12 +687,14 @@ function LootDisplayRowMixin:StyleIconHighlight()
 end
 
 function LootDisplayRowMixin:Styles()
+	self:StyleBackground()
 	self:StyleIcon()
 	RunNextFrame(function()
 		self:StyleIconHighlight()
 	end)
 	self:StyleUnitPortrait()
 	self:StyleText()
+	self:HandlerOnRightClick()
 end
 
 function LootDisplayRowMixin:BootstrapFromElement(element)
@@ -701,11 +707,12 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	local quantity = element.quantity
 	local quality = element.quality
 	local r, g, b, a = element.r, element.g, element.b, element.a
-	local logFn = element.logFn
+	self.logFn = element.logFn
 	local isLink = element.isLink
 	local unit = element.unit
 	local itemCount = element.itemCount
 	local highlight = element.highlight
+	local text
 
 	if unit then
 		key = unit .. "_" .. key
@@ -745,8 +752,9 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	self.highlight = highlight
 	RunNextFrame(function()
 		self:Enter()
+		self:UpdateItemCount(element)
 	end)
-	self:LogRow(logFn, text, true)
+	self:LogRow(self.logFn, text, true)
 end
 
 function LootDisplayRowMixin:LogRow(logFn, text, new)
@@ -876,6 +884,21 @@ function LootDisplayRowMixin:UpdateSecondaryText(secondaryTextFn)
 end
 
 function LootDisplayRowMixin:UpdateQuantity(element)
+	self.updatePending = false
+	if self.amount == nil then
+		self.updatePending = true
+	elseif self.PrimaryText:GetAlpha() < 1 then
+		self.updatePending = true
+	elseif self.EnterAnimation and self.EnterAnimation:IsPlaying() then
+		self.updatePending = true
+	elseif self.ElementFadeInAnimation and self.ElementFadeInAnimation:IsPlaying() then
+		self.updatePending = true
+	end
+	if self.updatePending then
+		self.pendingElement = element
+		return
+	end
+	self.pendingElement = nil
 	-- Update existing entry
 	local text = element.textFn(self.amount, self.link)
 	self.amount = self.amount + element.quantity
@@ -885,19 +908,6 @@ function LootDisplayRowMixin:UpdateQuantity(element)
 	self:UpdateItemCount(element)
 	self:ShowText(text, r, g, b, a)
 
-	if self.PrimaryText:GetAlpha() < 1 then
-		self.updatePending = true
-		return
-	end
-	if self.EnterAnimation and self.EnterAnimation:IsPlaying() then
-		self.pendingUpdate = true
-		return
-	end
-	if self.ElementFadeInAnimation and self.ElementFadeInAnimation:IsPlaying() then
-		self.pendingUpdate = true
-		return
-	end
-	self.pendingUpdate = false
 	if not G_RLF.db.global.disableRowHighlight then
 		self.HighlightAnimation:Stop()
 		self.HighlightAnimation:Play()
@@ -907,7 +917,7 @@ function LootDisplayRowMixin:UpdateQuantity(element)
 		self.FadeOutAnimation:Play()
 	end
 
-	self:LogRow(logFn, text, false)
+	self:LogRow(self.logFn, text, false)
 end
 
 function LootDisplayRowMixin:UpdateItemCount(element)
@@ -919,7 +929,7 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 
 		RunNextFrame(function()
 			local itemCount = C_Item.GetItemCount(element.key, true, false, true, true)
-			row:ShowItemCountText(itemCount, {
+			self:ShowItemCountText(itemCount, {
 				color = G_RLF:RGBAToHexFormat(unpack(itemDb.itemCountTextColor)),
 				wrapChar = itemDb.itemCountTextWrapChar,
 			})
@@ -933,7 +943,7 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 			return
 		end
 		RunNextFrame(function()
-			row:ShowItemCountText(element.totalCount, {
+			self:ShowItemCountText(element.totalCount, {
 				color = G_RLF:RGBAToHexFormat(unpack(currencyDb.currencyTotalTextColor)),
 				wrapChar = currencyDb.currencyTotalTextWrapChar,
 			})
@@ -943,11 +953,11 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 
 	if element.type == "Reputation" and element.repLevel then
 		local repDb = G_RLF.db.global.rep
-		if not repDb.repLevelTextEnabled then
+		if not repDb.enableRepLevel then
 			return
 		end
 		RunNextFrame(function()
-			row:ShowItemCountText(element.repLevel, {
+			self:ShowItemCountText(element.repLevel, {
 				color = G_RLF:RGBAToHexFormat(unpack(repDb.repLevelColor)),
 				wrapChar = repDb.repLevelTextWrapChar,
 			})
@@ -957,11 +967,11 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 
 	if element.type == "Experience" and element.currentLevel then
 		local xpDb = G_RLF.db.global.xp
-		if not xpDb.currentLevelTextEnabled then
+		if not xpDb.showCurrentLevel then
 			return
 		end
 		RunNextFrame(function()
-			row:ShowItemCountText(element.currentLevel, {
+			self:ShowItemCountText(element.currentLevel, {
 				color = G_RLF:RGBAToHexFormat(unpack(xpDb.currentLevelColor)),
 				wrapChar = xpDb.currentLevelTextWrapChar,
 			})
@@ -971,11 +981,11 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 
 	if element.type == "Professions" then
 		local profDb = G_RLF.db.global.prof
-		if not profDb.skillTextEnabled then
+		if not profDb.showSkillChange then
 			return
 		end
 		RunNextFrame(function()
-			row:ShowItemCountText(row.amount, {
+			self:ShowItemCountText(self.amount, {
 				color = G_RLF:RGBAToHexFormat(unpack(profDb.skillColor)),
 				wrapChar = profDb.skillTextWrapChar,
 				showSign = true,
@@ -1185,18 +1195,6 @@ function LootDisplayRowMixin:Dump()
 		prevKey,
 		nextKey
 	)
-end
-
-function LootDisplayRowMixin:UpdateItemCount()
-	RunNextFrame(function()
-		if self.id then
-			local itemCount = C_Item.GetItemCount(self.id, true, false, true, true)
-
-			if itemCount then
-				self:ShowItemCountText(itemCount, { wrapChar = G_RLF.db.global.item.itemCountTextWrapChar })
-			end
-		end
-	end)
 end
 
 function LootDisplayRowMixin:ShowItemCountText(itemCount, options)
