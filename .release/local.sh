@@ -498,13 +498,8 @@ if [[ -n $GITHUB_ACTIONS ]]; then
 		unset check_tag
 	fi
 	start_group() {
-		cyan=""
-		green=""
-		yellow=""
-		red=""
-		no_color=""
-		color_removed=$( echo -e "$1")
-		echo -e "##[group]$color_removed";
+		echo "##[group]$2";
+		echo -e "$1"
 	}
 	end_group() { echo "##[endgroup]"; }
 fi
