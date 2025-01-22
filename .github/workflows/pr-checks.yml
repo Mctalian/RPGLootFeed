@@ -107,14 +107,14 @@ jobs:
 
       - name: Package
         if: env.IS_FORK == 'false'
-        uses: BigWigsMods/packager@v2
+        uses: Mctalian/packager@local-mode-and-colors
         with:
           args: -d
           pandoc: "false"
 
       - name: Package (fork)
         if: env.IS_FORK == 'true'
-        uses: BigWigsMods/packager@v2
+        uses: Mctalian/packager@local-mode-and-colors
         with:
           args: -d -n {package-name}-pr${{github.event.number}}-{nolib}{classic}
           pandoc: "false"
