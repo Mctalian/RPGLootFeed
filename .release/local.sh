@@ -497,7 +497,7 @@ if [[ -n $GITHUB_ACTIONS ]]; then
 		fi
 		unset check_tag
 	fi
-	start_group() { echo "##[group]$1"; }
+	start_group() { echo -e "##[group]$1"; }
 	end_group() { echo "##[endgroup]"; }
 fi
 
