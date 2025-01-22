@@ -503,7 +503,8 @@ if [[ -n $GITHUB_ACTIONS ]]; then
 		yellow=""
 		red=""
 		no_color=""
-		echo -e "##[group]$1";
+		color_removed=$( echo -e "$1")
+		echo -e "##[group]$color_removed";
 	}
 	end_group() { echo "##[endgroup]"; }
 fi
