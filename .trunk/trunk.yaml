@@ -24,6 +24,9 @@ lint:
     - linters: [no-invalid-prints]
       paths:
         - spec/**
+    - linters: [ALL]
+      paths:
+        - .release/local.sh
   enabled:
     - taplo@0.9.3
     - stylua@0.20.0
