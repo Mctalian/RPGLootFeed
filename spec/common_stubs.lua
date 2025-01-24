@@ -42,6 +42,12 @@ function common_stubs.setup_G_RLF(spy)
 	}
 	local ns = {
 		addonVersion = "1.0.0",
+		defaults = {
+			global = {},
+		},
+		options = {
+			args = {},
+		},
 		db = {
 			global = {
 				currencyFeed = true,
@@ -124,7 +130,7 @@ function common_stubs.setup_G_RLF(spy)
 			return func(...)
 		end,
 		Print = function(msg) end,
-		ProfileFunction = function(_, name, func)
+		ProfileFunction = function(_, func, name)
 			return func
 		end,
 		CreatePatternSegmentsForStringNumber = spy.new(function()
@@ -175,6 +181,17 @@ function common_stubs.setup_G_RLF(spy)
 			info = "INFO",
 			warn = "WARN",
 			error = "ERROR",
+		},
+		EnterAnimationType = {
+			NONE = "none",
+			FADE = "fade",
+			SLIDE = "slide",
+		},
+		SlideDirection = {
+			LEFT = "left",
+			RIGHT = "right",
+			UP = "up",
+			DOWN = "down",
 		},
 		LogDebug = spy.new(),
 		LogInfo = spy.new(),

@@ -7,6 +7,6 @@
     <Script file="Positioning.lua"/>
     <Script file="Sizing.lua"/>
     <Script file="Styling.lua"/>
-    <Script file="Timing.lua"/>
+    <Script file="Animations.lua"/>
     <Script file="BlizzardUI.lua"/>
 </Ui>

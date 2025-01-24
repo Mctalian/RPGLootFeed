@@ -3,17 +3,19 @@ local addonName, G_RLF = ...
 local Logger = G_RLF.RLF:NewModule("Logger", "AceBucket-3.0", "AceEvent-3.0")
 local gui = LibStub("AceGUI-3.0")
 
-local loggerName = addonName .. "Logger"
-local defaults = {
-	sessionsLogged = 0,
-	logs = {},
-}
-
 local updateContent
+local logger = nil
+local initialized = false
 local function getLogger()
-	if G_RLF.db.global.logger ~= nil and G_RLF.db.global.logger.sessionsLogged > 0 then
-		return G_RLF.db.global.logger.logs[G_RLF.db.global.logger.sessionsLogged]
+	if not initialized then
+		initialized = true
+		G_RLF.db.global.logger = {}
 	end
+	if logger == nil then
+		logger = G_RLF.db.global.logger or {}
+	end
+
+	return logger
 end
 local WOWEVENT = G_RLF.LogEventSource.WOWEVENT
 
@@ -61,81 +63,100 @@ local function OnEventTypeChange(_, _, k, v)
 end
 
 local function OnClearLog()
-	local count = #getLogger()
-	for i = 0, count do
-		getLogger()[i] = nil
-	end
+	logger = {}
 	updateContent()
 end
 
-local contentBox
-function Logger:InitializeFrame()
-	if not self.frame then
-		self.frame = gui:Create("Frame")
-		self.frame:Hide()
-		RunNextFrame(function()
-			self.frame:SetTitle("Loot Log")
-			self.frame:EnableResize(false)
-		end)
-		self.frame:SetLayout("Flow")
+local createLoggerFrames
+local createFilterBar
+local createContentBox
+local createFilterBarComponents
 
-		local filterBar = gui:Create("SimpleGroup")
-		self.frame:AddChild(filterBar)
-		RunNextFrame(function()
-			filterBar:SetFullWidth(true)
-			filterBar:SetLayout("Flow")
-		end)
+createLoggerFrames = function(l)
+	if not l.frame then
+		l.frame = gui:Create("Frame")
+		l.frame:Hide()
+		l.frame:SetLayout("Flow")
+		l.frame:SetTitle("Loot Log")
+		l.frame:EnableResize(false)
+	end
 
-		contentBox = gui:Create("MultiLineEditBox")
-		self.frame:AddChild(contentBox)
-		RunNextFrame(function()
-			contentBox:SetLabel("Logs")
-			contentBox:DisableButton(true)
-			contentBox:SetFullWidth(true)
-			contentBox:SetNumLines(23)
-		end)
+	RunNextFrame(function()
+		createFilterBar(l.frame)
+		createContentBox(l.frame)
+	end)
+end
 
-		local logSources = gui:Create("Dropdown")
-		filterBar:AddChild(logSources)
+createContentBox = function(f)
+	if not f.contentBox then
+		f.contentBox = gui:Create("MultiLineEditBox")
+		f:AddChild(f.contentBox)
+		f.contentBox:SetLabel("Logs")
+		f.contentBox:DisableButton(true)
+		f.contentBox:SetFullWidth(true)
+		f.contentBox:SetNumLines(23)
+	end
+end
+
+createFilterBar = function(f)
+	if not f.filterBar then
+		f.filterBar = gui:Create("SimpleGroup")
+		f:AddChild(f.filterBar)
+		f.filterBar:SetFullWidth(true)
+		f.filterBar:SetLayout("Flow")
+	end
+	RunNextFrame(function()
+		createFilterBarComponents(f.filterBar)
+	end)
+end
+
+createFilterBarComponents = function(fB)
+	if not fB.logSources then
+		fB.logSources = gui:Create("Dropdown")
+		fB:AddChild(fB.logSources)
 		RunNextFrame(function()
-			logSources:SetLabel("Log Sources")
-			logSources:SetMultiselect(true)
-			logSources:SetList({
+			fB.logSources:SetLabel("Log Sources")
+			fB.logSources:SetMultiselect(true)
+			fB.logSources:SetList({
 				[addonName] = addonName,
 				[WOWEVENT] = WOWEVENT,
 			}, {
 				addonName,
 				WOWEVENT,
 			})
-			logSources:SetCallback("OnValueChanged", OnEventSourceChange)
+			fB.logSources:SetCallback("OnValueChanged", OnEventSourceChange)
 			for k, v in pairs(eventSource) do
-				logSources:SetItemValue(k, v)
+				fB.logSources:SetItemValue(k, v)
 			end
 		end)
+	end
 
-		local logLevels = gui:Create("Dropdown")
-		filterBar:AddChild(logLevels)
+	if not fB.logLevels then
+		fB.logLevels = gui:Create("Dropdown")
+		fB:AddChild(fB.logLevels)
 		RunNextFrame(function()
-			logLevels:SetLabel("Log Levels")
-			logLevels:SetMultiselect(true)
-			logLevels:SetList({
+			fB.logLevels:SetLabel("Log Levels")
+			fB.logLevels:SetMultiselect(true)
+			fB.logLevels:SetList({
 				[debug] = debug,
 				[info] = info,
 				[warn] = warn,
 				[error] = error,
 			})
-			logLevels:SetCallback("OnValueChanged", OnEventLevelChange)
+			fB.logLevels:SetCallback("OnValueChanged", OnEventLevelChange)
 			for k, v in pairs(eventLevel) do
-				logLevels:SetItemValue(k, v)
+				fB.logLevels:SetItemValue(k, v)
 			end
 		end)
+	end
 
-		local logTypes = gui:Create("Dropdown")
-		filterBar:AddChild(logTypes)
+	if not fB.logTypes then
+		fB.logTypes = gui:Create("Dropdown")
+		fB:AddChild(fB.logTypes)
 		RunNextFrame(function()
-			logTypes:SetLabel("Log Types")
-			logTypes:SetMultiselect(true)
-			logTypes:SetList({
+			fB.logTypes:SetLabel("Log Types")
+			fB.logTypes:SetMultiselect(true)
+			fB.logTypes:SetList({
 				[ItemLoot] = ItemLoot,
 				[Currency] = Currency,
 				[Money] = Money,
@@ -143,27 +164,45 @@ function Logger:InitializeFrame()
 				[Experience] = Experience,
 				[Profession] = Profession,
 			})
-			logTypes:SetCallback("OnValueChanged", OnEventTypeChange)
+			fB.logTypes:SetCallback("OnValueChanged", OnEventTypeChange)
 			for k, v in pairs(eventType) do
-				logTypes:SetItemValue(k, v)
+				fB.logTypes:SetItemValue(k, v)
 			end
 		end)
+	end
 
-		local clearButton = gui:Create("Button")
-		filterBar:AddChild(clearButton)
+	if not fB.clearButton then
+		fB.clearButton = gui:Create("Button")
+		fB:AddChild(fB.clearButton)
 		RunNextFrame(function()
-			clearButton:SetText("Clear Current Log")
-			clearButton:SetCallback("OnClick", OnClearLog)
+			fB.clearButton:SetText("Clear Current Log")
+			fB.clearButton:SetCallback("OnClick", OnClearLog)
 		end)
+	end
 
+	RunNextFrame(function()
+		Logger.frame:DoLayout()
+	end)
+end
+
+--@alpha@
+createLoggerFrames = G_RLF:ProfileFunction(createLoggerFrames, "createLoggerFrames")
+createContentBox = G_RLF:ProfileFunction(createContentBox, "createContentBox")
+createFilterBar = G_RLF:ProfileFunction(createFilterBar, "createFilterBar")
+createFilterBarComponents = G_RLF:ProfileFunction(createFilterBarComponents, "createFilterBarComponents")
+--@end-alpha@
+
+function Logger:InitializeFrame()
+	if not self.frame then
 		RunNextFrame(function()
-			self.frame:DoLayout()
+			createLoggerFrames(self)
 		end)
 	end
 end
 
 function Logger:OnInitialize()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	self:RegisterEvent("PLAYER_LEAVING_WORLD")
 	self:RegisterBucketMessage("RLF_LOG", 0.5, "ProcessLogs")
 	RunNextFrame(function()
 		self:InitializeFrame()
@@ -172,15 +211,17 @@ end
 
 function Logger:PLAYER_ENTERING_WORLD(_, isLogin, isReload)
 	if isLogin then
-		G_RLF.db.global.logger.sessionsLogged = (G_RLF.db.global.logger.sessionsLogged or 0) + 1
-		G_RLF.db.global.logger.logs = G_RLF.db.global.logger.logs or {}
-		G_RLF.db.global.logger.logs[G_RLF.db.global.logger.sessionsLogged] = {}
-		while G_RLF.db.global.logger.sessionsLogged > 3 do
-			tremove(G_RLF.db.global.logger.logs, 1)
-			G_RLF.db.global.logger.sessionsLogged = G_RLF.db.global.logger.sessionsLogged - 1
+		if not initialized then
+			initialized = true
+			G_RLF.db.global.logger = {}
 		end
-		G_RLF:LogDebug("Logger is ready", addonName)
+	else
+		logger = G_RLF.db.global.logger or {}
 	end
+end
+
+function Logger:PLAYER_LEAVING_WORLD()
+	G_RLF.db.global.logger = logger
 end
 
 local function getLevel(logEntry)
@@ -287,7 +328,7 @@ updateContent = function()
 		end
 	end
 	RunNextFrame(function()
-		contentBox:SetText(text)
+		Logger.frame.contentBox:SetText(text)
 	end)
 end
 
@@ -321,7 +362,9 @@ end
 
 function Logger:ProcessLogs(logs)
 	for log, _ in pairs(logs) do
-		self:addLogEntry(unpack(log))
+		RunNextFrame(function()
+			self:addLogEntry(unpack(log))
+		end)
 	end
 end
 

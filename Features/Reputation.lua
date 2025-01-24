@@ -75,7 +75,13 @@ local function buildFactionLocaleMap(findName)
 	end
 
 	for i = 1, numFactions do
-		local factionData = C_Reputation.GetFactionDataByIndex(i)
+		local factionData
+		if G_RLF:IsRetail() then
+			factionData = C_Reputation.GetFactionDataByIndex(i)
+		elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+			factionData = G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(i)
+		end
+
 		if factionData then
 			if not G_RLF.db.global.factionMaps[locale][factionData.name] then
 				G_RLF.db.global.factionMaps[locale][factionData.name] = factionData.factionID
@@ -306,15 +312,16 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 		end
 
 		local r, g, b, color
-		if G_RLF.db.global.factionMaps[locale][faction] == nil then
+		local factionMapEntry = G_RLF.db.global.factionMaps[locale][faction]
+		if factionMapEntry == nil then
 			-- attempt to find the missing faction's ID
 			G_RLF:LogDebug(faction .. " not cached for " .. locale, addonName, self.moduleName)
 			buildFactionLocaleMap(faction)
 		end
 
 		local repType, fId, factionData
-		if G_RLF.db.global.factionMaps[locale][faction] then
-			fId = G_RLF.db.global.factionMaps[locale][faction]
+		if factionMapEntry then
+			fId = factionMapEntry
 			if G_RLF:IsRetail() and C_Reputation.IsMajorFaction(fId) then
 				color = ACCOUNT_WIDE_FONT_COLOR
 				repType = RepType.MajorFaction

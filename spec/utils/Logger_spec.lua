@@ -8,8 +8,39 @@ describe("Logger module", function()
 		-- Define the global G_RLF
 		ns = ns or common_stubs.setup_G_RLF(spy)
 		ns.db.global.logger = {
-			sessionsLogged = 0,
-			logs = {},
+			{
+				timestamp = "2023-01-01 12:00:00",
+				level = "INFO",
+				source = "TestAddon",
+				type = "General",
+				id = "",
+				content = "",
+				amount = "",
+				new = true,
+				message = "Test log entry",
+			},
+			{
+				timestamp = "2023-01-01 12:00:01",
+				level = "INFO",
+				source = "TestAddon",
+				type = "General",
+				id = "",
+				content = "",
+				amount = "",
+				new = true,
+				message = "Test log entry 2",
+			},
+			{
+				timestamp = "2023-01-01 12:00:02",
+				level = "INFO",
+				source = "TestAddon",
+				type = "General",
+				id = "",
+				content = "",
+				amount = "",
+				new = true,
+				message = "Test log entry 3",
+			},
 		}
 
 		-- Load the module before each test
@@ -27,9 +58,9 @@ describe("Logger module", function()
 			assert.spy(Logger.InitializeFrame).was.called()
 		end)
 
-		it("increments sessionsLogged on PLAYER_ENTERING_WORLD event", function()
+		it("resets logger on login", function()
 			Logger:PLAYER_ENTERING_WORLD(nil, true, false)
-			assert.are.equal(ns.db.global.logger.sessionsLogged, 1)
+			assert.are.equal(#ns.db.global.logger, 0)
 		end)
 	end)
 
@@ -63,8 +94,8 @@ describe("Logger module", function()
 					logEntry.new,
 				}] = 1,
 			})
-			assert.are.equal(#ns.db.global.logger.logs[1], 1)
-			assert.are.same(ns.db.global.logger.logs[1][1], logEntry)
+			assert.are.equal(#ns.db.global.logger, 1)
+			assert.are.same(ns.db.global.logger[1], logEntry)
 		end)
 
 		it("formats log entries correctly", function()

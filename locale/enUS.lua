@@ -190,6 +190,8 @@ L["Top"] = true
 L["Bottom"] = true
 L["Left"] = true
 L["Right"] = true
+L["Down"] = true
+L["Up"] = true
 L["Center"] = true
 L["X Offset"] = true
 L["XOffsetDesc"] = "Adjust the loot feed left (negative) or right (positive)"
@@ -257,9 +259,23 @@ L["FontSizeDesc"] = "The size of the loot feed text in \"points\"."
 L["Secondary Font Size"] = true
 L["SecondaryFontSizeDesc"] = "The size of the secondary text in the loot feed in \"points\"."
 
--- ConfigOptions - Timing Group
+-- ConfigOptions - Animations Group
 L["Timing"] = true
 L["TimingDesc"] = "Adjust fade out delays and other timing-related options."
+L["Animations"] = true
+L["AnimationsDesc"] = "Customize the animations of the loot feed."
+L["Row Enter Animation"] = true
+L["RowEnterAnimationDesc"] = "Customize the enter animations of the loot feed rows."
+L["Enter Animation Type"] = true
+L["EnterAnimationTypeDesc"] = "The type of animation to use when a new row is added to the loot feed."
+L["Enter Animation Duration"] = true
+L["EnterAnimationDurationDesc"] = "The number of seconds the enter animation will take."
+L["Row Exit Animation"] = true
+L["RowExitAnimationDesc"] = "Customize the exit animations of the loot feed rows."
+L["Fade"] = true
+L["Slide"] = true
+L["Slide Direction"] = true
+L["SlideDirectionDesc"] = "The direction for the row to travel during a slide animation."
 L["Fade Out Delay"] = true
 L["FadeOutDelayDesc"] = "The number of seconds to show the loot row before it fades out."
 

@@ -50,7 +50,6 @@ local function signalIntegrationTestReady()
 end
 
 local function getItem(id)
-	local name, link, quality, icon, sellPrice, _
 	local info = G_RLF.ItemInfo:new(id, C.Item.GetItemInfo(id))
 	local isCached = info ~= nil
 	if isCached then
@@ -72,7 +71,7 @@ end
 
 local testItemIds = { 2589, 2592, 1515, 730 }
 if G_RLF:IsRetail() then
-	tconcat(testItemIds, { 50818, 2589, 2592, 1515, 730, 128827, 219325, 34494 })
+	tconcat(testItemIds, { 50818, 128827, 219325, 34494 })
 elseif G_RLF:IsClassic() then
 	tconcat(testItemIds, { 233620 })
 elseif G_RLF:IsCataClassic() then

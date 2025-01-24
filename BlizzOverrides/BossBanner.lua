@@ -22,14 +22,12 @@ function BossBannerOverride:BossBannerHook()
 end
 
 function BossBannerOverride:InterceptBossBannerAlert(s, event, ...)
-	if G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.FULLY_DISABLE then
+	local config = G_RLF.db.global.bossBannerConfig
+	if config == G_RLF.DisableBossBanner.FULLY_DISABLE then
 		return
 	end
 
-	if
-		G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.DISABLE_LOOT
-		and event == "ENCOUNTER_LOOT_RECEIVED"
-	then
+	if config == G_RLF.DisableBossBanner.DISABLE_LOOT and event == "ENCOUNTER_LOOT_RECEIVED" then
 		return
 	end
 
@@ -37,7 +35,7 @@ function BossBannerOverride:InterceptBossBannerAlert(s, event, ...)
 	local myGuid = GetPlayerGuid()
 	local myName, _ = GetNameAndServerNameFromGUID(myGuid)
 	if
-		G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.DISABLE_MY_LOOT
+		config == G_RLF.DisableBossBanner.DISABLE_MY_LOOT
 		and event == "ENCOUNTER_LOOT_RECEIVED"
 		and playerName == myName
 	then
@@ -45,7 +43,7 @@ function BossBannerOverride:InterceptBossBannerAlert(s, event, ...)
 	end
 
 	if
-		G_RLF.db.global.bossBannerConfig == G_RLF.DisableBossBanner.DISABLE_GROUP_LOOT
+		config == G_RLF.DisableBossBanner.DISABLE_GROUP_LOOT
 		and event == "ENCOUNTER_LOOT_RECEIVED"
 		and playerName ~= myName
 	then

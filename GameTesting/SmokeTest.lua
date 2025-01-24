@@ -98,7 +98,7 @@ local function testWoWGlobals()
 	assertEqual(type(UnitLevel), "function", "Global: UnitLevel")
 	assertEqual(type(C.Item.GetItemInfo), "function", "Global: C.Item.GetItemInfo")
 	assertEqual(type(GetInventoryItemLink), "function", "Global: GetInventoryItemLink")
-	local link = GetInventoryItemLink("player", G_RLF.equipSlotMap["INVTYPE_CHEST"])
+	local link = GetInventoryItemLink("player", G_RLF.equipSlotMap["INVTYPE_LEGS"])
 	local isCached = C.Item.GetItemInfo(link) ~= nil
 	if not isCached then
 		G_RLF:Print("Item not cached, skipping GetItemInfo test")

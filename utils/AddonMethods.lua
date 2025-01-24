@@ -68,7 +68,10 @@ function G_RLF:RGBAToHexFormat(r, g, b, a)
 end
 
 local function log(...)
-	G_RLF:SendMessage("RLF_LOG", { ... })
+	local args = { ... }
+	RunNextFrame(function()
+		G_RLF:SendMessage("RLF_LOG", args)
+	end)
 end
 
 function G_RLF:LogDebug(...)

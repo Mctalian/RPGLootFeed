@@ -82,6 +82,7 @@ local function runItemLootIntegrationTest()
 	if info.itemName == nil then
 		G_RLF:Print("Item not cached, skipping ItemLoot test")
 	else
+		e.highlight = true
 		runTestSafely(e.Show, "LootDisplay: Item", e, info.itemName, info.itemQuality)
 		e = module.Element:new(info, amountLooted, false)
 		e.highlight = true
@@ -144,7 +145,7 @@ function TestMode:IntegrationTest()
 	newRowsExpected = newRowsExpected + runReputationIntegrationTest()
 
 	assertEqual(frame ~= nil, true, "LootDisplayFrame")
-	C_Timer.After(G_RLF.db.global.fadeOutDelay + 3, function()
+	C_Timer.After(G_RLF.db.global.fadeOutDelay + 5, function()
 		local newHistoryRows = #frame.rowHistory - snapshotRowHistory
 		assertEqual(newHistoryRows, newRowsExpected, "LootDisplayFrame: rowHistory")
 		displayResults()
