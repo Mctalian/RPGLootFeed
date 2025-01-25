@@ -60,6 +60,10 @@ function LootDisplay:OnEnable()
 	end)
 
 	if G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+		if not ItemButtonMixin.SetItemButtonTexture then
+			ItemButtonMixin.SetItemButtonTexture = function(self, texture) end
+		end
+
 		self:RawHook(ItemButtonMixin, "SetItemButtonTexture", function(self, texture)
 			if SetItemButtonTexture_Base then
 				SetItemButtonTexture_Base(texture)
@@ -68,6 +72,10 @@ function LootDisplay:OnEnable()
 				self.icon:SetTexture(texture)
 			end
 		end, true)
+
+		if not ItemButtonMixin.SetItemButtonQuality then
+			ItemButtonMixin.SetItemButtonQuality = function(self, quality, itemIDOrLink) end
+		end
 
 		self:RawHook(ItemButtonMixin, "SetItemButtonQuality", function(self, quality, itemIDOrLink)
 			if SetItemButtonQuality_Base then
