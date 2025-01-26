@@ -22,6 +22,11 @@ function RLF:OnInitialize()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
 	local lsm = G_RLF.lsm
 	lsm:Register(lsm.MediaType.FONT, "BAR SADY Regular", "Interface\\AddOns\\RPGLootFeed\\Fonts\\BAR_SADY_Variable.ttf")
+	lsm:Register(
+		lsm.MediaType.SOUND,
+		"LittleRobotSoundFactory - Pickup_Gold_04",
+		"Interface\\AddOns\\RPGLootFeed\\Sounds\\Pickup_Gold_04.ogg"
+	)
 	self:Hook(acd, "Open", "OnOptionsOpen")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterChatCommand("rlf", "SlashCommand")
