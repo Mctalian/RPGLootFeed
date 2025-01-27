@@ -22,7 +22,7 @@ function BossBannerOverride:BossBannerHook()
 end
 
 function BossBannerOverride:InterceptBossBannerAlert(s, event, ...)
-	local config = G_RLF.db.global.bossBannerConfig
+	local config = G_RLF.db.global.blizzOverrides.bossBannerConfig
 	if config == G_RLF.DisableBossBanner.FULLY_DISABLE then
 		return
 	end

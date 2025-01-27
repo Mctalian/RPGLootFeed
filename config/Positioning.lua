@@ -2,12 +2,13 @@ local addonName, G_RLF = ...
 
 local Positioning = {}
 
-G_RLF.defaults.global.relativePoint = "UIParent"
-G_RLF.defaults.global.anchorPoint = "BOTTOMLEFT"
-G_RLF.defaults.global.xOffset = 720
-G_RLF.defaults.global.yOffset = 375
-G_RLF.defaults.global.frameStrata = "MEDIUM" -- Default frame strata
-
+G_RLF.defaults.global.positioning = {
+	relativePoint = "UIParent",
+	anchorPoint = "BOTTOMLEFT",
+	xOffset = 720,
+	yOffset = 375,
+	frameStrata = "MEDIUM",
+}
 -- Enumerate available frames to anchor to
 local function EnumerateFrames()
 	local frames = {
@@ -110,46 +111,46 @@ G_RLF.options.args.positioning = {
 }
 
 function Positioning:SetRelativeTo(info, value)
-	G_RLF.db.global.relativePoint = value
+	G_RLF.db.global.positioning.relativePoint = value
 	G_RLF.LootDisplay:UpdatePosition()
 end
 
 function Positioning:GetRelativeTo(info)
-	return G_RLF.db.global.relativePoint
+	return G_RLF.db.global.positioning.relativePoint
 end
 
 function Positioning:SetRelativePosition(info, value)
-	G_RLF.db.global.anchorPoint = value
+	G_RLF.db.global.positioning.anchorPoint = value
 	G_RLF.LootDisplay:UpdatePosition()
 end
 
 function Positioning:GetRelativePosition(info)
-	return G_RLF.db.global.anchorPoint
+	return G_RLF.db.global.positioning.anchorPoint
 end
 
 function Positioning:SetXOffset(info, value)
-	G_RLF.db.global.xOffset = value
+	G_RLF.db.global.positioning.xOffset = value
 	G_RLF.LootDisplay:UpdatePosition()
 end
 
 function Positioning:GetXOffset(info)
-	return G_RLF.db.global.xOffset
+	return G_RLF.db.global.positioning.xOffset
 end
 
 function Positioning:SetYOffset(info, value)
-	G_RLF.db.global.yOffset = value
+	G_RLF.db.global.positioning.yOffset = value
 	G_RLF.LootDisplay:UpdatePosition()
 end
 
 function Positioning:GetYOffset(info)
-	return G_RLF.db.global.yOffset
+	return G_RLF.db.global.positioning.yOffset
 end
 
 function Positioning:SetFrameStrata(info, value)
-	G_RLF.db.global.frameStrata = value
+	G_RLF.db.global.positioning.frameStrata = value
 	G_RLF.LootDisplay:UpdateStrata()
 end
 
 function Positioning:GetFrameStrata(info)
-	return G_RLF.db.global.frameStrata
+	return G_RLF.db.global.positioning.frameStrata
 end

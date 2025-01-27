@@ -6,8 +6,8 @@ local rows = G_RLF.list()
 local keyRowMap
 
 local function getFrameHeight()
-	local padding = G_RLF.db.global.padding
-	return G_RLF.db.global.maxRows * (G_RLF.db.global.rowHeight + padding) - padding
+	local padding = G_RLF.db.global.sizing.padding
+	return G_RLF.db.global.sizing.maxRows * (G_RLF.db.global.sizing.rowHeight + padding) - padding
 end
 
 local function getNumberOfRows()
@@ -15,11 +15,11 @@ local function getNumberOfRows()
 end
 
 local function getPositioningDetails()
-	local growUp = G_RLF.db.global.growUp
+	local growUp = G_RLF.db.global.styling.growUp
 	-- Position the new row at the bottom (or top if growing down)
 	local vertDir = growUp and "BOTTOM" or "TOP"
 	local opposite = growUp and "TOP" or "BOTTOM"
-	local yOffset = G_RLF.db.global.padding
+	local yOffset = G_RLF.db.global.sizing.padding
 	if not growUp then
 		yOffset = -yOffset
 	end
@@ -71,7 +71,7 @@ end
 function LootDisplayFrameMixin:CreateTab()
 	self.tab = CreateFrame("Button", nil, UIParent, "UIPanelButtonTemplate")
 	self.tab:SetSize(14, 14)
-	if G_RLF.db.global.growUp then
+	if G_RLF.db.global.styling.growUp then
 		self.tab:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", -14, 0)
 	else
 		self.tab:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
@@ -126,13 +126,13 @@ function LootDisplayFrameMixin:Load()
 	self.vertDir, self.opposite, self.yOffset = getPositioningDetails()
 	self:UpdateSize()
 	self:SetPoint(
-		G_RLF.db.global.anchorPoint,
-		_G[G_RLF.db.global.relativePoint],
-		G_RLF.db.global.xOffset,
-		G_RLF.db.global.yOffset
+		G_RLF.db.global.positioning.anchorPoint,
+		_G[G_RLF.db.global.positioning.relativePoint],
+		G_RLF.db.global.positioning.xOffset,
+		G_RLF.db.global.positioning.yOffset
 	)
 
-	self:SetFrameStrata(G_RLF.db.global.frameStrata) -- Set the frame strata here
+	self:SetFrameStrata(G_RLF.db.global.positioning.frameStrata) -- Set the frame strata here
 
 	self:ConfigureTestArea()
 	self:CreateTab()
@@ -151,7 +151,7 @@ function LootDisplayFrameMixin:ClearFeed()
 end
 
 function LootDisplayFrameMixin:UpdateSize()
-	self:SetSize(G_RLF.db.global.feedWidth, getFrameHeight())
+	self:SetSize(G_RLF.db.global.sizing.feedWidth, getFrameHeight())
 
 	for row in rows:iterate() do
 		row:UpdateStyles()
@@ -175,10 +175,10 @@ function LootDisplayFrameMixin:OnDragStop()
 
 	-- Save the new position
 	local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
-	G_RLF.db.global.anchorPoint = point
-	G_RLF.db.global.relativePoint = relativeTo or -1
-	G_RLF.db.global.xOffset = xOfs
-	G_RLF.db.global.yOffset = yOfs
+	G_RLF.db.global.positioning.anchorPoint = point
+	G_RLF.db.global.positioning.relativePoint = relativeTo or -1
+	G_RLF.db.global.positioning.xOffset = xOfs
+	G_RLF.db.global.positioning.yOffset = yOfs
 
 	-- Update the frame position
 	G_RLF.LootDisplay:UpdatePosition()
@@ -216,7 +216,7 @@ function LootDisplayFrameMixin:GetRow(key)
 end
 
 function LootDisplayFrameMixin:LeaseRow(key)
-	if getNumberOfRows() >= G_RLF.db.global.maxRows then
+	if getNumberOfRows() >= G_RLF.db.global.sizing.maxRows then
 		-- Skip this, we've already allocated too much
 		return nil
 	end
@@ -350,9 +350,9 @@ function LootDisplayFrameMixin:CreateHistoryFrame()
 	self.historyFrame:SetScrollChild(self.historyContent)
 
 	self.historyRows = {}
-	for i = 1, G_RLF.db.global.maxRows do
+	for i = 1, G_RLF.db.global.sizing.maxRows do
 		local row = CreateFrame("Frame", nil, self.historyContent, "LootDisplayRowTemplate")
-		row:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
+		row:SetSize(G_RLF.db.global.sizing.feedWidth, G_RLF.db.global.sizing.rowHeight)
 		table.insert(self.historyRows, row)
 	end
 
@@ -363,10 +363,10 @@ end
 
 function LootDisplayFrameMixin:UpdateHistoryFrame(offset)
 	offset = offset or 0
-	local padding = G_RLF.db.global.padding
-	local feedWidth = G_RLF.db.global.feedWidth
-	local rowHeight = G_RLF.db.global.rowHeight + padding
-	local visibleRows = G_RLF.db.global.maxRows
+	local padding = G_RLF.db.global.sizing.padding
+	local feedWidth = G_RLF.db.global.sizing.feedWidth
+	local rowHeight = G_RLF.db.global.sizing.rowHeight + padding
+	local visibleRows = G_RLF.db.global.sizing.maxRows
 	local totalRows = #self.rowHistory
 	local contentSize = totalRows * rowHeight - padding
 	local startIndex = math.floor(offset / rowHeight) + 1

@@ -14,11 +14,9 @@ G_RLF.WrapCharOptions = {
 G_RLF.defaults = {
 	profile = {},
 	global = {
-		logger = {
-			sessionsLogged = 0,
-			logs = {},
-		},
 		lastVersionLoaded = "v1.0.0",
+		logger = {},
+		migrationVersion = 0,
 	},
 }
 

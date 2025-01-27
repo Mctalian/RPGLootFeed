@@ -145,7 +145,7 @@ function TestMode:IntegrationTest()
 	newRowsExpected = newRowsExpected + runReputationIntegrationTest()
 
 	assertEqual(frame ~= nil, true, "LootDisplayFrame")
-	C_Timer.After(G_RLF.db.global.fadeOutDelay + 5, function()
+	C_Timer.After(G_RLF.db.global.animations.exit.fadeOutDelay + 5, function()
 		local newHistoryRows = #frame.rowHistory - snapshotRowHistory
 		assertEqual(newHistoryRows, newRowsExpected, "LootDisplayFrame: rowHistory")
 		displayResults()

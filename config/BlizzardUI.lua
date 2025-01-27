@@ -2,10 +2,12 @@ local addonName, G_RLF = ...
 
 local BlizzardUI = {}
 
-G_RLF.defaults.global.enableAutoLoot = false
-G_RLF.defaults.global.disableBlizzLootToasts = false
-G_RLF.defaults.global.disableBlizzMoneyAlerts = false
-G_RLF.defaults.global.bossBannerConfig = G_RLF.DisableBossBanner.ENABLED
+G_RLF.defaults.global.blizzOverrides = {
+	enableAutoLoot = false,
+	disableBlizzLootToasts = false,
+	disableBlizzMoneyAlerts = false,
+	bossBannerConfig = G_RLF.DisableBossBanner.ENABLED,
+}
 
 G_RLF.options.args.blizz = {
 	type = "group",
@@ -108,36 +110,36 @@ G_RLF.options.args.blizz = {
 }
 
 function BlizzardUI:SetDisableLootToast(info, value)
-	G_RLF.db.global.disableBlizzLootToasts = value
+	G_RLF.db.global.blizzOverrides.disableBlizzLootToasts = value
 end
 
 function BlizzardUI:GetDisableLootToast(info, value)
-	return G_RLF.db.global.disableBlizzLootToasts
+	return G_RLF.db.global.blizzOverrides.disableBlizzLootToasts
 end
 
 function BlizzardUI:GetDisableMoneyAlerts(info, value)
-	return G_RLF.db.global.disableBlizzMoneyAlerts
+	return G_RLF.db.global.blizzOverrides.disableBlizzMoneyAlerts
 end
 
 function BlizzardUI:SetDisableMoneyAlerts(info, value)
-	G_RLF.db.global.disableBlizzMoneyAlerts = value
+	G_RLF.db.global.blizzOverrides.disableBlizzMoneyAlerts = value
 end
 
 function BlizzardUI:GetEnableAutoLoot(info, value)
-	return G_RLF.db.global.enableAutoLoot
+	return G_RLF.db.global.blizzOverrides.enableAutoLoot
 end
 
 function BlizzardUI:SetEnableAutoLoot(info, value)
 	C_CVar.SetCVar("autoLootDefault", value and "1" or "0")
-	G_RLF.db.global.enableAutoLoot = value
+	G_RLF.db.global.blizzOverrides.enableAutoLoot = value
 end
 
 function BlizzardUI:SetBossBannerConfig(info, value)
-	G_RLF.db.global.bossBannerConfig = value
+	G_RLF.db.global.blizzOverrides.bossBannerConfig = value
 end
 
 function BlizzardUI:GetBossBannerConfig(info, value)
-	return G_RLF.db.global.bossBannerConfig
+	return G_RLF.db.global.blizzOverrides.bossBannerConfig
 end
 
 function BlizzardUI:DisableLootChatMessages()
