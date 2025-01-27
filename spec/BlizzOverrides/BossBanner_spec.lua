@@ -56,7 +56,7 @@ describe("BossBanner module", function()
 
 		it("completely skips BossBanner alert if fully disabled", function()
 			local event = "ANYTHING"
-			ns.db.global.bossBannerConfig = ns.DisableBossBanner.FULLY_DISABLE
+			ns.db.global.blizzOverrides.bossBannerConfig = ns.DisableBossBanner.FULLY_DISABLE
 			BossBannerOverride:InterceptBossBannerAlert(nil, event, nil, nil, nil, nil, nil, nil)
 			assert.spy(BossBannerOverride.hooks[BossBanner].OnEvent).was_not_called()
 		end)
@@ -65,7 +65,7 @@ describe("BossBanner module", function()
 			local event = "ENCOUNTER_LOOT_RECEIVED"
 			local myName = "MyPlayer"
 			local playerName = "TestPlayer"
-			ns.db.global.bossBannerConfig = ns.DisableBossBanner.DISABLE_LOOT
+			ns.db.global.blizzOverrides.bossBannerConfig = ns.DisableBossBanner.DISABLE_LOOT
 			BossBannerOverride:InterceptBossBannerAlert(nil, event, nil, nil, nil, nil, playerName, nil)
 			BossBannerOverride:InterceptBossBannerAlert(nil, event, nil, nil, nil, nil, myName, nil)
 			assert.spy(BossBannerOverride.hooks[BossBanner].OnEvent).was_not_called()
@@ -83,7 +83,7 @@ describe("BossBanner module", function()
 				return myName, nil
 			end
 
-			ns.db.global.bossBannerConfig = ns.DisableBossBanner.DISABLE_MY_LOOT
+			ns.db.global.blizzOverrides.bossBannerConfig = ns.DisableBossBanner.DISABLE_MY_LOOT
 			BossBannerOverride:InterceptBossBannerAlert(nil, event, nil, nil, nil, nil, myName, nil)
 			assert.spy(BossBannerOverride.hooks[BossBanner].OnEvent).was_not_called()
 		end)
@@ -100,7 +100,7 @@ describe("BossBanner module", function()
 				return myName, nil
 			end
 
-			ns.db.global.bossBannerConfig = ns.DisableBossBanner.DISABLE_GROUP_LOOT
+			ns.db.global.blizzOverrides.bossBannerConfig = ns.DisableBossBanner.DISABLE_GROUP_LOOT
 			BossBannerOverride:InterceptBossBannerAlert(nil, event, nil, nil, nil, nil, playerName, nil)
 			assert.spy(BossBannerOverride.hooks[BossBanner].OnEvent).was_not_called()
 			BossBannerOverride:InterceptBossBannerAlert(nil, event, nil, nil, nil, nil, myName, nil)

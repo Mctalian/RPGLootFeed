@@ -151,7 +151,7 @@ function Rep.Element:new(...)
 			end
 		elseif element.repType == RepType.Paragon then
 			if factionData.hasRewardPending then
-				local bagSize = G_RLF.db.global.fontSize
+				local bagSize = G_RLF.db.global.styling.fontSize
 				str = str .. "|A:ParagonReputation_Bag:" .. bagSize .. ":" .. bagSize .. ":0:0|a    "
 			end
 			if

@@ -46,13 +46,13 @@ describe("LootToasts module", function()
 		end)
 
 		it("completely skips LootAlertSystem alert if disabled", function()
-			ns.db.global.disableBlizzLootToasts = true
+			ns.db.global.blizzOverrides.disableBlizzLootToasts = true
 			LootToastOverride:InterceptAddAlert(nil)
 			assert.spy(LootToastOverride.hooks[LootAlertSystem].AddAlert).was_not_called()
 		end)
 
 		it("calls the original AddAlert function if not disabled", function()
-			ns.db.global.disableBlizzLootToasts = false
+			ns.db.global.blizzOverrides.disableBlizzLootToasts = false
 			LootToastOverride:InterceptAddAlert(nil)
 			assert.spy(LootToastOverride.hooks[LootAlertSystem].AddAlert).was_called()
 		end)
