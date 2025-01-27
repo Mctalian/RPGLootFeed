@@ -183,7 +183,7 @@ function ItemLoot.Element:new(...)
 			return "    " .. name
 		end
 
-		local fontSize = G_RLF.db.global.fontSize
+		local fontSize = G_RLF.db.global.styling.fontSize
 
 		if fromLink ~= "" and fromLink ~= nil then
 			local toItemLevel, fromItemLevel = getItemLevels(itemLink, fromLink)

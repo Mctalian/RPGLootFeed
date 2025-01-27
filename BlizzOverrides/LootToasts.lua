@@ -20,7 +20,7 @@ function LootToastOverride:LootToastHook()
 end
 
 function LootToastOverride:InterceptAddAlert(frame, ...)
-	if G_RLF.db.global.disableBlizzLootToasts then
+	if G_RLF.db.global.blizzOverrides.disableBlizzLootToasts then
 		return
 	end
 	-- Call the original AddAlert function if not blocked

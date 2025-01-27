@@ -20,7 +20,7 @@ function MoneyAlertOverride:MoneyAlertHook()
 end
 
 function MoneyAlertOverride:InterceptMoneyAddAlert(frame, ...)
-	if G_RLF.db.global.disableBlizzMoneyAlerts then
+	if G_RLF.db.global.blizzOverrides.disableBlizzMoneyAlerts then
 		return
 	end
 	-- Call the original AddAlert function if not blocked

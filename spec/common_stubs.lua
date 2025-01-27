@@ -48,8 +48,12 @@ function common_stubs.setup_G_RLF(spy)
 		options = {
 			args = {},
 		},
+		migrations = {},
 		db = {
 			global = {
+				blizzOverrides = {
+					enableAutoLoot = false,
+				},
 				currencyFeed = true,
 				factionMaps = {},
 				itemHighlights = {
@@ -69,6 +73,7 @@ function common_stubs.setup_G_RLF(spy)
 						[6] = true,
 					},
 				},
+				money = {},
 				xp = {
 					experienceTextColor = { 1, 1, 1, 1 },
 				},

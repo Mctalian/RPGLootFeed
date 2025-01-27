@@ -194,16 +194,16 @@ function Features:SetLootHistorySize(info, value)
 end
 
 function Features:GetSecondaryRowText(info, value)
-	return G_RLF.db.global.enabledSecondaryRowText
+	return G_RLF.db.global.styling.enabledSecondaryRowText
 end
 
 function Features:SetSecondaryRowText(info, value)
-	G_RLF.db.global.enabledSecondaryRowText = value
+	G_RLF.db.global.styling.enabledSecondaryRowText = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Features:SecondaryTextDisabled()
-	return not G_RLF.db.global.enabledSecondaryRowText
+	return not G_RLF.db.global.styling.enabledSecondaryRowText
 end
 
 function Features:GetPartyLootStatus()

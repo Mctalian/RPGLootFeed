@@ -24,7 +24,7 @@ function LootDisplayRowMixin:Init()
 	self.ClickableButton:SetScript("OnMouseUp", nil)
 	self.ClickableButton:SetScript("OnEvent", nil)
 
-	self:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
+	self:SetSize(G_RLF.db.global.sizing.feedWidth, G_RLF.db.global.sizing.rowHeight)
 	self:StyleBackground()
 	self:StyleRowBorders()
 	self:StyleEnterAnimation()
@@ -200,9 +200,9 @@ end
 function LootDisplayRowMixin:StyleBackground()
 	local changed = false
 
-	local gradientStart = G_RLF.db.global.rowBackgroundGradientStart
-	local gradientEnd = G_RLF.db.global.rowBackgroundGradientEnd
-	local leftAlign = G_RLF.db.global.leftAlign
+	local gradientStart = G_RLF.db.global.styling.rowBackgroundGradientStart
+	local gradientEnd = G_RLF.db.global.styling.rowBackgroundGradientEnd
+	local leftAlign = G_RLF.db.global.styling.leftAlign
 
 	if self.cachedGradientStart ~= gradientStart then
 		self.cachedGradientStart = gradientStart
@@ -232,8 +232,8 @@ end
 function LootDisplayRowMixin:StyleIcon()
 	local changed = false
 
-	local iconSize = G_RLF.db.global.iconSize
-	local leftAlign = G_RLF.db.global.leftAlign
+	local iconSize = G_RLF.db.global.sizing.iconSize
+	local leftAlign = G_RLF.db.global.styling.leftAlign
 
 	if self.cachedIconSize ~= iconSize then
 		self.cachedIconSize = iconSize
@@ -264,8 +264,8 @@ end
 function LootDisplayRowMixin:StyleUnitPortrait()
 	local sizeChanged = false
 
-	local iconSize = G_RLF.db.global.iconSize
-	local leftAlign = G_RLF.db.global.leftAlign
+	local iconSize = G_RLF.db.global.sizing.iconSize
+	local leftAlign = G_RLF.db.global.styling.leftAlign
 
 	if self.cachedUnitIconSize ~= iconSize or self.cachedUnitLeftAlign ~= leftAlign then
 		self.cachedUnitIconSize = iconSize
@@ -301,12 +301,12 @@ end
 function LootDisplayRowMixin:StyleText()
 	local fontChanged = false
 
-	local fontFace = G_RLF.db.global.fontFace
-	local useFontObjects = G_RLF.db.global.useFontObjects
-	local font = G_RLF.db.global.font
-	local fontFlags = G_RLF.db.global.fontFlags
-	local fontSize = G_RLF.db.global.fontSize
-	local secondaryFontSize = G_RLF.db.global.secondaryFontSize
+	local fontFace = G_RLF.db.global.styling.fontFace
+	local useFontObjects = G_RLF.db.global.styling.useFontObjects
+	local font = G_RLF.db.global.styling.font
+	local fontFlags = G_RLF.db.global.styling.fontFlags
+	local fontSize = G_RLF.db.global.styling.fontSize
+	local secondaryFontSize = G_RLF.db.global.styling.secondaryFontSize
 
 	if
 		self.cachedFontFace ~= fontFace
@@ -339,10 +339,10 @@ function LootDisplayRowMixin:StyleText()
 		end
 	end
 
-	local leftAlign = G_RLF.db.global.leftAlign
-	local padding = G_RLF.db.global.padding
-	local iconSize = G_RLF.db.global.iconSize
-	local enabledSecondaryRowText = G_RLF.db.global.enabledSecondaryRowText
+	local leftAlign = G_RLF.db.global.styling.leftAlign
+	local padding = G_RLF.db.global.sizing.padding
+	local iconSize = G_RLF.db.global.sizing.iconSize
+	local enabledSecondaryRowText = G_RLF.db.global.styling.enabledSecondaryRowText
 
 	if
 		self.cachedRowTextLeftAlign ~= leftAlign
@@ -411,7 +411,7 @@ function LootDisplayRowMixin:StyleText()
 end
 
 function LootDisplayRowMixin:StyleRowBorders()
-	local enableRowBorder = G_RLF.db.global.enableRowBorder
+	local enableRowBorder = G_RLF.db.global.styling.enableRowBorder
 	if not enableRowBorder then
 		self.StaticTopBorder:Hide()
 		self.StaticRightBorder:Hide()
@@ -420,9 +420,9 @@ function LootDisplayRowMixin:StyleRowBorders()
 		return
 	end
 
-	local borderSize = G_RLF.db.global.rowBorderSize
-	local classColors = G_RLF.db.global.rowBorderClassColors
-	local borderColor = G_RLF.db.global.rowBorderColor
+	local borderSize = G_RLF.db.global.styling.rowBorderSize
+	local classColors = G_RLF.db.global.styling.rowBorderClassColors
+	local borderColor = G_RLF.db.global.styling.rowBorderColor
 
 	if self.cachedBorderSize ~= borderSize then
 		self.cachedBorderSize = borderSize
@@ -523,7 +523,7 @@ function LootDisplayRowMixin:StyleFadeOutAnimation()
 	end
 
 	self.FadeOutAnimation.fadeOut:SetDuration(G_RLF.db.global.animations.exit.duration)
-	self.FadeOutAnimation.fadeOut:SetStartDelay(G_RLF.db.global.fadeOutDelay)
+	self.FadeOutAnimation.fadeOut:SetStartDelay(G_RLF.db.global.animations.exit.fadeOutDelay)
 end
 
 function LootDisplayRowMixin:StyleEnterAnimation()
@@ -532,8 +532,8 @@ function LootDisplayRowMixin:StyleEnterAnimation()
 	local enterAnimationType = G_RLF.db.global.animations.enter.type
 	local slideDirection = G_RLF.db.global.animations.enter.slide.direction
 	local enterDuration = G_RLF.db.global.animations.enter.duration
-	local feedWidth = G_RLF.db.global.feedWidth
-	local rowHeight = G_RLF.db.global.rowHeight
+	local feedWidth = G_RLF.db.global.sizing.feedWidth
+	local rowHeight = G_RLF.db.global.sizing.rowHeight
 
 	if
 		self.cachedEnterAnimationType ~= enterAnimationType
@@ -731,7 +731,7 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 
 		local extraWidth = G_RLF:CalculateTextWidth(extraWidthStr)
 		if self.unit then
-			local portraitSize = G_RLF.db.global.iconSize * 0.8
+			local portraitSize = G_RLF.db.global.sizing.iconSize * 0.8
 			extraWidth = extraWidth + portraitSize - (portraitSize / 2)
 		end
 		self.link = G_RLF:TruncateItemLink(textFn(), extraWidth)
@@ -872,7 +872,7 @@ end
 
 function LootDisplayRowMixin:UpdateSecondaryText(secondaryTextFn)
 	if
-		G_RLF.db.global.enabledSecondaryRowText
+		G_RLF.db.global.styling.enabledSecondaryRowText
 		and type(secondaryTextFn) == "function"
 		and secondaryTextFn(self.amount) ~= ""
 		and secondaryTextFn(self.amount) ~= nil
@@ -908,7 +908,7 @@ function LootDisplayRowMixin:UpdateQuantity(element)
 	self:UpdateItemCount(element)
 	self:ShowText(text, r, g, b, a)
 
-	if not G_RLF.db.global.disableRowHighlight then
+	if not G_RLF.db.global.styling.disableRowHighlight then
 		self.HighlightAnimation:Stop()
 		self.HighlightAnimation:Play()
 	end
@@ -1252,7 +1252,7 @@ function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 
 	self.PrimaryText:SetTextColor(r, g, b, a)
 
-	if G_RLF.db.global.enabledSecondaryRowText and self.secondaryText ~= nil and self.secondaryText ~= "" then
+	if G_RLF.db.global.styling.enabledSecondaryRowText and self.secondaryText ~= nil and self.secondaryText ~= "" then
 		self.SecondaryText:SetText(self.secondaryText)
 		self.SecondaryText:Show()
 	else
@@ -1266,7 +1266,7 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 		self.icon = icon
 
 		RunNextFrame(function()
-			local iconSize = G_RLF.db.global.iconSize
+			local iconSize = G_RLF.db.global.sizing.iconSize
 			-- Handle quality logic
 			if not quality then
 				self.Icon:SetItem(self.link)
@@ -1413,7 +1413,7 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 	self.unit = data.unit
 	self.PrimaryText:SetText(data.rowText)
 	self.PrimaryText:SetTextColor(unpack(data.textColor))
-	if self.unit and data.secondaryText and G_RLF.db.global.enabledSecondaryRowText then
+	if self.unit and data.secondaryText and G_RLF.db.global.styling.enabledSecondaryRowText then
 		self.secondaryText = data.secondaryText
 		self.SecondaryText:SetText(self.secondaryText)
 	end
