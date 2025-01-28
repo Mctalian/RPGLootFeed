@@ -2,11 +2,13 @@ local addonName, G_RLF = ...
 
 local Sizing = {}
 
-G_RLF.defaults.global.feedWidth = 330
-G_RLF.defaults.global.maxRows = 10
-G_RLF.defaults.global.rowHeight = 22
-G_RLF.defaults.global.padding = 2
-G_RLF.defaults.global.iconSize = 18
+G_RLF.defaults.global.sizing = {
+	feedWidth = 330,
+	maxRows = 10,
+	rowHeight = 22,
+	padding = 2,
+	iconSize = 18,
+}
 
 G_RLF.options.args.sizing = {
 	type = "group",
@@ -72,46 +74,46 @@ G_RLF.options.args.sizing = {
 }
 
 function Sizing:SetFeedWidth(info, value)
-	G_RLF.db.global.feedWidth = value
+	G_RLF.db.global.sizing.feedWidthedWidth = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Sizing:GetFeedWidth(info)
-	return G_RLF.db.global.feedWidth
+	return G_RLF.db.global.sizing.feedWidthedWidth
 end
 
 function Sizing:SetMaxRows(info, value)
-	G_RLF.db.global.maxRows = value
+	G_RLF.db.global.sizing.maxRows = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Sizing:GetMaxRows(info)
-	return G_RLF.db.global.maxRows
+	return G_RLF.db.global.sizing.maxRows
 end
 
 function Sizing:SetRowHeight(info, value)
-	G_RLF.db.global.rowHeight = value
+	G_RLF.db.global.sizing.rowHeight = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Sizing:GetRowHeight(info, value)
-	return G_RLF.db.global.rowHeight
+	return G_RLF.db.global.sizing.rowHeight
 end
 
 function Sizing:SetIconSize(info, value)
-	G_RLF.db.global.iconSize = value
+	G_RLF.db.global.sizing.iconSize = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Sizing:GetIconSize(info, value)
-	return G_RLF.db.global.iconSize
+	return G_RLF.db.global.sizing.iconSize
 end
 
 function Sizing:SetRowPadding(info, value)
-	G_RLF.db.global.padding = value
+	G_RLF.db.global.sizing.padding = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Sizing:GetRowPadding(info, value)
-	return G_RLF.db.global.padding
+	return G_RLF.db.global.sizing.padding
 end

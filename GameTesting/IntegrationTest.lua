@@ -88,7 +88,7 @@ local function runItemLootIntegrationTest()
 		e.highlight = true
 		runTestSafely(e.Show, "LootDisplay: Item Quantity Update", e, info.itemName, info.itemQuality)
 		rowsShown = rowsShown + 1
-		if G_RLF.db.global.enablePartyLoot then
+		if G_RLF.db.global.partyLoot.enabled then
 			e = module.Element:new(info, amountLooted, "player")
 			runTestSafely(e.Show, "LootDisplay: Item Party", e, info.itemName, info.itemQuality)
 			rowsShown = rowsShown + 1
@@ -145,7 +145,7 @@ function TestMode:IntegrationTest()
 	newRowsExpected = newRowsExpected + runReputationIntegrationTest()
 
 	assertEqual(frame ~= nil, true, "LootDisplayFrame")
-	C_Timer.After(G_RLF.db.global.fadeOutDelay + 5, function()
+	C_Timer.After(G_RLF.db.global.animations.exit.fadeOutDelay + 5, function()
 		local newHistoryRows = #frame.rowHistory - snapshotRowHistory
 		assertEqual(newHistoryRows, newRowsExpected, "LootDisplayFrame: rowHistory")
 		displayResults()

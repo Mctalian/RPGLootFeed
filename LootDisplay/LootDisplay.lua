@@ -110,10 +110,10 @@ end
 function LootDisplay:UpdatePosition()
 	frame:ClearAllPoints()
 	frame:SetPoint(
-		G_RLF.db.global.anchorPoint,
-		_G[G_RLF.db.global.relativePoint],
-		G_RLF.db.global.xOffset,
-		G_RLF.db.global.yOffset
+		G_RLF.db.global.positioning.anchorPoint,
+		_G[G_RLF.db.global.positioning.relativePoint],
+		G_RLF.db.global.positioning.xOffset,
+		G_RLF.db.global.positioning.yOffset
 	)
 end
 
@@ -123,7 +123,7 @@ end
 
 function LootDisplay:UpdateStrata()
 	if frame then
-		frame:SetFrameStrata(G_RLF.db.global.frameStrata)
+		frame:SetFrameStrata(G_RLF.db.global.positioning.frameStrata)
 	end
 end
 
@@ -187,7 +187,7 @@ end
 processFromQueue = function()
 	local snapshotQueueSize = elementQueue:size()
 	if snapshotQueueSize > 0 then
-		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.maxRows)
+		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.sizing.maxRows)
 		G_RLF:LogDebug("Processing " .. rowsToProcess .. " items from element queue")
 		for i = 1, rowsToProcess do
 			if elementQueue:isEmpty() then
@@ -213,12 +213,16 @@ end
 G_RLF.LootDisplay = LootDisplay
 
 function G_RLF:CalculateTextWidth(text)
-	local fontFace = G_RLF.db.global.fontFace
-	if G_RLF.db.global.useFontObjects or not fontFace then
-		G_RLF.tempFontString:SetFontObject(G_RLF.db.global.font)
+	local fontFace = G_RLF.db.global.styling.fontFace
+	if G_RLF.db.global.styling.useFontObjects or not fontFace then
+		G_RLF.tempFontString:SetFontObject(G_RLF.db.global.styling.font)
 	else
 		local fontPath = lsm:Fetch(lsm.MediaType.FONT, fontFace)
-		G_RLF.tempFontString:SetFont(fontPath, G_RLF.db.global.fontSize, G_RLF.defaults.global.fontFlags)
+		G_RLF.tempFontString:SetFont(
+			fontPath,
+			G_RLF.db.global.styling.fontSize,
+			G_RLF.defaults.global.styling.fontFlags
+		)
 	end
 	G_RLF.tempFontString:SetText(text)
 	local width = G_RLF.tempFontString:GetStringWidth()
@@ -235,8 +239,8 @@ function G_RLF:TruncateItemLink(itemLink, extraWidth)
 	local linkStart = string.sub(originalLink, 0, begIndex - 1)
 	local linkEnd = string.sub(originalLink, endIndex + 1)
 
-	local iconSize = G_RLF.db.global.iconSize
-	local maxWidth = G_RLF.db.global.feedWidth - iconSize - (iconSize / 4) - (iconSize / 2) - extraWidth
+	local iconSize = G_RLF.db.global.sizing.iconSize
+	local maxWidth = G_RLF.db.global.sizing.feedWidth - iconSize - (iconSize / 4) - (iconSize / 2) - extraWidth
 
 	-- Calculate the width of the item name plus the link start and end
 	local itemNameWidth = G_RLF:CalculateTextWidth("[" .. itemName .. "]")
