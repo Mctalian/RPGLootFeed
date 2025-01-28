@@ -3,6 +3,7 @@ local addonName, G_RLF = ...
 local CurrencyConfig = {}
 
 G_RLF.defaults.global.currency = {
+	enabled = true,
 	currencyTotalTextEnabled = true,
 	currencyTotalTextColor = { 0.737, 0.737, 0.737, 1 },
 	currencyTotalTextWrapChar = G_RLF.WrapCharEnum.PARENTHESIS,
@@ -25,10 +26,10 @@ G_RLF.options.args.features.args.currencyConfig = {
 			desc = G_RLF.L["EnableCurrencyDesc"],
 			width = "double",
 			get = function()
-				return G_RLF.db.global.currencyFeed
+				return G_RLF.db.global.currency.enabled
 			end,
 			set = function(_, value)
-				G_RLF.db.global.currencyFeed = value
+				G_RLF.db.global.currency.enabled = value
 				if value then
 					G_RLF.RLF:EnableModule("Currency")
 				else
@@ -45,7 +46,7 @@ G_RLF.options.args.features.args.currencyConfig = {
 			inline = true,
 			name = G_RLF.L["Currency Options"],
 			disabled = function()
-				return not G_RLF.db.global.currencyFeed
+				return not G_RLF.db.global.currency.enabled
 			end,
 			order = 2,
 			args = {

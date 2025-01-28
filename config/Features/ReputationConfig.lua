@@ -3,6 +3,7 @@ local addonName, G_RLF = ...
 local ReputationConfig = {}
 
 G_RLF.defaults.global.rep = {
+	enabled = true,
 	defaultRepColor = { 0.5, 0.5, 1 },
 	secondaryTextAlpha = 0.7,
 	enableRepLevel = true,
@@ -22,10 +23,10 @@ G_RLF.options.args.features.args.repConfig = {
 			desc = G_RLF.L["EnableRepDesc"],
 			width = "double",
 			get = function()
-				return G_RLF.db.global.repFeed
+				return G_RLF.db.global.rep.enabled
 			end,
 			set = function(_, value)
-				G_RLF.db.global.repFeed = value
+				G_RLF.db.global.rep.enabled = value
 				if value then
 					G_RLF.RLF:EnableModule("Reputation")
 				else
@@ -39,7 +40,7 @@ G_RLF.options.args.features.args.repConfig = {
 			inline = true,
 			name = G_RLF.L["Reputation Options"],
 			disabled = function()
-				return not G_RLF.db.global.repFeed
+				return not G_RLF.db.global.rep.enabled
 			end,
 			order = 1.1,
 			args = {

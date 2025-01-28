@@ -5,6 +5,7 @@ local MoneyConfig = {}
 local lsm = G_RLF.lsm
 
 G_RLF.defaults.global.money = {
+	enabled = true,
 	showMoneyTotal = true,
 	moneyTotalColor = { 0.333, 0.333, 1.0, 1.0 },
 	moneyTextWrapChar = G_RLF.WrapCharEnum.BAR,
@@ -26,10 +27,10 @@ G_RLF.options.args.features.args.moneyConfig = {
 			desc = G_RLF.L["EnableMoneyDesc"],
 			width = "double",
 			get = function()
-				return G_RLF.db.global.moneyFeed
+				return G_RLF.db.global.money.enabled
 			end,
 			set = function(_, value)
-				G_RLF.db.global.moneyFeed = value
+				G_RLF.db.global.money.enabled = value
 				if value then
 					G_RLF.RLF:EnableModule("Money")
 				else
@@ -43,7 +44,7 @@ G_RLF.options.args.features.args.moneyConfig = {
 			inline = true,
 			name = G_RLF.L["Money Options"],
 			disabled = function()
-				return not G_RLF.db.global.moneyFeed
+				return not G_RLF.db.global.money.enabled
 			end,
 			order = 1.1,
 			args = {

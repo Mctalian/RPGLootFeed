@@ -88,7 +88,7 @@ local function runItemLootIntegrationTest()
 		e.highlight = true
 		runTestSafely(e.Show, "LootDisplay: Item Quantity Update", e, info.itemName, info.itemQuality)
 		rowsShown = rowsShown + 1
-		if G_RLF.db.global.enablePartyLoot then
+		if G_RLF.db.global.partyLoot.enabled then
 			e = module.Element:new(info, amountLooted, "player")
 			runTestSafely(e.Show, "LootDisplay: Item Party", e, info.itemName, info.itemQuality)
 			rowsShown = rowsShown + 1

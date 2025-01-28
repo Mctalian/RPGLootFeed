@@ -50,7 +50,7 @@ describe("Reputation module", function()
 		assert.spy(newElement).was.called_with(_, 10, "Faction A", 1, 0, 0, 1, _, 3)
 		assert.spy(ns.SendMessage).was.called()
 		-- Successfully populates the locale cache
-		assert.equal(ns.db.global.factionMaps.enUS["Faction A"], 1)
+		assert.equal(ns.db.locale.factionMap["Faction A"], 1)
 	end)
 
 	it("handles rep increases despite locale cache miss", function()
@@ -84,7 +84,7 @@ describe("Reputation module", function()
 		assert.spy(newElement).was.called_with(_, 313, "Brann Bronzebeard", 0, 1, 0, 2640, _, 4)
 		assert.spy(ns.SendMessage).was.called()
 		-- Successfully populates the locale cache
-		assert.equal(ns.db.global.factionMaps.enUS["Brann Bronzebeard"], 2640)
+		assert.equal(ns.db.locale.factionMap["Brann Bronzebeard"], 2640)
 	end)
 
 	describe("element.textFn", function()
