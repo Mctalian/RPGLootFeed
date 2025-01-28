@@ -68,6 +68,14 @@ describe("DbMigrations module", function()
 		assert.is_nil(ns.db.global.missingValue)
 	end)
 
+	it("transfers false values", function()
+		ns.db.global.oldValue = false
+		ns.db.global.new = {}
+		dbMigrations:Migrate(ns.db, "global.oldValue", "global.new.value", 1)
+		assert.are.equal(false, ns.db.global.new.value)
+		assert.is_nil(ns.db.global.oldValue)
+	end)
+
 	it("handles invalid paths", function()
 		dbMigrations:Migrate(ns.db, "global.some.thing.old", "global.new.thing", 1)
 		assert.is_nil(ns.db.global.some)

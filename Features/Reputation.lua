@@ -196,9 +196,6 @@ end
 local increasePatterns, decreasePatterns
 function Rep:OnInitialize()
 	locale = GetLocale()
-	-- TODO: Move this to db defaults
-	G_RLF.db.global.factionMaps = G_RLF.db.global.factionMaps or {}
-	G_RLF.db.locale.factionMap = G_RLF.db.locale.factionMap or {}
 
 	if GetExpansionLevel() >= G_RLF.Expansion.TWW then
 		self.companionFactionId = C_DelvesUI.GetFactionForCompanion(BRANN_COMPANION_INFO_ID)

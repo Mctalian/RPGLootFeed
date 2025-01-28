@@ -50,7 +50,9 @@ function common_stubs.setup_G_RLF(spy)
 		},
 		migrations = {},
 		db = {
-			locale = {},
+			locale = {
+				factionMap = {},
+			},
 			global = {
 				blizzOverrides = {
 					enableAutoLoot = false,
