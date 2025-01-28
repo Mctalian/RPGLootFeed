@@ -50,15 +50,19 @@ function common_stubs.setup_G_RLF(spy)
 		},
 		migrations = {},
 		db = {
+			locale = {},
 			global = {
 				blizzOverrides = {
 					enableAutoLoot = false,
 				},
-				currencyFeed = true,
-				factionMaps = {},
-				itemHighlights = {
-					mounts = true,
-					legendary = true,
+				currency = {
+					enabled = true,
+				},
+				item = {
+					itemHighlights = {
+						mounts = true,
+						legendary = true,
+					},
 				},
 				prof = {
 					skillColor = { 1, 1, 1, 1 },

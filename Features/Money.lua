@@ -64,7 +64,7 @@ end
 
 function Money:OnInitialize()
 	self.startingMoney = 0
-	if G_RLF.db.global.moneyFeed then
+	if G_RLF.db.global.money.enabled then
 		self:Enable()
 	else
 		self:Disable()

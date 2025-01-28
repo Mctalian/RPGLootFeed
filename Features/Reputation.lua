@@ -25,7 +25,7 @@ end
 local locale
 local function countMappedFactions()
 	local count = 0
-	for k, v in pairs(G_RLF.db.global.factionMaps[locale]) do
+	for k, v in pairs(G_RLF.db.locale.factionMap) do
 		if v then
 			count = count + 1
 		end
@@ -63,8 +63,8 @@ local function buildFactionLocaleMap(findName)
 						factionData = G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(i)
 					end
 					if factionData and factionData.name then
-						if not G_RLF.db.global.factionMaps[locale][factionData.name] then
-							G_RLF.db.global.factionMaps[locale][factionData.name] = factionData.factionID
+						if not G_RLF.db.locale.factionMap[factionData.name] then
+							G_RLF.db.locale.factionMap[factionData.name] = factionData.factionID
 						end
 					end
 				end
@@ -83,8 +83,8 @@ local function buildFactionLocaleMap(findName)
 		end
 
 		if factionData then
-			if not G_RLF.db.global.factionMaps[locale][factionData.name] then
-				G_RLF.db.global.factionMaps[locale][factionData.name] = factionData.factionID
+			if not G_RLF.db.locale.factionMap[factionData.name] then
+				G_RLF.db.locale.factionMap[factionData.name] = factionData.factionID
 			end
 			if findName and factionData.name == findName then
 				break
@@ -198,7 +198,7 @@ function Rep:OnInitialize()
 	locale = GetLocale()
 	-- TODO: Move this to db defaults
 	G_RLF.db.global.factionMaps = G_RLF.db.global.factionMaps or {}
-	G_RLF.db.global.factionMaps[locale] = G_RLF.db.global.factionMaps[locale] or {}
+	G_RLF.db.locale.factionMap = G_RLF.db.locale.factionMap or {}
 
 	if GetExpansionLevel() >= G_RLF.Expansion.TWW then
 		self.companionFactionId = C_DelvesUI.GetFactionForCompanion(BRANN_COMPANION_INFO_ID)
@@ -232,7 +232,7 @@ function Rep:OnInitialize()
 		buildFactionLocaleMap()
 	end)
 
-	if G_RLF.db.global.repFeed then
+	if G_RLF.db.global.rep.enabled then
 		self:Enable()
 	else
 		self:Disable()
@@ -312,7 +312,7 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 		end
 
 		local r, g, b, color
-		local factionMapEntry = G_RLF.db.global.factionMaps[locale][faction]
+		local factionMapEntry = G_RLF.db.locale.factionMap[faction]
 		if factionMapEntry == nil then
 			-- attempt to find the missing faction's ID
 			G_RLF:LogDebug(faction .. " not cached for " .. locale, addonName, self.moduleName)
