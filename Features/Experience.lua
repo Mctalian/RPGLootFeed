@@ -44,7 +44,7 @@ local function initXpValues()
 end
 
 function Xp:OnInitialize()
-	if G_RLF.db.global.xpFeed then
+	if G_RLF.db.global.xp.enabled then
 		self:Enable()
 	else
 		self:Disable()

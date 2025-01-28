@@ -3,6 +3,7 @@ local addonName, G_RLF = ...
 local PartyLootConfig = {}
 
 G_RLF.defaults.global.partyLoot = {
+	enabled = false,
 	itemQualityFilter = {
 		[G_RLF.ItemQualEnum.Poor] = true,
 		[G_RLF.ItemQualEnum.Common] = true,
@@ -29,10 +30,10 @@ G_RLF.options.args.features.args.partyLootConfig = {
 			desc = G_RLF.L["EnablePartyLootDesc"],
 			width = "double",
 			get = function()
-				return G_RLF.db.global.enablePartyLoot
+				return G_RLF.db.global.partyLoot.enabled
 			end,
 			set = function(_, value)
-				G_RLF.db.global.enablePartyLoot = value
+				G_RLF.db.global.partyLoot.enabled = value
 			end,
 			order = 1,
 		},
@@ -41,7 +42,7 @@ G_RLF.options.args.features.args.partyLootConfig = {
 			inline = true,
 			name = G_RLF.L["Party Loot Options"],
 			disabled = function()
-				return not G_RLF.db.global.enablePartyLoot
+				return not G_RLF.db.global.partyLoot.enabled
 			end,
 			order = 2,
 			args = {
@@ -60,10 +61,10 @@ G_RLF.options.args.features.args.partyLootConfig = {
 						[G_RLF.ItemQualEnum.Heirloom] = G_RLF.L["Heirloom"],
 					},
 					get = function(_, key)
-						return G_RLF.db.global.itemQualityFilter[key]
+						return G_RLF.db.global.partyLoot.itemQualityFilter[key]
 					end,
 					set = function(_, key, value)
-						G_RLF.db.global.itemQualityFilter[key] = value
+						G_RLF.db.global.partyLoot.itemQualityFilter[key] = value
 					end,
 					order = 1,
 				},

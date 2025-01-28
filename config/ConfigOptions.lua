@@ -13,6 +13,7 @@ G_RLF.WrapCharOptions = {
 
 G_RLF.defaults = {
 	profile = {},
+	locale = {},
 	global = {
 		lastVersionLoaded = "v1.0.0",
 		logger = {},

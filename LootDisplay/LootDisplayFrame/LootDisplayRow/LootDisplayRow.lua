@@ -200,9 +200,10 @@ end
 function LootDisplayRowMixin:StyleBackground()
 	local changed = false
 
-	local gradientStart = G_RLF.db.global.styling.rowBackgroundGradientStart
-	local gradientEnd = G_RLF.db.global.styling.rowBackgroundGradientEnd
-	local leftAlign = G_RLF.db.global.styling.leftAlign
+	local stylingDb = G_RLF.db.global.styling
+	local gradientStart = stylingDb.rowBackgroundGradientStart
+	local gradientEnd = stylingDb.rowBackgroundGradientEnd
+	local leftAlign = stylingDb.leftAlign
 
 	if self.cachedGradientStart ~= gradientStart then
 		self.cachedGradientStart = gradientStart
@@ -301,12 +302,14 @@ end
 function LootDisplayRowMixin:StyleText()
 	local fontChanged = false
 
-	local fontFace = G_RLF.db.global.styling.fontFace
-	local useFontObjects = G_RLF.db.global.styling.useFontObjects
-	local font = G_RLF.db.global.styling.font
-	local fontFlags = G_RLF.db.global.styling.fontFlags
-	local fontSize = G_RLF.db.global.styling.fontSize
-	local secondaryFontSize = G_RLF.db.global.styling.secondaryFontSize
+	local stylingDb = G_RLF.db.global.styling
+	local sizingDb = G_RLF.db.global.sizing
+	local fontFace = stylingDb.fontFace
+	local useFontObjects = stylingDb.useFontObjects
+	local font = stylingDb.font
+	local fontFlags = stylingDb.fontFlags
+	local fontSize = stylingDb.fontSize
+	local secondaryFontSize = stylingDb.secondaryFontSize
 
 	if
 		self.cachedFontFace ~= fontFace
@@ -339,10 +342,10 @@ function LootDisplayRowMixin:StyleText()
 		end
 	end
 
-	local leftAlign = G_RLF.db.global.styling.leftAlign
-	local padding = G_RLF.db.global.sizing.padding
-	local iconSize = G_RLF.db.global.sizing.iconSize
-	local enabledSecondaryRowText = G_RLF.db.global.styling.enabledSecondaryRowText
+	local leftAlign = stylingDb.leftAlign
+	local padding = sizingDb.padding
+	local iconSize = sizingDb.iconSize
+	local enabledSecondaryRowText = stylingDb.enabledSecondaryRowText
 
 	if
 		self.cachedRowTextLeftAlign ~= leftAlign
@@ -411,7 +414,8 @@ function LootDisplayRowMixin:StyleText()
 end
 
 function LootDisplayRowMixin:StyleRowBorders()
-	local enableRowBorder = G_RLF.db.global.styling.enableRowBorder
+	local stylingDb = G_RLF.db.global.styling
+	local enableRowBorder = stylingDb.enableRowBorder
 	if not enableRowBorder then
 		self.StaticTopBorder:Hide()
 		self.StaticRightBorder:Hide()
@@ -420,9 +424,9 @@ function LootDisplayRowMixin:StyleRowBorders()
 		return
 	end
 
-	local borderSize = G_RLF.db.global.styling.rowBorderSize
-	local classColors = G_RLF.db.global.styling.rowBorderClassColors
-	local borderColor = G_RLF.db.global.styling.rowBorderColor
+	local borderSize = stylingDb.rowBorderSize
+	local classColors = stylingDb.rowBorderClassColors
+	local borderColor = stylingDb.rowBorderColor
 
 	if self.cachedBorderSize ~= borderSize then
 		self.cachedBorderSize = borderSize
@@ -529,11 +533,13 @@ end
 function LootDisplayRowMixin:StyleEnterAnimation()
 	local animationChanged = false
 
-	local enterAnimationType = G_RLF.db.global.animations.enter.type
-	local slideDirection = G_RLF.db.global.animations.enter.slide.direction
-	local enterDuration = G_RLF.db.global.animations.enter.duration
-	local feedWidth = G_RLF.db.global.sizing.feedWidth
-	local rowHeight = G_RLF.db.global.sizing.rowHeight
+	local animationsEnterDb = G_RLF.db.global.animations.enter
+	local sizingDb = G_RLF.db.global.sizing
+	local enterAnimationType = animationsEnterDb.type
+	local slideDirection = animationsEnterDb.slide.direction
+	local enterDuration = animationsEnterDb.duration
+	local feedWidth = sizingDb.feedWidth
+	local rowHeight = sizingDb.rowHeight
 
 	if
 		self.cachedEnterAnimationType ~= enterAnimationType
@@ -1050,10 +1056,10 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 	-- Add Tooltip
 	-- Tooltip logic
 	local function showTooltip()
-		if not G_RLF.db.global.tooltip then
+		if not G_RLF.db.global.tooltips.hover.enabled then
 			return
 		end
-		if G_RLF.db.global.tooltipOnShift and not IsShiftKeyDown() then
+		if G_RLF.db.global.tooltips.hover.onShift and not IsShiftKeyDown() then
 			return
 		end
 		local inCombat = UnitAffectingCombat("player")
