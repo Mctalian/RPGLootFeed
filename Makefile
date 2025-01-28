@@ -17,7 +17,10 @@ missing_locale_key_check:
 	@poetry run python .scripts/check_for_missing_locale_keys.py
 
 test:
-	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage && $(ROCKSBIN)/luacov
+	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage && $(ROCKSBIN)/luacov && echo "\nCoverage report generated at luacov-html/index.html"
+
+test-only:
+	@$(ROCKSBIN)/busted --tags=only
 
 test-ci:
 	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage -o=TAP && $(ROCKSBIN)/luacov

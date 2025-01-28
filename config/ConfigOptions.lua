@@ -13,7 +13,9 @@ G_RLF.WrapCharOptions = {
 
 G_RLF.defaults = {
 	profile = {},
-	locale = {},
+	locale = {
+		factionMap = {},
+	},
 	global = {
 		lastVersionLoaded = "v1.0.0",
 		logger = {},

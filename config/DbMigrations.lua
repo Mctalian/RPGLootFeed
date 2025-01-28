@@ -7,7 +7,7 @@ local function getPath(db, path)
 	local current = db
 	for part in path:gmatch("[^.]+") do
 		current = current[part]
-		if not current then
+		if current == nil then
 			return nil
 		end
 	end
@@ -24,7 +24,9 @@ local function setPath(db, path, value)
 	local current = db
 
 	for _, part in ipairs(parts) do
-		current[part] = current[part] or {}
+		if current[part] == nil then
+			current[part] = {}
+		end
 		current = current[part]
 	end
 
