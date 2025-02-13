@@ -2,8 +2,6 @@ local addonName, G_RLF = ...
 
 local Animations = {}
 
-G_RLF.defaults.global.fadeOutDelay = 5
-
 G_RLF.defaults.global.animations = {
 	enter = {
 		type = G_RLF.EnterAnimationType.FADE,
@@ -15,7 +13,7 @@ G_RLF.defaults.global.animations = {
 	exit = {
 		type = G_RLF.EnterAnimationType.FADE,
 		duration = 1,
-		-- fadeOutDelay = G_RLF.defaults.global.fadeOutDelay,
+		fadeOutDelay = 5,
 	},
 }
 
@@ -105,10 +103,10 @@ G_RLF.options.args.timing = {
 					min = 1,
 					max = 30,
 					get = function()
-						return G_RLF.db.global.fadeOutDelay
+						return G_RLF.db.global.animations.exit.fadeOutDelay
 					end,
 					set = function(info, value)
-						G_RLF.db.global.fadeOutDelay = value
+						G_RLF.db.global.animations.exit.fadeOutDelay = value
 						G_RLF.LootDisplay:UpdateFadeDelay()
 					end,
 					order = 1,

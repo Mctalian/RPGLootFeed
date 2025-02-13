@@ -9,4 +9,6 @@
     <Script file="Styling.lua"/>
     <Script file="Animations.lua"/>
     <Script file="BlizzardUI.lua"/>
+    <Script file="DbMigrations.lua"/>
+    <Include file="Migrations/migrations.xml"/>
 </Ui>

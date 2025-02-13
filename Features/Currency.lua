@@ -88,7 +88,7 @@ local function isHiddenCurrency(id)
 end
 
 function Currency:OnInitialize()
-	if G_RLF.db.global.currencyFeed and GetExpansionLevel() >= G_RLF.Expansion.SL then
+	if G_RLF.db.global.currency.enabled and GetExpansionLevel() >= G_RLF.Expansion.SL then
 		self:Enable()
 	else
 		self:Disable()

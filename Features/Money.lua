@@ -64,7 +64,7 @@ end
 
 function Money:OnInitialize()
 	self.startingMoney = 0
-	if G_RLF.db.global.moneyFeed then
+	if G_RLF.db.global.money.enabled then
 		self:Enable()
 	else
 		self:Disable()
@@ -96,6 +96,11 @@ function Money:PLAYER_MONEY(eventName)
 		self.startingMoney = newMoney
 		local e = self.Element:new(amountInCopper)
 		e:Show()
+		if G_RLF.db.global.money.overrideMoneyLootSound and G_RLF.db.global.money.moneyLootSound ~= "" then
+			RunNextFrame(function()
+				PlaySoundFile(G_RLF.db.global.money.moneyLootSound)
+			end)
+		end
 	end)
 end
 

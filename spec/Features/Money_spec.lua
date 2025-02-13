@@ -12,12 +12,12 @@ describe("Money module", function()
 	end)
 
 	it("Money:OnInitialize enables or disables the module based on global moneyFeed", function()
-		ns.db.global.moneyFeed = true
+		ns.db.global.money.enabled = true
 		spy.on(MoneyModule, "Enable")
 		MoneyModule:OnInitialize()
 		assert.spy(MoneyModule.Enable).was.called()
 
-		ns.db.global.moneyFeed = false
+		ns.db.global.money.enabled = false
 		spy.on(MoneyModule, "Disable")
 		MoneyModule:OnInitialize()
 		assert.spy(MoneyModule.Disable).was.called()

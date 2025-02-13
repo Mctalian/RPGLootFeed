@@ -3,6 +3,7 @@ local addonName, G_RLF = ...
 local ProfessionConfig = {}
 
 G_RLF.defaults.global.prof = {
+	enabled = true,
 	showSkillChange = true,
 	skillColor = { 0.333, 0.333, 1.0, 1.0 },
 	skillTextWrapChar = G_RLF.WrapCharEnum.BRACKET,
@@ -20,10 +21,10 @@ G_RLF.options.args.features.args.professionConfig = {
 			desc = G_RLF.L["EnableProfDesc"],
 			width = "double",
 			get = function()
-				return G_RLF.db.global.profFeed
+				return G_RLF.db.global.prof.enabled
 			end,
 			set = function(_, value)
-				G_RLF.db.global.profFeed = value
+				G_RLF.db.global.prof.enabled = value
 				if value then
 					G_RLF.RLF:EnableModule("Profession")
 				else
@@ -37,7 +38,7 @@ G_RLF.options.args.features.args.professionConfig = {
 			inline = true,
 			name = G_RLF.L["Profession Options"],
 			disabled = function()
-				return not G_RLF.db.global.profFeed
+				return not G_RLF.db.global.prof.enabled
 			end,
 			order = 1.1,
 			args = {

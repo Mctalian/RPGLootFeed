@@ -2,17 +2,16 @@ local addonName, G_RLF = ...
 
 local Features = {}
 
-G_RLF.defaults.global.lootHistoryEnabled = true
-G_RLF.defaults.global.historyLimit = 100
-G_RLF.defaults.global.enablePartyLoot = false
-G_RLF.defaults.global.itemLootFeed = true
-G_RLF.defaults.global.currencyFeed = true
-G_RLF.defaults.global.tooltip = true
-G_RLF.defaults.global.tooltipOnShift = false
-G_RLF.defaults.global.moneyFeed = true
-G_RLF.defaults.global.xpFeed = true
-G_RLF.defaults.global.repFeed = true
-G_RLF.defaults.global.profFeed = true
+G_RLF.defaults.global.lootHistory = {
+	enabled = true,
+	historyLimit = 100,
+}
+G_RLF.defaults.global.tooltips = {
+	hover = {
+		enabled = true,
+		onShift = false,
+	},
+}
 
 G_RLF.mainFeatureOrder = {
 	ItemLoot = 1,
@@ -173,53 +172,53 @@ G_RLF.options.args.features = {
 }
 
 function Features:GetLootHistoryStatus()
-	return G_RLF.db.global.lootHistoryEnabled
+	return G_RLF.db.global.lootHistory.enabled
 end
 
 function Features:SetLootHistoryStatus(info, value)
-	G_RLF.db.global.lootHistoryEnabled = value
+	G_RLF.db.global.lootHistory.enabled = value
 	LootDisplayFrame:UpdateTabVisibility()
 end
 
 function Features:LootHistoryDisabled()
-	return not G_RLF.db.global.lootHistoryEnabled
+	return not G_RLF.db.global.lootHistory.enabled
 end
 
 function Features:GetLootHistorySize()
-	return G_RLF.db.global.historyLimit
+	return G_RLF.db.global.lootHistory.historyLimit
 end
 
 function Features:SetLootHistorySize(info, value)
-	G_RLF.db.global.historyLimit = value
+	G_RLF.db.global.lootHistory.historyLimit = value
 end
 
 function Features:GetSecondaryRowText(info, value)
-	return G_RLF.db.global.enabledSecondaryRowText
+	return G_RLF.db.global.styling.enabledSecondaryRowText
 end
 
 function Features:SetSecondaryRowText(info, value)
-	G_RLF.db.global.enabledSecondaryRowText = value
+	G_RLF.db.global.styling.enabledSecondaryRowText = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Features:SecondaryTextDisabled()
-	return not G_RLF.db.global.enabledSecondaryRowText
+	return not G_RLF.db.global.styling.enabledSecondaryRowText
 end
 
 function Features:GetPartyLootStatus()
-	return G_RLF.db.global.enablePartyLoot
+	return G_RLF.db.global.partyLoot.enabled
 end
 
 function Features:SetPartyLootStatus(info, value)
-	G_RLF.db.global.enablePartyLoot = value
+	G_RLF.db.global.partyLoot.enabled = value
 end
 
 function Features:GetItemLootStatus(info, value)
-	return G_RLF.db.global.itemLootFeed
+	return G_RLF.db.global.item.enabled
 end
 
 function Features:SetItemLootStatus(info, value)
-	G_RLF.db.global.itemLootFeed = value
+	G_RLF.db.global.item.enabled = value
 	if value then
 		G_RLF.RLF:EnableModule("ItemLoot")
 	else
@@ -228,11 +227,11 @@ function Features:SetItemLootStatus(info, value)
 end
 
 function Features:GetCurrencyStatus(info, value)
-	return G_RLF.db.global.currencyFeed
+	return G_RLF.db.global.currency.enabled
 end
 
 function Features:SetCurrencyStatus(info, value)
-	G_RLF.db.global.currencyFeed = value
+	G_RLF.db.global.currency.enabled = value
 	if value then
 		G_RLF.RLF:EnableModule("Currency")
 	else
@@ -241,31 +240,31 @@ function Features:SetCurrencyStatus(info, value)
 end
 
 function Features:GetTooltipStatus(info, value)
-	return G_RLF.db.global.tooltip
+	return G_RLF.db.global.tooltips.hover.enabled
 end
 
 function Features:SetTooltipStatus(info, value)
-	G_RLF.db.global.tooltip = value
+	G_RLF.db.global.tooltips.hover.enabled = value
 end
 
 function Features:TooltipShiftDisabled()
-	return not G_RLF.db.global.tooltip
+	return not G_RLF.db.global.tooltips.hover.enabled
 end
 
 function Features:GetTooltipShiftStatus(info, value)
-	return G_RLF.db.global.tooltipOnShift
+	return G_RLF.db.global.tooltips.hover.onShift
 end
 
 function Features:SetTooltipShiftStatus(info, value)
-	G_RLF.db.global.tooltipOnShift = value
+	G_RLF.db.global.tooltips.hover.onShift = value
 end
 
 function Features:GetMoneyStatus(info, value)
-	return G_RLF.db.global.moneyFeed
+	return G_RLF.db.global.money.enabled
 end
 
 function Features:SetMoneyStatus(info, value)
-	G_RLF.db.global.moneyFeed = value
+	G_RLF.db.global.money.enabled = value
 	if value then
 		G_RLF.RLF:EnableModule("Money")
 	else
@@ -274,11 +273,11 @@ function Features:SetMoneyStatus(info, value)
 end
 
 function Features:GetXPStatus(info, value)
-	return G_RLF.db.global.xpFeed
+	return G_RLF.db.global.xp.enabled
 end
 
 function Features:SetXPStatus(info, value)
-	G_RLF.db.global.xpFeed = value
+	G_RLF.db.global.xp.enabled = value
 	if value then
 		G_RLF.RLF:EnableModule("Experience")
 	else
@@ -287,11 +286,11 @@ function Features:SetXPStatus(info, value)
 end
 
 function Features:GetRepStatus(info, value)
-	return G_RLF.db.global.repFeed
+	return G_RLF.db.global.rep.enabled
 end
 
 function Features:SetRepStatus(info, value)
-	G_RLF.db.global.repFeed = value
+	G_RLF.db.global.rep.enabled = value
 	if value then
 		G_RLF.RLF:EnableModule("Reputation")
 	else
@@ -300,11 +299,11 @@ function Features:SetRepStatus(info, value)
 end
 
 function Features:GetProfStatus(info, value)
-	return G_RLF.db.global.profFeed
+	return G_RLF.db.global.prof.enabled
 end
 
 function Features:SetProfStatus(info, value)
-	G_RLF.db.global.profFeed = value
+	G_RLF.db.global.prof.enabled = value
 	if value then
 		G_RLF.RLF:EnableModule("Professions")
 	else
