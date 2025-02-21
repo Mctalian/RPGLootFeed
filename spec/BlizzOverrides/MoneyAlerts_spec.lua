@@ -46,13 +46,13 @@ describe("MoneyAlerts module", function()
 		end)
 
 		it("completely skips MoneyWonAlertSystem alert if disabled", function()
-			ns.db.global.disableBlizzMoneyAlerts = true
+			ns.db.global.blizzOverrides.disableBlizzMoneyAlerts = true
 			MoneyAlertOverride:InterceptMoneyAddAlert(nil)
 			assert.spy(MoneyAlertOverride.hooks[MoneyWonAlertSystem].AddAlert).was_not_called()
 		end)
 
 		it("calls the original AddAlert function if not disabled", function()
-			ns.db.global.disableBlizzMoneyAlerts = false
+			ns.db.global.blizzOverrides.disableBlizzMoneyAlerts = false
 			MoneyAlertOverride:InterceptMoneyAddAlert(nil)
 			assert.spy(MoneyAlertOverride.hooks[MoneyWonAlertSystem].AddAlert).was_called()
 		end)

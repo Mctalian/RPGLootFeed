@@ -13,7 +13,9 @@ externals:
   Libs/AceLocale-3.0: https://repos.wowace.com/wow/ace3/trunk/AceLocale-3.0
   Libs/LibSharedMedia-3.0: https://repos.curseforge.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
   Libs/AceGUI-3.0-SharedMediaWidgets: https://repos.curseforge.com/wow/ace-gui-3-0-shared-media-widgets/trunk/AceGUI-3.0-SharedMediaWidgets
-  Libs/C_Everywhere: https://github.com/Jaliborc/C_Everywhere
+  Libs/C_Everywhere:
+    url: https://github.com/Jaliborc/C_Everywhere
+    curse-slug: c-everywhere
 
 enable-nolib-creation: yes
 github-release-as-changelog: yes

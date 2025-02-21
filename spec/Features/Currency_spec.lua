@@ -20,7 +20,7 @@ describe("Currency module", function()
 	end)
 
 	it("does not show loot if the currency type is nil", function()
-		ns.db.global.currencyFeed = true
+		ns.db.global.currency.enabled = true
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, nil)
 
@@ -28,7 +28,7 @@ describe("Currency module", function()
 	end)
 
 	it("does not show loot if the quantityChange is nil", function()
-		ns.db.global.currencyFeed = true
+		ns.db.global.currency.enabled = true
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, nil, nil)
 
@@ -36,7 +36,7 @@ describe("Currency module", function()
 	end)
 
 	it("does not show loot if the quantityChange is lte 0", function()
-		ns.db.global.currencyFeed = true
+		ns.db.global.currency.enabled = true
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, nil, -1)
 
@@ -44,7 +44,7 @@ describe("Currency module", function()
 	end)
 
 	it("does not show loot if the currency info cannot be found", function()
-		ns.db.global.currencyFeed = true
+		ns.db.global.currency.enabled = true
 		_G.C_CurrencyInfo.GetCurrencyInfo = function()
 			return nil
 		end
@@ -55,7 +55,7 @@ describe("Currency module", function()
 	end)
 
 	it("does not show loot if the currency has an empty description", function()
-		ns.db.global.currencyFeed = true
+		ns.db.global.currency.enabled = true
 		_G.C_CurrencyInfo.GetCurrencyInfo = function()
 			return {
 				currencyID = 123,
@@ -70,7 +70,7 @@ describe("Currency module", function()
 	end)
 
 	it("shows loot if the currency info is valid", function()
-		ns.db.global.currencyFeed = true
+		ns.db.global.currency.enabled = true
 		local info = {
 			currencyID = 123,
 			description = "An awesome currency",

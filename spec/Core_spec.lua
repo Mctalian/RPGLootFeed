@@ -5,13 +5,16 @@ describe("Core module", function()
 	local _ = match._
 
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
+		ns = common_stubs.setup_G_RLF(spy)
 		ns.L = {
 			Welcome = "Welcome",
 		}
 		ns.LootDisplay = {
 			SetBoundingBoxVisibility = function() end,
 			HideLoot = function() end,
+		}
+		ns.DbMigrations = {
+			Migrate = function() end,
 		}
 		RLF = assert(loadfile("Core.lua"))("TestAddon", ns)
 		RLF.GetModule = function(_, moduleName)
@@ -64,7 +67,7 @@ describe("Core module", function()
 
 	describe("PLAYER_ENTERING_WORLD", function()
 		it("should handle PLAYER_ENTERING_WORLD event correctly", function()
-			ns.db.global.enableAutoLoot = true
+			ns.db.global.blizzOverrides.enableAutoLoot = true
 			spy.on(RLF, "PLAYER_ENTERING_WORLD")
 			RLF:PLAYER_ENTERING_WORLD("PLAYER_ENTERING_WORLD", true, false)
 			assert.spy(RLF.PLAYER_ENTERING_WORLD).was.called()
