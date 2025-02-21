@@ -33,6 +33,6 @@ jobs:
       #   uses: BigWigsMods/packager@v2
 
       - name: Package and release
-        uses: McTalian/wow-build-tools@3ed476e40ba72a8a47c4be78eed7f04a5dbeff64
+        uses: McTalian/wow-build-tools@b29f6d4acf70b8c26e3760b833bf9d2cfc6153ee
         with:
           args: -V

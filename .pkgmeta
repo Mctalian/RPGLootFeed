@@ -16,6 +16,7 @@ externals:
   Libs/C_Everywhere: https://github.com/Jaliborc/C_Everywhere
 
 enable-nolib-creation: yes
+github-release-as-changelog: yes
 
 ignore:
   - spec/*
