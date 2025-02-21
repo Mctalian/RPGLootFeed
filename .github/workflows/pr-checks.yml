@@ -8,13 +8,13 @@ on:
     types:
       - checks_requested
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   check_translations:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -43,7 +43,9 @@ jobs:
 
   run_tests:
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: read
+      actions: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -54,7 +56,7 @@ jobs:
 
       - uses: leafo/gh-actions-luarocks@v4
         with:
-          luarocksVersion: 3.11.1
+          luaRocksVersion: 3.11.1
 
       - name: Install luarock dependencies
         run: luarocks make --local rpglootfeed-1-1.rockspec
@@ -73,6 +75,7 @@ jobs:
     env:
       IS_FORK: ${{ github.event.pull_request.head.repo.fork }}
     permissions:
+      contents: read
       actions: write
       pull-requests: write
 
@@ -162,6 +165,8 @@ jobs:
 
   commitlint:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     env:
       TITLE: ${{ github.event.pull_request.title }}
     steps:

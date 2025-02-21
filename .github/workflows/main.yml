@@ -5,13 +5,13 @@ on:
     branches:
       - main
 
-permissions:
-  contents: read
+permissions: {}
 
 jobs:
   i18n_translations:
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       actions: write
       issues: write
 
@@ -42,6 +42,9 @@ jobs:
 
   run_tests:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
 
     steps:
       - name: Checkout code
@@ -53,7 +56,7 @@ jobs:
 
       - uses: leafo/gh-actions-luarocks@v4
         with:
-          luarocksVersion: 3.11.1
+          luaRocksVersion: 3.11.1
 
       - name: Install luarock dependencies
         run: luarocks make --local rpglootfeed-1-1.rockspec
@@ -71,6 +74,8 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
+      issues: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -87,5 +92,5 @@ jobs:
 
       - name: Run semantic-release
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: npm run semantic-release
