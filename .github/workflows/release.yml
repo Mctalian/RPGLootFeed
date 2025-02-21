@@ -25,6 +25,6 @@ jobs:
           fetch-depth: 0
 
       - name: Package and release
-        uses: McTalian/wow-build-tools@d85d991ee52b775cfe2c263c6858da169999463a
+        uses: McTalian/wow-build-tools@75a0325fc2e0273898a34c1672ca9ede63e06c26
         with:
           args: -V
