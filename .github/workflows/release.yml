@@ -13,10 +13,10 @@ jobs:
     permissions:
       contents: write
     env:
-      GITHUB_OAUTH: ${{ secrets.GH_PAT}}
-    #   CF_API_KEY: ${{ secrets.CF_API_KEY }}
-    #   WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
-    #   WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+      CF_API_KEY: ${{ secrets.CF_API_KEY }}
+      WOWI_API_TOKEN: ${{ secrets.WOWI_API_TOKEN }}
+      WAGO_API_TOKEN: ${{ secrets.WAGO_API_TOKEN }}
+      GITHUB_OAUTH: ${{ secrets.GH_PAT }}
 
     steps:
       - name: Clone project
@@ -24,7 +24,15 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Package and release
-        uses: McTalian/wow-build-tools@75a0325fc2e0273898a34c1672ca9ede63e06c26
+      - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
-          args: -V
+          packages: subversion
+          version: test_package_apt_cache
+
+      - name: Package and release
+        uses: BigWigsMods/packager@v2
+
+      # - name: Package and release
+      #   uses: McTalian/wow-build-tools@75a0325fc2e0273898a34c1672ca9ede63e06c26
+      #   with:
+      #     args: -V
