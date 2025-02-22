@@ -34,6 +34,6 @@ jobs:
       - name: Package and release
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
-        uses: McTalian/wow-build-tools@6ba2ba0e7e6d9ad2c7d07ad2cc9c4b2e2e3c2391
+        uses: McTalian/wow-build-tools@v1-beta
         with:
           args: -V
