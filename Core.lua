@@ -10,6 +10,12 @@ RLF:SetDefaultModulePrototype({
 	end,
 })
 
+local function DbMigrations()
+	for _, migration in ipairs(G_RLF.migrations) do
+		migration:run()
+	end
+end
+
 G_RLF.localeName = addonName .. "Locale"
 G_RLF.lsm = LibStub("LibSharedMedia-3.0")
 G_RLF.Masque = LibStub and LibStub("Masque", true)
@@ -22,6 +28,11 @@ function RLF:OnInitialize()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
 	local lsm = G_RLF.lsm
 	lsm:Register(lsm.MediaType.FONT, "BAR SADY Regular", "Interface\\AddOns\\RPGLootFeed\\Fonts\\BAR_SADY_Variable.ttf")
+	lsm:Register(
+		lsm.MediaType.SOUND,
+		"LittleRobotSoundFactory - Pickup_Gold_04",
+		"Interface\\AddOns\\RPGLootFeed\\Sounds\\Pickup_Gold_04.ogg"
+	)
 	self:Hook(acd, "Open", "OnOptionsOpen")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterChatCommand("rlf", "SlashCommand")
@@ -39,6 +50,7 @@ function RLF:OnInitialize()
 	end
 
 	TestMode = self:GetModule("TestMode")
+	DbMigrations()
 end
 
 function RLF:SlashCommand(msg, editBox)
@@ -69,7 +81,7 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 	if isLogin and isReload == false and isNewVersion then
 		G_RLF.db.global.lastVersionLoaded = currentVersion
 		self:Print(G_RLF.L["Welcome"] .. " (" .. currentVersion .. ")")
-		if G_RLF.db.global.enableAutoLoot then
+		if G_RLF.db.global.blizzOverrides.enableAutoLoot then
 			C_CVar.SetCVar("autoLootDefault", "1")
 		end
 	end

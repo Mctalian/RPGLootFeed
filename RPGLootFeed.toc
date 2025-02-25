@@ -11,7 +11,9 @@
 ## X-WoWI-ID: 26799
 ## X-Wago-ID: 56n9R0N9
 
+#@no-lib-strip@
 embeds.xml
+#@end-no-lib-strip@
 
 Core.lua
 utils/utils.xml

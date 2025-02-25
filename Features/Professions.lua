@@ -40,7 +40,7 @@ function Professions:OnInitialize()
 	self.professions = {}
 	self.profNameIconMap = {}
 	self.profLocaleBaseNames = {}
-	if G_RLF.db.global.profFeed then
+	if G_RLF.db.global.prof.enabled then
 		self:Enable()
 	else
 		self:Disable()

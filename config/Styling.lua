@@ -4,22 +4,24 @@ local Styling = {}
 
 local lsm = G_RLF.lsm
 
-G_RLF.defaults.global.enabledSecondaryRowText = false
-G_RLF.defaults.global.leftAlign = true
-G_RLF.defaults.global.growUp = true
-G_RLF.defaults.global.rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 } -- Default to dark grey with 80% opacity
-G_RLF.defaults.global.rowBackgroundGradientEnd = { 0.1, 0.1, 0.1, 0 } -- Default to dark grey with 0% opacity
-G_RLF.defaults.global.disableRowHighlight = false
-G_RLF.defaults.global.enableRowBorder = false
-G_RLF.defaults.global.rowBorderSize = 1
-G_RLF.defaults.global.rowBorderColor = { 0, 0, 0, 1 }
-G_RLF.defaults.global.rowBorderClassColors = false
-G_RLF.defaults.global.useFontObjects = true
-G_RLF.defaults.global.font = "GameFontNormalSmall"
-G_RLF.defaults.global.fontFace = "Friz Quadrata TT"
-G_RLF.defaults.global.fontSize = 10
-G_RLF.defaults.global.secondaryFontSize = 8
-G_RLF.defaults.global.fontFlags = ""
+G_RLF.defaults.global.styling = {
+	enabledSecondaryRowText = false,
+	leftAlign = true,
+	growUp = true,
+	rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 },
+	rowBackgroundGradientEnd = { 0.1, 0.1, 0.1, 0 },
+	disableRowHighlight = false,
+	enableRowBorder = false,
+	rowBorderSize = 1,
+	rowBorderColor = { 0, 0, 0, 1 },
+	rowBorderClassColors = false,
+	useFontObjects = true,
+	font = "GameFontNormalSmall",
+	fontFace = "Friz Quadrata TT",
+	fontSize = 10,
+	secondaryFontSize = 8,
+	fontFlags = "",
+}
 
 G_RLF.options.args.styles = {
 	type = "group",
@@ -222,157 +224,157 @@ function Styling:GetFonts()
 end
 
 function Styling:GetGradientStartColor(info, value)
-	local r, g, b, a = unpack(G_RLF.db.global.rowBackgroundGradientStart)
+	local r, g, b, a = unpack(G_RLF.db.global.styling.rowBackgroundGradientStart)
 	return r, g, b, a
 end
 
 function Styling:SetGradientStartColor(info, r, g, b, a)
-	G_RLF.db.global.rowBackgroundGradientStart = { r, g, b, a }
+	G_RLF.db.global.styling.rowBackgroundGradientStart = { r, g, b, a }
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:GetGradientEndColor(info, value)
-	local r, g, b, a = unpack(G_RLF.db.global.rowBackgroundGradientEnd)
+	local r, g, b, a = unpack(G_RLF.db.global.styling.rowBackgroundGradientEnd)
 	return r, g, b, a
 end
 
 function Styling:SetGradientEndColor(info, r, g, b, a)
-	G_RLF.db.global.rowBackgroundGradientEnd = { r, g, b, a }
+	G_RLF.db.global.styling.rowBackgroundGradientEnd = { r, g, b, a }
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:SetLeftAlign(info, value)
-	G_RLF.db.global.leftAlign = value
+	G_RLF.db.global.styling.leftAlign = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:GetLeftAlign(info, value)
-	return G_RLF.db.global.leftAlign
+	return G_RLF.db.global.styling.leftAlign
 end
 
 function Styling:GetGrowUp(info, value)
-	return G_RLF.db.global.growUp
+	return G_RLF.db.global.styling.growUp
 end
 
 function Styling:SetGrowUp(info, value)
-	G_RLF.db.global.growUp = value
+	G_RLF.db.global.styling.growUp = value
 	G_RLF.LootDisplay:UpdateRowPositions()
 end
 
 function Styling:GetRowHighlight(info, value)
-	return G_RLF.db.global.disableRowHighlight
+	return G_RLF.db.global.styling.disableRowHighlight
 end
 
 function Styling:SetRowHighlight(info, value)
-	G_RLF.db.global.disableRowHighlight = value
+	G_RLF.db.global.styling.disableRowHighlight = value
 end
 
 function Styling:GetSecondaryRowText(info, value)
-	return G_RLF.db.global.enabledSecondaryRowText
+	return G_RLF.db.global.styling.enabledSecondaryRowText
 end
 
 function Styling:SetSecondaryRowText(info, value)
-	G_RLF.db.global.enabledSecondaryRowText = value
+	G_RLF.db.global.styling.enabledSecondaryRowText = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:GetUseFontObjects(info, value)
-	return G_RLF.db.global.useFontObjects
+	return G_RLF.db.global.styling.useFontObjects
 end
 
 function Styling:SetUseFontObjects(info, value)
-	G_RLF.db.global.useFontObjects = value
+	G_RLF.db.global.styling.useFontObjects = value
 end
 
 function Styling:DisableFontObjects(info, value)
-	return G_RLF.db.global.useFontObjects == false
+	return G_RLF.db.global.styling.useFontObjects == false
 end
 
 function Styling:DisableCustomFonts(info, value)
-	return G_RLF.db.global.useFontObjects == true
+	return G_RLF.db.global.styling.useFontObjects == true
 end
 
 function Styling:GetRowFontFace(info, value)
-	return G_RLF.db.global.fontFace
+	return G_RLF.db.global.styling.fontFace
 end
 
 function Styling:SetRowFontFace(info, value)
-	G_RLF.db.global.fontFace = value
+	G_RLF.db.global.styling.fontFace = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:GetRowFontSize(info, value)
-	return G_RLF.db.global.fontSize
+	return G_RLF.db.global.styling.fontSize
 end
 
 function Styling:SetRowFontSize(info, value)
-	G_RLF.db.global.fontSize = value
+	G_RLF.db.global.styling.fontSize = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:SecondaryTextDisabled()
-	return not G_RLF.db.global.enabledSecondaryRowText
+	return not G_RLF.db.global.styling.enabledSecondaryRowText
 end
 
 function Styling:GetSecondaryRowFontSize()
-	return G_RLF.db.global.secondaryFontSize
+	return G_RLF.db.global.styling.secondaryFontSize
 end
 
 function Styling:SetSecondaryRowFontSize(info, value)
-	G_RLF.db.global.secondaryFontSize = value
+	G_RLF.db.global.styling.secondaryFontSize = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:SetRowFont(info, value)
-	G_RLF.db.global.font = value
+	G_RLF.db.global.styling.font = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:GetRowFont(info, value)
-	return G_RLF.db.global.font
+	return G_RLF.db.global.styling.font
 end
 
 function Styling:GetRowBorders(info, value)
-	return G_RLF.db.global.enableRowBorder
+	return G_RLF.db.global.styling.enableRowBorder
 end
 
 function Styling:SetRowBorders(info, value)
-	G_RLF.db.global.enableRowBorder = value
+	G_RLF.db.global.styling.enableRowBorder = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:GetRowBorderThickness(info, value)
-	return G_RLF.db.global.rowBorderSize
+	return G_RLF.db.global.styling.rowBorderSize
 end
 
 function Styling:SetRowBorderThickness(info, value)
-	G_RLF.db.global.rowBorderSize = value
+	G_RLF.db.global.styling.rowBorderSize = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:GetRowBorderColor(info, value)
-	local r, g, b, a = unpack(G_RLF.db.global.rowBorderColor)
+	local r, g, b, a = unpack(G_RLF.db.global.styling.rowBorderColor)
 	return r, g, b, a
 end
 
 function Styling:SetRowBorderColor(info, r, g, b, a)
-	G_RLF.db.global.rowBorderColor = { r, g, b, a }
+	G_RLF.db.global.styling.rowBorderColor = { r, g, b, a }
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Styling:DisableRowBorders(info, value)
-	return G_RLF.db.global.enableRowBorder == false
+	return G_RLF.db.global.styling.enableRowBorder == false
 end
 
 function Styling:DisableRowColor(info, value)
-	return G_RLF.db.global.enableRowBorder == false or G_RLF.db.global.rowBorderClassColors
+	return G_RLF.db.global.styling.enableRowBorder == false or G_RLF.db.global.styling.rowBorderClassColors
 end
 
 function Styling:GetRowBorderClassColors(info, value)
-	return G_RLF.db.global.rowBorderClassColors
+	return G_RLF.db.global.styling.rowBorderClassColors
 end
 
 function Styling:SetRowBorderClassColors(info, value)
-	G_RLF.db.global.rowBorderClassColors = value
+	G_RLF.db.global.styling.rowBorderClassColors = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
