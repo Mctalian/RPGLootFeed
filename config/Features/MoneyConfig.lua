@@ -141,6 +141,7 @@ G_RLF.options.args.features.args.moneyConfig = {
 						G_RLF.db.global.money.overrideMoneyLootSound = value
 						MoneyConfig:OverrideSound()
 					end,
+					width = "double",
 					order = 3,
 				},
 				moneyLootSound = {
@@ -158,6 +159,7 @@ G_RLF.options.args.features.args.moneyConfig = {
 					disabled = function()
 						return not G_RLF.db.global.money.overrideMoneyLootSound
 					end,
+					width = "full",
 					order = 4,
 				},
 			},
@@ -166,6 +168,7 @@ G_RLF.options.args.features.args.moneyConfig = {
 }
 
 function MoneyConfig:OverrideSound()
+	G_RLF:Print("MoneyConfig:OverrideSound")
 	if G_RLF.db.global.money.overrideMoneyLootSound then
 		MuteSoundFile(120)
 		if G_RLF.db.global.money.moneyLootSound ~= "" then

@@ -41,5 +41,8 @@ check_untracked_files:
 		echo "No untracked files."; \
 	fi
 
-local: missing_locale_key_check check_untracked_files
-	@rm -rf node_modules && .release/local.sh -D
+watch: missing_locale_key_check check_untracked_files
+	@../wow-build-tools/dist/wow-build-tools watch
+
+build: missing_locale_key_check check_untracked_files
+	@../wow-build-tools/dist/wow-build-tools build -V -d

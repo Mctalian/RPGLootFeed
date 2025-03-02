@@ -2,6 +2,8 @@ local addonName, G_RLF = ...
 
 local ItemConfig = {}
 
+local lsm = G_RLF.lsm
+
 local PricesEnum = G_RLF.PricesEnum
 
 G_RLF.defaults.global.item = {
@@ -30,6 +32,20 @@ G_RLF.defaults.global.item = {
 	},
 	auctionHouseSource = G_RLF.L["None"],
 	pricesForSellableItems = PricesEnum.Vendor,
+	sounds = {
+		mounts = {
+			enabled = false,
+			sound = "",
+		},
+		legendary = {
+			enabled = false,
+			sound = "",
+		},
+		betterThanEquipped = {
+			enabled = false,
+			sound = "",
+		},
+	},
 }
 
 G_RLF.options.args.features.args.itemLootConfig = {
@@ -335,7 +351,113 @@ G_RLF.options.args.features.args.itemLootConfig = {
 						-- },
 					},
 				},
+				itemSounds = {
+					type = "group",
+					name = G_RLF.L["Item Loot Sounds"],
+					inline = true,
+					order = 4,
+					args = {
+						mounts = {
+							type = "toggle",
+							name = G_RLF.L["Play Sound for Mounts"],
+							desc = G_RLF.L["PlaySoundForMountsDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.item.sounds.mounts.enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.mounts.enabled = value
+							end,
+							order = 1,
+						},
+						mountSound = {
+							type = "select",
+							name = G_RLF.L["Mount Sound"],
+							desc = G_RLF.L["MountSoundDesc"],
+							values = "SoundOptionValues",
+							get = function()
+								return G_RLF.db.global.item.sounds.mounts.sound
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.mounts.sound = value
+							end,
+							disabled = function()
+								return not G_RLF.db.global.item.sounds.mounts.enabled
+							end,
+							order = 2,
+							width = "full",
+						},
+						legendary = {
+							type = "toggle",
+							name = G_RLF.L["Play Sound for Legendary Items"],
+							desc = G_RLF.L["PlaySoundForLegendaryDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.item.sounds.legendary.enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.legendary.enabled = value
+							end,
+							order = 3,
+						},
+						legendarySound = {
+							type = "select",
+							name = G_RLF.L["Legendary Sound"],
+							desc = G_RLF.L["LegendarySoundDesc"],
+							values = "SoundOptionValues",
+							get = function()
+								return G_RLF.db.global.item.sounds.legendary.sound
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.legendary.sound = value
+							end,
+							disabled = function()
+								return not G_RLF.db.global.item.sounds.legendary.enabled
+							end,
+							order = 4,
+							width = "full",
+						},
+						betterThanEquipped = {
+							type = "toggle",
+							name = G_RLF.L["Play Sound for Items Better Than Equipped"],
+							desc = G_RLF.L["PlaySoundForBetterDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.item.sounds.betterThanEquipped.enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.betterThanEquipped.enabled = value
+							end,
+							order = 5,
+						},
+						betterThanEquippedSound = {
+							type = "select",
+							name = G_RLF.L["Better Than Equipped Sound"],
+							desc = G_RLF.L["BetterThanEquippedSoundDesc"],
+							values = "SoundOptionValues",
+							get = function()
+								return G_RLF.db.global.item.sounds.betterThanEquipped.sound
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.betterThanEquipped.sound = value
+							end,
+							disabled = function()
+								return not G_RLF.db.global.item.sounds.betterThanEquipped.enabled
+							end,
+							width = "full",
+							order = 6,
+						},
+					},
+				},
 			},
 		},
 	},
 }
+
+function ItemConfig:SoundOptionValues()
+	local sounds = {}
+	for k, v in pairs(lsm:HashTable(lsm.MediaType.SOUND)) do
+		sounds[v] = k
+	end
+	return sounds
+end

@@ -231,8 +231,33 @@ function ItemLoot.Element:new(...)
 		return ""
 	end
 
+	element.isMount = IsMount(info)
+	element.isLegendary = IsLegendary(info)
+	element.isBetterThanEquipped = IsBetterThanEquipped(info)
+
+	function element:PlaySoundIfEnabled()
+		local soundsConfig = G_RLF.db.global.item.sounds
+		if self.isMount and soundsConfig.mounts.enabled and soundsConfig.mounts.sound ~= "" then
+			RunNextFrame(function()
+				PlaySoundFile(soundsConfig.mounts.sound)
+			end)
+		elseif self.isLegendary and soundsConfig.legendaries.enabled and soundsConfig.legendaries.sound ~= "" then
+			RunNextFrame(function()
+				PlaySoundFile(soundsConfig.legendaries.sound)
+			end)
+		elseif
+			self.isBetterThanEquipped
+			and soundsConfig.betterThanEquipped.enabled
+			and soundsConfig.betterThanEquipped.sound ~= ""
+		then
+			RunNextFrame(function()
+				PlaySoundFile(soundsConfig.betterThanEquipped.sound)
+			end)
+		end
+	end
+
 	function element:SetHighlight()
-		self.highlight = IsMount(info) or IsLegendary(info) or IsBetterThanEquipped(info)
+		self.highlight = self.isMount or self.isLegendary or self.isBetterThanEquipped
 	end
 
 	return element
@@ -268,6 +293,7 @@ function ItemLoot:OnItemReadyToShow(info, amount, fromLink)
 	local e = ItemLoot.Element:new(info, amount, false, fromLink)
 	e:SetHighlight()
 	e:Show(info.itemName, info.itemQuality)
+	e:PlaySoundIfEnabled()
 end
 
 function ItemLoot:OnPartyReadyToShow(info, amount, unit)

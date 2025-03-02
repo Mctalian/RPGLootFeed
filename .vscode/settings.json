@@ -29,7 +29,20 @@
     "EditModeManagerFrame",
     "GetPlayerGuid",
     "GetNumSkillLines",
-    "GetSkillLineInfo"
+    "GetSkillLineInfo",
+    "SELECTED_CHAT_FRAME",
+    "CLOSE",
+    "FONT_COLOR_CODE_CLOSE",
+    "ACCEPT",
+    "SlashCmdList",
+    "hash_SlashCmdList",
+    "DEFAULT_CHAT_FRAME",
+    "OKAY",
+    "ColorPickerFrame",
+    "SetDesaturation",
+    "CANCEL",
+    "Settings",
+    "NOT_BOUND"
   ],
   "Lua.workspace.library": [
     "${addons}/busted/module/library",
