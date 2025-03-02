@@ -72,6 +72,11 @@ G_RLF.EnterAnimationType = {
 	SLIDE = "slide",
 }
 
+G_RLF.ExitAnimationType = {
+	NONE = "none",
+	FADE = "fade",
+}
+
 G_RLF.SlideDirection = {
 	UP = "up",
 	DOWN = "down",
