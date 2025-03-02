@@ -506,28 +506,59 @@ function LootDisplayRowMixin:StyleHighlightBorder()
 end
 
 function LootDisplayRowMixin:StyleFadeOutAnimation()
-	if not self.FadeOutAnimation then
-		self.FadeOutAnimation = self:CreateAnimationGroup()
-		self.FadeOutAnimation:SetToFinalAlpha(true)
+	local animationChanged = false
+
+	local animationsExitDb = G_RLF.db.global.animations.exit
+	local exitAnimationType = animationsExitDb.type
+	local exitDuration = animationsExitDb.duration
+	local exitDelay = animationsExitDb.fadeOutDelay
+
+	if
+		self.cachedExitAnimationType ~= exitAnimationType
+		or self.cachedExitAnimationDuration ~= exitDuration
+		or self.cachedExitFadeOutDelay ~= exitDelay
+	then
+		self.cachedExitAnimationType = exitAnimationType
+		self.cachedExitAnimationDuration = exitDuration
+		self.cachedExitFadeOutDelay = exitDelay
+		animationChanged = true
 	end
-	if not self.FadeOutAnimation.fadeOut then
-		self.FadeOutAnimation.fadeOut = self.FadeOutAnimation:CreateAnimation("Alpha")
-		self.FadeOutAnimation.fadeOut:SetFromAlpha(1)
-		self.FadeOutAnimation.fadeOut:SetToAlpha(0)
-		self.FadeOutAnimation.fadeOut:SetScript("OnUpdate", function()
-			if self.glowTexture and self.glowTexture:IsShown() then
-				self.glowTexture:SetAlpha(0.75 * (1 - self.FadeOutAnimation.fadeOut:GetProgress()))
-			end
-		end)
-		self.FadeOutAnimation.fadeOut:SetScript("OnFinished", function()
+
+	if not self.ExitAnimation then
+		self.ExitAnimation = self:CreateAnimationGroup()
+	end
+
+	if animationChanged then
+		self.ExitAnimation:Stop()
+		self.ExitAnimation:RemoveAnimations()
+		self.ExitAnimation:SetToFinalAlpha(true)
+		self.ExitAnimation:SetScript("OnFinished", function()
 			self:Hide()
 			local frame = LootDisplayFrame
 			frame:ReleaseRow(self)
 		end)
-	end
 
-	self.FadeOutAnimation.fadeOut:SetDuration(G_RLF.db.global.animations.exit.duration)
-	self.FadeOutAnimation.fadeOut:SetStartDelay(G_RLF.db.global.animations.exit.fadeOutDelay)
+		if exitAnimationType == G_RLF.ExitAnimationType.NONE then
+			self.ExitAnimation.noop = self.ExitAnimation:CreateAnimation()
+			self.ExitAnimation.fadeOut = nil
+			self:SetAlpha(1)
+			return
+		end
+
+		if exitAnimationType ~= G_RLF.ExitAnimationType.NONE then
+			self.ExitAnimation.noop = nil
+			self.ExitAnimation.fadeOut = self.ExitAnimation:CreateAnimation("Alpha")
+			self.ExitAnimation.fadeOut:SetFromAlpha(1)
+			self.ExitAnimation.fadeOut:SetToAlpha(0)
+			self.ExitAnimation.fadeOut:SetDuration(exitDuration)
+			self.ExitAnimation.fadeOut:SetStartDelay(exitDelay)
+			self.ExitAnimation.fadeOut:SetScript("OnUpdate", function()
+				if self.glowTexture and self.glowTexture:IsShown() then
+					self.glowTexture:SetAlpha(0.75 * (1 - self.ExitAnimation.fadeOut:GetProgress()))
+				end
+			end)
+		end
+	end
 end
 
 function LootDisplayRowMixin:StyleEnterAnimation()
@@ -823,7 +854,7 @@ end
 function LootDisplayRowMixin:Enter()
 	self.EnterAnimation:Stop()
 	self.ElementFadeInAnimation:Stop()
-	self.FadeOutAnimation:Stop()
+	self.ExitAnimation:Stop()
 	if not self:IsStaggeredEnter() or not self.waiting then
 		RunNextFrame(function()
 			self:Show()
@@ -844,19 +875,19 @@ end
 function LootDisplayRowMixin:HandlerOnRightClick()
 	self:SetScript("OnMouseUp", function(_, button)
 		if button == "RightButton" and not self.isHistoryMode then
-			if not self.FadeOutAnimation then
+			if not self.ExitAnimation then
 				return
 			end
 			-- Stop any ongoing animation
-			if self.FadeOutAnimation:IsPlaying() then
-				self.FadeOutAnimation:Stop()
+			if self.ExitAnimation:IsPlaying() then
+				self.ExitAnimation:Stop()
 			end
 
 			-- Remove the delay for immediate fade-out
-			self.FadeOutAnimation.fadeOut:SetStartDelay(0)
+			self.ExitAnimation.fadeOut:SetStartDelay(0)
 
 			-- Start the fade-out animation
-			self.FadeOutAnimation:Play()
+			self.ExitAnimation:Play()
 		end
 	end)
 end
@@ -918,9 +949,9 @@ function LootDisplayRowMixin:UpdateQuantity(element)
 		self.HighlightAnimation:Stop()
 		self.HighlightAnimation:Play()
 	end
-	if self.FadeOutAnimation:IsPlaying() then
-		self.FadeOutAnimation:Stop()
-		self.FadeOutAnimation:Play()
+	if self.ExitAnimation:IsPlaying() then
+		self.ExitAnimation:Stop()
+		self.ExitAnimation:Play()
 	end
 
 	self:LogRow(self.logFn, text, false)
@@ -1078,7 +1109,7 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 	-- OnEnter: Show tooltip or listen for Shift changes
 	self.ClickableButton:SetScript("OnEnter", function()
 		if not isHistoryFrame then
-			self.FadeOutAnimation:Stop()
+			self.ExitAnimation:Stop()
 			self.HighlightAnimation:Stop()
 			self:ResetHighlightBorder()
 		end
@@ -1091,7 +1122,7 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 	-- OnLeave: Hide tooltip and stop listening for Shift changes
 	self.ClickableButton:SetScript("OnLeave", function()
 		if not isHistoryFrame then
-			self.FadeOutAnimation:Play()
+			self.ExitAnimation:Play()
 		end
 		hideTooltip()
 
@@ -1125,15 +1156,15 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 			end
 		elseif button == "RightButton" and not self.isHistoryMode then
 			-- Stop any ongoing animation
-			if self.FadeOutAnimation:IsPlaying() then
-				self.FadeOutAnimation:Stop()
+			if self.ExitAnimation:IsPlaying() then
+				self.ExitAnimation:Stop()
 			end
 
 			-- Remove the delay for immediate fade-out
-			self.FadeOutAnimation.fadeOut:SetStartDelay(0)
+			self.ExitAnimation.fadeOut:SetStartDelay(0)
 
 			-- Start the fade-out animation
-			self.FadeOutAnimation:Play()
+			self.ExitAnimation:Play()
 		end
 	end
 
@@ -1145,7 +1176,7 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 	if self.Icon then
 		self.Icon:SetScript("OnEnter", function()
 			if not isHistoryFrame then
-				self.FadeOutAnimation:Stop()
+				self.ExitAnimation:Stop()
 				self.HighlightAnimation:Stop()
 				self:ResetHighlightBorder()
 			end
@@ -1154,7 +1185,7 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 		end)
 		self.Icon:SetScript("OnLeave", function()
 			if not isHistoryFrame then
-				self.FadeOutAnimation:Play()
+				self.ExitAnimation:Play()
 			end
 			hideTooltip()
 			self.Icon:UnregisterEvent("MODIFIER_STATE_CHANGED")
@@ -1175,7 +1206,7 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 end
 
 function LootDisplayRowMixin:IsFading()
-	return self.FadeOutAnimation:IsPlaying() and not self.FadeOutAnimation.fadeOut:IsDelaying()
+	return self.ExitAnimation:IsPlaying() and not self.ExitAnimation.fadeOut:IsDelaying()
 end
 
 function LootDisplayRowMixin:Dump()
@@ -1397,8 +1428,8 @@ end
 
 function LootDisplayRowMixin:ResetFadeOut()
 	RunNextFrame(function()
-		self.FadeOutAnimation:Stop()
-		self.FadeOutAnimation:Play()
+		self.ExitAnimation:Stop()
+		self.ExitAnimation:Play()
 	end)
 end
 

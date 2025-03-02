@@ -111,6 +111,38 @@ G_RLF.options.args.timing = {
 					end,
 					order = 1,
 				},
+				-- exitAnimationType = {
+				-- 	type = "select",
+				-- 	name = G_RLF.L["Exit Animation Type"],
+				-- 	desc = G_RLF.L["ExitAnimationTypeDesc"],
+				-- 	values = {
+				-- 		[G_RLF.EnterAnimationType.NONE] = G_RLF.L["None"],
+				-- 		[G_RLF.EnterAnimationType.FADE] = G_RLF.L["Fade"],
+				-- 	},
+				-- 	get = function()
+				-- 		return G_RLF.db.global.animations.exit.type
+				-- 	end,
+				-- 	set = function(info, value)
+				-- 		G_RLF.db.global.animations.exit.type = value
+				-- 	end,
+				-- 	order = 2,
+				-- },
+				exitAnimationDuration = {
+					type = "range",
+					name = G_RLF.L["Exit Animation Duration"],
+					desc = G_RLF.L["ExitAnimationDurationDesc"],
+					min = 0.1,
+					max = 3,
+					step = 0.1,
+					get = function()
+						return G_RLF.db.global.animations.exit.duration
+					end,
+					set = function(info, value)
+						G_RLF.db.global.animations.exit.duration = value
+						G_RLF.LootDisplay:UpdateFadeDelay()
+					end,
+					order = 3,
+				},
 			},
 		},
 	},
