@@ -168,7 +168,6 @@ G_RLF.options.args.features.args.moneyConfig = {
 }
 
 function MoneyConfig:OverrideSound()
-	G_RLF:Print("MoneyConfig:OverrideSound")
 	if G_RLF.db.global.money.overrideMoneyLootSound then
 		MuteSoundFile(120)
 		if G_RLF.db.global.money.moneyLootSound ~= "" then

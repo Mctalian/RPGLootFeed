@@ -60,9 +60,7 @@ function Money.Element:new(...)
 	end
 
 	function element:PlaySoundIfEnabled()
-		G_RLF:Print("Money:PlaySoundIfEnabled")
 		if G_RLF.db.global.money.overrideMoneyLootSound and G_RLF.db.global.money.moneyLootSound ~= "" then
-			G_RLF:Print("Playing sound")
 			RunNextFrame(function()
 				PlaySoundFile(G_RLF.db.global.money.moneyLootSound)
 			end)

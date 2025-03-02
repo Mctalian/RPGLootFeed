@@ -65,6 +65,20 @@ function common_stubs.setup_G_RLF(spy)
 						mounts = true,
 						legendary = true,
 					},
+					sounds = {
+						mounts = {
+							enabled = false,
+							sound = "",
+						},
+						legendary = {
+							enabled = false,
+							sound = "",
+						},
+						betterThanEquipped = {
+							enabled = false,
+							sound = "",
+						},
+					},
 				},
 				prof = {
 					skillColor = { 1, 1, 1, 1 },

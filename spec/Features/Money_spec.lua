@@ -59,14 +59,19 @@ describe("Money module", function()
 	end)
 
 	it("Money:PLAYER_MONEY updates startingMoney and creates a new element", function()
+		local fakeElement = { Show = function() end, PlaySoundIfEnabled = function() end }
 		stub(_G, "GetMoney").returns(3000)
-		stub(MoneyModule.Element, "new").returns({ Show = function() end })
+		stub(MoneyModule.Element, "new").returns(fakeElement)
+		local showSpy = spy.on(fakeElement, "Show")
+		local playSoundSpy = spy.on(fakeElement, "PlaySoundIfEnabled")
 
 		MoneyModule.startingMoney = 1000
 		MoneyModule:PLAYER_MONEY("PLAYER_MONEY")
 
 		assert.equals(MoneyModule.startingMoney, 3000)
 		assert.stub(MoneyModule.Element.new).was_called_with(MoneyModule.Element, 2000)
+		assert.spy(showSpy).was_called()
+		assert.spy(playSoundSpy).was_called()
 
 		MoneyModule.Element.new:revert()
 		_G.GetMoney:revert()
