@@ -2,33 +2,50 @@ local addonName, G_RLF = ...
 
 local ItemConfig = {}
 
+local lsm = G_RLF.lsm
+
 local PricesEnum = G_RLF.PricesEnum
 
 G_RLF.defaults.global.item = {
+	enabled = true,
 	itemCountTextEnabled = true,
 	itemCountTextColor = { 0.737, 0.737, 0.737, 1 },
 	itemCountTextWrapChar = G_RLF.WrapCharEnum.PARENTHESIS,
-}
-G_RLF.defaults.global.itemQualityFilter = {
-	[G_RLF.ItemQualEnum.Poor] = true,
-	[G_RLF.ItemQualEnum.Common] = true,
-	[G_RLF.ItemQualEnum.Uncommon] = true,
-	[G_RLF.ItemQualEnum.Rare] = true,
-	[G_RLF.ItemQualEnum.Epic] = true,
-	[G_RLF.ItemQualEnum.Legendary] = true,
-	[G_RLF.ItemQualEnum.Artifact] = true,
-	[G_RLF.ItemQualEnum.Heirloom] = true,
-}
-G_RLF.defaults.global.auctionHouseSource = G_RLF.L["None"]
-G_RLF.defaults.global.pricesForSellableItems = PricesEnum.Vendor
-G_RLF.defaults.global.itemHighlights = {
-	boe = false,
-	bop = false,
-	quest = false,
-	transmog = false,
-	mounts = true,
-	legendary = true,
-	betterThanEquipped = true,
+	itemQualityFilter = {
+		[G_RLF.ItemQualEnum.Poor] = true,
+		[G_RLF.ItemQualEnum.Common] = true,
+		[G_RLF.ItemQualEnum.Uncommon] = true,
+		[G_RLF.ItemQualEnum.Rare] = true,
+		[G_RLF.ItemQualEnum.Epic] = true,
+		[G_RLF.ItemQualEnum.Legendary] = true,
+		[G_RLF.ItemQualEnum.Artifact] = true,
+		[G_RLF.ItemQualEnum.Heirloom] = true,
+	},
+	itemHighlights = {
+		boe = false,
+		bop = false,
+		quest = false,
+		transmog = false,
+		mounts = true,
+		legendary = true,
+		betterThanEquipped = true,
+	},
+	auctionHouseSource = G_RLF.L["None"],
+	pricesForSellableItems = PricesEnum.Vendor,
+	sounds = {
+		mounts = {
+			enabled = false,
+			sound = "",
+		},
+		legendary = {
+			enabled = false,
+			sound = "",
+		},
+		betterThanEquipped = {
+			enabled = false,
+			sound = "",
+		},
+	},
 }
 
 G_RLF.options.args.features.args.itemLootConfig = {
@@ -43,10 +60,10 @@ G_RLF.options.args.features.args.itemLootConfig = {
 			desc = G_RLF.L["EnableItemLootDesc"],
 			width = "double",
 			get = function()
-				return G_RLF.db.global.itemLootFeed
+				return G_RLF.db.global.item.enabled
 			end,
 			set = function(_, value)
-				G_RLF.db.global.itemLootFeed = value
+				G_RLF.db.global.item.enabled = value
 				if value then
 					G_RLF.RLF:EnableModule("ItemLoot")
 				else
@@ -60,7 +77,7 @@ G_RLF.options.args.features.args.itemLootConfig = {
 			inline = true,
 			name = G_RLF.L["Item Loot Options"],
 			disabled = function()
-				return not G_RLF.db.global.itemLootFeed
+				return not G_RLF.db.global.item.enabled
 			end,
 			order = 1.1,
 			args = {
@@ -145,15 +162,15 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							},
 							get = function(info)
 								if
-									G_RLF.db.global.pricesForSellableItems == PricesEnum.AH
+									G_RLF.db.global.item.pricesForSellableItems == PricesEnum.AH
 									and G_RLF.AuctionIntegrations.numActiveIntegrations == 0
 								then
-									G_RLF.db.global.pricesForSellableItems = PricesEnum.Vendor
+									G_RLF.db.global.item.pricesForSellableItems = PricesEnum.Vendor
 								end
-								return G_RLF.db.global.pricesForSellableItems
+								return G_RLF.db.global.item.pricesForSellableItems
 							end,
 							set = function(info, value)
-								G_RLF.db.global.pricesForSellableItems = value
+								G_RLF.db.global.item.pricesForSellableItems = value
 							end,
 							order = 1,
 						},
@@ -195,7 +212,7 @@ G_RLF.options.args.features.args.itemLootConfig = {
 								local numActiveIntegrations = G_RLF.AuctionIntegrations.numActiveIntegrations
 								local hide = not activeIntegrations or numActiveIntegrations == 0
 								if hide then
-									G_RLF.db.global.auctionHouseSource =
+									G_RLF.db.global.item.auctionHouseSource =
 										G_RLF.AuctionIntegrations.nilIntegration:ToString()
 								end
 								return hide
@@ -205,16 +222,16 @@ G_RLF.options.args.features.args.itemLootConfig = {
 								local numActiveIntegrations = G_RLF.AuctionIntegrations.numActiveIntegrations
 								if
 									not activeIntegrations
-									or not activeIntegrations[G_RLF.db.global.auctionHouseSource]
+									or not activeIntegrations[G_RLF.db.global.item.auctionHouseSource]
 									or numActiveIntegrations == 0
 								then
-									G_RLF.db.global.auctionHouseSource =
+									G_RLF.db.global.item.auctionHouseSource =
 										G_RLF.AuctionIntegrations.nilIntegration:ToString()
 								end
-								return G_RLF.db.global.auctionHouseSource
+								return G_RLF.db.global.item.auctionHouseSource
 							end,
 							set = function(info, value)
-								G_RLF.db.global.auctionHouseSource = value
+								G_RLF.db.global.item.auctionHouseSource = value
 								if value ~= G_RLF.AuctionIntegrations.nilIntegration:ToString() then
 									G_RLF.AuctionIntegrations.activeIntegration =
 										G_RLF.AuctionIntegrations.activeIntegrations[value]
@@ -243,10 +260,10 @@ G_RLF.options.args.features.args.itemLootConfig = {
 					},
 					width = "double",
 					get = function(info, quality)
-						return G_RLF.db.global.itemQualityFilter[quality]
+						return G_RLF.db.global.item.itemQualityFilter[quality]
 					end,
 					set = function(info, quality, value)
-						G_RLF.db.global.itemQualityFilter[quality] = value
+						G_RLF.db.global.item.itemQualityFilter[quality] = value
 					end,
 					order = 2,
 				},
@@ -263,10 +280,10 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							desc = G_RLF.L["HighlightMountsDesc"],
 							width = "double",
 							get = function(info)
-								return G_RLF.db.global.itemHighlights.mounts
+								return G_RLF.db.global.item.itemHighlights.mounts
 							end,
 							set = function(info, value)
-								G_RLF.db.global.itemHighlights.mounts = value
+								G_RLF.db.global.item.itemHighlights.mounts = value
 							end,
 							order = 1,
 						},
@@ -276,10 +293,10 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							desc = G_RLF.L["HighlightLegendaryDesc"],
 							width = "double",
 							get = function(info)
-								return G_RLF.db.global.itemHighlights.legendary
+								return G_RLF.db.global.item.itemHighlights.legendary
 							end,
 							set = function(info, value)
-								G_RLF.db.global.itemHighlights.legendary = value
+								G_RLF.db.global.item.itemHighlights.legendary = value
 							end,
 							order = 2,
 						},
@@ -289,10 +306,10 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							desc = G_RLF.L["HighlightBetterThanEquippedDesc"],
 							width = "double",
 							get = function(info)
-								return G_RLF.db.global.itemHighlights.betterThanEquipped
+								return G_RLF.db.global.item.itemHighlights.betterThanEquipped
 							end,
 							set = function(info, value)
-								G_RLF.db.global.itemHighlights.betterThanEquipped = value
+								G_RLF.db.global.item.itemHighlights.betterThanEquipped = value
 							end,
 							order = 3,
 						},
@@ -301,8 +318,8 @@ G_RLF.options.args.features.args.itemLootConfig = {
 						--   name = G_RLF.L["Highlight BoE Items"],
 						--   desc = G_RLF.L["HighlightBoEDesc"],
 						--   width = "double",
-						--   get = function(info) return G_RLF.db.global.itemHighlights.boe end,
-						--   set = function(info, value) G_RLF.db.global.itemHighlights.boe = value end,
+						--   get = function(info) return G_RLF.db.global.item.itemHighlights.boe end,
+						--   set = function(info, value) G_RLF.db.global.item.itemHighlights.boe = value end,
 						--   order = 3,
 						-- },
 						-- highlightBoP = {
@@ -310,8 +327,8 @@ G_RLF.options.args.features.args.itemLootConfig = {
 						--   name = G_RLF.L["Highlight BoP Items"],
 						--   desc = G_RLF.L["HighlightBoPDesc"],
 						--   width = "double",
-						--   get = function(info) return G_RLF.db.global.itemHighlights.bop end,
-						--   set = function(info, value) G_RLF.db.global.itemHighlights.bop = value end,
+						--   get = function(info) return G_RLF.db.global.item.itemHighlights.bop end,
+						--   set = function(info, value) G_RLF.db.global.item.itemHighlights.bop = value end,
 						--   order = 4,
 						-- },
 						-- highlightQuest = {
@@ -319,8 +336,8 @@ G_RLF.options.args.features.args.itemLootConfig = {
 						--   name = G_RLF.L["Highlight Quest Items"],
 						--   desc = G_RLF.L["HighlightQuestDesc"],
 						--   width = "double",
-						--   get = function(info) return G_RLF.db.global.itemHighlights.quest end,
-						--   set = function(info, value) G_RLF.db.global.itemHighlights.quest = value end,
+						--   get = function(info) return G_RLF.db.global.item.itemHighlights.quest end,
+						--   set = function(info, value) G_RLF.db.global.item.itemHighlights.quest = value end,
 						--   order = 5,
 						-- },
 						-- highlightTransmog = {
@@ -328,13 +345,119 @@ G_RLF.options.args.features.args.itemLootConfig = {
 						--   name = G_RLF.L["Highlight Transmog Items"],
 						--   desc = G_RLF.L["HighlightTransmogDesc"],
 						--   width = "double",
-						--   get = function(info) return G_RLF.db.global.itemHighlights.transmog end,
-						--   set = function(info, value) G_RLF.db.global.itemHighlights.transmog = value end,
+						--   get = function(info) return G_RLF.db.global.item.itemHighlights.transmog end,
+						--   set = function(info, value) G_RLF.db.global.item.itemHighlights.transmog = value end,
 						--   order = 6,
 						-- },
+					},
+				},
+				itemSounds = {
+					type = "group",
+					name = G_RLF.L["Item Loot Sounds"],
+					inline = true,
+					order = 4,
+					args = {
+						mounts = {
+							type = "toggle",
+							name = G_RLF.L["Play Sound for Mounts"],
+							desc = G_RLF.L["PlaySoundForMountsDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.item.sounds.mounts.enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.mounts.enabled = value
+							end,
+							order = 1,
+						},
+						mountSound = {
+							type = "select",
+							name = G_RLF.L["Mount Sound"],
+							desc = G_RLF.L["MountSoundDesc"],
+							values = "SoundOptionValues",
+							get = function()
+								return G_RLF.db.global.item.sounds.mounts.sound
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.mounts.sound = value
+							end,
+							disabled = function()
+								return not G_RLF.db.global.item.sounds.mounts.enabled
+							end,
+							order = 2,
+							width = "full",
+						},
+						legendary = {
+							type = "toggle",
+							name = G_RLF.L["Play Sound for Legendary Items"],
+							desc = G_RLF.L["PlaySoundForLegendaryDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.item.sounds.legendary.enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.legendary.enabled = value
+							end,
+							order = 3,
+						},
+						legendarySound = {
+							type = "select",
+							name = G_RLF.L["Legendary Sound"],
+							desc = G_RLF.L["LegendarySoundDesc"],
+							values = "SoundOptionValues",
+							get = function()
+								return G_RLF.db.global.item.sounds.legendary.sound
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.legendary.sound = value
+							end,
+							disabled = function()
+								return not G_RLF.db.global.item.sounds.legendary.enabled
+							end,
+							order = 4,
+							width = "full",
+						},
+						betterThanEquipped = {
+							type = "toggle",
+							name = G_RLF.L["Play Sound for Items Better Than Equipped"],
+							desc = G_RLF.L["PlaySoundForBetterDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.item.sounds.betterThanEquipped.enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.betterThanEquipped.enabled = value
+							end,
+							order = 5,
+						},
+						betterThanEquippedSound = {
+							type = "select",
+							name = G_RLF.L["Better Than Equipped Sound"],
+							desc = G_RLF.L["BetterThanEquippedSoundDesc"],
+							values = "SoundOptionValues",
+							get = function()
+								return G_RLF.db.global.item.sounds.betterThanEquipped.sound
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.betterThanEquipped.sound = value
+							end,
+							disabled = function()
+								return not G_RLF.db.global.item.sounds.betterThanEquipped.enabled
+							end,
+							width = "full",
+							order = 6,
+						},
 					},
 				},
 			},
 		},
 	},
 }
+
+function ItemConfig:SoundOptionValues()
+	local sounds = {}
+	for k, v in pairs(lsm:HashTable(lsm.MediaType.SOUND)) do
+		sounds[v] = k
+	end
+	return sounds
+end

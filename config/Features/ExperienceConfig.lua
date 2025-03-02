@@ -3,6 +3,7 @@ local addonName, G_RLF = ...
 local ExperienceConfig = {}
 
 G_RLF.defaults.global.xp = {
+	enabled = true,
 	experienceTextColor = { 1, 0, 1, 0.8 },
 	showCurrentLevel = true,
 	currentLevelColor = { 0.749, 0.737, 0.012, 1 },
@@ -21,10 +22,10 @@ G_RLF.options.args.features.args.experienceConfig = {
 			desc = G_RLF.L["EnableXPDesc"],
 			width = "double",
 			get = function()
-				return G_RLF.db.global.xpFeed
+				return G_RLF.db.global.xp.enabled
 			end,
 			set = function(_, value)
-				G_RLF.db.global.xpFeed = value
+				G_RLF.db.global.xp.enabled = value
 			end,
 			order = 1,
 		},
@@ -34,7 +35,7 @@ G_RLF.options.args.features.args.experienceConfig = {
 			inline = true,
 			order = 2,
 			disabled = function()
-				return not G_RLF.db.global.xpFeed
+				return not G_RLF.db.global.xp.enabled
 			end,
 			args = {
 				experienceTextColor = {

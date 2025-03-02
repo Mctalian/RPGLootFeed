@@ -72,7 +72,7 @@ describe("ItemLoot module", function()
 		local playerName = "PartyMember"
 		local amount = 1
 		local itemId = 18803
-		ns.db.global.enablePartyLoot = true
+		ns.db.global.partyLoot.enabled = true
 		LootModule.nameUnitMap = { PartyMember = "party1" }
 
 		LootModule:CHAT_MSG_LOOT(

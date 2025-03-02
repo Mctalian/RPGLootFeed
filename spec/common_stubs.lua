@@ -48,13 +48,37 @@ function common_stubs.setup_G_RLF(spy)
 		options = {
 			args = {},
 		},
+		migrations = {},
 		db = {
+			locale = {
+				factionMap = {},
+			},
 			global = {
-				currencyFeed = true,
-				factionMaps = {},
-				itemHighlights = {
-					mounts = true,
-					legendary = true,
+				blizzOverrides = {
+					enableAutoLoot = false,
+				},
+				currency = {
+					enabled = true,
+				},
+				item = {
+					itemHighlights = {
+						mounts = true,
+						legendary = true,
+					},
+					sounds = {
+						mounts = {
+							enabled = false,
+							sound = "",
+						},
+						legendary = {
+							enabled = false,
+							sound = "",
+						},
+						betterThanEquipped = {
+							enabled = false,
+							sound = "",
+						},
+					},
 				},
 				prof = {
 					skillColor = { 1, 1, 1, 1 },
@@ -69,6 +93,7 @@ function common_stubs.setup_G_RLF(spy)
 						[6] = true,
 					},
 				},
+				money = {},
 				xp = {
 					experienceTextColor = { 1, 1, 1, 1 },
 				},

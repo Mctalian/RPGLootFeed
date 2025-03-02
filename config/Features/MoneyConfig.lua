@@ -2,12 +2,17 @@ local addonName, G_RLF = ...
 
 local MoneyConfig = {}
 
+local lsm = G_RLF.lsm
+
 G_RLF.defaults.global.money = {
+	enabled = true,
 	showMoneyTotal = true,
 	moneyTotalColor = { 0.333, 0.333, 1.0, 1.0 },
 	moneyTextWrapChar = G_RLF.WrapCharEnum.BAR,
 	abbreviateTotal = true,
 	accountantMode = false,
+	overrideMoneyLootSound = false,
+	moneyLootSound = "",
 }
 
 G_RLF.options.args.features.args.moneyConfig = {
@@ -22,10 +27,10 @@ G_RLF.options.args.features.args.moneyConfig = {
 			desc = G_RLF.L["EnableMoneyDesc"],
 			width = "double",
 			get = function()
-				return G_RLF.db.global.moneyFeed
+				return G_RLF.db.global.money.enabled
 			end,
 			set = function(_, value)
-				G_RLF.db.global.moneyFeed = value
+				G_RLF.db.global.money.enabled = value
 				if value then
 					G_RLF.RLF:EnableModule("Money")
 				else
@@ -39,7 +44,7 @@ G_RLF.options.args.features.args.moneyConfig = {
 			inline = true,
 			name = G_RLF.L["Money Options"],
 			disabled = function()
-				return not G_RLF.db.global.moneyFeed
+				return not G_RLF.db.global.money.enabled
 			end,
 			order = 1.1,
 			args = {
@@ -125,7 +130,61 @@ G_RLF.options.args.features.args.moneyConfig = {
 					end,
 					order = 2,
 				},
+				overrideMoneyLootSound = {
+					type = "toggle",
+					name = G_RLF.L["Override Money Loot Sound"],
+					desc = G_RLF.L["OverrideMoneyLootSoundDesc"],
+					get = function()
+						return G_RLF.db.global.money.overrideMoneyLootSound
+					end,
+					set = function(_, value)
+						G_RLF.db.global.money.overrideMoneyLootSound = value
+						MoneyConfig:OverrideSound()
+					end,
+					width = "double",
+					order = 3,
+				},
+				moneyLootSound = {
+					type = "select",
+					name = G_RLF.L["Money Loot Sound"],
+					desc = G_RLF.L["MoneyLootSoundDesc"],
+					values = "SoundOptionValues",
+					get = function()
+						return G_RLF.db.global.money.moneyLootSound
+					end,
+					set = function(_, value)
+						G_RLF.db.global.money.moneyLootSound = value
+						MoneyConfig:OverrideSound()
+					end,
+					disabled = function()
+						return not G_RLF.db.global.money.overrideMoneyLootSound
+					end,
+					width = "full",
+					order = 4,
+				},
 			},
 		},
 	},
 }
+
+function MoneyConfig:OverrideSound()
+	if G_RLF.db.global.money.overrideMoneyLootSound then
+		MuteSoundFile(120)
+		if G_RLF.db.global.money.moneyLootSound ~= "" then
+			UnmuteSoundFile(G_RLF.db.global.money.moneyLootSound)
+		end
+	else
+		if G_RLF.db.global.money.moneyLootSound == "" then
+			MuteSoundFile(G_RLF.db.global.money.moneyLootSound)
+		end
+		UnmuteSoundFile(120)
+	end
+end
+
+function MoneyConfig:SoundOptionValues()
+	local sounds = {}
+	for k, v in pairs(lsm:HashTable(lsm.MediaType.SOUND)) do
+		sounds[v] = k
+	end
+	return sounds
+end

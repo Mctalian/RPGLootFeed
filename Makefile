@@ -17,7 +17,10 @@ missing_locale_key_check:
 	@poetry run python .scripts/check_for_missing_locale_keys.py
 
 test:
-	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage && $(ROCKSBIN)/luacov
+	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage && $(ROCKSBIN)/luacov && echo "\nCoverage report generated at luacov-html/index.html"
+
+test-only:
+	@$(ROCKSBIN)/busted --tags=only
 
 test-ci:
 	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage -o=TAP && $(ROCKSBIN)/luacov
@@ -38,5 +41,8 @@ check_untracked_files:
 		echo "No untracked files."; \
 	fi
 
-local: missing_locale_key_check check_untracked_files
-	@rm -rf node_modules && .release/local.sh -D
+watch: missing_locale_key_check check_untracked_files
+	@../wow-build-tools/dist/wow-build-tools watch
+
+build: missing_locale_key_check check_untracked_files
+	@../wow-build-tools/dist/wow-build-tools build -d

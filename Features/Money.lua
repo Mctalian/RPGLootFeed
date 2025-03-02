@@ -59,12 +59,20 @@ function Money.Element:new(...)
 		return "    " .. C_CurrencyInfo.GetCoinTextureString(money)
 	end
 
+	function element:PlaySoundIfEnabled()
+		if G_RLF.db.global.money.overrideMoneyLootSound and G_RLF.db.global.money.moneyLootSound ~= "" then
+			RunNextFrame(function()
+				PlaySoundFile(G_RLF.db.global.money.moneyLootSound)
+			end)
+		end
+	end
+
 	return element
 end
 
 function Money:OnInitialize()
 	self.startingMoney = 0
-	if G_RLF.db.global.moneyFeed then
+	if G_RLF.db.global.money.enabled then
 		self:Enable()
 	else
 		self:Disable()
@@ -95,7 +103,13 @@ function Money:PLAYER_MONEY(eventName)
 		local amountInCopper = newMoney - self.startingMoney
 		self.startingMoney = newMoney
 		local e = self.Element:new(amountInCopper)
+		if not e then
+			G_RLF:LogDebug("No money to display", addonName, self.moduleName)
+			return
+		end
+
 		e:Show()
+		e:PlaySoundIfEnabled()
 	end)
 end
 

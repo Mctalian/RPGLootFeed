@@ -60,20 +60,20 @@ function ItemLoot:SetPartyLootFilters()
 end
 
 local function IsMount(info)
-	if G_RLF.db.global.itemHighlights.mounts then
+	if G_RLF.db.global.item.itemHighlights.mounts then
 		return info:IsMount()
 	end
 end
 
 local function IsLegendary(info)
-	if G_RLF.db.global.itemHighlights.legendaries then
+	if G_RLF.db.global.item.itemHighlights.legendaries then
 		return info:IsLegendary()
 	end
 end
 
 local function IsBetterThanEquipped(info)
 	-- Highlight Better Than Equipped
-	if G_RLF.db.global.itemHighlights.betterThanEquipped and info:IsEligibleEquipment() then
+	if G_RLF.db.global.item.itemHighlights.betterThanEquipped and info:IsEligibleEquipment() then
 		local equippedLink
 		local slot = G_RLF.equipSlotMap[info.itemEquipLoc]
 		if type(slot) == "table" then
@@ -144,12 +144,12 @@ function ItemLoot.Element:new(...)
 	element.icon = info.itemTexture
 	element.sellPrice = info.sellPrice
 
-	if not G_RLF.db.global.enablePartyLoot then
+	if not G_RLF.db.global.partyLoot.enabled then
 		element.unit = nil
 	end
 
 	function element:isPassingFilter(itemName, itemQuality)
-		if not G_RLF.db.global.itemQualityFilter[itemQuality] then
+		if not G_RLF.db.global.item.itemQualityFilter[itemQuality] then
 			G_RLF:LogDebug(
 				itemName .. " ignored by quality: " .. ItemLoot:ItemQualityName(itemQuality),
 				addonName,
@@ -183,7 +183,7 @@ function ItemLoot.Element:new(...)
 			return "    " .. name
 		end
 
-		local fontSize = G_RLF.db.global.fontSize
+		local fontSize = G_RLF.db.global.styling.fontSize
 
 		if fromLink ~= "" and fromLink ~= nil then
 			local toItemLevel, fromItemLevel = getItemLevels(itemLink, fromLink)
@@ -196,7 +196,7 @@ function ItemLoot.Element:new(...)
 		local atlasIconSize = fontSize * 1.5
 		local atlasIcon
 		local unitPrice
-		local pricesForSellableItems = G_RLF.db.global.pricesForSellableItems
+		local pricesForSellableItems = G_RLF.db.global.item.pricesForSellableItems
 		if pricesForSellableItems == G_RLF.PricesEnum.Vendor then
 			if not element.sellPrice or element.sellPrice == 0 then
 				return ""
@@ -231,8 +231,33 @@ function ItemLoot.Element:new(...)
 		return ""
 	end
 
+	element.isMount = IsMount(info)
+	element.isLegendary = IsLegendary(info)
+	element.isBetterThanEquipped = IsBetterThanEquipped(info)
+
+	function element:PlaySoundIfEnabled()
+		local soundsConfig = G_RLF.db.global.item.sounds
+		if self.isMount and soundsConfig.mounts.enabled and soundsConfig.mounts.sound ~= "" then
+			RunNextFrame(function()
+				PlaySoundFile(soundsConfig.mounts.sound)
+			end)
+		elseif self.isLegendary and soundsConfig.legendaries.enabled and soundsConfig.legendaries.sound ~= "" then
+			RunNextFrame(function()
+				PlaySoundFile(soundsConfig.legendaries.sound)
+			end)
+		elseif
+			self.isBetterThanEquipped
+			and soundsConfig.betterThanEquipped.enabled
+			and soundsConfig.betterThanEquipped.sound ~= ""
+		then
+			RunNextFrame(function()
+				PlaySoundFile(soundsConfig.betterThanEquipped.sound)
+			end)
+		end
+	end
+
 	function element:SetHighlight()
-		self.highlight = IsMount(info) or IsLegendary(info) or IsBetterThanEquipped(info)
+		self.highlight = self.isMount or self.isLegendary or self.isBetterThanEquipped
 	end
 
 	return element
@@ -242,7 +267,7 @@ function ItemLoot:OnInitialize()
 	self.pendingItemRequests = {}
 	self.pendingPartyRequests = {}
 	self.nameUnitMap = {}
-	if G_RLF.db.global.itemLootFeed then
+	if G_RLF.db.global.item.enabled then
 		self:Enable()
 	else
 		self:Disable()
@@ -268,6 +293,7 @@ function ItemLoot:OnItemReadyToShow(info, amount, fromLink)
 	local e = ItemLoot.Element:new(info, amount, false, fromLink)
 	e:SetHighlight()
 	e:Show(info.itemName, info.itemQuality)
+	e:PlaySoundIfEnabled()
 end
 
 function ItemLoot:OnPartyReadyToShow(info, amount, unit)
@@ -369,7 +395,7 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 	end
 
 	if not me then
-		if not G_RLF.db.global.enablePartyLoot then
+		if not G_RLF.db.global.partyLoot.enabled then
 			G_RLF:LogDebug("Party Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
 			return
 		end

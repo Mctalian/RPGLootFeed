@@ -20,7 +20,7 @@ describe("Experience module", function()
 	end)
 
 	it("does not show xp if the unit target is not player", function()
-		ns.db.global.xpFeed = true
+		ns.db.global.xp.enabled = true
 
 		XpModule:PLAYER_XP_UPDATE("PLAYER_XP_UPDATE", "target")
 
@@ -28,7 +28,7 @@ describe("Experience module", function()
 	end)
 
 	it("does not show xp if the calculated delta is 0", function()
-		ns.db.global.xpFeed = true
+		ns.db.global.xp.enabled = true
 
 		XpModule:PLAYER_ENTERING_WORLD()
 
@@ -38,7 +38,7 @@ describe("Experience module", function()
 	end)
 
 	it("show xp if the player levels up", function()
-		ns.db.global.xpFeed = true
+		ns.db.global.xp.enabled = true
 
 		XpModule:PLAYER_ENTERING_WORLD()
 

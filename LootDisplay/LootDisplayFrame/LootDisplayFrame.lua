@@ -6,8 +6,8 @@ local rows = G_RLF.list()
 local keyRowMap
 
 local function getFrameHeight()
-	local padding = G_RLF.db.global.padding
-	return G_RLF.db.global.maxRows * (G_RLF.db.global.rowHeight + padding) - padding
+	local padding = G_RLF.db.global.sizing.padding
+	return G_RLF.db.global.sizing.maxRows * (G_RLF.db.global.sizing.rowHeight + padding) - padding
 end
 
 local function getNumberOfRows()
@@ -15,11 +15,11 @@ local function getNumberOfRows()
 end
 
 local function getPositioningDetails()
-	local growUp = G_RLF.db.global.growUp
+	local growUp = G_RLF.db.global.styling.growUp
 	-- Position the new row at the bottom (or top if growing down)
 	local vertDir = growUp and "BOTTOM" or "TOP"
 	local opposite = growUp and "TOP" or "BOTTOM"
-	local yOffset = G_RLF.db.global.padding
+	local yOffset = G_RLF.db.global.sizing.padding
 	if not growUp then
 		yOffset = -yOffset
 	end
@@ -71,7 +71,7 @@ end
 function LootDisplayFrameMixin:CreateTab()
 	self.tab = CreateFrame("Button", nil, UIParent, "UIPanelButtonTemplate")
 	self.tab:SetSize(14, 14)
-	if G_RLF.db.global.growUp then
+	if G_RLF.db.global.styling.growUp then
 		self.tab:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", -14, 0)
 	else
 		self.tab:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
@@ -107,7 +107,7 @@ end
 function LootDisplayFrameMixin:UpdateTabVisibility()
 	local inCombat = UnitAffectingCombat("player")
 	local hasItems = getNumberOfRows() > 0
-	local isEnabled = G_RLF.db.global.lootHistoryEnabled
+	local isEnabled = G_RLF.db.global.lootHistory.enabled
 
 	if not inCombat and not hasItems and isEnabled then
 		self.tab:Show()
@@ -124,15 +124,16 @@ function LootDisplayFrameMixin:Load()
 	self.rowHistory = {}
 	self.rowFramePool = CreateFramePool("Frame", self, "LootDisplayRowTemplate")
 	self.vertDir, self.opposite, self.yOffset = getPositioningDetails()
+	local positioningDb = G_RLF.db.global.positioning
 	self:UpdateSize()
 	self:SetPoint(
-		G_RLF.db.global.anchorPoint,
-		_G[G_RLF.db.global.relativePoint],
-		G_RLF.db.global.xOffset,
-		G_RLF.db.global.yOffset
+		positioningDb.anchorPoint,
+		_G[positioningDb.relativePoint],
+		positioningDb.xOffset,
+		positioningDb.yOffset
 	)
 
-	self:SetFrameStrata(G_RLF.db.global.frameStrata) -- Set the frame strata here
+	self:SetFrameStrata(positioningDb.frameStrata) -- Set the frame strata here
 
 	self:ConfigureTestArea()
 	self:CreateTab()
@@ -151,7 +152,7 @@ function LootDisplayFrameMixin:ClearFeed()
 end
 
 function LootDisplayFrameMixin:UpdateSize()
-	self:SetSize(G_RLF.db.global.feedWidth, getFrameHeight())
+	self:SetSize(G_RLF.db.global.sizing.feedWidth, getFrameHeight())
 
 	for row in rows:iterate() do
 		row:UpdateStyles()
@@ -175,10 +176,10 @@ function LootDisplayFrameMixin:OnDragStop()
 
 	-- Save the new position
 	local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
-	G_RLF.db.global.anchorPoint = point
-	G_RLF.db.global.relativePoint = relativeTo or -1
-	G_RLF.db.global.xOffset = xOfs
-	G_RLF.db.global.yOffset = yOfs
+	G_RLF.db.global.positioning.anchorPoint = point
+	G_RLF.db.global.positioning.relativePoint = relativeTo or -1
+	G_RLF.db.global.positioning.xOffset = xOfs
+	G_RLF.db.global.positioning.yOffset = yOfs
 
 	-- Update the frame position
 	G_RLF.LootDisplay:UpdatePosition()
@@ -216,7 +217,7 @@ function LootDisplayFrameMixin:GetRow(key)
 end
 
 function LootDisplayFrameMixin:LeaseRow(key)
-	if getNumberOfRows() >= G_RLF.db.global.maxRows then
+	if getNumberOfRows() >= G_RLF.db.global.sizing.maxRows then
 		-- Skip this, we've already allocated too much
 		return nil
 	end
@@ -270,7 +271,7 @@ function LootDisplayFrameMixin:ReleaseRow(row)
 end
 
 function LootDisplayFrameMixin:StoreRowHistory(row)
-	if not G_RLF.db.global.lootHistoryEnabled then
+	if not G_RLF.db.global.lootHistory.enabled then
 		return
 	end
 
@@ -288,7 +289,7 @@ function LootDisplayFrameMixin:StoreRowHistory(row)
 	table.insert(self.rowHistory, 1, rowData)
 
 	-- Trim the history to the configured limit
-	if #self.rowHistory > G_RLF.db.global.historyLimit then
+	if #self.rowHistory > G_RLF.db.global.lootHistory.historyLimit then
 		table.remove(self.rowHistory) -- Remove the oldest entry to maintain the limit
 	end
 end
@@ -350,9 +351,10 @@ function LootDisplayFrameMixin:CreateHistoryFrame()
 	self.historyFrame:SetScrollChild(self.historyContent)
 
 	self.historyRows = {}
-	for i = 1, G_RLF.db.global.maxRows do
+	local sizingDb = G_RLF.db.global.sizing
+	for i = 1, sizingDb.maxRows do
 		local row = CreateFrame("Frame", nil, self.historyContent, "LootDisplayRowTemplate")
-		row:SetSize(G_RLF.db.global.feedWidth, G_RLF.db.global.rowHeight)
+		row:SetSize(sizingDb.feedWidth, sizingDb.rowHeight)
 		table.insert(self.historyRows, row)
 	end
 
@@ -363,10 +365,11 @@ end
 
 function LootDisplayFrameMixin:UpdateHistoryFrame(offset)
 	offset = offset or 0
-	local padding = G_RLF.db.global.padding
-	local feedWidth = G_RLF.db.global.feedWidth
-	local rowHeight = G_RLF.db.global.rowHeight + padding
-	local visibleRows = G_RLF.db.global.maxRows
+	local sizingDb = G_RLF.db.global.sizing
+	local padding = sizingDb.padding
+	local feedWidth = sizingDb.feedWidth
+	local rowHeight = sizingDb.rowHeight + padding
+	local visibleRows = sizingDb.maxRows
 	local totalRows = #self.rowHistory
 	local contentSize = totalRows * rowHeight - padding
 	local startIndex = math.floor(offset / rowHeight) + 1

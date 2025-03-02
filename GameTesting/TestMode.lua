@@ -211,6 +211,7 @@ local function generateRandomLoot()
 			local module = G_RLF.RLF:GetModule("Money")
 			local e = module.Element:new(copper)
 			e:Show()
+			e:PlaySoundIfEnabled()
 			G_RLF:LogDebug("Copper gained: " .. copper, addonName)
 		end
 
@@ -221,9 +222,11 @@ local function generateRandomLoot()
 			local module = G_RLF.RLF:GetModule("ItemLoot")
 			local e = module.Element:new(info, amountLooted, false)
 			e:Show(info.itemName, info.itemQuality)
+			e:PlaySoundIfEnabled()
+			e:SetHighlight()
 			G_RLF:LogDebug("Item looted: " .. info.itemName, addonName)
 
-			-- 10% chance of iitem loot to show up as a party member
+			-- 10% chance of item loot to show up as a party member
 			if rng < 0.3 then
 				local unit = "player"
 				local module = G_RLF.RLF:GetModule("ItemLoot")
