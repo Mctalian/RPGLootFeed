@@ -45,4 +45,4 @@ watch: missing_locale_key_check check_untracked_files
 	@../wow-build-tools/dist/wow-build-tools watch
 
 build: missing_locale_key_check check_untracked_files
-	@../wow-build-tools/dist/wow-build-tools build -V -d
+	@../wow-build-tools/dist/wow-build-tools build -d
