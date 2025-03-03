@@ -1,0 +1,46 @@
+name: Lua Error Report
+description: Create a report to help us fix a lua error in the project.
+title: "[ERROR]: "
+labels:
+  - lua error
+assignees:
+  - McTalian
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a lua error! Please fill out the details below so we can investigate the issue.
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: A short summary of the bug.
+      placeholder: e.g. Looting an epic item causes a lua error
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Did this occur when you logged in? When you looted something? Does it only occur when you have a certain options configured?
+      placeholder: |
+        1. Enable party loot
+        2. Join a party
+        3. Party member loots an epic item
+        4. Lua error is raised
+    validations:
+      required: true
+  - type: textarea
+    id: lua-error
+    attributes:
+      label: Lua Error
+      description: Please paste the lua error that was raised.
+    validations:
+      required: true
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional Information
+      description: Any additional context, screenshots, or logs (`/rlf log` in game).
+      placeholder: Add any other context about the problem here.

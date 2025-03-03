@@ -1,0 +1,51 @@
+name: Bug Report
+description: Create a report to help us fix a bug in the project.
+title: "[Bug]: "
+labels:
+  - bug
+assignees:
+  - McTalian
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug! Please fill out the details below so we can investigate the issue.
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: A short summary of the bug.
+      placeholder: e.g. The text for party loot overlaps with the party member's icon
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Did this occur when you logged in? When you looted something? Does it only occur when you have a certain options configured?
+      placeholder: |
+        1. Enable party loot
+        2. Join a party
+        3. Party member loots an item
+        4. The text overlaps with the party member's icon
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+      placeholder: For more complicated issues - describe what should happen instead. (In case it is not obvious from the summary)
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened?
+      placeholder: Describe what happened instead. (In case it is not obvious from the summary)
+  - type: textarea
+    id: additional-information
+    attributes:
+      label: Additional Information
+      description: Any additional context, screenshots, or logs (`/rlf log` in game).
+      placeholder: Add any other context about the problem here.
