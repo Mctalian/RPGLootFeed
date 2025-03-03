@@ -71,26 +71,8 @@ jobs:
 
   release:
     needs: [run_tests, i18n_translations]
-    runs-on: ubuntu-latest
     permissions:
       contents: write
-      pull-requests: write
+      actions: write
       issues: write
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run semantic-release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
-        run: npm run semantic-release
+    uses: ./.github/workflows/release.yml

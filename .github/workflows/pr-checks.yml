@@ -100,8 +100,8 @@ jobs:
           echo "NoLibSize: $nolib_size"
           lib_size=$(gh release view --json assets -q '.assets[] | select(.name | endswith(".zip")) | select(.name | contains("-nolib") | not) | .size')
           echo "LibSize: $lib_size"
-          echo "LATEST_RELEASE_NOLIB_SIZE=$nolib_size" >> $GITHUB_ENV
-          echo "LATEST_RELEASE_LIBS_SIZE=$lib_size" >> $GITHUB_ENV
+          echo "LATEST_RELEASE_NOLIB_SIZE=$nolib_size" >> $GITHUB_OUTPUT
+          echo "LATEST_RELEASE_LIBS_SIZE=$lib_size" >> $GITHUB_OUTPUT
 
       - uses: awalsh128/cache-apt-pkgs-action@latest
         with:
@@ -127,24 +127,24 @@ jobs:
         run: |
           FILE1=$(ls .release/RPGLootFeed-*-nolib.zip)
           FILE2=$(ls .release/RPGLootFeed-*.zip | grep -v 'nolib')
-          echo "FILE1=$FILE1" >> $GITHUB_ENV
-          echo "FILE2=$FILE2" >> $GITHUB_ENV
-          echo "TEST_NOLIB_SIZE=$(stat -c%s "$FILE1")" >> $GITHUB_ENV
-          echo "TEST_LIBS_SIZE=$(stat -c%s "$FILE2")" >> $GITHUB_ENV
+          echo "NOLIBZIP=$FILE1" >> $GITHUB_OUTPUT
+          echo "ZIP=$FILE2" >> $GITHUB_OUTPUT
+          echo "TEST_NOLIB_SIZE=$(stat -c%s "$FILE1")" >> $GITHUB_OUTPUT
+          echo "TEST_LIBS_SIZE=$(stat -c%s "$FILE2")" >> $GITHUB_OUTPUT
 
       - name: Upload RPGLootFeed ZIP
         uses: actions/upload-artifact@v4
         id: upload-zips-standard
         with:
           name: pr-pkg
-          path: ${{ env.FILE2 }}
+          path: ${{ steps.capture-filenames.outputs.ZIP }}
 
       - name: Upload RPGLootFeed Nolib ZIP
         uses: actions/upload-artifact@v4
         id: upload-zips-nolib
         with:
           name: pr-pkg-nolib
-          path: ${{ env.FILE1 }}
+          path: ${{ steps.capture-filenames.outputs.NOLIBZIP }}
 
       - name: Post PR comment
         if: env.IS_FORK == 'false'
@@ -157,10 +157,10 @@ jobs:
               context,
               libsUrl: "${{ steps['upload-zips-standard'].outputs.artifact-url }}",
               noLibUrl: "${{ steps['upload-zips-nolib'].outputs.artifact-url }}",
-              latestReleaseStandardSize: process.env.LATEST_RELEASE_LIBS_SIZE,
-              testPkgStandardSize: process.env.TEST_LIBS_SIZE,
-              latestReleaseNoLibSize: process.env.LATEST_RELEASE_NOLIB_SIZE,
-              testPkgNoLibSize: process.env.TEST_NOLIB_SIZE
+              latestReleaseStandardSize: ${{ steps.fetch-release-assets.outputs.LATEST_RELEASE_LIBS_SIZE }},
+              testPkgStandardSize: ${{ steps.capture-filenames.outputs.TEST_LIBS_SIZE }},
+              latestReleaseNoLibSize: ${{ steps.fetch-release-assets.outputs.LATEST_RELEASE_NOLIB_SIZE }},
+              testPkgNoLibSize: ${{ steps.capture-filenames.outputs.TEST_NOLIB_SIZE }},
             });
 
   commitlint:
@@ -181,8 +181,8 @@ jobs:
 
       - name: Install commitlint
         run: |
-          npm install @commitlint/config-angular @commitlint/cli
-          echo "export default {extends: ['@commitlint/config-angular']};" > commitlint.config.js
+          npm install @commitlint/config-conventional @commitlint/cli
+          echo "export default {extends: ['@commitlint/config-conventional']};" > commitlint.config.js
 
       - name: Run commitlint (PR)
         if: ${{ github.event_name == 'pull_request' }}
