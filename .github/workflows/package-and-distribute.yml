@@ -23,7 +23,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Package and release
+      - name: Package and distribute
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
         uses: McTalian/wow-build-tools@v1-beta
