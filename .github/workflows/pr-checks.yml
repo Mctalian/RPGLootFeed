@@ -155,8 +155,8 @@ jobs:
             await script({
               github,
               context,
-              libsUrl: "${{ steps['upload-zips-standard'].outputs.artifact-url }}",
-              noLibUrl: "${{ steps['upload-zips-nolib'].outputs.artifact-url }}",
+              libsUrl: "${{ steps.upload-zips-standard.outputs.artifact-url }}",
+              noLibUrl: "${{ steps.upload-zips-nolib.outputs.artifact-url }}",
               latestReleaseStandardSize: ${{ steps.fetch-release-assets.outputs.LATEST_RELEASE_LIBS_SIZE }},
               testPkgStandardSize: ${{ steps.capture-filenames.outputs.TEST_LIBS_SIZE }},
               latestReleaseNoLibSize: ${{ steps.fetch-release-assets.outputs.LATEST_RELEASE_NOLIB_SIZE }},
