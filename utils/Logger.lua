@@ -21,7 +21,7 @@ local WOWEVENT = G_RLF.LogEventSource.WOWEVENT
 
 local eventSource = {
 	[G_RLF.LogEventSource.ADDON] = true,
-	[WOWEVENT] = false,
+	[WOWEVENT] = true,
 }
 local function OnEventSourceChange(_, _, k, v)
 	eventSource[k] = v
@@ -33,7 +33,7 @@ local info = G_RLF.LogLevel.info
 local warn = G_RLF.LogLevel.warn
 local error = G_RLF.LogLevel.error
 local eventLevel = {
-	[debug] = false,
+	[debug] = true,
 	[info] = true,
 	[warn] = true,
 	[error] = true,
