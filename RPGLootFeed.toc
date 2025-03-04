@@ -5,6 +5,7 @@
 ## Notes: A non-intrusive way to see what you just looted.|n|n|cffFFC700Slash command: /rlf, /rpgLootFeed|r
 ## SavedVariables: RPGLootFeedDB
 ## IconTexture: Interface/AddOns/RPGLootFeed/Icons/logo
+## AddonCompartmentFunc: RLFOpenOptions
 ## Category-enUS: Loot
 ## Category-deDE: Beute
 ## Category-esES: Botín

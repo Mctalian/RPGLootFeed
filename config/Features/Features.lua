@@ -12,6 +12,9 @@ G_RLF.defaults.global.tooltips = {
 		onShift = false,
 	},
 }
+G_RLF.defaults.global.minimap = {
+	hide = true,
+}
 
 G_RLF.mainFeatureOrder = {
 	ItemLoot = 1,
@@ -129,6 +132,24 @@ G_RLF.options.args.features = {
 					get = "GetLootHistorySize",
 					set = "SetLootHistorySize",
 					order = 2,
+				},
+				showMinimapIcon = {
+					type = "toggle",
+					name = G_RLF.L["Show Minimap Icon"],
+					desc = G_RLF.L["ShowMinimapIconDesc"],
+					width = "double",
+					get = function()
+						return not G_RLF.db.global.minimap.hide
+					end,
+					set = function(info, value)
+						G_RLF.db.global.minimap.hide = not value
+						if G_RLF.db.global.minimap.hide then
+							G_RLF.DBIcon:Hide(addonName)
+						else
+							G_RLF.DBIcon:Show(addonName)
+						end
+					end,
+					order = 2.5,
 				},
 				enableTooltip = {
 					type = "toggle",
