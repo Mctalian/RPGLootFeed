@@ -88,3 +88,7 @@ G_RLF.WrapCharEnum = {
 	ANGLE = 5,
 	BAR = 6,
 }
+
+G_RLF.GameSounds = {
+	LOOT_SMALL_COIN = 567428,
+}

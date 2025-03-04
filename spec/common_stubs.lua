@@ -266,6 +266,9 @@ function common_stubs.setup_G_RLF(spy)
 			ANGLE = 5,
 			BAR = 6,
 		},
+		GameSounds = {
+			LOOT_SMALL_COIN = 567428,
+		},
 		IsRetail = spy.new(function()
 			return true
 		end),
@@ -456,6 +459,9 @@ function common_stubs.stub_WoWGlobals(spy)
 	_G.GetLocale = function()
 		return "enUS"
 	end
+
+	_G.MuteSoundFile = function() end
+	_G.UnmuteSoundFile = function() end
 end
 
 function common_stubs.stub_C_CurrencyInfo()
