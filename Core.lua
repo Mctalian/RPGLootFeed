@@ -88,13 +88,7 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 	G_RLF.AuctionIntegrations:Init()
 	if G_RLF.db.global.money.overrideMoneyLootSound then
 		MuteSoundFile(G_RLF.GameSounds.LOOT_SMALL_COIN)
-		if G_RLF.db.global.money.moneyLootSound ~= "" then
-			UnmuteSoundFile(G_RLF.db.global.money.moneyLootSound)
-		end
 	else
-		if G_RLF.db.global.money.moneyLootSound == "" then
-			MuteSoundFile(G_RLF.db.global.money.moneyLootSound)
-		end
 		UnmuteSoundFile(G_RLF.GameSounds.LOOT_SMALL_COIN)
 	end
 end
