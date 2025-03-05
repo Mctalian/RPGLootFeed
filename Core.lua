@@ -21,18 +21,7 @@ G_RLF.lsm = LibStub("LibSharedMedia-3.0")
 G_RLF.Masque = LibStub and LibStub("Masque", true)
 G_RLF.iconGroup = G_RLF.Masque and G_RLF.Masque:Group(addonName)
 local dbName = addonName .. "DB"
-local acd = LibStub("AceConfigDialog-3.0")
-
-function RLF:OpenOptions(button)
-	if button == "LeftButton" then
-		acd:Open(addonName)
-	elseif button == "RightButton" then
-		if G_RLF.db.global.lootHistory.enabled then
-			LootDisplayFrame:ToggleHistoryFrame()
-		end
-	end
-end
-RLFOpenOptions = RLF.OpenOptions
+G_RLF.acd = LibStub("AceConfigDialog-3.0")
 
 local TestMode
 function RLF:OnInitialize()
@@ -42,7 +31,7 @@ function RLF:OnInitialize()
 		type = "launcher",
 		icon = "Interface\\AddOns\\RPGLootFeed\\Icons\\logo.blp",
 		OnClick = function(og_frame, button)
-			RLF:OpenOptions(button)
+			G_RLF:OpenOptions(button)
 		end,
 		OnTooltipShow = function(tooltip)
 			tooltip:AddLine(
@@ -69,7 +58,7 @@ function RLF:OnInitialize()
 		"Interface\\AddOns\\RPGLootFeed\\Sounds\\Pickup_Gold_04.ogg"
 	)
 	G_RLF.DBIcon:Register(addonName, rlfLDB, G_RLF.db.global.minimap)
-	self:Hook(acd, "Open", "OnOptionsOpen")
+	self:Hook(G_RLF.acd, "Open", "OnOptionsOpen")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterChatCommand("rlf", "SlashCommand")
 	self:RegisterChatCommand("RLF", "SlashCommand")
@@ -110,7 +99,7 @@ end
 local currentVersion = "@project-version@"
 function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 	if self.optionsFrame == nil then
-		self.optionsFrame = acd:AddToBlizOptions(addonName, addonName)
+		self.optionsFrame = G_RLF.acd:AddToBlizOptions(addonName, addonName)
 	end
 
 	local isNewVersion = currentVersion ~= G_RLF.db.global.lastVersionLoaded
@@ -141,7 +130,7 @@ function RLF:OnOptionsOpen(...)
 			isOpen = true
 			G_RLF.LootDisplay:SetBoundingBoxVisibility(true)
 			self:ScheduleTimer(function()
-				optionsFrame = acd.OpenFrames[name]
+				optionsFrame = G_RLF.acd.OpenFrames[name]
 				if self:IsHooked(optionsFrame, "Hide") then
 					self:Unhook(optionsFrame, "Hide")
 				end

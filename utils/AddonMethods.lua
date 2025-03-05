@@ -122,3 +122,36 @@ function G_RLF:ExtractDynamicsFromPattern(localeString, segments)
 
 	return nil, nil
 end
+
+local menu = {
+	{ text = addonName, isTitle = true },
+	{
+		text = G_RLF.L["Clear rows"],
+		func = function()
+			G_RLF.LootDisplay:HideLoot()
+		end,
+	},
+}
+local menuFrame = CreateFrame("Frame", addonName .. "MenuFrame", UIParent, "UIDropDownMenuTemplate")
+local LibEasyMenu = LibStub:GetLibrary("LibEasyMenu")
+
+function G_RLF:OpenOptions(button)
+	if button == "LeftButton" then
+		G_RLF.acd:Open(addonName)
+	elseif button == "RightButton" then
+		local tmpMenu = {}
+		for _, item in ipairs(menu) do
+			table.insert(tmpMenu, item)
+		end
+		if G_RLF.db.global.lootHistory.enabled then
+			table.insert(tmpMenu, {
+				text = G_RLF.L["LootHistory"],
+				func = function()
+					LootDisplayFrame:ToggleHistoryFrame()
+				end,
+			})
+		end
+		LibEasyMenu:EasyMenu(tmpMenu, menuFrame, "cursor", 0, 0, "MENU")
+	end
+end
+RLFOpenOptions = G_RLF.OpenOptions

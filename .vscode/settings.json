@@ -42,7 +42,13 @@
     "SetDesaturation",
     "CANCEL",
     "Settings",
-    "NOT_BOUND"
+    "NOT_BOUND",
+    "StaticPopupDialogs",
+    "StaticPopup_Show",
+    "UIDropDownMenu_Initialize",
+    "ToggleDropDownMenu",
+    "UIDropDownMenu_AddButton",
+    "AddonCompartmentFrame"
   ],
   "Lua.workspace.library": [
     "${addons}/busted/module/library",
