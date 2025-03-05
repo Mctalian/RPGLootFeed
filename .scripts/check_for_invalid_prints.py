@@ -25,7 +25,7 @@ def check_print_statements(file_path):
                     {
                         "ruleId": "invalid-print",
                         "message": {
-                            "text": f"Invalid `print`, use `self:Print(...)` or `G_RLF:Print(...)`"
+                            "text": "Invalid `print`, use `self:Print(...)` or `G_RLF:Print(...)`"
                         },
                         "locations": [
                             {
