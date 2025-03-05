@@ -108,12 +108,17 @@ function LootDisplayFrameMixin:UpdateTabVisibility()
 	local inCombat = UnitAffectingCombat("player")
 	local hasItems = getNumberOfRows() > 0
 	local isEnabled = G_RLF.db.global.lootHistory.enabled
+	local hideTab = G_RLF.db.global.lootHistory.hideTab
 
 	if not inCombat and not hasItems and isEnabled then
 		self.tab:Show()
 	else
 		self.tab:Hide()
 		self:HideHistoryFrame()
+	end
+
+	if hideTab then
+		self.tab:Hide()
 	end
 end
 
@@ -145,7 +150,7 @@ function LootDisplayFrameMixin:ClearFeed()
 	while row do
 		local oldRow = row
 		row = row._prev
-		oldRow.FadeOutAnimation:Stop()
+		oldRow.ExitAnimation:Stop()
 		oldRow:Hide()
 		self:ReleaseRow(oldRow)
 	end
@@ -345,6 +350,9 @@ function LootDisplayFrameMixin:CreateHistoryFrame()
 	self.historyFrame = CreateFrame("ScrollFrame", "LootHistoryFrame", UIParent, "UIPanelScrollFrameTemplate")
 	self.historyFrame:SetSize(self:GetSize())
 	self.historyFrame:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
+	self.historyFrame.title = self.historyFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+	self.historyFrame.title:SetPoint("BOTTOMLEFT", self.historyFrame, "TOPLEFT", 0, 0)
+	self.historyFrame.title:SetText(G_RLF.L["Loot History"])
 
 	self.historyContent = CreateFrame("Frame", "LootHistoryFrameContent", self.historyFrame)
 	self.historyContent:SetSize(self:GetSize())

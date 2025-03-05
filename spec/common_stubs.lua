@@ -379,6 +379,25 @@ function common_stubs.setup_G_RLF(spy)
 				CurrencyInfo = _G.C_CurrencyInfo,
 				Item = _G.C_Item,
 			}
+		elseif lib == "LibDataBroker-1.1" then
+			ns.LibStubReturn[lib] = {
+				NewDataObject = function()
+					return {
+						OnClick = spy.new(),
+						OnTooltipShow = spy.new(),
+					}
+				end,
+			}
+		elseif lib == "LibDBIcon-1.0" then
+			ns.LibStubReturn[lib] = {
+				Register = spy.new(),
+				Show = spy.new(),
+				Hide = spy.new(),
+			}
+		elseif lib == "LibEasyMenu" then
+			ns.LibStubReturn[lib] = {
+				EasyMenu = spy.new(),
+			}
 		else
 			error("Unmocked library: " .. lib)
 		end
@@ -391,6 +410,8 @@ end
 function common_stubs.stub_WoWGlobals(spy)
 	common_stubs.stub_Unit_Funcs()
 	common_stubs.stub_Money_Funcs()
+
+	_G.CreateFrame = function() end
 
 	_G.GetExpansionLevel = function()
 		return 10

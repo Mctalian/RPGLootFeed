@@ -21,11 +21,35 @@ G_RLF.lsm = LibStub("LibSharedMedia-3.0")
 G_RLF.Masque = LibStub and LibStub("Masque", true)
 G_RLF.iconGroup = G_RLF.Masque and G_RLF.Masque:Group(addonName)
 local dbName = addonName .. "DB"
-local acd = LibStub("AceConfigDialog-3.0")
+G_RLF.acd = LibStub("AceConfigDialog-3.0")
+
 local TestMode
 function RLF:OnInitialize()
 	G_RLF.db = LibStub("AceDB-3.0"):New(dbName, G_RLF.defaults, true)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
+	local rlfLDB = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
+		type = "launcher",
+		icon = "Interface\\AddOns\\RPGLootFeed\\Icons\\logo.blp",
+		OnClick = function(og_frame, button)
+			G_RLF:OpenOptions(button)
+		end,
+		OnTooltipShow = function(tooltip)
+			tooltip:AddLine(
+				G_RLF:RGBAToHexFormat(1, 0.5, 0, 1)
+					.. addonName
+					.. "|r "
+					.. G_RLF:RGBAToHexFormat(0.2, 0.5, 0.4, 1)
+					.. G_RLF.addonVersion
+					.. "|r"
+			)
+			tooltip:AddLine(" ")
+			tooltip:AddLine(G_RLF.L["LauncherLeftClick"], 1, 1, 1, 1)
+			if G_RLF.db.global.lootHistory.enabled then
+				tooltip:AddLine(G_RLF.L["LauncherRightClick"], 1, 1, 1, 1)
+			end
+		end,
+	})
+	G_RLF.DBIcon = LibStub("LibDBIcon-1.0")
 	local lsm = G_RLF.lsm
 	lsm:Register(lsm.MediaType.FONT, "BAR SADY Regular", "Interface\\AddOns\\RPGLootFeed\\Fonts\\BAR_SADY_Variable.ttf")
 	lsm:Register(
@@ -33,7 +57,8 @@ function RLF:OnInitialize()
 		"LittleRobotSoundFactory - Pickup_Gold_04",
 		"Interface\\AddOns\\RPGLootFeed\\Sounds\\Pickup_Gold_04.ogg"
 	)
-	self:Hook(acd, "Open", "OnOptionsOpen")
+	G_RLF.DBIcon:Register(addonName, rlfLDB, G_RLF.db.global.minimap)
+	self:Hook(G_RLF.acd, "Open", "OnOptionsOpen")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterChatCommand("rlf", "SlashCommand")
 	self:RegisterChatCommand("RLF", "SlashCommand")
@@ -65,8 +90,10 @@ function RLF:SlashCommand(msg, editBox)
 			G_RLF.LootDisplay:HideLoot()
 		elseif msg == "log" then
 			self:GetModule("Logger"):Show()
+		elseif msg == "history" and G_RLF.db.global.lootHistory.enabled then
+			LootDisplayFrame:ToggleHistoryFrame()
 		else
-			acd:Open(addonName)
+			G_RLF.acd:Open(addonName)
 		end
 	end)
 end
@@ -74,7 +101,7 @@ end
 local currentVersion = "@project-version@"
 function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 	if self.optionsFrame == nil then
-		self.optionsFrame = acd:AddToBlizOptions(addonName, addonName)
+		self.optionsFrame = G_RLF.acd:AddToBlizOptions(addonName, addonName)
 	end
 
 	local isNewVersion = currentVersion ~= G_RLF.db.global.lastVersionLoaded
@@ -105,7 +132,7 @@ function RLF:OnOptionsOpen(...)
 			isOpen = true
 			G_RLF.LootDisplay:SetBoundingBoxVisibility(true)
 			self:ScheduleTimer(function()
-				optionsFrame = acd.OpenFrames[name]
+				optionsFrame = G_RLF.acd.OpenFrames[name]
 				if self:IsHooked(optionsFrame, "Hide") then
 					self:Unhook(optionsFrame, "Hide")
 				end

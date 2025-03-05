@@ -145,11 +145,14 @@ function TestMode:IntegrationTest()
 	newRowsExpected = newRowsExpected + runReputationIntegrationTest()
 
 	assertEqual(frame ~= nil, true, "LootDisplayFrame")
-	C_Timer.After(G_RLF.db.global.animations.exit.fadeOutDelay + 5, function()
-		local newHistoryRows = #frame.rowHistory - snapshotRowHistory
-		assertEqual(newHistoryRows, newRowsExpected, "LootDisplayFrame: rowHistory")
-		displayResults()
-	end)
+	C_Timer.After(
+		G_RLF.db.global.animations.exit.fadeOutDelay + G_RLF.db.global.animations.exit.duration + 1,
+		function()
+			local newHistoryRows = #frame.rowHistory - snapshotRowHistory
+			assertEqual(newHistoryRows, newRowsExpected, "LootDisplayFrame: rowHistory")
+			displayResults()
+		end
+	)
 end
 
 -- trunk-ignore-end(no-invalid-prints/invalid-print)

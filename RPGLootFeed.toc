@@ -5,11 +5,12 @@
 ## Notes: A non-intrusive way to see what you just looted.|n|n|cffFFC700Slash command: /rlf, /rpgLootFeed|r
 ## SavedVariables: RPGLootFeedDB
 ## IconTexture: Interface/AddOns/RPGLootFeed/Icons/logo
+## AddonCompartmentFunc: RLFOpenOptions
 ## Category-enUS: Loot
 ## Category-deDE: Beute
 ## Category-esES: Botín
 ## Category-esMX: Botín
-## Category-frFR: Butin 
+## Category-frFR: Butin
 ## Category-itIT: Bottino
 ## Category-koKR: 전리품
 ## Category-ptBR: Saque
@@ -27,8 +28,8 @@ embeds.xml
 #@end-no-lib-strip@
 
 Core.lua
-utils/utils.xml
 locale/locales.xml
+utils/utils.xml
 config/config.xml
 BlizzOverrides/overrides.xml
 Features/features.xml
