@@ -145,12 +145,18 @@ function G_RLF:OpenOptions(button)
 		end
 		if G_RLF.db.global.lootHistory.enabled then
 			table.insert(tmpMenu, {
-				text = G_RLF.L["LootHistory"],
+				text = G_RLF.L["Toggle Loot History"],
 				func = function()
 					LootDisplayFrame:ToggleHistoryFrame()
 				end,
 			})
 		end
+		table.insert(tmpMenu, {
+			text = G_RLF.L["Close"],
+			func = function()
+				CloseDropDownMenus()
+			end,
+		})
 		LibEasyMenu:EasyMenu(tmpMenu, menuFrame, "cursor", 0, 0, "MENU")
 	end
 end

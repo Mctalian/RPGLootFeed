@@ -32,8 +32,9 @@ L["Bars"] = "|Bars|"
 -- Experience
 L["XP"] = true
 
+L["Close"] = true
 L["LauncherLeftClick"] = "|cffeda55fClick|r to open addon config menu."
-L["LauncherRightClick"] = "|cffeda55fRight-click|r to toggle the loot history frame."
+L["LauncherRightClick"] = "|cffeda55fRight-click|r to open a quick-menu."
 
 -- ConfigOptions
 L["Toggle Test Mode"] = true
@@ -46,13 +47,15 @@ L["Features"] = true
 L["FeaturesDesc"] = "Enable or Disable different RPGLootFeed features"
 L["Loot Feeds"] = true
 L["Miscellaneous"] = true
+L["Show Minimap Icon"] = true
+L["ShowMinimapIconDesc"] = "Show the RPGLootFeed minimap icon"
 L["Enable Loot History"] = true
 L["Loot History"] = true
 L["EnableLootHistoryDesc"] = "Store a history of looted items and display them in a separate frame"
 L["Loot History Size"] = true
 L["LootHistorySizeDesc"] = "The maximum number of items to store in the loot history"
-L["Show Minimap Icon"] = true
-L["ShowMinimapIconDesc"] = "Show the RPGLootFeed minimap icon"
+L["Hide Loot History Tab"] = true
+L["HideLootHistoryTabDesc"] = "Hide the loot history tab attached to the Loot Feed"
 L["Enable Party Loot in Feed"] = true
 L["EnablePartyLootDesc"] = "Show party/raid looted items in the Loot Feed"
 L["Enable Item Loot in Feed"] = true

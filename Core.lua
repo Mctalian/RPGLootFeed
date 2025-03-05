@@ -90,8 +90,10 @@ function RLF:SlashCommand(msg, editBox)
 			G_RLF.LootDisplay:HideLoot()
 		elseif msg == "log" then
 			self:GetModule("Logger"):Show()
+		elseif msg == "history" and G_RLF.db.global.lootHistory.enabled then
+			LootDisplayFrame:ToggleHistoryFrame()
 		else
-			self:OpenOptions()
+			G_RLF.acd:Open(addonName)
 		end
 	end)
 end

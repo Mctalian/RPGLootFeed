@@ -4,6 +4,7 @@ local Features = {}
 
 G_RLF.defaults.global.lootHistory = {
 	enabled = true,
+	hideTab = false,
 	historyLimit = 100,
 }
 G_RLF.defaults.global.tooltips = {
@@ -112,7 +113,24 @@ G_RLF.options.args.features = {
 			name = G_RLF.L["Miscellaneous"],
 			order = lastFeature + 1,
 			args = {
-
+				showMinimapIcon = {
+					type = "toggle",
+					name = G_RLF.L["Show Minimap Icon"],
+					desc = G_RLF.L["ShowMinimapIconDesc"],
+					width = "double",
+					get = function()
+						return not G_RLF.db.global.minimap.hide
+					end,
+					set = function(info, value)
+						G_RLF.db.global.minimap.hide = not value
+						if G_RLF.db.global.minimap.hide then
+							G_RLF.DBIcon:Hide(addonName)
+						else
+							G_RLF.DBIcon:Show(addonName)
+						end
+					end,
+					order = 0.5,
+				},
 				enableLootHistory = {
 					type = "toggle",
 					name = G_RLF.L["Enable Loot History"],
@@ -133,21 +151,17 @@ G_RLF.options.args.features = {
 					set = "SetLootHistorySize",
 					order = 2,
 				},
-				showMinimapIcon = {
+				hideLootHistoryTab = {
 					type = "toggle",
-					name = G_RLF.L["Show Minimap Icon"],
-					desc = G_RLF.L["ShowMinimapIconDesc"],
+					name = G_RLF.L["Hide Loot History Tab"],
+					desc = G_RLF.L["HideLootHistoryTabDesc"],
 					width = "double",
 					get = function()
-						return not G_RLF.db.global.minimap.hide
+						return G_RLF.db.global.lootHistory.hideTab
 					end,
 					set = function(info, value)
-						G_RLF.db.global.minimap.hide = not value
-						if G_RLF.db.global.minimap.hide then
-							G_RLF.DBIcon:Hide(addonName)
-						else
-							G_RLF.DBIcon:Show(addonName)
-						end
+						G_RLF.db.global.lootHistory.hideTab = value
+						LootDisplayFrame:UpdateTabVisibility()
 					end,
 					order = 2.5,
 				},
