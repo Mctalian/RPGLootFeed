@@ -27,7 +27,7 @@ local TestMode
 function RLF:OnInitialize()
 	G_RLF.db = LibStub("AceDB-3.0"):New(dbName, G_RLF.defaults, true)
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
-	local rlfLDB = LibStub:GetLibrary("LibDataBroker-1.1"):NewDataObject(addonName, {
+	local rlfLDB = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
 		type = "launcher",
 		icon = "Interface\\AddOns\\RPGLootFeed\\Icons\\logo.blp",
 		OnClick = function(og_frame, button)

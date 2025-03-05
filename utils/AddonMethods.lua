@@ -133,7 +133,7 @@ local menu = {
 	},
 }
 local menuFrame = CreateFrame("Frame", addonName .. "MenuFrame", UIParent, "UIDropDownMenuTemplate")
-local LibEasyMenu = LibStub:GetLibrary("LibEasyMenu")
+local LibEasyMenu = LibStub("LibEasyMenu")
 
 function G_RLF:OpenOptions(button)
 	if button == "LeftButton" then
