@@ -212,6 +212,10 @@ function common_stubs.setup_G_RLF(spy)
 			FADE = "fade",
 			SLIDE = "slide",
 		},
+		ExitAnimationType = {
+			NONE = "none",
+			FADE = "fade",
+		},
 		SlideDirection = {
 			LEFT = "left",
 			RIGHT = "right",
