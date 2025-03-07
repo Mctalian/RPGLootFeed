@@ -992,7 +992,7 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 		end
 
 		RunNextFrame(function()
-			local itemCount = C_Item.GetItemCount(element.key, true, false, true, true)
+			local itemCount = C_Item.GetItemCount(self.id or element.key, true, false, true, true)
 			self:ShowItemCountText(itemCount, {
 				color = G_RLF:RGBAToHexFormat(unpack(itemDb.itemCountTextColor)),
 				wrapChar = itemDb.itemCountTextWrapChar,
