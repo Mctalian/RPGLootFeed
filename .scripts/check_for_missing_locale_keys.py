@@ -2,7 +2,9 @@ import os
 import re
 
 # Directory paths
-base_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+base_dir = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "RPGLootFeed"
+)
 locale_dir = os.path.join(base_dir, "locale")
 enUS_file = os.path.join(locale_dir, "enUS.lua")
 
