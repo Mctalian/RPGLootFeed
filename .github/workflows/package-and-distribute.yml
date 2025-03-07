@@ -27,3 +27,5 @@ jobs:
         env:
           GITHUB_OAUTH: ${{ secrets.GITHUB_TOKEN }}
         uses: McTalian/wow-build-tools@v1-beta
+        with:
+          args: -t ./RPGLootFeed -r ./.release

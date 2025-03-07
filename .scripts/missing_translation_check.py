@@ -88,7 +88,7 @@ def compare_translations(reference_dict, target_dict, locale):
 
 # Step 4: Main function to load files and perform comparison
 def main():
-    locale_dir = "locale"
+    locale_dir = "RPGLootFeed/locale"
     output_directory = ".scripts/.output"
     ignored_files = ["main.lua"]
 

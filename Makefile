@@ -17,13 +17,13 @@ missing_locale_key_check:
 	@poetry run python .scripts/check_for_missing_locale_keys.py
 
 test:
-	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage RPGLootFeed_spec && $(ROCKSBIN)/luacov && echo "\nCoverage report generated at luacov-html/index.html"
+	@rm -rf luacov-html && rm -rf luacov.*out && mkdir -p luacov-html && $(ROCKSBIN)/busted --coverage RPGLootFeed_spec && $(ROCKSBIN)/luacov && echo "\nCoverage report generated at luacov-html/index.html"
 
 test-only:
 	@$(ROCKSBIN)/busted --tags=only RPGLootFeed_spec
 
 test-ci:
-	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage -o=TAP RPGLootFeed_spec && $(ROCKSBIN)/luacov
+	@rm -rf luacov-html && rm -rf luacov.*out && mkdir -p luacov-html && $(ROCKSBIN)/busted --coverage -o=TAP RPGLootFeed_spec && $(ROCKSBIN)/luacov
 
 lua_deps:
 	@luarocks install busted --local
