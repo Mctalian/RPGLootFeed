@@ -112,13 +112,13 @@ jobs:
         if: env.IS_FORK == 'false'
         uses: Mctalian/wow-build-tools@v1-beta
         with:
-          args: -d -t ./RPGLootFeed -r ./.release
+          args: -d -t ./RPGLootFeed -r ./.release --skipChangelog
 
       - name: Package (fork)
         if: env.IS_FORK == 'true'
         uses: Mctalian/wow-build-tools@v1-beta
         with:
-          args: -d -t ./RPGLootFeed -r ./.release -n {package-name}-pr${{github.event.number}}-{nolib}{classic}
+          args: -d -t ./RPGLootFeed -r ./.release --skipChangelog -n {package-name}-pr${{github.event.number}}-{nolib}{classic}
 
       - name: Capture Filenames
         id: capture-filenames

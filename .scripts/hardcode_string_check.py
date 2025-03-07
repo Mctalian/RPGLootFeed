@@ -72,20 +72,13 @@ def main():
         "SmokeTest.lua",
     ]
     ignore_dirs = [
-        ".git",
-        ".github",
-        ".release",
-        ".scripts",
-        ".trunk",
-        ".venv",
+        "Fonts",
         "Icons",
         "locale",
-        "luacov-html",
-        "spec",
     ]
 
     # Scan the current directory
-    issues = scan_directory(".", ignore_files, ignore_dirs)
+    issues = scan_directory("RPGLootFeed", ignore_files, ignore_dirs)
 
     # Output any issues found
     if issues:
