@@ -48,7 +48,16 @@
     "UIDropDownMenu_Initialize",
     "ToggleDropDownMenu",
     "UIDropDownMenu_AddButton",
-    "AddonCompartmentFrame"
+    "AddonCompartmentFrame",
+    "CloseDropDownMenus",
+    "GetFactionInfoByID",
+    "GetFactionInfo",
+    "Auctionator",
+    "TSM_API",
+    "BRANN_COMPANION_INFO_ID",
+    "loadfile",
+    "require",
+    "load"
   ],
   "Lua.workspace.library": [
     "${addons}/busted/module/library",

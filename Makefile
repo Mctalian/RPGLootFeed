@@ -17,13 +17,13 @@ missing_locale_key_check:
 	@poetry run python .scripts/check_for_missing_locale_keys.py
 
 test:
-	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage && $(ROCKSBIN)/luacov && echo "\nCoverage report generated at luacov-html/index.html"
+	@rm -rf luacov-html && rm -rf luacov.*out && mkdir -p luacov-html && $(ROCKSBIN)/busted --coverage RPGLootFeed_spec && $(ROCKSBIN)/luacov && echo "\nCoverage report generated at luacov-html/index.html"
 
 test-only:
-	@$(ROCKSBIN)/busted --tags=only
+	@$(ROCKSBIN)/busted --tags=only RPGLootFeed_spec
 
 test-ci:
-	@rm -rf luacov-html && rm -rf luacov.*out && $(ROCKSBIN)/busted --coverage -o=TAP && $(ROCKSBIN)/luacov
+	@rm -rf luacov-html && rm -rf luacov.*out && mkdir -p luacov-html && $(ROCKSBIN)/busted --coverage -o=TAP RPGLootFeed_spec && $(ROCKSBIN)/luacov
 
 lua_deps:
 	@luarocks install busted --local
@@ -42,7 +42,7 @@ check_untracked_files:
 	fi
 
 watch: missing_locale_key_check check_untracked_files
-	@../wow-build-tools/dist/wow-build-tools watch
+	@../wow-build-tools/dist/wow-build-tools watch -t RPGLootFeed -r ./.release
 
 build: missing_locale_key_check check_untracked_files
-	@../wow-build-tools/dist/wow-build-tools build -d
+	@../wow-build-tools/dist/wow-build-tools build -d -t RPGLootFeed -r ./.release

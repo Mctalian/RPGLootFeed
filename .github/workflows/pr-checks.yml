@@ -110,17 +110,15 @@ jobs:
 
       - name: Package
         if: env.IS_FORK == 'false'
-        uses: BigWigsMods/packager@v2
+        uses: Mctalian/wow-build-tools@v1-beta
         with:
-          args: -d
-          pandoc: "false"
+          args: -d -t ./RPGLootFeed -r ./.release --skipChangelog
 
       - name: Package (fork)
         if: env.IS_FORK == 'true'
-        uses: BigWigsMods/packager@v2
+        uses: Mctalian/wow-build-tools@v1-beta
         with:
-          args: -d -n {package-name}-pr${{github.event.number}}-{nolib}{classic}
-          pandoc: "false"
+          args: -d -t ./RPGLootFeed -r ./.release --skipChangelog -n {package-name}-pr${{github.event.number}}-{nolib}{classic}
 
       - name: Capture Filenames
         id: capture-filenames

@@ -20,10 +20,10 @@ lint:
   ignore:
     - linters: [stylua]
       paths:
-        - locale/**
+        - "*/locale/**"
     - linters: [no-invalid-prints]
       paths:
-        - spec/**
+        - "*_spec/**"
   enabled:
     - taplo@0.9.3
     - stylua@0.20.0
