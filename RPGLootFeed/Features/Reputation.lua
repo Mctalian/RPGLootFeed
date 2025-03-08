@@ -197,14 +197,6 @@ local increasePatterns, decreasePatterns
 function Rep:OnInitialize()
 	locale = GetLocale()
 
-	if GetExpansionLevel() >= G_RLF.Expansion.TWW then
-		self.companionFactionId = C_DelvesUI.GetFactionForCompanion(BRANN_COMPANION_INFO_ID)
-		local factionData = C_Reputation.GetFactionDataByID(self.companionFactionId)
-		if factionData then
-			self.companionFactionName = factionData.name
-		end
-	end
-
 	local increase_consts = {
 		FACTION_STANDING_INCREASED,
 		FACTION_STANDING_INCREASED_ACH_BONUS,
@@ -266,10 +258,12 @@ end
 
 function Rep:OnDisable()
 	self:UnregisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
+	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 end
 
 function Rep:OnEnable()
 	self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
+	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
@@ -283,12 +277,29 @@ function Rep:ParseFactionChangeMessage(message)
 		end
 	end
 	if not faction then
+		G_RLF:LogDebug(
+			"Checking for " .. self.companionFactionName .. " in message " .. message,
+			addonName,
+			self.moduleName
+		)
 		faction, repChange = extractFactionAndRepForDelves(message, self.companionFactionName)
 		if faction then
 			isDelveCompanion = true
 		end
 	end
 	return faction, repChange, isDelveCompanion
+end
+
+function Rep:PLAYER_ENTERING_WORLD(eventName, isLogin, isReload)
+	if GetExpansionLevel() >= G_RLF.Expansion.TWW then
+		if not self.companionFactionId or not self.companionFactionName then
+			self.companionFactionId = C_DelvesUI.GetFactionForCompanion(BRANN_COMPANION_INFO_ID)
+			local factionData = C_Reputation.GetFactionDataByID(self.companionFactionId)
+			if factionData then
+				self.companionFactionName = factionData.name
+			end
+		end
+	end
 end
 
 function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
