@@ -16,7 +16,7 @@ describe("Currency module", function()
 		assert.is_not_nil(ns.LootDisplayProperties)
 
 		-- Load the list module before each test
-		CurrencyModule = assert(loadfile("RPGLootFeed/Features/Currency.lua"))("TestAddon", ns)
+		CurrencyModule = assert(loadfile("RPGLootFeed/Features/Currency/Currency.lua"))("TestAddon", ns)
 	end)
 
 	it("does not show loot if the currency type is nil", function()

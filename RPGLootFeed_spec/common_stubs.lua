@@ -106,6 +106,7 @@ function common_stubs.setup_G_RLF(spy)
 				},
 			},
 		},
+		hiddenCurrencies = {},
 		L = {
 			Issues = "Issues",
 		},

@@ -19,6 +19,7 @@ describe("Reputation module", function()
 		-- Load the list module before each test
 		RepModule = assert(loadfile("RPGLootFeed/Features/Reputation.lua"))("TestAddon", ns)
 		RepModule:OnInitialize()
+		RepModule:PLAYER_ENTERING_WORLD(true, false)
 		ns.SendMessage:clear()
 		ns.LogWarn:clear()
 	end)
