@@ -269,7 +269,12 @@ L["CustomFontsDesc"] = "Customize the font face, font sizing, and font flags to 
 L["Font Face"] = true
 L["FontFaceDesc"] = "The style of the text that will show in the loot feed."
 L["Font Size"] = true
-L["FontSizeDesc"] = "The size of the loot feed text in \"points\"."
+L["FontSizeDesc"] = "The size of he loot feed text in \"points\"."
+L["Font Flags"] = true
+L["FontFlagsDesc"] = "The flags to apply to the loot feed text."
+L["Outline"] = true
+L["Thick Outline"] = true
+L["Monochrome"] = true
 L["Secondary Font Size"] = true
 L["SecondaryFontSizeDesc"] = "The size of the secondary text in the loot feed in \"points\"."
 

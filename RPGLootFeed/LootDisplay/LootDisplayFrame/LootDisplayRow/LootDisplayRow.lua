@@ -36,6 +36,30 @@ function LootDisplayRowMixin:Init()
 	end)
 end
 
+function LootDisplayRowMixin:StopAllAnimations()
+	if self.glowAnimationGroup then
+		self.glowAnimationGroup:Stop()
+	end
+	if self.EnterAnimation then
+		self.EnterAnimation:Stop()
+	end
+	if self.ExitAnimation then
+		self.ExitAnimation:Stop()
+	end
+	if self.HighlightFadeIn then
+		self.HighlightFadeIn:Stop()
+	end
+	if self.HighlightFadeOut then
+		self.HighlightFadeOut:Stop()
+	end
+	if self.HighlightAnimation then
+		self.HighlightAnimation:Stop()
+	end
+	if self.ElementFadeInAnimation then
+		self.ElementFadeInAnimation:Stop()
+	end
+end
+
 function LootDisplayRowMixin:Reset()
 	self:Hide()
 	self:SetAlpha(1)
@@ -70,32 +94,13 @@ function LootDisplayRowMixin:Reset()
 	self.Icon:SetScript("OnMouseUp", nil)
 	self.Icon:SetScript("OnEvent", nil)
 
-	if self.glowAnimationGroup then
-		self.glowAnimationGroup:Stop()
-	end
+	self:StopAllAnimations()
+
 	if self.glowTexture then
 		self.glowTexture:Hide()
 	end
-	if self.EnterAnimation then
-		self.EnterAnimation:Stop()
-	end
-	if self.ExitAnimation then
-		self.ExitAnimation:Stop()
-	end
-	if self.HighlightFadeIn then
-		self.HighlightFadeIn:Stop()
-	end
-	if self.HighlightFadeOut then
-		self.HighlightFadeOut:Stop()
-	end
 	if self.HighlightBGOverlay then
 		self.HighlightBGOverlay:SetAlpha(0)
-	end
-	if self.HighlightAnimation then
-		self.HighlightAnimation:Stop()
-	end
-	if self.ElementFadeInAnimation then
-		self.ElementFadeInAnimation:Stop()
 	end
 
 	self.UnitPortrait:SetTexture(nil)
@@ -325,20 +330,20 @@ function LootDisplayRowMixin:StyleText()
 	local fontFace = stylingDb.fontFace
 	local useFontObjects = stylingDb.useFontObjects
 	local font = stylingDb.font
-	local fontFlags = stylingDb.fontFlags
 	local fontSize = stylingDb.fontSize
+	local fontFlagsString = G_RLF:FontFlagsToString()
 	local secondaryFontSize = stylingDb.secondaryFontSize
 
 	if
 		self.cachedFontFace ~= fontFace
 		or self.cachedFontSize ~= fontSize
 		or self.cachedSecondaryFontSize ~= secondaryFontSize
-		or self.cachedFontFlags ~= fontFlags
+		or self.cachedFontFlags ~= fontFlagsString
 	then
 		self.cachedFontFace = fontFace
 		self.cachedFontSize = fontSize
 		self.cachedSecondaryFontSize = secondaryFontSize
-		self.cachedFontFlags = fontFlags
+		self.cachedFontFlags = fontFlagsString
 		fontChanged = true
 	end
 
@@ -354,9 +359,9 @@ function LootDisplayRowMixin:StyleText()
 			self.SecondaryText:SetFontObject(font)
 		else
 			local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, fontFace)
-			self.PrimaryText:SetFont(fontPath, fontSize, fontFlags)
-			self.ItemCountText:SetFont(fontPath, fontSize, fontFlags)
-			self.SecondaryText:SetFont(fontPath, secondaryFontSize, fontFlags)
+			self.PrimaryText:SetFont(fontPath, fontSize, fontFlagsString)
+			self.ItemCountText:SetFont(fontPath, fontSize, fontFlagsString)
+			self.SecondaryText:SetFont(fontPath, secondaryFontSize, fontFlagsString)
 		end
 	end
 
