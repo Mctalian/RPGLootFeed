@@ -10,7 +10,6 @@ G_RLF.defaults.global.styling = {
 	growUp = true,
 	rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 },
 	rowBackgroundGradientEnd = { 0.1, 0.1, 0.1, 0 },
-	disableRowHighlight = false,
 	enableRowBorder = false,
 	rowBorderSize = 1,
 	rowBorderColor = { 0, 0, 0, 1 },
@@ -73,15 +72,6 @@ G_RLF.options.args.styles = {
 			inline = true,
 			order = 5,
 			args = {
-				rowHighlight = {
-					type = "toggle",
-					name = G_RLF.L["Disable Row Highlight"],
-					desc = G_RLF.L["DisableRowHighlightDesc"],
-					width = "double",
-					get = "GetRowHighlight",
-					set = "SetRowHighlight",
-					order = 1,
-				},
 				rowBordersEnabled = {
 					type = "toggle",
 					name = G_RLF.L["Enable Row Borders"],
@@ -89,7 +79,7 @@ G_RLF.options.args.styles = {
 					width = "double",
 					get = "GetRowBorders",
 					set = "SetRowBorders",
-					order = 2,
+					order = 1,
 				},
 				rowBorderThickness = {
 					type = "range",
@@ -101,7 +91,7 @@ G_RLF.options.args.styles = {
 					disabled = "DisableRowBorders",
 					get = "GetRowBorderThickness",
 					set = "SetRowBorderThickness",
-					order = 3,
+					order = 2,
 				},
 				rowBorderColor = {
 					type = "color",
@@ -111,7 +101,7 @@ G_RLF.options.args.styles = {
 					disabled = "DisableRowColor",
 					get = "GetRowBorderColor",
 					set = "SetRowBorderColor",
-					order = 4,
+					order = 3,
 				},
 				rowBorderClassColors = {
 					type = "toggle",
@@ -120,7 +110,7 @@ G_RLF.options.args.styles = {
 					set = "SetRowBorderClassColors",
 					get = "GetRowBorderClassColors",
 					disabled = "DisableRowBorders",
-					order = 5,
+					order = 4,
 				},
 			},
 		},
@@ -131,7 +121,7 @@ G_RLF.options.args.styles = {
 			width = "double",
 			get = "GetSecondaryRowText",
 			set = "SetSecondaryRowText",
-			order = 5.1,
+			order = 6,
 		},
 		useFontObjects = {
 			type = "toggle",
@@ -140,7 +130,7 @@ G_RLF.options.args.styles = {
 			width = "double",
 			get = "GetUseFontObjects",
 			set = "SetUseFontObjects",
-			order = 6,
+			order = 7,
 		},
 		font = {
 			type = "select",
@@ -151,7 +141,7 @@ G_RLF.options.args.styles = {
 			values = "GetFonts",
 			get = "GetRowFont",
 			set = "SetRowFont",
-			order = 7,
+			order = 8,
 		},
 		customFonts = {
 			type = "group",
@@ -159,7 +149,7 @@ G_RLF.options.args.styles = {
 			desc = G_RLF.L["CustomFontsDesc"],
 			disabled = "DisableCustomFonts",
 			inline = true,
-			order = 8,
+			order = 9,
 			args = {
 				font = {
 					type = "select",
@@ -259,14 +249,6 @@ end
 function Styling:SetGrowUp(info, value)
 	G_RLF.db.global.styling.growUp = value
 	G_RLF.LootDisplay:UpdateRowPositions()
-end
-
-function Styling:GetRowHighlight(info, value)
-	return G_RLF.db.global.styling.disableRowHighlight
-end
-
-function Styling:SetRowHighlight(info, value)
-	G_RLF.db.global.styling.disableRowHighlight = value
 end
 
 function Styling:GetSecondaryRowText(info, value)

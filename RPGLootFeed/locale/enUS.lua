@@ -250,8 +250,6 @@ L["Background Gradient End"] = true
 L["GradientEndDesc"] = "The end color of the row background gradient."
 L["Row Borders"] = true
 L["RowBordersDesc"] = "Customize the row borders."
-L["Disable Row Highlight"] = true
-L["DisableRowHighlightDesc"] = "If checked, don't highlight a row when you loot the same item again and the quanity is updated."
 L["Enable Row Borders"] = true
 L["EnableRowBordersDesc"] = "If checked, show borders around each row in the loot feed."
 L["Row Border Thickness"] = true
@@ -304,6 +302,10 @@ L["Hover Alpha"] = true
 L["HoverAlphaDesc"] = "The alpha of the row highlight when hovered over."
 L["Base Duration"] = true
 L["BaseDurationDesc"] = "The number of seconds the hover animation will take."
+L["Update Animations"] = true
+L["UpdateAnimationsDesc"] = "Customize animations when the quantity is updated on an existing row in the loot feed."
+L["Disable Highlight"] = true
+L["DisableHighlightDesc"] = "If checked, don't highlight a row's border when you loot the same item again and the quanity is updated."
 
 -- ConfigOptions - Blizzard UI Group
 L["Blizzard UI"] = true
