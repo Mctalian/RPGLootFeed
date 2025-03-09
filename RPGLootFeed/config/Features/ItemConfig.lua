@@ -207,6 +207,9 @@ G_RLF.options.args.features.args.itemLootConfig = {
 								end
 								return values
 							end,
+							disabled = function()
+								return G_RLF.db.global.item.pricesForSellableItems ~= PricesEnum.AH
+							end,
 							hidden = function()
 								local activeIntegrations = G_RLF.AuctionIntegrations.activeIntegrations
 								local numActiveIntegrations = G_RLF.AuctionIntegrations.numActiveIntegrations
