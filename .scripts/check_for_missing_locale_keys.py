@@ -1,5 +1,6 @@
 import os
 import re
+from collections import Counter
 
 # Directory paths
 base_dir = os.path.join(
@@ -33,11 +34,22 @@ def get_locale_keys(base_dir):
 # Function to get all defined keys in enUS.lua
 def get_defined_keys(enUS_file):
     defined_keys = set()
+    raw_keys = list()
     with open(enUS_file, "r") as f:
         for line in f:
             if not comment_pattern.match(line):
                 keys = definition_pattern.findall(line)
                 defined_keys.update(keys)
+                raw_keys.extend(keys)
+
+    key_counts = Counter(raw_keys)
+    duplicates = [key for key, count in key_counts.items() if count > 1]
+    if duplicates:
+        print("Duplicate keys defined in enUS.lua")
+        for key in duplicates:
+            print(f'L["{key}"]')
+        print("\nPlease remove the duplicate keys from enUS.lua")
+
     return defined_keys
 
 
@@ -47,6 +59,16 @@ def check_missing_keys():
     defined_keys = get_defined_keys(enUS_file)
 
     missing_keys = locale_keys - defined_keys
+    unused_keys = defined_keys - locale_keys
+    # These are dynamically used keys in retryHook
+    unused_keys.discard("AddLootAlertUnavailable")
+    unused_keys.discard("BossBannerAlertUnavailable")
+    unused_keys.discard("AddMoneyAlertUnavailable")
+    if unused_keys:
+        print("Possibly unused locale keys defined in enUS.lua:\n")
+        for key in unused_keys:
+            print(f'L["{key}"]')
+        print("\nPlease remove the extra keys from enUS.lua\n")
     if missing_keys:
         print("Missing locale keys in enUS.lua:\n")
         for key in missing_keys:

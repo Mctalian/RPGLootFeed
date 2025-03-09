@@ -110,13 +110,13 @@ jobs:
 
       - name: Package
         if: env.IS_FORK == 'false'
-        uses: Mctalian/wow-build-tools@v1-beta
+        uses: McTalian/wow-build-tools@v1-beta
         with:
           args: -d -t ./RPGLootFeed -r ./.release --skipChangelog
 
       - name: Package (fork)
         if: env.IS_FORK == 'true'
-        uses: Mctalian/wow-build-tools@v1-beta
+        uses: McTalian/wow-build-tools@v1-beta
         with:
           args: -d -t ./RPGLootFeed -r ./.release --skipChangelog -n {package-name}-pr${{github.event.number}}-{nolib}{classic}
 
