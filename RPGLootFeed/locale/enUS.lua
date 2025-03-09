@@ -306,6 +306,10 @@ L["Update Animations"] = true
 L["UpdateAnimationsDesc"] = "Customize animations when the quantity is updated on an existing row in the loot feed."
 L["Disable Highlight"] = true
 L["DisableHighlightDesc"] = "If checked, don't highlight a row's border when you loot the same item again and the quanity is updated."
+L["Update Animation Duration"] = true
+L["UpdateAnimationDurationDesc"] = "The number of seconds the update animation will take."
+L["Loop Update Highlight"] = true
+L["LoopUpdateHighlightDesc"] = "If checked, the highlight animation will loop when the quantity is updated."
 
 -- ConfigOptions - Blizzard UI Group
 L["Blizzard UI"] = true

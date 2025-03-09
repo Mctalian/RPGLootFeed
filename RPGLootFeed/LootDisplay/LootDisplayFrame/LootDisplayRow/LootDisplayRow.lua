@@ -491,6 +491,18 @@ function LootDisplayRowMixin:StyleHighlightBorder()
 	if not self.HighlightAnimation then
 		self.HighlightAnimation = self:CreateAnimationGroup()
 		self.HighlightAnimation:SetToFinalAlpha(true)
+	end
+
+	if
+		self.cachedUpdateDisableHighlight ~= G_RLF.db.global.animations.update.disableHighlight
+		or self.cachedUpdateDuration ~= G_RLF.db.global.animations.update.duration
+		or self.cachedUpdateLoop ~= G_RLF.db.global.animations.update.loop
+	then
+		self.cachedUpdateDisableHighlight = G_RLF.db.global.animations.update.disableHighlight
+		self.cachedUpdateDuration = G_RLF.db.global.animations.update.duration
+		self.cachedUpdateLoop = G_RLF.db.global.animations.update.loop
+
+		local duration = G_RLF.db.global.animations.update.duration
 		local borders = {
 			self.TopBorder,
 			self.RightBorder,
@@ -505,9 +517,9 @@ function LootDisplayRowMixin:StyleHighlightBorder()
 				b.fadeIn:SetOrder(1)
 				b.fadeIn:SetFromAlpha(0)
 				b.fadeIn:SetToAlpha(1)
-				b.fadeIn:SetDuration(0.2)
 				b.fadeIn:SetSmoothing("IN_OUT")
 			end
+			b.fadeIn:SetDuration(duration)
 
 			if not b.fadeOut then
 				b.fadeOut = self.HighlightAnimation:CreateAnimation("Alpha")
@@ -515,10 +527,16 @@ function LootDisplayRowMixin:StyleHighlightBorder()
 				b.fadeOut:SetOrder(2)
 				b.fadeOut:SetFromAlpha(1)
 				b.fadeOut:SetToAlpha(0)
-				b.fadeOut:SetDuration(0.2)
 				b.fadeOut:SetStartDelay(0.1)
 				b.fadeOut:SetSmoothing("IN_OUT")
 			end
+			b.fadeOut:SetDuration(duration)
+		end
+
+		if G_RLF.db.global.animations.update.loop then
+			self.HighlightAnimation:SetLooping("BOUNCE")
+		else
+			self.HighlightAnimation:SetLooping("NONE")
 		end
 	end
 end
