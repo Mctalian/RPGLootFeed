@@ -20,6 +20,9 @@ G_RLF.defaults.global.animations = {
 		alpha = 0.25,
 		baseDuration = 0.3,
 	},
+	update = {
+		disableHighlight = false,
+	},
 }
 
 G_RLF.options.args.timing = {
@@ -204,6 +207,27 @@ G_RLF.options.args.timing = {
 						G_RLF.db.global.animations.hover.baseDuration = value
 					end,
 					order = 3,
+				},
+			},
+		},
+		updateAnimations = {
+			type = "group",
+			name = G_RLF.L["Update Animations"],
+			desc = G_RLF.L["UpdateAnimationsDesc"],
+			inline = true,
+			order = 4,
+			args = {
+				disableHighlight = {
+					type = "toggle",
+					name = G_RLF.L["Disable Highlight"],
+					desc = G_RLF.L["DisableHighlightDesc"],
+					get = function()
+						return G_RLF.db.global.animations.update.disableHighlight
+					end,
+					set = function(info, value)
+						G_RLF.db.global.animations.update.disableHighlight = value
+					end,
+					order = 1,
 				},
 			},
 		},

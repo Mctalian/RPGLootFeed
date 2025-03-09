@@ -978,7 +978,7 @@ function LootDisplayRowMixin:UpdateQuantity(element)
 	self:UpdateItemCount(element)
 	self:ShowText(text, r, g, b, a)
 
-	if not G_RLF.db.global.styling.disableRowHighlight then
+	if not G_RLF.db.global.animations.update.disableHighlight then
 		self.HighlightAnimation:Stop()
 		self.HighlightAnimation:Play()
 	end
