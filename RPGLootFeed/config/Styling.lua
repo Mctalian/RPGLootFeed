@@ -19,7 +19,12 @@ G_RLF.defaults.global.styling = {
 	fontFace = "Friz Quadrata TT",
 	fontSize = 10,
 	secondaryFontSize = 8,
-	fontFlags = "",
+	fontFlags = {
+		[G_RLF.FontFlags.NONE] = true,
+		[G_RLF.FontFlags.OUTLINE] = false,
+		[G_RLF.FontFlags.THICKOUTLINE] = false,
+		[G_RLF.FontFlags.MONOCHROME] = false,
+	},
 }
 
 G_RLF.options.args.styles = {
@@ -174,6 +179,25 @@ G_RLF.options.args.styles = {
 					get = "GetRowFontSize",
 					set = "SetRowFontSize",
 					order = 2,
+				},
+				fontFlags = {
+					type = "multiselect",
+					name = G_RLF.L["Font Flags"],
+					desc = G_RLF.L["FontFlagsDesc"],
+					width = "double",
+					values = {
+						[G_RLF.FontFlags.NONE] = G_RLF.L["None"],
+						[G_RLF.FontFlags.OUTLINE] = G_RLF.L["Outline"],
+						[G_RLF.FontFlags.THICKOUTLINE] = G_RLF.L["Thick Outline"],
+						[G_RLF.FontFlags.MONOCHROME] = G_RLF.L["Monochrome"],
+					},
+					get = function(info, key)
+						return G_RLF.db.global.styling.fontFlags[key]
+					end,
+					set = function(info, key, value)
+						G_RLF.db.global.styling.fontFlags[key] = value
+						G_RLF.LootDisplay:UpdateRowStyles()
+					end,
 				},
 				secondaryFontSize = {
 					type = "range",

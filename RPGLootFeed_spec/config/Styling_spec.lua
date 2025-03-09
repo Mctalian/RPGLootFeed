@@ -16,6 +16,12 @@ describe("Styling module", function()
 				DISABLE_MY_LOOT = 3,
 				DISABLE_GROUP_LOOT = 4,
 			},
+			FontFlags = {
+				NONE = "",
+				OUTLINE = "OUTLINE",
+				THICKOUTLINE = "THICKOUTLINE",
+				MONOCHROME = "MONOCHROME",
+			},
 			lsm = {
 				MediaType = {
 					["FONT"] = "font",
