@@ -161,3 +161,18 @@ function G_RLF:OpenOptions(button)
 	end
 end
 RLFOpenOptions = G_RLF.OpenOptions
+
+function G_RLF:TableToCommaSeparatedString(tbl)
+	local result = {}
+	for key, value in pairs(tbl) do
+		if value then
+			table.insert(result, key)
+		end
+	end
+	return table.concat(result, ", ")
+end
+
+function G_RLF:FontFlagsToString()
+	local flags = G_RLF.db.global.styling.fontFlags
+	return self:TableToCommaSeparatedString(flags)
+end
