@@ -1378,7 +1378,10 @@ local function isMouseOverSelfOrChildren(frame)
 end
 
 function LootDisplayRowMixin:SetUpHoverEffect()
-	local highlightedAlpha = 0.25
+	local hoverDb = G_RLF.db.global.animations.hover
+	local highlightedAlpha = hoverDb.alpha
+	local baseDuration = hoverDb.baseDuration
+
 	-- Fade-in animation group
 	if not self.HighlightFadeIn then
 		self.HighlightFadeIn = self.HighlightBGOverlay:CreateAnimationGroup()
@@ -1387,7 +1390,7 @@ function LootDisplayRowMixin:SetUpHoverEffect()
 		local startingAlpha = self.HighlightBGOverlay:GetAlpha()
 		fadeIn:SetFromAlpha(startingAlpha) -- Start from the current alpha
 		fadeIn:SetToAlpha(highlightedAlpha) -- Target alpha for the highlight
-		local duration = 0.3 * (highlightedAlpha - startingAlpha) / highlightedAlpha
+		local duration = baseDuration * (highlightedAlpha - startingAlpha) / highlightedAlpha
 		fadeIn:SetDuration(duration)
 		fadeIn:SetSmoothing("OUT")
 
@@ -1405,7 +1408,7 @@ function LootDisplayRowMixin:SetUpHoverEffect()
 		local startingAlpha = self.HighlightBGOverlay:GetAlpha()
 		fadeOut:SetFromAlpha(startingAlpha) -- Start from the target alpha of the fade-in
 		fadeOut:SetToAlpha(0) -- Return to original alpha
-		local duration = 0.3 * startingAlpha / highlightedAlpha
+		local duration = baseDuration * startingAlpha / highlightedAlpha
 		fadeOut:SetDuration(duration)
 		fadeOut:SetSmoothing("IN")
 		-- fadeOut:SetStartDelay(0.15) -- Delay before starting the fade-out
@@ -1418,7 +1421,7 @@ function LootDisplayRowMixin:SetUpHoverEffect()
 
 	-- OnEnter: Play fade-in animation
 	self:SetScript("OnEnter", function()
-		if self.hasMouseOver then
+		if self.hasMouseOver or not G_RLF.db.global.animations.hover.enabled then
 			return
 		end
 		self.hasMouseOver = true

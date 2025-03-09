@@ -15,6 +15,11 @@ G_RLF.defaults.global.animations = {
 		duration = 1,
 		fadeOutDelay = 5,
 	},
+	hover = {
+		enabled = true,
+		alpha = 0.25,
+		baseDuration = 0.3,
+	},
 }
 
 G_RLF.options.args.timing = {
@@ -140,6 +145,63 @@ G_RLF.options.args.timing = {
 					set = function(info, value)
 						G_RLF.db.global.animations.exit.duration = value
 						G_RLF.LootDisplay:UpdateFadeDelay()
+					end,
+					order = 3,
+				},
+			},
+		},
+		hoverAnimations = {
+			type = "group",
+			name = G_RLF.L["Hover Animation"],
+			desc = G_RLF.L["HoverAnimationDesc"],
+			inline = true,
+			order = 3,
+			args = {
+				enabled = {
+					type = "toggle",
+					name = G_RLF.L["Enable Hover Animation"],
+					desc = G_RLF.L["EnableHoverAnimationDesc"],
+					get = function()
+						return G_RLF.db.global.animations.hover.enabled
+					end,
+					set = function(info, value)
+						G_RLF.db.global.animations.hover.enabled = value
+					end,
+					order = 1,
+				},
+				alpha = {
+					type = "range",
+					name = G_RLF.L["Hover Alpha"],
+					desc = G_RLF.L["HoverAlphaDesc"],
+					min = 0,
+					max = 1,
+					step = 0.05,
+					disabled = function()
+						return not G_RLF.db.global.animations.hover.enabled
+					end,
+					get = function()
+						return G_RLF.db.global.animations.hover.alpha
+					end,
+					set = function(info, value)
+						G_RLF.db.global.animations.hover.alpha = value
+					end,
+					order = 2,
+				},
+				baseDuration = {
+					type = "range",
+					name = G_RLF.L["Base Duration"],
+					desc = G_RLF.L["BaseDurationDesc"],
+					min = 0.1,
+					max = 1,
+					step = 0.1,
+					disabled = function()
+						return not G_RLF.db.global.animations.hover.enabled
+					end,
+					get = function()
+						return G_RLF.db.global.animations.hover.baseDuration
+					end,
+					set = function(info, value)
+						G_RLF.db.global.animations.hover.baseDuration = value
 					end,
 					order = 3,
 				},
