@@ -22,6 +22,8 @@ G_RLF.defaults.global.animations = {
 	},
 	update = {
 		disableHighlight = false,
+		duration = 0.2,
+		loop = false,
 	},
 }
 
@@ -228,6 +230,39 @@ G_RLF.options.args.timing = {
 						G_RLF.db.global.animations.update.disableHighlight = value
 					end,
 					order = 1,
+				},
+				duration = {
+					type = "range",
+					name = G_RLF.L["Update Animation Duration"],
+					desc = G_RLF.L["UpdateAnimationDurationDesc"],
+					min = 0.1,
+					max = 1,
+					step = 0.1,
+					disabled = function()
+						return G_RLF.db.global.animations.update.disableHighlight
+					end,
+					get = function()
+						return G_RLF.db.global.animations.update.duration
+					end,
+					set = function(info, value)
+						G_RLF.db.global.animations.update.duration = value
+					end,
+					order = 2,
+				},
+				loop = {
+					type = "toggle",
+					name = G_RLF.L["Loop Update Highlight"],
+					desc = G_RLF.L["LoopUpdateHighlightDesc"],
+					disabled = function()
+						return G_RLF.db.global.animations.update.disableHighlight
+					end,
+					get = function()
+						return G_RLF.db.global.animations.update.loop
+					end,
+					set = function(info, value)
+						G_RLF.db.global.animations.update.loop = value
+					end,
+					order = 3,
 				},
 			},
 		},
