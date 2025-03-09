@@ -275,6 +275,13 @@ L["FontFlagsDesc"] = "The flags to apply to the loot feed text."
 L["Outline"] = true
 L["Thick Outline"] = true
 L["Monochrome"] = true
+L["Shadow Color"] = true
+L["ShadowColorDesc"] = "The color of the shadow behind the loot feed text."
+L["ShadowOffsetHelp"] = "Negative values for shadows to the left or below text. -1 is usually desired for font sizes 8-10. Set both offsets to 0 to disable shadow."
+L["Shadow Offset X"] = true
+L["ShadowOffsetXDesc"] = "The horizontal offset of the shadow behind the loot feed text. Negative values for shadows to the left of text. -1 is usually desired for font sizes 8-10. 0 to disable horizontal shadow."
+L["Shadow Offset Y"] = true
+L["ShadowOffsetYDesc"] = "The vertical offset of the shadow behind the loot feed text. Negative values for shadows below text. -1 is usually desired for font sizes 8-10. 0 to disable vertical shadow."
 L["Secondary Font Size"] = true
 L["SecondaryFontSizeDesc"] = "The size of the secondary text in the loot feed in \"points\"."
 

@@ -25,6 +25,9 @@ G_RLF.defaults.global.styling = {
 		[G_RLF.FontFlags.THICKOUTLINE] = false,
 		[G_RLF.FontFlags.MONOCHROME] = false,
 	},
+	fontShadowColor = { 0, 0, 0, 1 },
+	fontShadowOffsetX = 1,
+	fontShadowOffsetY = -1,
 }
 
 G_RLF.options.args.styles = {
@@ -180,6 +183,20 @@ G_RLF.options.args.styles = {
 					set = "SetRowFontSize",
 					order = 2,
 				},
+				secondaryFontSize = {
+					type = "range",
+					name = G_RLF.L["Secondary Font Size"],
+					desc = G_RLF.L["SecondaryFontSizeDesc"],
+					disabled = "SecondaryTextDisabled",
+					softMin = 6,
+					softMax = 24,
+					min = 1,
+					max = 72,
+					bigStep = 1,
+					get = "GetSecondaryRowFontSize",
+					set = "SetSecondaryRowFontSize",
+					order = 3,
+				},
 				fontFlags = {
 					type = "multiselect",
 					name = G_RLF.L["Font Flags"],
@@ -198,20 +215,61 @@ G_RLF.options.args.styles = {
 						G_RLF.db.global.styling.fontFlags[key] = value
 						G_RLF.LootDisplay:UpdateRowStyles()
 					end,
+					order = 4,
 				},
-				secondaryFontSize = {
+				shadowColor = {
+					type = "color",
+					name = G_RLF.L["Shadow Color"],
+					desc = G_RLF.L["ShadowColorDesc"],
+					hasAlpha = true,
+					get = function(info, value)
+						local r, g, b, a = unpack(G_RLF.db.global.styling.fontShadowColor)
+						return r, g, b, a
+					end,
+					set = function(info, r, g, b, a)
+						G_RLF.db.global.styling.fontShadowColor = { r, g, b, a }
+						G_RLF.LootDisplay:UpdateRowStyles()
+					end,
+					order = 5,
+					width = "double",
+				},
+				shadowHelp = {
+					type = "description",
+					name = G_RLF.L["ShadowOffsetHelp"],
+					order = 5.1,
+					width = "full",
+				},
+				shadowOffsetX = {
 					type = "range",
-					name = G_RLF.L["Secondary Font Size"],
-					desc = G_RLF.L["SecondaryFontSizeDesc"],
-					disabled = "SecondaryTextDisabled",
-					softMin = 6,
-					softMax = 24,
-					min = 1,
-					max = 72,
-					bigStep = 1,
-					get = "GetSecondaryRowFontSize",
-					set = "SetSecondaryRowFontSize",
-					order = 3,
+					name = G_RLF.L["Shadow Offset X"],
+					desc = G_RLF.L["ShadowOffsetXDesc"],
+					min = -10,
+					max = 10,
+					step = 1,
+					get = function(info, value)
+						return G_RLF.db.global.styling.fontShadowOffsetX
+					end,
+					set = function(info, value)
+						G_RLF.db.global.styling.fontShadowOffsetX = value
+						G_RLF.LootDisplay:UpdateRowStyles()
+					end,
+					order = 6,
+				},
+				shadowOffsetY = {
+					type = "range",
+					name = G_RLF.L["Shadow Offset Y"],
+					desc = G_RLF.L["ShadowOffsetYDesc"],
+					min = -10,
+					max = 10,
+					step = 1,
+					get = function(info, value)
+						return G_RLF.db.global.styling.fontShadowOffsetY
+					end,
+					set = function(info, value)
+						G_RLF.db.global.styling.fontShadowOffsetY = value
+						G_RLF.LootDisplay:UpdateRowStyles()
+					end,
+					order = 7,
 				},
 			},
 		},
