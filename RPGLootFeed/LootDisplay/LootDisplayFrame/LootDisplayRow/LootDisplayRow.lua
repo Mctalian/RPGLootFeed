@@ -322,6 +322,20 @@ function LootDisplayRowMixin:StyleUnitPortrait()
 	end
 end
 
+local function ApplyFontStyle(
+	fontString,
+	fontPath,
+	fontSize,
+	fontFlagsString,
+	fontShadowColor,
+	fontShadowOffsetX,
+	fontShadowOffsetY
+)
+	fontString:SetFont(fontPath, fontSize, fontFlagsString)
+	fontString:SetShadowColor(unpack(fontShadowColor))
+	fontString:SetShadowOffset(fontShadowOffsetX or 1, fontShadowOffsetY or -1)
+end
+
 function LootDisplayRowMixin:StyleText()
 	local fontChanged = false
 
@@ -332,6 +346,9 @@ function LootDisplayRowMixin:StyleText()
 	local font = stylingDb.font
 	local fontSize = stylingDb.fontSize
 	local fontFlagsString = G_RLF:FontFlagsToString()
+	local fontShadowColor = stylingDb.fontShadowColor
+	local fontShadowOffsetX = stylingDb.fontShadowOffsetX
+	local fontShadowOffsetY = stylingDb.fontShadowOffsetY
 	local secondaryFontSize = stylingDb.secondaryFontSize
 
 	if
@@ -339,16 +356,19 @@ function LootDisplayRowMixin:StyleText()
 		or self.cachedFontSize ~= fontSize
 		or self.cachedSecondaryFontSize ~= secondaryFontSize
 		or self.cachedFontFlags ~= fontFlagsString
+		or self.cachedUseFontObject ~= useFontObjects
+		or self.cachedFontShadowColor ~= fontShadowColor
+		or self.cachedFontShadowOffsetX ~= fontShadowOffsetX
+		or self.cachedFontShadowOffsetY ~= fontShadowOffsetY
 	then
+		self.cachedUseFontObject = useFontObjects
 		self.cachedFontFace = fontFace
 		self.cachedFontSize = fontSize
 		self.cachedSecondaryFontSize = secondaryFontSize
 		self.cachedFontFlags = fontFlagsString
-		fontChanged = true
-	end
-
-	if self.cachedUseFontObject ~= useFontObjects then
-		self.cachedUseFontObject = useFontObjects
+		self.cachedFontShadowColor = fontShadowColor
+		self.cachedFontShadowOffsetX = fontShadowOffsetX
+		self.cachedFontShadowOffsetY = fontShadowOffsetY
 		fontChanged = true
 	end
 
@@ -359,9 +379,33 @@ function LootDisplayRowMixin:StyleText()
 			self.SecondaryText:SetFontObject(font)
 		else
 			local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, fontFace)
-			self.PrimaryText:SetFont(fontPath, fontSize, fontFlagsString)
-			self.ItemCountText:SetFont(fontPath, fontSize, fontFlagsString)
-			self.SecondaryText:SetFont(fontPath, secondaryFontSize, fontFlagsString)
+			ApplyFontStyle(
+				self.PrimaryText,
+				fontPath,
+				fontSize,
+				fontFlagsString,
+				fontShadowColor,
+				fontShadowOffsetX,
+				fontShadowOffsetY
+			)
+			ApplyFontStyle(
+				self.ItemCountText,
+				fontPath,
+				fontSize,
+				fontFlagsString,
+				fontShadowColor,
+				fontShadowOffsetX,
+				fontShadowOffsetY
+			)
+			ApplyFontStyle(
+				self.SecondaryText,
+				fontPath,
+				secondaryFontSize,
+				fontFlagsString,
+				fontShadowColor,
+				fontShadowOffsetX,
+				fontShadowOffsetY
+			)
 		end
 	end
 
