@@ -18,18 +18,8 @@ L["Money messages Disabled"] = "金钱消息已禁用"
 L["XP messages Disabled"] = "经验值消息已禁用"
 L["Rep messages Disabled"] = "声望消息已禁用"
 
--- 货币聊天消息
-L["Gold"] = "金币"
-L["Silver"] = "银币"
-L["Copper"] = "铜币"
-
 -- 经验值
 L["XP"] = "经验值"
-
--- 配置选项
-L["Toggle Test Mode"] = "切换测试模式"
-L["Clear rows"] = "清除信息流"
-L["Toggle Area"] = "切换区域"
 
 -- 配置选项 - 功能组
 L["Features"] = "功能"
@@ -48,7 +38,6 @@ L["EnableRepDesc"] = "在战利品信息流中显示声望收益"
 -- 配置选项 - 定位组
 L["Toggle Test Mode"] = "切换测试模式"
 L["Clear rows"] = "清除行"
-L["Toggle Area"] = "切换区域"
 L["Positioning"] = "定位"
 L["PositioningDesc"] = "定位并锚定战利品信息流。"
 L["Anchor Relative To"] = "相对于"
@@ -85,7 +74,6 @@ L["RowPaddingDesc"] = "战利品信息流中项目“行”之间的空间量"
 
 -- 配置选项 - 样式组
 L["Styling"] = "样式"
-L["Row Styling"] = "行样式"
 L["StylingDesc"] = "使用自定义颜色、对齐方式等来设置信息流及其元素的样式。"
 L["Left Align"] = "左对齐"
 L["LeftAlignDesc"] = "左对齐行内容（如果未选中，则右对齐）"
@@ -97,8 +85,6 @@ L["Font"] = "字体"
 L["FontDesc"] = "战利品文本的字体对象。"
 
 -- 配置选项 - 定时组
-L["Timing"] = "定时"
-L["TimingDesc"] = "调整淡出延迟和其他与时间相关的选项。"
 L["Fade Out Delay"] = "淡出延迟"
 L["FadeOutDelayDesc"] = "战利品行显示的秒数，之后开始淡出。"
 
@@ -161,8 +147,6 @@ L["UIParent"] = true
 L["PlayerFrame"] = "玩家框架"
 L["Minimap"] = "小地图"
 L["BagBar"] = "背包栏"
-L["Disable Row Highlight"] = "禁用行高亮"
-L["DisableRowHighlightDesc"] = "如果选中，当你再次拾取相同的物品并且数量更新时，不再高亮显示该行。"
 L["AddMoneyAlertUnavailable"] = "MoneyAlertSystem:AddAlert 函数超过30秒无法使用，无法禁用金钱提醒 :("
 L["Use Font Objects"] = "使用字体"
 L["UseFontObjectsDesc"] = "如果选中，使用自定义字体来确定字体样式和字体大小。"
