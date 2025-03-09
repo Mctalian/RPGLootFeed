@@ -26,6 +26,7 @@ G_RLF.acd = LibStub("AceConfigDialog-3.0")
 local TestMode
 function RLF:OnInitialize()
 	G_RLF.db = LibStub("AceDB-3.0"):New(dbName, G_RLF.defaults, true)
+	DbMigrations()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
 	local rlfLDB = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
 		type = "launcher",
@@ -75,7 +76,6 @@ function RLF:OnInitialize()
 	end
 
 	TestMode = self:GetModule("TestMode")
-	DbMigrations()
 end
 
 function RLF:SlashCommand(msg, editBox)
