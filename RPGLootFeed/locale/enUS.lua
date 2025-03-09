@@ -296,6 +296,14 @@ L["Slide Direction"] = true
 L["SlideDirectionDesc"] = "The direction for the row to travel during a slide animation."
 L["Fade Out Delay"] = true
 L["FadeOutDelayDesc"] = "The number of seconds to show the loot row before it fades out."
+L["Hover Animation"] = true
+L["HoverAnimationDesc"] = "Customize animations when hovering over a row in the loot feed."
+L["Enable Hover Animation"] = true
+L["EnableHoverAnimationDesc"] = "If checked, hovering over a row will highlight it."
+L["Hover Alpha"] = true
+L["HoverAlphaDesc"] = "The alpha of the row highlight when hovered over."
+L["Base Duration"] = true
+L["BaseDurationDesc"] = "The number of seconds the hover animation will take."
 
 -- ConfigOptions - Blizzard UI Group
 L["Blizzard UI"] = true
