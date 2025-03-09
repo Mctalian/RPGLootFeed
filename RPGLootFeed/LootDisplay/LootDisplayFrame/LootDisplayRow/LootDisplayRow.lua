@@ -91,6 +91,12 @@ function LootDisplayRowMixin:Reset()
 	if self.HighlightBGOverlay then
 		self.HighlightBGOverlay:SetAlpha(0)
 	end
+	if self.HighlightAnimation then
+		self.HighlightAnimation:Stop()
+	end
+	if self.ElementFadeInAnimation then
+		self.ElementFadeInAnimation:Stop()
+	end
 
 	self.UnitPortrait:SetTexture(nil)
 	self.PrimaryText:SetText(nil)
