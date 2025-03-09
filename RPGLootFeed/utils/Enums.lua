@@ -22,6 +22,13 @@ G_RLF.DisableBossBanner = {
 	DISABLE_GROUP_LOOT = 4,
 }
 
+G_RLF.FontFlags = {
+	NONE = "",
+	OUTLINE = "OUTLINE",
+	THICKOUTLINE = "THICKOUTLINE",
+	MONOCHROME = "MONOCHROME",
+}
+
 G_RLF.ItemQualEnum = {}
 
 if GetExpansionLevel() >= G_RLF.Expansion.BFA then
