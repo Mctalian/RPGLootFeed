@@ -16,11 +16,6 @@ L["Money messages Disabled"] = true
 L["XP messages Disabled"] = true
 L["Rep messages Disabled"] = true
 
--- CHAT_MSG_MONEY
-L["Gold"] = true
-L["Silver"] = true
-L["Copper"] = true
-
 -- Count Text Wrap Character
 L["Spaces"] = " Spaces "
 L["Parentheses"] = "(Parentheses)"
@@ -39,7 +34,6 @@ L["LauncherRightClick"] = "|cffeda55fRight-click|r to open a quick-menu."
 -- ConfigOptions
 L["Toggle Test Mode"] = true
 L["Clear rows"] = true
-L["Toggle Area"] = true
 L["Toggle Loot History"] = true
 
 -- ConfigOptions - Features Group
@@ -193,9 +187,6 @@ L["Skill Text Wrap Character"] = true
 L["SkillTextWrapCharDesc"] = "The characters to wrap the skill text with."
 
 -- ConfigOptions - Positioning Group
-L["Toggle Test Mode"] = true
-L["Clear rows"] = true
-L["Toggle Area"] = true
 L["Positioning"] = true
 L["Drag to Move"] = true
 L["PositioningDesc"] = "Position and anchor the loot feed."
@@ -248,7 +239,6 @@ L["RowPaddingDesc"] = "The amount of space between item 'rows' in the loot feed"
 
 -- ConfigOptions - Styling Group
 L["Styling"] = true
-L["Row Styling"] = true
 L["StylingDesc"] = "Style the feed and its elements with custom colors, alignment, etc."
 L["Left Align"] = true
 L["LeftAlignDesc"] = "Left align row content (right align if unchecked)"
@@ -286,8 +276,6 @@ L["Secondary Font Size"] = true
 L["SecondaryFontSizeDesc"] = "The size of the secondary text in the loot feed in \"points\"."
 
 -- ConfigOptions - Animations Group
-L["Timing"] = true
-L["TimingDesc"] = "Adjust fade out delays and other timing-related options."
 L["Animations"] = true
 L["AnimationsDesc"] = "Customize the animations of the loot feed."
 L["Row Enter Animation"] = true
