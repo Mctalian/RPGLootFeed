@@ -19,7 +19,7 @@ function BossBannerOverride:BossBannerHook()
 		self:RawHookScript(BossBanner, "OnEvent", "InterceptBossBannerAlert")
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	else
-		bossBannerAttempts = G_RLF.retryHook(self, "BossBannerHook", bossBannerAttempts, "BossBannerAlertUnavailable")
+		bossBannerAttempts = G_RLF.retryHook(self, bossBannerAttempts, "BossBannerHook", "BossBannerAlertUnavailable")
 	end
 end
 

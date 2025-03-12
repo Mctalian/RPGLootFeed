@@ -17,7 +17,7 @@ function LootToastOverride:LootToastHook()
 		self:RawHook(LootAlertSystem, "AddAlert", "InterceptAddAlert", true)
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	else
-		lootAlertAttempts = G_RLF.retryHook(self, "LootToastHook", lootAlertAttempts, "AddLootAlertUnavailable")
+		lootAlertAttempts = G_RLF.retryHook(self, lootAlertAttempts, "LootToastHook", "AddLootAlertUnavailable")
 	end
 end
 
