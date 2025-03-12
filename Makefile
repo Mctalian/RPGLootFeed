@@ -44,5 +44,8 @@ check_untracked_files:
 watch: missing_locale_key_check check_untracked_files
 	@../wow-build-tools/dist/wow-build-tools watch -t RPGLootFeed -r ./.release
 
+dev: missing_locale_key_check check_untracked_files
+	@../wow-build-tools/dist/wow-build-tools build -d -t RPGLootFeed -r ./.release --skipChangelog
+
 build: missing_locale_key_check check_untracked_files
 	@../wow-build-tools/dist/wow-build-tools build -d -t RPGLootFeed -r ./.release

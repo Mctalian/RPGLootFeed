@@ -20,7 +20,7 @@ describe("AlphaHelpers", function()
 
 		it("dumps a table to a string", function()
 			local t = { key = "value", nested = { 1, 2, 3 } }
-			local result = dump(t)
+			local result = ns:dump(t)
 
 			local parsed = parse_dumped_table(result)
 
@@ -28,7 +28,7 @@ describe("AlphaHelpers", function()
 		end)
 
 		it("dumps a non-table value to a string", function()
-			local result = dump(123)
+			local result = ns:dump(123)
 			assert.are.equal(result, "123")
 		end)
 	end)

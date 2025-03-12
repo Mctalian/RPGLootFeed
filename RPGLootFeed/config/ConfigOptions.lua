@@ -1,3 +1,4 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
 local ConfigOptions = {}
@@ -64,5 +65,7 @@ function ConfigOptions:ClearRows()
 end
 
 function ConfigOptions:ToggleLootHistory()
-	LootDisplayFrame:ToggleHistoryFrame()
+	---@type RLF_LootDisplayFrame
+	local frame = LootDisplayFrame
+	frame:ToggleHistoryFrame()
 end

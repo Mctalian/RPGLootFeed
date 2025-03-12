@@ -1,5 +1,7 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class BossBannerOverride: RLF_Module, AceEvent, AceHook, AceTimer
 local BossBannerOverride = G_RLF.RLF:NewModule("BossBanner", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 
 function BossBannerOverride:OnInitialize()
@@ -14,7 +16,7 @@ function BossBannerOverride:BossBannerHook()
 		return
 	end
 	if BossBanner then
-		self:RawHookScript(BossBanner, "OnEvent", "InterceptBossBannerAlert", true)
+		self:RawHookScript(BossBanner, "OnEvent", "InterceptBossBannerAlert")
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	else
 		bossBannerAttempts = G_RLF.retryHook(self, "BossBannerHook", bossBannerAttempts, "BossBannerAlertUnavailable")

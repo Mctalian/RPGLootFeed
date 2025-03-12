@@ -1,5 +1,7 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class ItemLoot: RLF_Module, AceEvent
 local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 
 local C = LibStub("C_Everywhere")
@@ -117,11 +119,18 @@ end
 
 local function getItemLevels(toLink, fromLink)
 	local toInfo = ItemInfo:new(C.Item.GetItemIDForItemInfo(toLink), C.Item.GetItemInfo(toLink))
+	if not toInfo then
+		return 0, 0
+	end
 	local fromInfo = ItemInfo:new(C.Item.GetItemIDForItemInfo(fromLink), C.Item.GetItemInfo(fromLink))
+	if not fromInfo then
+		return 0, 0
+	end
 	return toInfo.itemLevel, fromInfo.itemLevel
 end
 
 function ItemLoot.Element:new(...)
+	---@class ItemLoot.Element: RLF_LootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 
@@ -187,6 +196,9 @@ function ItemLoot.Element:new(...)
 
 		if fromLink ~= "" and fromLink ~= nil then
 			local toItemLevel, fromItemLevel = getItemLevels(itemLink, fromLink)
+			if toItemLevel == 0 or fromItemLevel == 0 then
+				return ""
+			end
 			local atlasIconSize = fontSize * 1.5
 			local atlasArrow = "|A:npe_arrowrightglow:" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a"
 			return "    " .. fromItemLevel .. " " .. atlasArrow .. " " .. toItemLevel

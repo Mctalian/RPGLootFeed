@@ -1,0 +1,75 @@
+---@meta _
+---@class ItemButton: Button
+---@field item string|number|nil ItemID, item link, or item name
+---@field itemLink string|nil The item link of the current item
+---@field itemLocation table|nil The location information of the item
+---@field bagID number|nil The bag ID this button is associated with
+---@field matchesSearch boolean|nil Whether the item matches the current search
+---@field itemContextMatchResult number The result of item context matching
+---@field isProfessionItem boolean Whether the item is a profession item
+---@field isCraftedItem boolean Whether the item is a crafted item
+---@field pendingInfo table|nil Pending item information while waiting for item info
+---@field noProfessionQualityOverlay boolean Whether to hide profession quality overlay
+---@field professionQualityOverlayOverride any Override for profession quality display
+---@field showMatchHighlight boolean Shows system-specific highlight when matching current context
+---@field icon Texture The item icon texture
+---@field Count FontString The count text for stackable items
+---@field Stock FontString The stock text display
+---@field searchOverlay Texture Overlay shown when searching
+---@field ItemContextOverlay Texture Overlay for item context display
+---@field IconBorder Texture Border around the item icon
+---@field IconOverlay Texture Primary overlay on the icon
+---@field IconOverlay2 Texture Secondary overlay on the icon
+---@field ProfessionQualityOverlay Texture|nil Overlay showing profession quality
+---@field NormalTexture Texture Normal button texture
+---@field PushedTexture Texture Texture shown when button is pushed
+---@field HighlightTexture Texture Highlight texture when hovering
+---@field GetItemContextMatchResult fun(self: ItemButton): number Function to get item context match results
+---@field OnItemContextChanged fun(self: ItemButton) Called when item context changes
+---@field PostOnShow fun(self: ItemButton) Called after OnShow
+---@field PostOnHide fun(self: ItemButton) Called after OnHide
+---@field PostOnEvent fun(self: ItemButton, event: string, ...) Called after OnEvent
+---@field SetMatchesSearch fun(self: ItemButton, matchesSearch: boolean) Set if item matches search
+---@field GetMatchesSearch fun(self: ItemButton): boolean Get if item matches search
+---@field UpdateItemContextMatching fun(self: ItemButton) Update context matching for item
+---@field UpdateCraftedProfessionsQualityShown fun(self: ItemButton) Update display of profession quality
+---@field GetItemContextOverlayMode fun(self: ItemButton): number|nil Get the overlay mode based on context
+---@field UpdateItemContextOverlay fun(self: ItemButton) Update the item context overlay
+---@field UpdateItemContextOverlayTextures fun(self: ItemButton, contextMode: number) Update overlay textures based on mode
+---@field Reset fun(self: ItemButton) Reset the button to empty state
+---@field SetItemSource fun(self: ItemButton, itemLocation: table|nil) Set the item source location
+---@field SetItemLocation fun(self: ItemButton, itemLocation: table|nil): boolean Set item from location
+---@field SetItem fun(self: ItemButton, item: string|number|nil): boolean Set item by ID, link or name
+---@field SetItemInternal fun(self: ItemButton, item: string|number|nil): boolean Internal method to set the item
+---@field GetItemInfo fun(self: ItemButton): string|nil, number|nil, string|nil Get item link, quality and icon
+---@field GetItemID fun(self: ItemButton): number|nil Get the item ID
+---@field GetItem fun(self: ItemButton): string|number|nil Get the current item
+---@field GetItemLink fun(self: ItemButton): string|nil Get the item link
+---@field GetItemLocation fun(self: ItemButton): table|nil Get the item location
+---@field SetItemButtonCount fun(self: ItemButton, count: number|nil) Set the item count text
+---@field SetItemButtonAnchorPoint fun(self: ItemButton, point: string, x: number, y: number) Set anchor for count text
+---@field SetItemButtonScale fun(self: ItemButton, scale: number) Set the scale of count text
+---@field GetItemButtonCount fun(self: ItemButton): number Get the current count
+---@field SetItemButtonTexture fun(self: ItemButton, texture: string|nil) Set the item icon texture
+---@field SetItemButtonQuality fun(self: ItemButton, quality: number, itemIDOrLink: string|number|nil, suppressOverlays?: boolean, isBound?: boolean) Set the item quality
+---@field SetAlpha fun(self: ItemButton, alpha: number) Set alpha for button elements
+---@field SetBagID fun(self: ItemButton, bagID: number) Set the bag ID
+---@field GetBagID fun(self: ItemButton): number Get the bag ID
+---@field GetSlotAndBagID fun(self: ItemButton): number, number Get slot ID and bag ID
+---@field OnUpdateItemContextMatching fun(self: ItemButton, bagID: number) Update item context matching if bag matches
+---@field RegisterBagButtonUpdateItemContextMatching fun(self: ItemButton) Register for item context updating events
+---@field GetItemButtonIconTexture fun(self: ItemButton): Texture Get the icon texture
+
+---@class AlphaAnimation: Animation
+---@field SetFromAlpha fun(self: AlphaAnimation, fromAlpha: number) Set the starting alpha value
+---@field GetFromAlpha fun(self: AlphaAnimation): number Get the starting alpha value
+---@field SetToAlpha fun(self: AlphaAnimation, toAlpha: number) Set the ending alpha value
+---@field GetToAlpha fun(self: AlphaAnimation): number Get the ending alpha value
+
+---@class TranslationAnimation: Animation
+---@field SetOffset fun(self: TranslationAnimation, xOffset: number, yOffset: number) Set the offset for the translation
+---@field GetOffset fun(self: TranslationAnimation): number, number Get the offset for the translation
+
+---@meta _
+---@class _G
+---@field public SKILL_RANK_UP string

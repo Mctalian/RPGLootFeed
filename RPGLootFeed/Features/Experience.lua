@@ -1,11 +1,14 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class RLF_Experience: RLF_Module, AceEvent
 local Xp = G_RLF.RLF:NewModule("Experience", "AceEvent-3.0")
 local currentXP, currentMaxXP, currentLevel
 
 Xp.Element = {}
 
 function Xp.Element:new(...)
+	---@class Xp.Element: RLF_LootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 

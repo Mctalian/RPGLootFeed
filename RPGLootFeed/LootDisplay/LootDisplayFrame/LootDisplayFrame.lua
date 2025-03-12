@@ -1,7 +1,16 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class RLF_LootDisplayFrame: Frame
+---@field BoundingBox Texture
+---@field InstructionText FontString
+---@field ArrowUp Texture
+---@field ArrowDown Texture
+---@field ArrowLeft Texture
+---@field ArrowRight Texture
 LootDisplayFrameMixin = {}
 
+---@type list<RLF_LootDisplayRow>
 local rows = G_RLF.list()
 local keyRowMap
 
@@ -69,7 +78,7 @@ end
 
 -- Create the tab frame and anchor it to the LootDisplayFrame
 function LootDisplayFrameMixin:CreateTab()
-	self.tab = CreateFrame("Button", nil, UIParent, "UIPanelButtonTemplate")
+	self.tab = CreateFrame("Button", nil, UIParent, "UIPanelButtonTemplate") --[[@as Button]]
 	self.tab:SetSize(14, 14)
 	if G_RLF.db.global.styling.growUp then
 		self.tab:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", -14, 0)
@@ -103,7 +112,7 @@ function LootDisplayFrameMixin:CreateTab()
 	end)
 end
 
--- Function to update the tab visibility based on conditions
+--- Function to update the loot history tab visibility
 function LootDisplayFrameMixin:UpdateTabVisibility()
 	local inCombat = UnitAffectingCombat("player")
 	local hasItems = getNumberOfRows() > 0
@@ -214,7 +223,7 @@ end
 function LootDisplayFrameMixin:MakeUnmovable()
 	self:SetMovable(false)
 	self:EnableMouse(false)
-	self:RegisterForDrag("")
+	self:RegisterForDrag()
 end
 
 function LootDisplayFrameMixin:GetRow(key)
@@ -313,24 +322,13 @@ function LootDisplayFrameMixin:Dump()
 		lastKey = "last nil"
 	end
 
-	local children = { self:GetChildren() }
-	local childrenLog = "["
-	for i, r in ipairs(children) do
-		if i > 0 then
-			childrenLog = childrenLog .. ", "
-		end
-		childrenLog = childrenLog .. r:Dump()
-	end
-	childrenLog = childrenLog .. "]"
-
 	return format(
-		"{getNumberOfRows=%s,#rowFramePool=%s,#keyRowMap=%s,first.key=%s,last.key=%s,frame.children=%s}",
+		"{getNumberOfRows=%s,#rowFramePool=%s,#keyRowMap=%s,first.key=%s,last.key=%s}",
 		getNumberOfRows(),
 		self.rowFramePool:size(),
 		keyRowMap.length,
 		firstKey,
-		lastKey,
-		childrenLog
+		lastKey
 	)
 end
 

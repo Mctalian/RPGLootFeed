@@ -1,7 +1,9 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
-G_RLF.addonVersion = "@project-version@-@project-revision@-@project-abbreviated-hash@"
+G_RLF.addonVersion = "@project-version@-@project-abbreviated-hash@"
 
+---@class RPGLootFeed: AceAddon, AceConsole, AceEvent, AceHook, AceTimer
 local RLF = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 RLF:SetDefaultModuleState(true)
 RLF:SetDefaultModulePrototype({
@@ -9,6 +11,9 @@ RLF:SetDefaultModulePrototype({
 		return G_RLF.fn(s, func, ...)
 	end,
 })
+
+---@class RLF_Module: AceModule
+---@field protected fn fun(self: RLF_Module, func: function, ...?: any): any
 
 local function DbMigrations()
 	for _, migration in ipairs(G_RLF.migrations) do
@@ -21,7 +26,8 @@ G_RLF.lsm = LibStub("LibSharedMedia-3.0")
 G_RLF.Masque = LibStub and LibStub("Masque", true)
 G_RLF.iconGroup = G_RLF.Masque and G_RLF.Masque:Group(addonName)
 local dbName = addonName .. "DB"
-G_RLF.acd = LibStub("AceConfigDialog-3.0")
+G_RLF.acd = LibStub("AceConfigDialog-3.0") --[[@as AceConfigDialog]]
+G_RLF.DBIcon = LibStub("LibDBIcon-1.0")
 
 local TestMode
 function RLF:OnInitialize()
@@ -50,7 +56,7 @@ function RLF:OnInitialize()
 			end
 		end,
 	})
-	G_RLF.DBIcon = LibStub("LibDBIcon-1.0")
+
 	local lsm = G_RLF.lsm
 	lsm:Register(lsm.MediaType.FONT, "BAR SADY Regular", "Interface\\AddOns\\RPGLootFeed\\Fonts\\BAR_SADY_Variable.ttf")
 	lsm:Register(
@@ -91,7 +97,9 @@ function RLF:SlashCommand(msg, editBox)
 		elseif msg == "log" then
 			self:GetModule("Logger"):Show()
 		elseif msg == "history" and G_RLF.db.global.lootHistory.enabled then
-			LootDisplayFrame:ToggleHistoryFrame()
+			---@type RLF_LootDisplayFrame
+			local frame = LootDisplayFrame
+			frame:ToggleHistoryFrame()
 		else
 			G_RLF.acd:Open(addonName)
 		end

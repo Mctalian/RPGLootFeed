@@ -283,7 +283,7 @@ function common_stubs.setup_G_RLF(spy)
 	}
 
 	ns.LibStubReturn = {}
-	_G.LibStub = function(lib)
+	_G.LibStub = function(lib, silence)
 		ns.LibStubReturn[lib] = {}
 		if lib == "AceAddon-3.0" then
 			ns.LibStubReturn[lib] = {
@@ -412,7 +412,7 @@ function common_stubs.stub_WoWGlobals(spy)
 	common_stubs.stub_Unit_Funcs()
 	common_stubs.stub_Money_Funcs()
 
-	_G.CreateFrame = function() end
+	_G.CreateFrame = function(type, name, parent, template) end
 
 	_G.GetExpansionLevel = function()
 		return 10
@@ -434,14 +434,14 @@ function common_stubs.stub_WoWGlobals(spy)
 	}
 
 	_G.C_CVar = {
-		SetCVar = function() end,
+		SetCVar = function(var, val) end,
 	}
 
 	_G.EditModeManagerFrame = {
 		IsInMode = function() end,
 	}
 	_G.EventRegistry = {
-		RegisterCallback = function() end,
+		RegisterCallback = function(self, event, cb) end,
 		SecureInsertEvent = function() end,
 		UnregisterEvents = function() end,
 		TriggerEvent = function() end,
@@ -640,7 +640,7 @@ function common_stubs.stub_WoWGlobals(spy)
 		StopAnimating = function() end,
 	}
 
-	_G.date = function()
+	_G.date = function(format)
 		return "2023-01-01 12:00:00"
 	end
 	_G.debugprofilestop = function()
@@ -683,8 +683,8 @@ function common_stubs.stub_WoWGlobals(spy)
 		return "enUS"
 	end
 
-	_G.MuteSoundFile = function() end
-	_G.UnmuteSoundFile = function() end
+	_G.MuteSoundFile = function(sound) end
+	_G.UnmuteSoundFile = function(sound) end
 end
 
 function common_stubs.stub_C_CurrencyInfo()
@@ -850,21 +850,21 @@ function common_stubs.stub_C_Reputation()
 				}
 			end
 		end,
-		IsMajorFaction = function()
+		IsMajorFaction = function(id)
 			return false
 		end,
-		IsFactionParagon = function()
+		IsFactionParagon = function(id)
 			return false
 		end,
 	}
 	_G.C_GossipInfo = {
-		GetFriendshipReputationRanks = function()
+		GetFriendshipReputationRanks = function(id)
 			return {
 				currentLevel = 3,
 				maxLevel = 60,
 			}
 		end,
-		GetFriendshipReputation = function()
+		GetFriendshipReputation = function(id)
 			return {
 				standing = 63,
 				reactionThreshold = 60,
@@ -879,7 +879,7 @@ function common_stubs.stub_C_DelvesUI()
 		GetCurrentDelvesSeasonNumber = function()
 			return 1
 		end,
-		GetFactionForCompanion = function()
+		GetFactionForCompanion = function(id)
 			return 2640
 		end,
 	}

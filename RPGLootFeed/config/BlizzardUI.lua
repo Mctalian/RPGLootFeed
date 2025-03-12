@@ -1,3 +1,4 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
 local BlizzardUI = {}

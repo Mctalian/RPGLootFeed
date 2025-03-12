@@ -1,5 +1,7 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class RLF_DbMigrations
 local DbMigrations = {}
 
 -- Helper function to get or set a nested table value by path

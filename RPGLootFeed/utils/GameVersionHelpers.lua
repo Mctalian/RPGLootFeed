@@ -1,7 +1,14 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class ClassicToRetail
+---@field ConvertFactionInfoByID fun(s: ClassicToRetail, id: number): table | nil
+---@field ConvertFactionInfoByIndex fun(s: ClassicToRetail, index: number): table | nil
 G_RLF.ClassicToRetail = {}
 
+---Convert faction info from Classic to Retail format
+---@param t table
+---@return table | nil
 local function ConvertFactionInfo(t)
 	if not t[1] then
 		return nil
