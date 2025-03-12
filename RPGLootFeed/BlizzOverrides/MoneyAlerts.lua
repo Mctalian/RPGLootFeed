@@ -17,7 +17,7 @@ function MoneyAlertOverride:MoneyAlertHook()
 		self:RawHook(MoneyWonAlertSystem, "AddAlert", "InterceptMoneyAddAlert", true)
 		self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	else
-		moneyAlertAttempts = G_RLF.retryHook(self, "MoneyAlertHook", moneyAlertAttempts, "AddMoneyAlertUnavailable")
+		moneyAlertAttempts = G_RLF.retryHook(self, moneyAlertAttempts, "MoneyAlertHook", "AddMoneyAlertUnavailable")
 	end
 end
 
