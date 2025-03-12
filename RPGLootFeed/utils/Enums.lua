@@ -1,5 +1,7 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@enum G_RLF.Expansion
 G_RLF.Expansion = {
 	CLASSIC = 0,
 	TBC = 1,
@@ -14,6 +16,7 @@ G_RLF.Expansion = {
 	TWW = 10,
 }
 
+---@enum G_RLF.DisableBossBanner
 G_RLF.DisableBossBanner = {
 	ENABLED = 0,
 	FULLY_DISABLE = 1,
@@ -22,6 +25,7 @@ G_RLF.DisableBossBanner = {
 	DISABLE_GROUP_LOOT = 4,
 }
 
+---@enum G_RLF.FontFlags
 G_RLF.FontFlags = {
 	NONE = "",
 	OUTLINE = "OUTLINE",
@@ -29,6 +33,7 @@ G_RLF.FontFlags = {
 	MONOCHROME = "MONOCHROME",
 }
 
+---@enum G_RLF.ItemQualEnum
 G_RLF.ItemQualEnum = {}
 
 if GetExpansionLevel() >= G_RLF.Expansion.BFA then
@@ -46,11 +51,13 @@ else
 	}
 end
 
+---@enum G_RLF.LogEventSource
 G_RLF.LogEventSource = {
 	ADDON = addonName,
 	WOWEVENT = "WOWEVENT",
 }
 
+---@enum G_RLF.LogLevel
 G_RLF.LogLevel = {
 	debug = "DEBUG",
 	info = "INFO",
@@ -58,6 +65,7 @@ G_RLF.LogLevel = {
 	error = "ERROR",
 }
 
+---@enum G_RLF.FeatureModule
 G_RLF.FeatureModule = {
 	ItemLoot = "ItemLoot",
 	Currency = "Currency",
@@ -67,23 +75,27 @@ G_RLF.FeatureModule = {
 	Profession = "Professions",
 }
 
+---@enum G_RLF.PricesEnum
 G_RLF.PricesEnum = {
 	None = "none",
 	Vendor = "vendor",
 	AH = "ah",
 }
 
+---@enum G_RLF.EnterAnimationType
 G_RLF.EnterAnimationType = {
 	NONE = "none",
 	FADE = "fade",
 	SLIDE = "slide",
 }
 
+---@enum G_RLF.ExitAnimationType
 G_RLF.ExitAnimationType = {
 	NONE = "none",
 	FADE = "fade",
 }
 
+---@enum G_RLF.SlideDirection
 G_RLF.SlideDirection = {
 	UP = "up",
 	DOWN = "down",
@@ -91,6 +103,7 @@ G_RLF.SlideDirection = {
 	RIGHT = "right",
 }
 
+---@enum G_RLF.WrapCharEnum
 G_RLF.WrapCharEnum = {
 	DEFAULT = 0,
 	SPACE = 1,
@@ -101,6 +114,7 @@ G_RLF.WrapCharEnum = {
 	BAR = 6,
 }
 
+---@enum G_RLF.GameSounds
 G_RLF.GameSounds = {
 	LOOT_SMALL_COIN = 567428,
 }

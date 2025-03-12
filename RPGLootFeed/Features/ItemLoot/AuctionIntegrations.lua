@@ -1,9 +1,27 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class AuctionIntegrations
+---@field private initialized boolean
+---@field public activeIntegrations table<string, table>
+---@field public activeIntegration RLF_AH_Integ
+---@field public numActiveIntegrations number
+---@field public nilIntegration RLF_AH_Integ
+---@field public Init fun(self: AuctionIntegrations): nil
+---@field public GetAHPrice fun(self: AuctionIntegrations, itemLink: string): number|nil
 local AuctionIntegrations = {}
+
+---@class RLF_AH_Integ
+---@field public Init fun(self: RLF_AH_Integ): boolean
+---@field public ToString fun(self: RLF_AH_Integ): string
+---@field public GetAHPrice fun(self: RLF_AH_Integ, itemLink: string): number|nil
+local Integ_Base = {}
+
+---@class Integ_Auctionator : RLF_AH_Integ
 local Integ_Auctionator = {}
+
+---@class Integ_TSM : RLF_AH_Integ
 local Integ_TSM = {}
-local Integ_Nil = {}
 
 function AuctionIntegrations:Init()
 	if self.initialized then
@@ -12,7 +30,7 @@ function AuctionIntegrations:Init()
 
 	self.initialized = true
 	local possibleIntegrations = { Integ_Auctionator, Integ_TSM }
-	self.nilIntegration = Integ_Nil
+	self.nilIntegration = Integ_Base
 	self.activeIntegrations = {}
 	self.activeIntegration = nil
 
@@ -33,7 +51,7 @@ function AuctionIntegrations:Init()
 			self.activeIntegration = integration
 		end
 	elseif ahSource then
-		if ahSource == Integ_Nil:ToString() then
+		if ahSource == Integ_Base:ToString() then
 			self.activeIntegration = self.nilIntegration
 		end
 		self.activeIntegration = self.activeIntegrations[ahSource]
@@ -55,18 +73,20 @@ function AuctionIntegrations:GetAHPrice(itemLink)
 	return nil
 end
 
-function Integ_Nil:Init()
+function Integ_Base:Init()
 	return true
 end
 
-function Integ_Nil:ToString()
+function Integ_Base:ToString()
 	return G_RLF.L["None"]
 end
 
-function Integ_Nil:GetAHPrice(itemLink)
+function Integ_Base:GetAHPrice(_)
 	return nil
 end
 
+---Initialize the Auctionator integration
+---@return boolean true if Auctionator is available and initialized
 function Integ_Auctionator:Init()
 	if Auctionator and Auctionator.API and Auctionator.API.v1 and Auctionator.API.v1.GetAuctionPriceByItemLink then
 		Auctionator.API.v1.RegisterForDBUpdate(addonName, function()
@@ -78,10 +98,15 @@ function Integ_Auctionator:Init()
 	return false
 end
 
+---String representation of the Auctionator integration
+---@return string localized "Auctionator"
 function Integ_Auctionator:ToString()
 	return G_RLF.L["Auctionator"]
 end
 
+---Get the AH price for an item
+---@param itemLink string
+---@return number | nil price in copper or nil if not found
 function Integ_Auctionator:GetAHPrice(itemLink)
 	local price = Auctionator.API.v1.GetAuctionPriceByItemLink(addonName, itemLink)
 	if price then
@@ -91,14 +116,21 @@ function Integ_Auctionator:GetAHPrice(itemLink)
 	return nil
 end
 
+---Initialize the TSM integration
+---@return boolean true if TSM is available and initialized
 function Integ_TSM:Init()
 	return TSM_API ~= nil
 end
 
+---String representation of the TSM integration
+---@return string localized "TSM"
 function Integ_TSM:ToString()
 	return G_RLF.L["TSM"]
 end
 
+---Get the AH price for an item
+---@param itemLink string
+---@return number | nil marketValue in copper or nil if not found
 function Integ_TSM:GetAHPrice(itemLink)
 	if TSM_API and TSM_API.ToItemString and TSM_API.GetCustomPriceValue then
 		local itemString = TSM_API.Item:ToItemString(itemLink)

@@ -1,5 +1,7 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class MoneyAlertOverride: RLF_Module, AceEvent, AceHook, AceTimer
 local MoneyAlertOverride = G_RLF.RLF:NewModule("MoneyAlerts", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 
 function MoneyAlertOverride:OnInitialize()

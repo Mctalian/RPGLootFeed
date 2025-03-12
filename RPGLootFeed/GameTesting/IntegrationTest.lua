@@ -1,7 +1,9 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
 --@alpha@
 -- trunk-ignore-begin(no-invalid-prints/invalid-print)
+---@type RLF_TestMode
 local TestMode = G_RLF.RLF:GetModule("TestMode")
 local tests = {}
 local prints = ""

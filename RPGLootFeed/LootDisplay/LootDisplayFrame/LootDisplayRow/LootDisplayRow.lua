@@ -1,5 +1,69 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class RLF_RowItemButtonElementFadeIn
+---@field icon Alpha
+---@field IconBorder Alpha
+---@field IconOverlay Alpha
+---@field Stock Alpha
+---@field Count Alpha
+
+---@class RLF_RowItemButton: ItemButton
+---@field elementFadeIn RLF_RowItemButtonElementFadeIn
+
+---@class RLF_RowFontString: FontString
+---@field elementFadeIn Alpha
+
+---@class RLF_RowTexture: Texture
+---@field elementFadeIn Alpha
+
+---@class RLF_RowBorderTexture: Texture
+---@field fadeIn Alpha
+---@field fadeOut Alpha
+
+---@class RLF_RowExitAnimationGroup: AnimationGroup
+---@field noop Animation
+---@field fadeOut Alpha
+
+---@class RLF_RowEnterAnimationGroup: AnimationGroup
+---@field noop Animation
+---@field fadeIn Alpha
+---@field slideIn Translation
+
+---@class RLF_LootDisplayRow: Frame
+---@field id number
+---@field amount number
+---@field icon string
+---@field link string
+---@field secondaryText string
+---@field unit string
+---@field type string
+---@field highlight boolean
+---@field isHistoryMode boolean
+---@field pendingElement table
+---@field updatePending boolean
+---@field waiting boolean
+---@field _next RLF_LootDisplayRow
+---@field _prev RLF_LootDisplayRow
+---@field Background Texture
+---@field HighlightBGOverlay Texture
+---@field StaticTopBorder Texture
+---@field StaticRightBorder Texture
+---@field StaticBottomBorder Texture
+---@field StaticLeftBorder Texture
+---@field UnitPortrait RLF_RowTexture
+---@field PrimaryText RLF_RowFontString
+---@field SecondaryText RLF_RowFontString
+---@field ItemCountText RLF_RowFontString
+---@field TopBorder RLF_RowBorderTexture
+---@field RightBorder RLF_RowBorderTexture
+---@field BottomBorder RLF_RowBorderTexture
+---@field LeftBorder RLF_RowBorderTexture
+---@field ClickableButton Button
+---@field Icon RLF_RowItemButton
+---@field glowTexture table
+---@field EnterAnimation RLF_RowEnterAnimationGroup
+---@field ExitAnimation RLF_RowExitAnimationGroup
 LootDisplayRowMixin = {}
 
 local defaultColor = { 1, 1, 1, 1 }
@@ -12,7 +76,10 @@ function LootDisplayRowMixin:Init()
 	self.pendingElement = nil
 
 	self.ClickableButton:Hide()
-	local textures = { self.ClickableButton:GetRegions() }
+	---@type ScriptRegion[]
+	local textures = {
+		self.ClickableButton:GetRegions() --[[@as ScriptRegion[] ]],
+	}
 	for _, region in ipairs(textures) do
 		if region:GetObjectType() == "Texture" then
 			region:Hide()
@@ -111,7 +178,10 @@ function LootDisplayRowMixin:Reset()
 	self.ItemCountText:SetText(nil)
 	self.ItemCountText:Hide()
 	self.ClickableButton:Hide()
-	local textures = { self.ClickableButton:GetRegions() }
+	---@type ScriptRegion[]
+	local textures = {
+		self.ClickableButton:GetRegions() --[[@as ScriptRegion[] ]],
+	}
 	for _, region in ipairs(textures) do
 		if region:GetObjectType() == "Texture" then
 			region:Hide()
@@ -611,7 +681,7 @@ function LootDisplayRowMixin:StyleExitAnimation()
 
 	if animationChanged then
 		if not self.ExitAnimation then
-			self.ExitAnimation = self:CreateAnimationGroup()
+			self.ExitAnimation = self:CreateAnimationGroup() --[[@as RLF_RowExitAnimationGroup]]
 			self.ExitAnimation:SetScript("OnFinished", function()
 				self:Hide()
 				local frame = LootDisplayFrame
@@ -685,7 +755,7 @@ function LootDisplayRowMixin:StyleEnterAnimation()
 	end
 
 	if not self.EnterAnimation then
-		self.EnterAnimation = self:CreateAnimationGroup()
+		self.EnterAnimation = self:CreateAnimationGroup() --[[@as RLF_RowEnterAnimationGroup]]
 	end
 
 	if animationChanged then

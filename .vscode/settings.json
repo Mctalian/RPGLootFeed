@@ -57,7 +57,20 @@
     "BRANN_COMPANION_INFO_ID",
     "loadfile",
     "require",
-    "load"
+    "load",
+    "WOW_PROJECT_ID",
+    "WOW_PROJECT_MAINLINE",
+    "WOW_PROJECT_CLASSIC",
+    "GameTooltip",
+    "CreateColor",
+    "RAID_CLASS_COLORS",
+    "GameFontNormal",
+    "WOW_PROJECT_CATACLYSM_CLASSIC",
+    "MoneyWonAlertSystem",
+    "LootAlertSystem",
+    "GetNameAndServerNameFromGUID",
+    "BossBanner",
+    "XP"
   ],
   "Lua.workspace.library": [
     "${addons}/busted/module/library",

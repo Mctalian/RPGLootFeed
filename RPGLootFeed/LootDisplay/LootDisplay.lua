@@ -1,5 +1,7 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class LootDisplay: RLF_Module, AceBucket, AceEvent, AceHook
 local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0", "AceHook-3.0")
 
 local lsm = G_RLF.lsm
@@ -41,6 +43,7 @@ elementQueue.dequeue = updateTestLabelsWrapper(elementQueue.dequeue)
 
 -- Public methods
 function LootDisplay:OnInitialize()
+	---@type RLF_LootDisplayFrame
 	frame = LootDisplayFrame
 	frame:Load()
 
@@ -53,6 +56,7 @@ function LootDisplay:OnEnable()
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", "OnPlayerCombatChange")
 	self:RegisterBucketEvent("BAG_UPDATE_DELAYED", 0.5, "BAG_UPDATE_DELAYED")
 	self:RegisterMessage("RLF_NEW_LOOT", "OnLootReady")
+	self:RegisterMessage("RLF_NEW_PARTY_LOOT", "OnPartyLootReady")
 	self:RegisterBucketMessage("RLF_ROW_RETURNED", 0.3, "OnRowReturn")
 
 	RunNextFrame(function()
@@ -92,10 +96,18 @@ function LootDisplay:OnEnable()
 end
 
 function LootDisplay:OnPlayerCombatChange()
+	if frame == nil then
+		return
+	end
+
 	frame:UpdateTabVisibility()
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)
+	if frame == nil then
+		return
+	end
+
 	if show then
 		frame:ShowTestArea()
 	else
@@ -104,10 +116,16 @@ function LootDisplay:SetBoundingBoxVisibility(show)
 end
 
 function LootDisplay:ToggleBoundingBox()
+	if frame == nil then
+		return
+	end
 	self:SetBoundingBoxVisibility(not frame.BoundingBox:IsVisible())
 end
 
 function LootDisplay:UpdatePosition()
+	if frame == nil then
+		return
+	end
 	frame:ClearAllPoints()
 	frame:SetPoint(
 		G_RLF.db.global.positioning.anchorPoint,
@@ -118,6 +136,10 @@ function LootDisplay:UpdatePosition()
 end
 
 function LootDisplay:UpdateRowPositions()
+	if frame == nil then
+		return
+	end
+
 	frame:UpdateRowPositions()
 end
 
@@ -128,24 +150,44 @@ function LootDisplay:UpdateStrata()
 end
 
 function LootDisplay:UpdateRowStyles()
+	if frame == nil then
+		return
+	end
+
 	frame:UpdateSize()
 end
 
 function LootDisplay:UpdateEnterAnimation()
+	if frame == nil then
+		return
+	end
+
 	frame:UpdateEnterAnimationType()
 end
 
 function LootDisplay:UpdateFadeDelay()
+	if frame == nil then
+		return
+	end
+
 	frame:UpdateFadeDelay()
 end
 
 function LootDisplay:BAG_UPDATE_DELAYED()
+	if frame == nil then
+		return
+	end
+
 	G_RLF:LogInfo("BAG_UPDATE_DELAYED", "WOWEVENT", self.moduleName, nil, "BAG_UPDATE_DELAYED")
 
 	frame:UpdateRowItemCounts()
 end
 
 local function processRow(element)
+	if frame == nil then
+		return
+	end
+
 	if not element:IsEnabled() then
 		return
 	end
@@ -180,6 +222,10 @@ function LootDisplay:OnLootReady(_, element)
 	processRow(element)
 end
 
+function LootDisplay:OnPartyLootReady(_, element)
+	processRow(element)
+end
+
 function LootDisplay:OnRowReturn()
 	processFromQueue()
 end
@@ -206,6 +252,10 @@ local function emptyQueue()
 end
 
 function LootDisplay:HideLoot()
+	if frame == nil then
+		return
+	end
+
 	emptyQueue()
 	frame:ClearFeed()
 end

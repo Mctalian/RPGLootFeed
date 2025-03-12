@@ -1,12 +1,15 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
 local C = LibStub("C_Everywhere")
 
+---@class RLF_Currency: RLF_Module, AceEvent
 local Currency = G_RLF.RLF:NewModule("Currency", "AceEvent-3.0")
 
 Currency.Element = {}
 
 function Currency.Element:new(...)
+	---@class Currency.Element: RLF_LootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 

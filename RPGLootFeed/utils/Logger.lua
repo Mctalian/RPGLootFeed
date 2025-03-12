@@ -1,7 +1,11 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class RLF_Logger: RLF_Module, AceBucket, AceEvent
 local Logger = G_RLF.RLF:NewModule("Logger", "AceBucket-3.0", "AceEvent-3.0")
-local gui = LibStub("AceGUI-3.0")
+
+---@type AceGUI
+local gui = LibStub("AceGUI-3.0") --[[@as AceGUI]]
 
 local updateContent
 local logger = nil
@@ -72,24 +76,30 @@ local createFilterBar
 local createContentBox
 local createFilterBarComponents
 
-createLoggerFrames = function(l)
-	if not l.frame then
-		l.frame = gui:Create("Frame")
-		l.frame:Hide()
-		l.frame:SetLayout("Flow")
-		l.frame:SetTitle("Loot Log")
-		l.frame:EnableResize(false)
+function Logger:createLoggerFrames()
+	if not self.frame then
+		---@class LoggerFrame: AceGUIFrameContainer
+		---@field contentBox LoggerContentBox
+		---@field filterBar LoggerFilterBox
+		self.frame = gui:Create("Frame") --[[@as AceGUIFrameContainer]]
+		self.frame:Hide()
+		self.frame:SetLayout("Flow")
+		self.frame:SetTitle("Loot Log")
+		self.frame:EnableResize(false)
 	end
 
 	RunNextFrame(function()
-		createFilterBar(l.frame)
-		createContentBox(l.frame)
+		self:createFilterBar()
+		self:createContentBox()
 	end)
 end
 
-createContentBox = function(f)
+---@private
+function Logger:createContentBox()
+	local f = self.frame
 	if not f.contentBox then
-		f.contentBox = gui:Create("MultiLineEditBox")
+		---@class LoggerContentBox: AceGUIMultiLineEditBoxWidget
+		f.contentBox = gui:Create("MultiLineEditBox") --[[@as AceGUIMultiLineEditBoxWidget]]
 		f:AddChild(f.contentBox)
 		f.contentBox:SetLabel("Logs")
 		f.contentBox:DisableButton(true)
@@ -98,21 +108,29 @@ createContentBox = function(f)
 	end
 end
 
-createFilterBar = function(f)
+---@private
+function Logger:createFilterBar()
+	local f = self.frame
 	if not f.filterBar then
-		f.filterBar = gui:Create("SimpleGroup")
+		---@class LoggerFilterBox: AceGUISimpleGroupContainer
+		---@field logSources AceGUIDropdownWidget
+		---@field logLevels AceGUIDropdownWidget
+		---@field logTypes AceGUIDropdownWidget
+		---@field clearButton AceGUIButtonWidget
+		f.filterBar = gui:Create("SimpleGroup") --[[@as AceGUISimpleGroupContainer]]
 		f:AddChild(f.filterBar)
 		f.filterBar:SetFullWidth(true)
 		f.filterBar:SetLayout("Flow")
 	end
 	RunNextFrame(function()
-		createFilterBarComponents(f.filterBar)
+		self:createFilterBarComponents()
 	end)
 end
 
-createFilterBarComponents = function(fB)
+function Logger:createFilterBarComponents()
+	local fB = self.frame.filterBar
 	if not fB.logSources then
-		fB.logSources = gui:Create("Dropdown")
+		fB.logSources = gui:Create("Dropdown") --[[@as AceGUIDropdownWidget]]
 		fB:AddChild(fB.logSources)
 		RunNextFrame(function()
 			fB.logSources:SetLabel("Log Sources")
@@ -132,7 +150,7 @@ createFilterBarComponents = function(fB)
 	end
 
 	if not fB.logLevels then
-		fB.logLevels = gui:Create("Dropdown")
+		fB.logLevels = gui:Create("Dropdown") --[[@as AceGUIDropdownWidget]]
 		fB:AddChild(fB.logLevels)
 		RunNextFrame(function()
 			fB.logLevels:SetLabel("Log Levels")
@@ -151,7 +169,7 @@ createFilterBarComponents = function(fB)
 	end
 
 	if not fB.logTypes then
-		fB.logTypes = gui:Create("Dropdown")
+		fB.logTypes = gui:Create("Dropdown") --[[@as AceGUIDropdownWidget]]
 		fB:AddChild(fB.logTypes)
 		RunNextFrame(function()
 			fB.logTypes:SetLabel("Log Types")
@@ -172,7 +190,7 @@ createFilterBarComponents = function(fB)
 	end
 
 	if not fB.clearButton then
-		fB.clearButton = gui:Create("Button")
+		fB.clearButton = gui:Create("Button") --[[@as AceGUIButtonWidget]]
 		fB:AddChild(fB.clearButton)
 		RunNextFrame(function()
 			fB.clearButton:SetText("Clear Current Log")
@@ -195,7 +213,7 @@ createFilterBarComponents = G_RLF:ProfileFunction(createFilterBarComponents, "cr
 function Logger:InitializeFrame()
 	if not self.frame then
 		RunNextFrame(function()
-			createLoggerFrames(self)
+			self:createLoggerFrames()
 		end)
 	end
 end
@@ -332,7 +350,29 @@ updateContent = function()
 	end)
 end
 
+---@class LogEntry
+---@field timestamp string|osdate
+---@field level string
+---@field message string
+---@field source string
+---@field type string
+---@field id string
+---@field content string
+---@field amount string
+---@field new boolean
+
+---Add a log entry to the log table
+---@param level string
+---@param message string
+---@param source string
+---@param type string
+---@param id string
+---@param content string
+---@param amount string
+---@param isNew boolean
+---@return nil
 function Logger:addLogEntry(level, message, source, type, id, content, amount, isNew)
+	---@type LogEntry
 	local entry = {
 		timestamp = date("%Y-%m-%d %H:%M:%S"),
 		level = level,
@@ -360,6 +400,9 @@ function Logger:addLogEntry(level, message, source, type, id, content, amount, i
 	end
 end
 
+---Process a table of logs
+---@param logs table<LogEntry, number>
+---@return nil
 function Logger:ProcessLogs(logs)
 	for log, _ in pairs(logs) do
 		RunNextFrame(function()

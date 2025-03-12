@@ -1,21 +1,47 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class RLF_ItemInfo
+---@field itemId number
+---@field itemName string
+---@field itemLink string
+---@field itemQuality number
+---@field itemLevel number
+---@field itemMinLevel number
+---@field itemType string
+---@field itemSubType string
+---@field itemStackCount number
+---@field itemEquipLoc string
+---@field itemTexture string
+---@field sellPrice number
+---@field classID number
+---@field subclassID number
+---@field bindType number
+---@field expansionID number
+---@field setID number
+---@field isCraftingReagent boolean
 local ItemInfo = {}
 ItemInfo.__index = ItemInfo
+
+--- Create a new ItemInfo object
+--- @param ... number | string | boolean | nil
+--- @return RLF_ItemInfo | nil
 function ItemInfo:new(...)
-	local self = {}
-	setmetatable(self, ItemInfo)
-	self.itemId, self.itemName, self.itemLink, self.itemQuality, self.itemLevel, self.itemMinLevel, self.itemType, self.itemSubType, self.itemStackCount, self.itemEquipLoc, self.itemTexture, self.sellPrice, self.classID, self.subclassID, self.bindType, self.expansionID, self.setID, self.isCraftingReagent =
+	local instance = {}
+	setmetatable(instance, ItemInfo)
+	instance.itemId, instance.itemName, instance.itemLink, instance.itemQuality, instance.itemLevel, instance.itemMinLevel, instance.itemType, instance.itemSubType, instance.itemStackCount, instance.itemEquipLoc, instance.itemTexture, instance.sellPrice, instance.classID, instance.subclassID, instance.bindType, instance.expansionID, instance.setID, instance.isCraftingReagent =
 		...
-	if not self.itemName then
+	if instance.itemName == nil then
 		return nil
 	end
-	if not self.itemId then
-		self.itemId = C_Item.GetItemIDForItemInfo(self.itemLink)
+	if instance.itemId == nil then
+		instance.itemId = C_Item.GetItemIDForItemInfo(instance.itemLink)
 	end
-	return self
+	return instance
 end
 
+---Determine if the item is a mount
+---@return boolean
 function ItemInfo:IsMount()
 	-- Highlight Mounts
 	if self.classID == Enum.ItemClass.Miscellaneous and self.subclassID == Enum.ItemMiscellaneousSubclass.Mount then
@@ -25,6 +51,8 @@ function ItemInfo:IsMount()
 	return false
 end
 
+---Determine if the item is Legendary
+---@return boolean
 function ItemInfo:IsLegendary()
 	-- Highlight Legendary Items
 	if self.itemQuality == Enum.ItemQuality.Legendary then
@@ -34,6 +62,8 @@ function ItemInfo:IsLegendary()
 	return false
 end
 
+---Determine the highest armor proficiency the character has; Clients prior to Cata only
+---@return number | nil
 local function ClassicSkillLineCheck()
 	local armorClass = nil
 	for i = 1, GetNumSkillLines() do
@@ -53,6 +83,8 @@ local function ClassicSkillLineCheck()
 	return armorClass
 end
 
+---Determine the highest armor proficiency the character has
+---@return number | nil
 local function GetHighestArmorClass()
 	if G_RLF.cachedArmorClass and GetExpansionLevel() >= G_RLF.Expansion.CATA then
 		return G_RLF.cachedArmorClass

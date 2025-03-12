@@ -1,5 +1,15 @@
+---@type string, G_RLF
 local _, G_RLF = ...
 
+---@class list<T>
+---@field length number
+---@field first any
+---@field last any
+---@field push fun(s: list, t: any): boolean
+---@field unshift fun(s: list, t: any): boolean
+---@field pop fun(s: list): any
+---@field shift fun(s: list): any
+---@field remove fun(s: list, t: any)
 local list = {}
 list.__index = list
 
@@ -138,6 +148,10 @@ local function iterate(self, current)
 	return current
 end
 
+---iterate through the list
+---@return fun(list, any):any
+---@return list
+---@return any
 function list:iterate()
 	return iterate, self, nil
 end

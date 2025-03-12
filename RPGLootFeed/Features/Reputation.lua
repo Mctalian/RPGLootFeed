@@ -1,10 +1,13 @@
 ---@diagnostic disable: inject-field
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class RLF_Reputation: RLF_Module, AceEvent, AceTimer
 local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0")
 
 Rep.Element = {}
 
+---@enum RepType
 local RepType = {
 	MajorFaction = 1,
 	Paragon = 2,
@@ -94,6 +97,8 @@ local function buildFactionLocaleMap(findName)
 end
 
 function Rep.Element:new(...)
+	---@class Rep.Element: RLF_LootElement
+	---@field public repType RepType
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 
@@ -248,7 +253,7 @@ local function extractFactionAndRepForDelves(message, companionFactionName)
 	if factionStart then
 		local repStart, repEnd = string.find(message, "%d+", factionEnd + 1)
 		if repStart then
-			local rep = message:sub(repStart, repEnd)
+			local rep = string.sub(message, repStart, repEnd)
 			return companionFactionName, tonumber(rep)
 		end
 	end

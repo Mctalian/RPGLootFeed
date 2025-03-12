@@ -1,10 +1,13 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
+---@class RLF_Professions: RLF_Module, AceEvent
 local Professions = G_RLF.RLF:NewModule("Professions", "AceEvent-3.0")
 
 Professions.Element = {}
 
 function Professions.Element:new(...)
+	---@class Professions.Element: RLF_LootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 

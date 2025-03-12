@@ -182,7 +182,7 @@ describe("ItemInfo", function()
 
 	describe("IsEligibleEquipment", function()
 		it("checks if an item is eligible equipment", function()
-			_G.UnitClass = function()
+			_G.UnitClass = function(unit)
 				return nil, "Warrior"
 			end
 			ns.armorClassMapping = { Warrior = 4 }
@@ -260,7 +260,7 @@ describe("ItemInfo", function()
 		end)
 
 		it("checks if an item is not eligible equipment due to mismatched armor class", function()
-			_G.UnitClass = function()
+			_G.UnitClass = function(unit)
 				return nil, "Mage"
 			end
 			ns.armorClassMapping = { Mage = 1 }
@@ -289,7 +289,7 @@ describe("ItemInfo", function()
 		end)
 
 		it("checks if an item is not eligible equipment due to missing equip slot", function()
-			_G.UnitClass = function()
+			_G.UnitClass = function(unit)
 				return nil, "Warrior"
 			end
 			ns.armorClassMapping = { Warrior = 4 }

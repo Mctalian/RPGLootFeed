@@ -1,3 +1,4 @@
+---@type string, G_RLF
 local addonName, G_RLF = ...
 
 local Features = {}
@@ -161,7 +162,9 @@ G_RLF.options.args.features = {
 					end,
 					set = function(info, value)
 						G_RLF.db.global.lootHistory.hideTab = value
-						LootDisplayFrame:UpdateTabVisibility()
+						---@type RLF_LootDisplayFrame
+						local frame = LootDisplayFrame
+						frame:UpdateTabVisibility()
 					end,
 					order = 2.5,
 				},
@@ -212,7 +215,9 @@ end
 
 function Features:SetLootHistoryStatus(info, value)
 	G_RLF.db.global.lootHistory.enabled = value
-	LootDisplayFrame:UpdateTabVisibility()
+	---@type RLF_LootDisplayFrame
+	local frame = LootDisplayFrame
+	frame:UpdateTabVisibility()
 end
 
 function Features:LootHistoryDisabled()
