@@ -1,7 +1,7 @@
 ---@type string, G_RLF
 local addonName, G_RLF = ...
 
-function dump(o, depth)
+function G_RLF.dump(o, depth)
 	depth = depth or 0
 	local indent = string.rep("  ", depth)
 
@@ -19,7 +19,7 @@ function dump(o, depth)
 		-- Iterate over sorted keys
 		for _, k in ipairs(keys) do
 			local key = type(k) == "number" and k or '"' .. k .. '"'
-			s = s .. indent .. "  [" .. key .. "] = " .. dump(o[k], depth + 1) .. ",\n"
+			s = s .. indent .. "  [" .. key .. "] = " .. G_RLF.dump(o[k], depth + 1) .. ",\n"
 		end
 		return s .. indent .. "}"
 	elseif type(o) == "string" then
