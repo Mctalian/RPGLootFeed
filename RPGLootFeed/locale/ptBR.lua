@@ -1,5 +1,8 @@
----@type string, G_RLF
-local _, G_RLF = ...
+---@type string, table
+local _, ns = ...
+
+---@class G_RLF
+local G_RLF = ns
 
 local L = LibStub("AceLocale-3.0"):NewLocale(G_RLF.localeName, "ptBR")
 if not L then

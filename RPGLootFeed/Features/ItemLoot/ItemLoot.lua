@@ -1,7 +1,10 @@
----@type string, G_RLF
-local addonName, G_RLF = ...
+---@type string, table
+local addonName, ns = ...
 
----@class ItemLoot: RLF_Module, AceEvent
+---@class G_RLF
+local G_RLF = ns
+
+---@class RLF_ItemLoot: RLF_Module, AceEvent
 local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 
 local C = LibStub("C_Everywhere")

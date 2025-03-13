@@ -1,9 +1,14 @@
----@type string, G_RLF
-local addonName, G_RLF = ...
+---@type string, table
+local addonName, ns = ...
+
+---@class G_RLF
+local G_RLF = ns
 
 G_RLF.addonVersion = "@project-version@-@project-abbreviated-hash@"
 
 ---@class RPGLootFeed: AceAddon, AceConsole, AceEvent, AceHook, AceTimer
+---@field public GetModule fun(self: RPGLootFeed, name: string): RLF_Module
+---@field public NewModule fun(self: RPGLootFeed, name: string, ...: string): RLF_Module
 local RLF = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 RLF:SetDefaultModuleState(true)
 RLF:SetDefaultModulePrototype({
@@ -95,7 +100,9 @@ function RLF:SlashCommand(msg, editBox)
 		elseif msg == "clear" then
 			G_RLF.LootDisplay:HideLoot()
 		elseif msg == "log" then
-			self:GetModule("Logger"):Show()
+			---@type RLF_Logger
+			local loggerModule = self:GetModule("Logger") --[[@as RLF_Logger]]
+			loggerModule:Show()
 		elseif msg == "history" and G_RLF.db.global.lootHistory.enabled then
 			---@type RLF_LootDisplayFrame
 			local frame = LootDisplayFrame

@@ -1,12 +1,16 @@
----@type string, G_RLF
-local addonName, G_RLF = ...
+---@type string, table
+local addonName, ns = ...
+
+---@class G_RLF
+local G_RLF = ns
 
 function G_RLF:fn(func, ...)
+	---@type G_RLF | RLF_Module
 	local s = self
 	local function errorhandler(err)
 		local suffix = "\n\n==== Addon Info " .. addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
 		local status, trace = pcall(function()
-			local logger = G_RLF.RLF:GetModule("Logger")
+			local logger = G_RLF.RLF:GetModule("Logger") --[[@as RLF_Logger]]
 			if s.moduleName then
 				return logger:Trace(s.moduleName)
 			end

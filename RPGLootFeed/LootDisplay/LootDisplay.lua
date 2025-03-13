@@ -1,5 +1,8 @@
----@type string, G_RLF
-local addonName, G_RLF = ...
+---@type string, table
+local addonName, ns = ...
+
+---@class G_RLF
+local G_RLF = ns
 
 ---@class LootDisplay: RLF_Module, AceBucket, AceEvent, AceHook
 local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0", "AceHook-3.0")
@@ -60,7 +63,9 @@ function LootDisplay:OnEnable()
 	self:RegisterBucketMessage("RLF_ROW_RETURNED", 0.3, "OnRowReturn")
 
 	RunNextFrame(function()
-		G_RLF.RLF:GetModule("TestMode"):OnLootDisplayReady()
+		---@type RLF_TestMode
+		local TestModeModule = G_RLF.RLF:GetModule("TestMode") --[[@as RLF_TestMode]]
+		TestModeModule:OnLootDisplayReady()
 	end)
 
 	if G_RLF:IsClassic() or G_RLF:IsCataClassic() then
@@ -268,6 +273,10 @@ function G_RLF:CalculateTextWidth(text)
 		G_RLF.tempFontString:SetFontObject(G_RLF.db.global.styling.font)
 	else
 		local fontPath = lsm:Fetch(lsm.MediaType.FONT, fontFace)
+		if not fontPath then
+			G_RLF:LogWarn("Font not found: " .. fontFace, addonName)
+			return 0
+		end
 		G_RLF.tempFontString:SetFont(
 			fontPath,
 			G_RLF.db.global.styling.fontSize,

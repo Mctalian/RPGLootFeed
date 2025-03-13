@@ -1,5 +1,8 @@
----@type string, G_RLF
-local addonName, G_RLF = ...
+---@type string, table
+local addonName, ns = ...
+
+---@class G_RLF
+local G_RLF = ns
 
 G_RLF.retryHook = function(module, previousAttempts, hookFunctionName, localeKey)
 	local attempts = previousAttempts
