@@ -1,5 +1,8 @@
----@type string, G_RLF
-local addonName, G_RLF = ...
+---@type string, table
+local addonName, ns = ...
+
+---@class G_RLF
+local G_RLF = ns
 
 local C = LibStub("C_Everywhere")
 
@@ -204,7 +207,7 @@ local function generateRandomLoot()
 
 		if rng >= 0.8 then
 			local experienceGained = math.random(100, 10000)
-			local module = G_RLF.RLF:GetModule("Experience")
+			local module = G_RLF.RLF:GetModule("Experience") --[[@as RLF_Experience]]
 			local e = module.Element:new(experienceGained)
 			e:Show()
 			G_RLF:LogDebug("Experience gained: " .. experienceGained, addonName)
@@ -212,18 +215,22 @@ local function generateRandomLoot()
 
 		if rng <= 0.2 then
 			local copper = math.random(1, 100000000)
-			local module = G_RLF.RLF:GetModule("Money")
+			local module = G_RLF.RLF:GetModule("Money") --[[@as RLF_Money]]
 			local e = module.Element:new(copper)
-			e:Show()
-			e:PlaySoundIfEnabled()
-			G_RLF:LogDebug("Copper gained: " .. copper, addonName)
+			if not e then
+				G_RLF:LogError("Failed to create Money Element", addonName)
+			else
+				e:Show()
+				e:PlaySoundIfEnabled()
+				G_RLF:LogDebug("Copper gained: " .. copper, addonName)
+			end
 		end
 
 		-- 50% chance to show items
 		if rng > 0.2 and rng <= 0.7 then
 			local info = TestMode.testItems[math.random(#TestMode.testItems)]
 			local amountLooted = math.random(1, 5)
-			local module = G_RLF.RLF:GetModule("ItemLoot")
+			local module = G_RLF.RLF:GetModule("ItemLoot") --[[@as RLF_ItemLoot]]
 			local e = module.Element:new(info, amountLooted, false)
 			e:Show(info.itemName, info.itemQuality)
 			e:PlaySoundIfEnabled()
@@ -233,7 +240,7 @@ local function generateRandomLoot()
 			-- 10% chance of item loot to show up as a party member
 			if rng < 0.3 then
 				local unit = "player"
-				local module = G_RLF.RLF:GetModule("ItemLoot")
+				local module = G_RLF.RLF:GetModule("ItemLoot") --[[@as RLF_ItemLoot]]
 				local e = module.Element:new(info, amountLooted, unit)
 				e:Show(info.itemName, info.itemQuality)
 				G_RLF:LogDebug("Party Item looted: " .. info.itemName, addonName)
@@ -244,17 +251,21 @@ local function generateRandomLoot()
 			if GetExpansionLevel() >= G_RLF.Expansion.SL then
 				local currency = TestMode.testCurrencies[math.random(#TestMode.testCurrencies)]
 				local amountLooted = math.random(1, 500)
-				local module = G_RLF.RLF:GetModule("Currency")
+				local module = G_RLF.RLF:GetModule("Currency") --[[@as RLF_Currency]]
 				local e = module.Element:new(currency.link, currency.info, currency.basicInfo)
-				e:Show()
-				G_RLF:LogDebug("Currency looted: " .. currency.info.name, addonName)
+				if not e then
+					G_RLF:LogError("Failed to create Currency Element", addonName)
+				else
+					e:Show()
+					G_RLF:LogDebug("Currency looted: " .. currency.info.name, addonName)
+				end
 			end
 
 			-- 10% chance to show reputation (least frequent)
 		elseif rng > 0.85 then
 			local reputationGained = math.random(10, 100)
 			local factionName = TestMode.testFactions[math.random(#TestMode.testFactions)]
-			local module = G_RLF.RLF:GetModule("Reputation")
+			local module = G_RLF.RLF:GetModule("Reputation") --[[@as RLF_Reputation]]
 			local e = module.Element:new(reputationGained, factionName)
 			e:Show()
 			G_RLF:LogDebug("Reputation gained: " .. reputationGained, addonName)

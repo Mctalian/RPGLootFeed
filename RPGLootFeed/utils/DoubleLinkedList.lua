@@ -1,5 +1,8 @@
----@type string, G_RLF
-local _, G_RLF = ...
+---@type string, table
+local _, ns = ...
+
+---@class G_RLF
+local G_RLF = ns
 
 ---@class list<T>
 ---@field length number
