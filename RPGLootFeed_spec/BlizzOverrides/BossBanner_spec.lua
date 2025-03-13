@@ -34,7 +34,7 @@ describe("BossBanner module", function()
 		BossBannerOverride:BossBannerHook()
 		assert
 			.spy(BossBannerOverride.RawHookScript).was
-			.called_with(BossBannerOverride, BossBanner, "OnEvent", "InterceptBossBannerAlert", true)
+			.called_with(BossBannerOverride, BossBanner, "OnEvent", "InterceptBossBannerAlert")
 	end)
 
 	it("does not hook BossBanner OnEvent if already hooked", function()
