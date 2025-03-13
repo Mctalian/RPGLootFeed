@@ -1219,7 +1219,7 @@ function LootDisplayRowMixin:UpdatePosition(frame)
 		self.opposite = nil
 		self.yOffset = nil
 		self.anchorTo = frame
-		self:SetFrameLevel(10000)
+		self:SetFrameLevel(500)
 	end
 end
 
@@ -1243,7 +1243,7 @@ function LootDisplayRowMixin:UpdateNeighborPositions(frame)
 			_next.opposite = nil
 			_next.yOffset = nil
 			_next.anchorTo = frame
-			_next:SetFrameLevel(10000)
+			_next:SetFrameLevel(500)
 		end
 	end
 end
@@ -1302,6 +1302,10 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 
 	-- Handle Shift key changes
 	self.ClickableButton:SetScript("OnEvent", function(_, event, key, state)
+		if not G_RLF.db.global.tooltips.hover.onShift then
+			return
+		end
+
 		if event == "MODIFIER_STATE_CHANGED" and key == "LSHIFT" then
 			if state == 1 then
 				showTooltip()
