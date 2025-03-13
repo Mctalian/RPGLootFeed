@@ -250,21 +250,46 @@ function ItemLoot.Element:new(...)
 	function element:PlaySoundIfEnabled()
 		local soundsConfig = G_RLF.db.global.item.sounds
 		if self.isMount and soundsConfig.mounts.enabled and soundsConfig.mounts.sound ~= "" then
-			RunNextFrame(function()
-				PlaySoundFile(soundsConfig.mounts.sound)
-			end)
+			local willPlay, handle = PlaySoundFile(soundsConfig.mounts.sound)
+			if not willPlay then
+				G_RLF:LogWarn("Failed to play sound " .. soundsConfig.mounts.sound, addonName, ItemLoot.moduleName)
+			else
+				G_RLF:LogDebug(
+					"Sound queued to play " .. soundsConfig.mounts.sound .. " " .. handle,
+					addonName,
+					ItemLoot.moduleName
+				)
+			end
 		elseif self.isLegendary and soundsConfig.legendaries.enabled and soundsConfig.legendaries.sound ~= "" then
-			RunNextFrame(function()
-				PlaySoundFile(soundsConfig.legendaries.sound)
-			end)
+			local willPlay, handle = PlaySoundFile(soundsConfig.legendaries.sound)
+			if not willPlay then
+				G_RLF:LogWarn("Failed to play sound " .. soundsConfig.legendaries.sound, addonName, ItemLoot.moduleName)
+			else
+				G_RLF:LogDebug(
+					"Sound queued to play " .. soundsConfig.legendaries.sound .. " " .. handle,
+					addonName,
+					ItemLoot.moduleName
+				)
+			end
 		elseif
 			self.isBetterThanEquipped
 			and soundsConfig.betterThanEquipped.enabled
 			and soundsConfig.betterThanEquipped.sound ~= ""
 		then
-			RunNextFrame(function()
-				PlaySoundFile(soundsConfig.betterThanEquipped.sound)
-			end)
+			local willPlay, handle = PlaySoundFile(soundsConfig.betterThanEquipped.sound)
+			if not willPlay then
+				G_RLF:LogWarn(
+					"Failed to play sound " .. soundsConfig.betterThanEquipped.sound,
+					addonName,
+					ItemLoot.moduleName
+				)
+			else
+				G_RLF:LogDebug(
+					"Sound queued to play " .. soundsConfig.betterThanEquipped.sound .. " " .. handle,
+					addonName,
+					ItemLoot.moduleName
+				)
+			end
 		end
 	end
 

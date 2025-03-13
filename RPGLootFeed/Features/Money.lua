@@ -64,9 +64,20 @@ function Money.Element:new(...)
 
 	function element:PlaySoundIfEnabled()
 		if G_RLF.db.global.money.overrideMoneyLootSound and G_RLF.db.global.money.moneyLootSound ~= "" then
-			RunNextFrame(function()
-				PlaySoundFile(G_RLF.db.global.money.moneyLootSound)
-			end)
+			local willPlay, handle = PlaySoundFile(G_RLF.db.global.money.moneyLootSound)
+			if not willPlay then
+				G_RLF:LogWarn(
+					"Failed to play sound " .. G_RLF.db.global.money.moneyLootSound,
+					addonName,
+					Money.moduleName
+				)
+			else
+				G_RLF:LogDebug(
+					"Sound queued to play " .. G_RLF.db.global.money.moneyLootSound .. " " .. handle,
+					addonName,
+					Money.moduleName
+				)
+			end
 		end
 	end
 
