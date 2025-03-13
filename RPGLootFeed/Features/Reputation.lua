@@ -1,6 +1,9 @@
 ---@diagnostic disable: inject-field
----@type string, G_RLF
-local addonName, G_RLF = ...
+---@type string, table
+local addonName, ns = ...
+
+---@class G_RLF
+local G_RLF = ns
 
 ---@class RLF_Reputation: RLF_Module, AceEvent, AceTimer
 local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0")

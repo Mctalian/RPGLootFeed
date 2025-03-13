@@ -1,5 +1,8 @@
----@type string, G_RLF
-local addonName, G_RLF = ...
+---@type string, table
+local addonName, ns = ...
+
+---@class G_RLF
+local G_RLF = ns
 
 ---@class RLF_Money: RLF_Module, AceEvent
 local Money = G_RLF.RLF:NewModule("Money", "AceEvent-3.0")

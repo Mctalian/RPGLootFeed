@@ -1,5 +1,8 @@
----@type string, G_RLF
-local addonName, G_RLF = ...
+---@type string, table
+local addonName, ns = ...
+
+---@class G_RLF
+local G_RLF = ns
 
 ---@class LootToastOverride: RLF_Module, AceEvent, AceHook, AceTimer
 local LootToastOverride = G_RLF.RLF:NewModule("LootToasts", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
