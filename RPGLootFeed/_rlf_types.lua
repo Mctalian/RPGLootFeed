@@ -47,6 +47,7 @@ local addonName, G_RLF = ...
 ---@field public mainFeatureOrder table<string, number>
 ---@field public OpenOptions fun(self: G_RLF, button: string): any
 ---@field public fn fun(self: G_RLF | AceModule, func: function, ...: any): any
+---@field public dump fun(o: any, depth: number): string
 ---@field public retryHook fun(module: AceTimer, previousAttempts: number, hookFunctionName: string, localeKey: string): number
 ---@field public NotifyChange fun(self: G_RLF, ...: any): any
 ---@field public Print fun(self: G_RLF, ...: any): any

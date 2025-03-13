@@ -28,5 +28,5 @@ enable-nolib-creation: yes
 github-release-as-changelog: yes
 
 ignore:
-  - utils/_Init.lua
+  - _rlf_types.lua
 
