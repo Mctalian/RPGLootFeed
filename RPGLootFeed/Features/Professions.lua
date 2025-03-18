@@ -110,6 +110,9 @@ function Professions:CHAT_MSG_SKILL(event, message)
 				end
 			end
 		end
+		if not icon then
+			icon = G_RLF.DefaultIcons.PROFESSION
+		end
 		local e = self.Element:new(
 			skillName,
 			skillName,

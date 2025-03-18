@@ -125,6 +125,16 @@ function Rep.Element:new(...)
 		return sign .. math.abs(rep) .. " " .. factionName
 	end
 
+	if factionData ~= nil and factionData.textureKit then
+		element.atlas = true
+		local majorFactionIconFormat = "majorFactions_icons_%s512"
+		element.icon = majorFactionIconFormat:format(factionData.textureKit)
+	else
+		element.atlas = false
+		element.icon = G_RLF.DefaultIcons.REPUTATION
+		element.quality = Enum.ItemQuality.Rare
+	end
+
 	element.repLevel = nil
 	if factionData then
 		if factionData.renownLevel then
@@ -341,7 +351,11 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 			if G_RLF:IsRetail() and C_Reputation.IsMajorFaction(fId) then
 				color = ACCOUNT_WIDE_FONT_COLOR
 				repType = RepType.MajorFaction
-				factionData = C_MajorFactions.GetMajorFactionRenownInfo(fId)
+				local renownInfo = C_MajorFactions.GetMajorFactionRenownInfo(fId)
+				factionData = C_MajorFactions.GetMajorFactionData(fId)
+				factionData.renownLevel = renownInfo and renownInfo.renownLevel or 0
+				factionData.renownReputationEarned = renownInfo and renownInfo.renownReputationEarned or 0
+				factionData.renownLevelThreshold = renownInfo and renownInfo.renownLevelThreshold or 0
 			elseif G_RLF:IsRetail() and isDelveCompanion then
 				factionData = C_Reputation.GetFactionDataByID(fId)
 				if not factionData then

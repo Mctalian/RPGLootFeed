@@ -142,6 +142,7 @@ function LootDisplayRowMixin:Reset()
 	self.id = nil
 	self.amount = nil
 	self.icon = nil
+	self.isAtlas = false
 	self.link = nil
 	self.secondaryText = nil
 	self.unit = nil
@@ -951,6 +952,8 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	self.id = key
 	self.amount = quantity
 	self.type = element.type
+	self.isAtlas = element.atlas or false
+	self.quality = quality
 
 	if isLink then
 		local extraWidthStr = " x" .. self.amount
@@ -964,7 +967,6 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 			extraWidth = extraWidth + portraitSize - (portraitSize / 2)
 		end
 		self.link = G_RLF:TruncateItemLink(textFn(), extraWidth)
-		self.quality = quality
 		text = textFn(0, self.link)
 		self:SetupTooltip()
 	else
@@ -972,7 +974,7 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	end
 
 	if icon then
-		self:UpdateIcon(key, icon, quality)
+		self:UpdateIcon(key, icon, quality, element.atlas)
 	end
 
 	self:UpdateSecondaryText(secondaryTextFn)
@@ -1514,7 +1516,11 @@ function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 	end
 end
 
-function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
+local function GetItemButtonIconTexture(button)
+	return button.Icon or button.icon or _G[button:GetName() .. "IconTexture"]
+end
+
+function LootDisplayRowMixin:UpdateIcon(key, icon, quality, isAtlas)
 	-- Only update if the icon has changed
 	if icon and self.icon ~= icon then
 		self.icon = icon
@@ -1524,7 +1530,10 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 			local sizingDb = G_RLF.db.global.sizing
 			local iconSize = sizingDb.iconSize
 			-- Handle quality logic
-			if not quality then
+			if isAtlas then
+				local i = GetItemButtonIconTexture(self.Icon)
+				i:SetAtlas(icon)
+			elseif not quality then
 				self.Icon:SetItem(self.link)
 			else
 				self.Icon:SetItemButtonTexture(icon)
@@ -1688,7 +1697,7 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 		self.SecondaryText:SetText(self.secondaryText)
 	end
 	if data.icon then
-		self:UpdateIcon(self.key, data.icon, self.quality)
+		self:UpdateIcon(self.key, data.icon, self.quality, data.isAtlas)
 		self:SetupTooltip(true)
 	else
 		self.icon = nil

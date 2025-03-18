@@ -121,3 +121,11 @@ G_RLF.WrapCharEnum = {
 G_RLF.GameSounds = {
 	LOOT_SMALL_COIN = 567428,
 }
+
+---@enum G_RLF.DefaultIcons
+G_RLF.DefaultIcons = {
+	MONEY = "133785",
+	REPUTATION = "236681",
+	XP = "894556",
+	PROFESSION = "133740",
+}

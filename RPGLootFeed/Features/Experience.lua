@@ -27,6 +27,8 @@ function Xp.Element:new(...)
 		return "+" .. ((existingXP or 0) + element.quantity) .. " " .. G_RLF.L["XP"]
 	end
 	element.currentLevel = currentLevel
+	element.icon = G_RLF.DefaultIcons.XP
+	element.quality = Enum.ItemQuality.Epic
 
 	element.secondaryTextFn = function()
 		if not currentXP then
