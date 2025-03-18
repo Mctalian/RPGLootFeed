@@ -1,5 +1,8 @@
 ---@type string, table
-local addonName, G_RLF = ...
+local addonName, ns = ...
+
+---@class G_RLF
+local G_RLF = ns
 
 ---@class Styling
 local Styling = {}
@@ -14,7 +17,11 @@ local function startswith(str, start)
 	return string.sub(str, 1, #start) == start
 end
 
-G_RLF.defaults.global.styling = {
+---@class RLF_DBGlobal
+local globalDefaults = G_RLF.defaults.global
+
+---@class RLF_ConfigStyling
+globalDefaults.styling = {
 	enabledSecondaryRowText = false,
 	leftAlign = true,
 	growUp = true,

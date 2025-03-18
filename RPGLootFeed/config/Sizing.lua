@@ -6,7 +6,11 @@ local G_RLF = ns
 
 local Sizing = {}
 
-G_RLF.defaults.global.sizing = {
+---@class RLF_DBGlobal
+local globalDefaults = G_RLF.defaults.global
+
+---@class RLF_ConfigSizing
+globalDefaults.sizing = {
 	feedWidth = 330,
 	maxRows = 10,
 	rowHeight = 22,

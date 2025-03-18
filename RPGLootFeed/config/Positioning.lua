@@ -6,7 +6,11 @@ local G_RLF = ns
 
 local Positioning = {}
 
-G_RLF.defaults.global.positioning = {
+---@class RLF_DBGlobal
+local globalDefaults = G_RLF.defaults.global
+
+---@class RLF_ConfigPositioning
+globalDefaults.positioning = {
 	relativePoint = "UIParent",
 	anchorPoint = "BOTTOMLEFT",
 	xOffset = 720,

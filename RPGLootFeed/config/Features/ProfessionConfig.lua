@@ -6,7 +6,11 @@ local G_RLF = ns
 
 local ProfessionConfig = {}
 
-G_RLF.defaults.global.prof = {
+---@class RLF_DBGlobal
+local globalDefaults = G_RLF.defaults.global
+
+---@class RLF_ConfigProfession
+globalDefaults.prof = {
 	enabled = true,
 	showSkillChange = true,
 	skillColor = { 0.333, 0.333, 1.0, 1.0 },
