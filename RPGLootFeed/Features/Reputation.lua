@@ -160,7 +160,7 @@ function Rep.Element:new(...)
 		elseif element.repType == RepType.Paragon then
 			if factionData.hasRewardPending then
 				local bagSize = G_RLF.db.global.styling.fontSize
-				str = str .. "|A:ParagonReputation_Bag:" .. bagSize .. ":" .. bagSize .. ":0:0|a    "
+				str = str .. CreateAtlasMarkup("ParagonReputation_Bag", bagSize, bagSize, 0, 0) .. "    "
 			end
 			if
 				factionData.currentValue ~= nil
