@@ -15,6 +15,8 @@ function Money.Element:new(...)
 	G_RLF.InitializeLootDisplayProperties(element)
 
 	element.type = "Money"
+	element.icon = G_RLF.DefaultIcons.MONEY
+	element.quality = Enum.ItemQuality.Poor
 	element.IsEnabled = function()
 		return Money:IsEnabled()
 	end
