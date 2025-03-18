@@ -31,16 +31,16 @@ lint:
     - actionlint@1.7.7
     - bandit@1.8.3
     - black@25.1.0
-    - checkov@3.2.384
+    - checkov@3.2.386
     - git-diff-check
     - isort@6.0.1
     - markdownlint@0.44.0
     - osv-scanner@1.9.2
     - prettier@3.5.3
-    - ruff@0.9.10
+    - ruff@0.10.0
     - shellcheck@0.10.0
     - shfmt@3.6.0
-    - trufflehog@3.88.16
+    - trufflehog@3.88.17
     - yamllint@1.36.0
     - no-invalid-prints
   definitions:
