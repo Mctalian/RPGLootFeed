@@ -6,7 +6,11 @@ local G_RLF = ns
 
 local Animations = {}
 
-G_RLF.defaults.global.animations = {
+---@class RLF_DBGlobal
+local globalDefaults = G_RLF.defaults.global
+
+---@class RLF_ConfigAnimations
+globalDefaults.animations = {
 	enter = {
 		type = G_RLF.EnterAnimationType.FADE,
 		duration = 0.3,

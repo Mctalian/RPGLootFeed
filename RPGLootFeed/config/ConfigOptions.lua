@@ -15,11 +15,15 @@ G_RLF.WrapCharOptions = {
 	[G_RLF.WrapCharEnum.BAR] = G_RLF.L["Bars"],
 }
 
+---@class RLF_DB
 G_RLF.defaults = {
+	---@class RLF_DBProfile
 	profile = {},
+	---@class RLF_DBLocale
 	locale = {
 		factionMap = {},
 	},
+	---@class RLF_DBGlobal
 	global = {
 		lastVersionLoaded = "v1.0.0",
 		logger = {},
@@ -59,7 +63,7 @@ end
 
 local TestMode
 function ConfigOptions:ToggleTestMode()
-	TestMode = TestMode or G_RLF.RLF:GetModule("TestMode")
+	TestMode = TestMode or G_RLF.RLF:GetModule("TestMode") --[[@as RLF_TestMode]]
 	TestMode:ToggleTestMode()
 end
 

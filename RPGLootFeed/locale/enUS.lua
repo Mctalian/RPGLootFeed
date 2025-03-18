@@ -4,6 +4,7 @@ local _, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
+---@class RLF_Locale
 local L = LibStub("AceLocale-3.0"):NewLocale(G_RLF.localeName, "enUS", true)
 
 -- Chat Window Printing
@@ -110,6 +111,8 @@ L["BetterThanEquippedSoundDesc"] = "The sound to play when an item better than w
 L["Item Loot Sounds"] = true
 L["Party Loot Config"] = true
 L["Party Loot Options"] = true
+L["Hide Server Names"] = true
+L["HideServerNamesDesc"] = "Hide server names in the Party Loot Feed"
 L["Party Item Quality Filter"] = true
 L["PartyItemQualityFilterDesc"] = "Check which qualities you would like to show in the Party Loot Feed."
 L["Only Epic and Above in Raid"] = true

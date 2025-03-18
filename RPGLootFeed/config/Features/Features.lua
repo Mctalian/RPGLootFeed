@@ -6,19 +6,30 @@ local G_RLF = ns
 
 local Features = {}
 
-G_RLF.defaults.global.lootHistory = {
+---@class RLF_DBGlobal
+local globalDefaults = G_RLF.defaults.global
+
+---@class RLF_ConfigLootHistory
+globalDefaults.lootHistory = {
 	enabled = true,
 	hideTab = false,
 	historyLimit = 100,
 }
-G_RLF.defaults.global.tooltips = {
+---@class RLF_ConfigTooltips
+globalDefaults.tooltips = {
 	hover = {
 		enabled = true,
 		onShift = false,
 	},
 }
-G_RLF.defaults.global.minimap = {
+---@class RLF_ConfigMinimap : LibDBIcon.button.DB
+---@field hide boolean
+---@field lock boolean
+---@field minimapPos integer
+globalDefaults.minimap = {
 	hide = true,
+	lock = false,
+	minimapPos = 220,
 }
 
 G_RLF.mainFeatureOrder = {

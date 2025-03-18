@@ -10,7 +10,11 @@ local lsm = G_RLF.lsm
 
 local PricesEnum = G_RLF.PricesEnum
 
-G_RLF.defaults.global.item = {
+---@class RLF_DBGlobal
+local globalDefaults = G_RLF.defaults.global
+
+---@class RLF_ConfigItemLoot
+globalDefaults.item = {
 	enabled = true,
 	itemCountTextEnabled = true,
 	itemCountTextColor = { 0.737, 0.737, 0.737, 1 },
@@ -34,7 +38,8 @@ G_RLF.defaults.global.item = {
 		legendary = true,
 		betterThanEquipped = true,
 	},
-	auctionHouseSource = G_RLF.L["None"],
+	---@type string
+	auctionHouseSource = G_RLF.L["None"] --[[@as string]],
 	pricesForSellableItems = PricesEnum.Vendor,
 	sounds = {
 		mounts = {

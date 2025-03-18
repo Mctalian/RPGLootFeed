@@ -6,6 +6,11 @@ local G_RLF = ns
 
 local PartyLootConfig = {}
 
+---@class RLF_DBGlobal
+---@field partyLoot RLF_ConfigPartyLoot
+local globalDefaults = G_RLF.defaults.global
+
+---@class RLF_ConfigPartyLoot
 G_RLF.defaults.global.partyLoot = {
 	enabled = false,
 	itemQualityFilter = {

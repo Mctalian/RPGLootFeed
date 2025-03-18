@@ -7,6 +7,17 @@ local G_RLF = ns
 ---@class RLF_DbMigrations
 local DbMigrations = {}
 
+---@class RLF_DB
+---@field global RLF_DBGlobal
+---@field profile RLF_DBProfile
+---@field locale RLF_DBLocale
+
+---@class RLF_DBGlobal
+
+---@class RLF_DBProfile
+
+---@class RLF_DBLocale
+
 -- Helper function to get or set a nested table value by path
 local function getPath(db, path)
 	local current = db
@@ -57,7 +68,10 @@ local function clearPath(db, path)
 	current[lastKey] = nil
 end
 
--- Migrate function that takes paths as strings
+--- Migrate function that takes paths as strings
+--- @param db RLF_DB
+--- @param oldPath string
+--- @param newPath string
 function DbMigrations:Migrate(db, oldPath, newPath)
 	local oldValue = getPath(db, oldPath)
 	if oldValue ~= nil then
