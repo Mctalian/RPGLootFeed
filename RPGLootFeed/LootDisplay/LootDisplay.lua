@@ -277,11 +277,7 @@ function G_RLF:CalculateTextWidth(text)
 			G_RLF:LogWarn("Font not found: " .. fontFace, addonName)
 			return 0
 		end
-		G_RLF.tempFontString:SetFont(
-			fontPath,
-			G_RLF.db.global.styling.fontSize,
-			G_RLF.defaults.global.styling.fontFlags
-		)
+		G_RLF.tempFontString:SetFont(fontPath, G_RLF.db.global.styling.fontSize, G_RLF:FontFlagsToString())
 	end
 	G_RLF.tempFontString:SetText(text)
 	local width = G_RLF.tempFontString:GetStringWidth()

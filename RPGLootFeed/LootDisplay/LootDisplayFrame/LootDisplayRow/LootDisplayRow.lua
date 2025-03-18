@@ -94,7 +94,10 @@ function LootDisplayRowMixin:Init()
 	self.ClickableButton:SetScript("OnMouseUp", nil)
 	self.ClickableButton:SetScript("OnEvent", nil)
 
-	self:SetSize(G_RLF.db.global.sizing.feedWidth, G_RLF.db.global.sizing.rowHeight)
+	---@type RLF_ConfigSizing
+	local sizingDb = G_RLF.db.global.sizing
+
+	self:SetSize(sizingDb.feedWidth, sizingDb.rowHeight)
 	self:StyleBackground()
 	self:StyleRowBorders()
 	self:StyleExitAnimation()
@@ -329,8 +332,12 @@ end
 function LootDisplayRowMixin:StyleIcon()
 	local changed = false
 
-	local iconSize = G_RLF.db.global.sizing.iconSize
-	local leftAlign = G_RLF.db.global.styling.leftAlign
+	---@type RLF_ConfigSizing
+	local sizingDb = G_RLF.db.global.sizing
+	---@type RLF_ConfigStyling
+	local stylingDb = G_RLF.db.global.styling
+	local iconSize = sizingDb.iconSize
+	local leftAlign = stylingDb.leftAlign
 
 	if self.cachedIconSize ~= iconSize then
 		self.cachedIconSize = iconSize
@@ -361,8 +368,12 @@ end
 function LootDisplayRowMixin:StyleUnitPortrait()
 	local sizeChanged = false
 
-	local iconSize = G_RLF.db.global.sizing.iconSize
-	local leftAlign = G_RLF.db.global.styling.leftAlign
+	---@type RLF_ConfigSizing
+	local sizingDb = G_RLF.db.global.sizing
+	---@type RLF_ConfigStyling
+	local stylingDb = G_RLF.db.global.styling
+	local iconSize = sizingDb.iconSize
+	local leftAlign = stylingDb.leftAlign
 
 	if self.cachedUnitIconSize ~= iconSize or self.cachedUnitLeftAlign ~= leftAlign then
 		self.cachedUnitIconSize = iconSize
@@ -412,7 +423,9 @@ end
 function LootDisplayRowMixin:StyleText()
 	local fontChanged = false
 
+	---@type RLF_ConfigStyling
 	local stylingDb = G_RLF.db.global.styling
+	---@type RLF_ConfigSizing
 	local sizingDb = G_RLF.db.global.sizing
 	local fontFace = stylingDb.fontFace
 	local useFontObjects = stylingDb.useFontObjects
@@ -554,6 +567,7 @@ function LootDisplayRowMixin:StyleText()
 end
 
 function LootDisplayRowMixin:StyleRowBorders()
+	---@type RLF_ConfigStyling
 	local stylingDb = G_RLF.db.global.styling
 	local enableRowBorder = stylingDb.enableRowBorder
 	if not enableRowBorder then
@@ -615,16 +629,19 @@ function LootDisplayRowMixin:StyleHighlightBorder()
 		self.HighlightAnimation:SetToFinalAlpha(true)
 	end
 
-	if
-		self.cachedUpdateDisableHighlight ~= G_RLF.db.global.animations.update.disableHighlight
-		or self.cachedUpdateDuration ~= G_RLF.db.global.animations.update.duration
-		or self.cachedUpdateLoop ~= G_RLF.db.global.animations.update.loop
-	then
-		self.cachedUpdateDisableHighlight = G_RLF.db.global.animations.update.disableHighlight
-		self.cachedUpdateDuration = G_RLF.db.global.animations.update.duration
-		self.cachedUpdateLoop = G_RLF.db.global.animations.update.loop
+	---@type RLF_ConfigAnimations
+	local animationsDb = G_RLF.db.global.animations
 
-		local duration = G_RLF.db.global.animations.update.duration
+	if
+		self.cachedUpdateDisableHighlight ~= animationsDb.update.disableHighlight
+		or self.cachedUpdateDuration ~= animationsDb.update.duration
+		or self.cachedUpdateLoop ~= animationsDb.update.loop
+	then
+		self.cachedUpdateDisableHighlight = animationsDb.update.disableHighlight
+		self.cachedUpdateDuration = animationsDb.update.duration
+		self.cachedUpdateLoop = animationsDb.update.loop
+
+		local duration = animationsDb.update.duration
 		local borders = {
 			self.TopBorder,
 			self.RightBorder,
@@ -655,7 +672,7 @@ function LootDisplayRowMixin:StyleHighlightBorder()
 			b.fadeOut:SetDuration(duration)
 		end
 
-		if G_RLF.db.global.animations.update.loop then
+		if animationsDb.update.loop then
 			self.HighlightAnimation:SetLooping("BOUNCE")
 		else
 			self.HighlightAnimation:SetLooping("NONE")
@@ -666,7 +683,9 @@ end
 function LootDisplayRowMixin:StyleExitAnimation()
 	local animationChanged = false
 
-	local animationsExitDb = G_RLF.db.global.animations.exit
+	---@type RLF_ConfigAnimations
+	local animationsDb = G_RLF.db.global.animations
+	local animationsExitDb = animationsDb.exit
 	local exitAnimationType = animationsExitDb.type
 	local exitDuration = animationsExitDb.duration
 	local exitDelay = animationsExitDb.fadeOutDelay
@@ -734,7 +753,10 @@ end
 function LootDisplayRowMixin:StyleEnterAnimation()
 	local animationChanged = false
 
-	local animationsEnterDb = G_RLF.db.global.animations.enter
+	---@type RLF_ConfigAnimations
+	local animationsDb = G_RLF.db.global.animations
+	local animationsEnterDb = animationsDb.enter
+	---@type RLF_ConfigSizing
 	local sizingDb = G_RLF.db.global.sizing
 	local enterAnimationType = animationsEnterDb.type
 	local slideDirection = animationsEnterDb.slide.direction
@@ -1132,6 +1154,7 @@ end
 
 function LootDisplayRowMixin:UpdateItemCount(element)
 	if element.type == "ItemLoot" and not element.unit then
+		---@type RLF_ConfigItemLoot
 		local itemDb = G_RLF.db.global.item
 		if not itemDb.itemCountTextEnabled then
 			return
@@ -1148,6 +1171,7 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 	end
 
 	if element.type == "Currency" then
+		---@type RLF_ConfigCurrency
 		local currencyDb = G_RLF.db.global.currency
 		if not currencyDb.currencyTotalTextEnabled then
 			return
@@ -1162,6 +1186,7 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 	end
 
 	if element.type == "Reputation" and element.repLevel then
+		---@type RLF_ConfigReputation
 		local repDb = G_RLF.db.global.rep
 		if not repDb.enableRepLevel then
 			return
@@ -1176,6 +1201,7 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 	end
 
 	if element.type == "Experience" and element.currentLevel then
+		---@type RLF_ConfigExperience
 		local xpDb = G_RLF.db.global.xp
 		if not xpDb.showCurrentLevel then
 			return
@@ -1190,6 +1216,7 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 	end
 
 	if element.type == "Professions" then
+		---@type RLF_ConfigProfession
 		local profDb = G_RLF.db.global.prof
 		if not profDb.showSkillChange then
 			return
@@ -1252,6 +1279,9 @@ function LootDisplayRowMixin:UpdateNeighborPositions(frame)
 end
 
 function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
+	if not self.link then
+		return
+	end
 	-- Dynamically size the button to match the PrimaryText width
 	self.ClickableButton:ClearAllPoints()
 	self.ClickableButton:SetPoint("LEFT", self.PrimaryText, "LEFT")
@@ -1260,10 +1290,12 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 	-- Add Tooltip
 	-- Tooltip logic
 	local function showTooltip()
-		if not G_RLF.db.global.tooltips.hover.enabled then
+		---@type RLF_ConfigTooltips
+		local tooltipDb = G_RLF.db.global.tooltips
+		if not tooltipDb.hover.enabled then
 			return
 		end
-		if G_RLF.db.global.tooltips.hover.onShift and not IsShiftKeyDown() then
+		if tooltipDb.hover.onShift and not IsShiftKeyDown() then
 			return
 		end
 		local inCombat = UnitAffectingCombat("player")
@@ -1305,7 +1337,9 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 
 	-- Handle Shift key changes
 	self.ClickableButton:SetScript("OnEvent", function(_, event, key, state)
-		if not G_RLF.db.global.tooltips.hover.onShift then
+		---@type RLF_ConfigTooltips
+		local tooltipDb = G_RLF.db.global.tooltips
+		if not tooltipDb.hover.onShift then
 			return
 		end
 
@@ -1470,7 +1504,9 @@ function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 
 	self.PrimaryText:SetTextColor(r, g, b, a)
 
-	if G_RLF.db.global.styling.enabledSecondaryRowText and self.secondaryText ~= nil and self.secondaryText ~= "" then
+	---@type RLF_ConfigStyling
+	local stylingDb = G_RLF.db.global.styling
+	if stylingDb.enabledSecondaryRowText and self.secondaryText ~= nil and self.secondaryText ~= "" then
 		self.SecondaryText:SetText(self.secondaryText)
 		self.SecondaryText:Show()
 	else
@@ -1484,7 +1520,9 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 		self.icon = icon
 
 		RunNextFrame(function()
-			local iconSize = G_RLF.db.global.sizing.iconSize
+			---@type RLF_ConfigSizing
+			local sizingDb = G_RLF.db.global.sizing
+			local iconSize = sizingDb.iconSize
 			-- Handle quality logic
 			if not quality then
 				self.Icon:SetItem(self.link)
@@ -1528,7 +1566,9 @@ local function isMouseOverSelfOrChildren(frame)
 end
 
 function LootDisplayRowMixin:SetUpHoverEffect()
-	local hoverDb = G_RLF.db.global.animations.hover
+	---@type RLF_ConfigAnimations
+	local animationsDb = G_RLF.db.global.animations
+	local hoverDb = animationsDb.hover
 	local highlightedAlpha = hoverDb.alpha
 	local baseDuration = hoverDb.baseDuration
 
@@ -1571,7 +1611,9 @@ function LootDisplayRowMixin:SetUpHoverEffect()
 
 	-- OnEnter: Play fade-in animation
 	self:SetScript("OnEnter", function()
-		if self.hasMouseOver or not G_RLF.db.global.animations.hover.enabled then
+		---@type RLF_ConfigAnimations
+		local animationsDb = G_RLF.db.global.animations
+		if self.hasMouseOver or not animationsDb.hover.enabled then
 			return
 		end
 		self.hasMouseOver = true
@@ -1638,7 +1680,10 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 	self.unit = data.unit
 	self.PrimaryText:SetText(data.rowText)
 	self.PrimaryText:SetTextColor(unpack(data.textColor))
-	if self.unit and data.secondaryText and G_RLF.db.global.styling.enabledSecondaryRowText then
+
+	---@type RLF_ConfigStyling
+	local stylingDb = G_RLF.db.global.styling
+	if self.unit and data.secondaryText and stylingDb.enabledSecondaryRowText then
 		self.secondaryText = data.secondaryText
 		self.SecondaryText:SetText(self.secondaryText)
 	end
