@@ -2,7 +2,8 @@ import os
 import re
 import sys
 import textwrap
-import xml.etree.ElementTree as ET
+
+import defusedxml.ElementTree as ET
 
 
 # Step 1: Parse locales.xml to extract Lua file names
