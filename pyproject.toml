@@ -8,6 +8,7 @@ charset-normalizer = "3.3.2"
 idna = "3.8"
 requests = "2.32.3"
 urllib3 = "2.2.2"
+defusedxml = "^0.7.1"
 
 [build-system]
 requires = ["poetry-core"]
