@@ -5,4 +5,5 @@
     <Script file="base.lua"/>
     <Script file="v1.lua"/>
     <Script file="v2.lua"/>
+    <Script file="v3.lua"/>
 </Ui>

@@ -82,12 +82,12 @@ G_RLF.options.args.sizing = {
 }
 
 function Sizing:SetFeedWidth(info, value)
-	G_RLF.db.global.sizing.feedWidthedWidth = value
+	G_RLF.db.global.sizing.feedWidth = value
 	G_RLF.LootDisplay:UpdateRowStyles()
 end
 
 function Sizing:GetFeedWidth(info)
-	return G_RLF.db.global.sizing.feedWidthedWidth
+	return G_RLF.db.global.sizing.feedWidth
 end
 
 function Sizing:SetMaxRows(info, value)
