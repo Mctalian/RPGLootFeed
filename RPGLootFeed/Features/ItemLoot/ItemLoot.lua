@@ -203,7 +203,7 @@ function ItemLoot.Element:new(...)
 				return ""
 			end
 			local atlasIconSize = fontSize * 1.5
-			local atlasArrow = "|A:npe_arrowrightglow:" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a"
+			local atlasArrow = CreateAtlasMarkup("npe_arrowrightglow", atlasIconSize, atlasIconSize, 0, 0)
 			return "    " .. fromItemLevel .. " " .. atlasArrow .. " " .. toItemLevel
 		end
 
@@ -237,7 +237,7 @@ function ItemLoot.Element:new(...)
 		if unitPrice then
 			local str = "    "
 			if atlasIcon then
-				str = str .. "|A:" .. atlasIcon .. ":" .. atlasIconSize .. ":" .. atlasIconSize .. ":0:0|a  "
+				str = str .. CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0) .. "  "
 			end
 			str = str .. C_CurrencyInfo.GetCoinTextureString(unitPrice * (quantity or 1))
 			return str
