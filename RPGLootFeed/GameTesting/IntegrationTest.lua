@@ -139,6 +139,15 @@ local function runReputationIntegrationTest()
 	return 1
 end
 
+local function runProfessionIntegrationTest()
+	local module = G_RLF.RLF:GetModule("Professions") --[[@as RLF_Professions]]
+	local e = module.Element:new("Cooking", "Cooking", "4620671", 3, nil, 1)
+	runTestSafely(e.Show, "LootDisplay: Professions", e)
+	e = module.Element:new("Cooking", "Cooking", "4620671", 4, nil, 2)
+	runTestSafely(e.Show, "LootDisplay: Professions Quantity Update", e)
+	return 1
+end
+
 function TestMode:IntegrationTest()
 	if not self.integrationTestReady then
 		G_RLF:Print("Integration test not ready")
@@ -160,6 +169,7 @@ function TestMode:IntegrationTest()
 		newRowsExpected = newRowsExpected + runCurrencyIntegrationTest()
 	end
 	newRowsExpected = newRowsExpected + runReputationIntegrationTest()
+	newRowsExpected = newRowsExpected + runProfessionIntegrationTest()
 
 	assertEqual(frame ~= nil, true, "LootDisplayFrame")
 	C_Timer.After(
