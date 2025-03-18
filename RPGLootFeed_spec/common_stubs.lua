@@ -274,6 +274,12 @@ function common_stubs.setup_G_RLF(spy)
 		GameSounds = {
 			LOOT_SMALL_COIN = 567428,
 		},
+		DefaultIcons = {
+			MONEY = "133785",
+			REPUTATION = "236681",
+			XP = "894556",
+			PROFESSION = "133740",
+		},
 		IsRetail = spy.new(function()
 			return true
 		end),
