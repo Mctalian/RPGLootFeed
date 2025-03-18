@@ -14,6 +14,9 @@ headers = {
     "Accept": "application/vnd.github.v3+json",
 }
 
+DEFAULT_GET_TIMEOUT = 10
+DEFAULT_PATCH_TIMEOUT = 10
+
 
 def get_all_translation_issues():
     """Search for an existing issue for the given locale."""
@@ -21,7 +24,9 @@ def get_all_translation_issues():
     query = f"repo:{REPO_OWNER}/{REPO_NAME} is:issue label:i18n state:open"
     params = {"q": query}
 
-    response = requests.get(search_url, headers=headers, params=params)
+    response = requests.get(
+        search_url, headers=headers, params=params, timeout=DEFAULT_GET_TIMEOUT
+    )
     response.raise_for_status()
     issues = response.json().get("items", [])
 
@@ -47,7 +52,9 @@ def create_issue(locale, markdown_content):
         "labels": ["i18n"],
     }
 
-    response = requests.post(issue_url, headers=headers, json=issue_data)
+    response = requests.post(
+        issue_url, headers=headers, json=issue_data, timeout=DEFAULT_GET_TIMEOUT
+    )
     response.raise_for_status()
     print(f"Issue created: {response.json().get('html_url')}")
 
@@ -59,7 +66,9 @@ def update_issue(issue_number, markdown_content):
         "body": markdown_content,
     }
 
-    response = requests.patch(issue_url, headers=headers, json=issue_data)
+    response = requests.patch(
+        issue_url, headers=headers, json=issue_data, timeout=DEFAULT_PATCH_TIMEOUT
+    )
     response.raise_for_status()
     print(f"Issue updated: {response.json().get('html_url')}")
 
