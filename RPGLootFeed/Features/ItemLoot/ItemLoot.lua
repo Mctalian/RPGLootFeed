@@ -189,7 +189,7 @@ function ItemLoot.Element:new(...)
 			if not name then
 				return "A former party member"
 			end
-			if server then
+			if server and G_RLF.db.global.partyLoot.hideServerNames then
 				return "    " .. name .. "-" .. server
 			end
 			return "    " .. name

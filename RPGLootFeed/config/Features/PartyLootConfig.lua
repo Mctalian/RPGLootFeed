@@ -23,6 +23,7 @@ G_RLF.defaults.global.partyLoot = {
 		[G_RLF.ItemQualEnum.Artifact] = true,
 		[G_RLF.ItemQualEnum.Heirloom] = true,
 	},
+	hideServerNames = false,
 	onlyEpicAndAboveInRaid = true,
 	onlyEpicAndAboveInInstance = true,
 }
@@ -55,6 +56,19 @@ G_RLF.options.args.features.args.partyLootConfig = {
 			end,
 			order = 2,
 			args = {
+				hideServerNames = {
+					type = "toggle",
+					name = G_RLF.L["Hide Server Names"],
+					desc = G_RLF.L["HideServerNamesDesc"],
+					width = "double",
+					get = function()
+						return G_RLF.db.global.partyLoot.hideServerNames
+					end,
+					set = function(_, value)
+						G_RLF.db.global.partyLoot.hideServerNames = value
+					end,
+					order = 1,
+				},
 				itemQualityFilter = {
 					type = "multiselect",
 					name = G_RLF.L["Party Item Quality Filter"],
@@ -75,7 +89,7 @@ G_RLF.options.args.features.args.partyLootConfig = {
 					set = function(_, key, value)
 						G_RLF.db.global.partyLoot.itemQualityFilter[key] = value
 					end,
-					order = 1,
+					order = 2,
 				},
 				onlyEpicAndAboveInRaid = {
 					type = "toggle",
@@ -87,9 +101,10 @@ G_RLF.options.args.features.args.partyLootConfig = {
 					end,
 					set = function(_, value)
 						G_RLF.db.global.partyLoot.onlyEpicAndAboveInRaid = value
-						G_RLF.RLF:GetModule("ItemLoot"):SetPartyLootFilters()
+						local itemLoot = G_RLF.RLF:GetModule("ItemLoot") --[[@as RLF_ItemLoot]]
+						itemLoot:SetPartyLootFilters()
 					end,
-					order = 2,
+					order = 3,
 				},
 				onlyEpicAndAboveInInstance = {
 					type = "toggle",
@@ -101,9 +116,10 @@ G_RLF.options.args.features.args.partyLootConfig = {
 					end,
 					set = function(_, value)
 						G_RLF.db.global.partyLoot.onlyEpicAndAboveInInstance = value
-						G_RLF.RLF:GetModule("ItemLoot"):SetPartyLootFilters()
+						local itemLoot = G_RLF.RLF:GetModule("ItemLoot") --[[@as RLF_ItemLoot]]
+						itemLoot:SetPartyLootFilters()
 					end,
-					order = 3,
+					order = 4,
 				},
 			},
 		},
