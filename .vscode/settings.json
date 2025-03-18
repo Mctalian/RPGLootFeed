@@ -70,7 +70,11 @@
     "LootAlertSystem",
     "GetNameAndServerNameFromGUID",
     "BossBanner",
-    "XP"
+    "XP",
+    "MONEY",
+    "REPUTATION",
+    "TextureKitConstants",
+    "GetItemButtonIconTexture"
   ],
   "Lua.workspace.library": [
     "${addons}/busted/module/library",

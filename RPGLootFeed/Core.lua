@@ -37,6 +37,9 @@ G_RLF.DBIcon = LibStub("LibDBIcon-1.0")
 local TestMode
 function RLF:OnInitialize()
 	---@class RLF_DB : AceDBObject-3.0
+	---@field global RLF_DBGlobal
+	---@field locale RLF_DBLocale
+	---@field profile RLF_DBProfile
 	G_RLF.db = LibStub("AceDB-3.0"):New(dbName, G_RLF.defaults, true)
 	DbMigrations()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)

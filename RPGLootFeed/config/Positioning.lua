@@ -11,6 +11,7 @@ local globalDefaults = G_RLF.defaults.global
 
 ---@class RLF_ConfigPositioning
 globalDefaults.positioning = {
+	---@type string | ScriptRegion
 	relativePoint = "UIParent",
 	anchorPoint = "BOTTOMLEFT",
 	xOffset = 720,

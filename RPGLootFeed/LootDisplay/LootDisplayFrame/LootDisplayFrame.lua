@@ -138,6 +138,7 @@ function LootDisplayFrameMixin:Load()
 	keyRowMap = {
 		length = 0,
 	}
+	---@type RLF_LootHistoryRowData[]
 	self.rowHistory = {}
 	self.rowFramePool = CreateFramePool("Frame", self, "LootDisplayRowTemplate")
 	self.vertDir, self.opposite, self.yOffset = getPositioningDetails()
@@ -194,7 +195,7 @@ function LootDisplayFrameMixin:OnDragStop()
 	-- Save the new position
 	local point, relativeTo, relativePoint, xOfs, yOfs = self:GetPoint()
 	G_RLF.db.global.positioning.anchorPoint = point
-	G_RLF.db.global.positioning.relativePoint = relativeTo or -1
+	G_RLF.db.global.positioning.relativePoint = relativeTo or "UIParent"
 	G_RLF.db.global.positioning.xOffset = xOfs
 	G_RLF.db.global.positioning.yOffset = yOfs
 
@@ -292,6 +293,7 @@ function LootDisplayFrameMixin:StoreRowHistory(row)
 		return
 	end
 
+	---@class RLF_LootHistoryRowData
 	local rowData = {
 		key = row.key,
 		amount = row.amount,
@@ -353,12 +355,13 @@ function LootDisplayFrameMixin:CreateHistoryFrame()
 	self.historyFrame:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)
 	self.historyFrame.title = self.historyFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
 	self.historyFrame.title:SetPoint("BOTTOMLEFT", self.historyFrame, "TOPLEFT", 0, 0)
-	self.historyFrame.title:SetText(G_RLF.L["Loot History"])
+	self.historyFrame.title:SetText(G_RLF.L["Loot History"] --[[@as string]])
 
 	self.historyContent = CreateFrame("Frame", "LootHistoryFrameContent", self.historyFrame)
 	self.historyContent:SetSize(self:GetSize())
 	self.historyFrame:SetScrollChild(self.historyContent)
 
+	---@type RLF_LootDisplayRow[]
 	self.historyRows = {}
 	local sizingDb = G_RLF.db.global.sizing
 	for i = 1, sizingDb.maxRows do
@@ -374,6 +377,7 @@ end
 
 function LootDisplayFrameMixin:UpdateHistoryFrame(offset)
 	offset = offset or 0
+	---@type RLF_ConfigSizing
 	local sizingDb = G_RLF.db.global.sizing
 	local padding = sizingDb.padding
 	local feedWidth = sizingDb.feedWidth

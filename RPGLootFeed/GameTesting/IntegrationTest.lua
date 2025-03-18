@@ -7,7 +7,7 @@ local G_RLF = ns
 --@alpha@
 -- trunk-ignore-begin(no-invalid-prints/invalid-print)
 ---@type RLF_TestMode
-local TestMode = G_RLF.RLF:GetModule("TestMode")
+local TestMode = G_RLF.RLF:GetModule("TestMode") --[[@as RLF_TestMode]]
 local tests = {}
 local prints = ""
 local successCount = 0
@@ -65,21 +65,25 @@ local function displayResults()
 end
 
 local function runExperienceIntegrationTest()
-	local module = G_RLF.RLF:GetModule("Experience")
+	local module = G_RLF.RLF:GetModule("Experience") --[[@as RLF_Experience]]
 	local e = module.Element:new(1337)
 	runTestSafely(e.Show, "LootDisplay: Experience", e)
 	return 1
 end
 
 local function runMoneyIntegrationTest()
-	local module = G_RLF.RLF:GetModule("Money")
+	local module = G_RLF.RLF:GetModule("Money") --[[@as RLF_Money]]
 	local e = module.Element:new(12345)
+	if not e then
+		G_RLF:Print("Money element not created, something went wrong")
+		return 1
+	end
 	runTestSafely(e.Show, "LootDisplay: Money", e)
 	return 1
 end
 
 local function runItemLootIntegrationTest()
-	local module = G_RLF.RLF:GetModule("ItemLoot")
+	local module = G_RLF.RLF:GetModule("ItemLoot") --[[@as RLF_ItemLoot]]
 	local info = TestMode.testItems[2]
 	local amountLooted = 1
 	local rowsShown = 0
@@ -105,19 +109,27 @@ local function runItemLootIntegrationTest()
 end
 
 local function runCurrencyIntegrationTest()
-	local module = G_RLF.RLF:GetModule("Currency")
+	local module = G_RLF.RLF:GetModule("Currency") --[[@as RLF_Currency]]
 	local testObj = TestMode.testCurrencies[2]
 	local amountLooted = 1
 	testObj.basicInfo.displayAmount = amountLooted
 	local e = module.Element:new(testObj.link, testObj.info, testObj.basicInfo)
+	if not e then
+		G_RLF:Print("Currency element not created, something went wrong")
+		return 1
+	end
 	runTestSafely(e.Show, "LootDisplay: Currency", e)
 	e = module.Element:new(testObj.link, testObj.info, testObj.basicInfo)
+	if not e then
+		G_RLF:Print("Currency update element not created, something went wrong")
+		return 1
+	end
 	runTestSafely(e.Show, "LootDisplay: Currency Quantity Update", e)
 	return 1
 end
 
 local function runReputationIntegrationTest()
-	local module = G_RLF.RLF:GetModule("Reputation")
+	local module = G_RLF.RLF:GetModule("Reputation") --[[@as RLF_Reputation]]
 	local testObj = TestMode.testFactions[2]
 	local amountLooted = 664
 	local e = module.Element:new(amountLooted, testObj)
