@@ -38,7 +38,7 @@ function G_RLF:ProfileFunction(func, funcName)
 		local result = { func(...) }
 		local endTime = debugprofilestop()
 		local duration = endTime - startTime
-		if duration > 0.3 then
+		if duration > 0.8 then
 			G_RLF:Print(string.format("%s took %.2f ms", funcName, endTime - startTime))
 		end
 

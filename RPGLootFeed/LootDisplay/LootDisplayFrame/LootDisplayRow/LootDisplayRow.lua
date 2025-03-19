@@ -62,6 +62,7 @@ local G_RLF = ns
 ---@field RightBorder RLF_RowBorderTexture
 ---@field BottomBorder RLF_RowBorderTexture
 ---@field LeftBorder RLF_RowBorderTexture
+---@field MajorFactionIcon Texture
 ---@field ClickableButton Button
 ---@field Icon RLF_RowItemButton
 ---@field glowTexture table
@@ -952,7 +953,7 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	self.id = key
 	self.amount = quantity
 	self.type = element.type
-	self.isAtlas = element.atlas or false
+	self.texCoords = element.texCoords or nil
 	self.quality = quality
 
 	if isLink then
@@ -974,7 +975,7 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	end
 
 	if icon then
-		self:UpdateIcon(key, icon, quality, element.atlas)
+		self:UpdateIcon(key, icon, quality, element.texCoords)
 	end
 
 	self:UpdateSecondaryText(secondaryTextFn)
@@ -1516,47 +1517,54 @@ function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 	end
 end
 
-local function GetItemButtonIconTexture(button)
-	return button.Icon or button.icon or _G[button:GetName() .. "IconTexture"]
-end
+function LootDisplayRowMixin:UpdateIcon(key, icon, quality, texCoords)
+	self.icon = icon
 
-function LootDisplayRowMixin:UpdateIcon(key, icon, quality, isAtlas)
-	-- Only update if the icon has changed
-	if icon and self.icon ~= icon then
-		self.icon = icon
+	RunNextFrame(function()
+		---@type RLF_ConfigSizing
+		local sizingDb = G_RLF.db.global.sizing
+		local iconSize = sizingDb.iconSize
 
-		RunNextFrame(function()
-			---@type RLF_ConfigSizing
-			local sizingDb = G_RLF.db.global.sizing
-			local iconSize = sizingDb.iconSize
-			-- Handle quality logic
-			if isAtlas then
-				local i = GetItemButtonIconTexture(self.Icon)
-				i:SetAtlas(icon)
-			elseif not quality then
-				self.Icon:SetItem(self.link)
-			else
-				self.Icon:SetItemButtonTexture(icon)
-				self.Icon:SetItemButtonQuality(quality, self.link)
+		---@type RLF_TexCoords
+		if texCoords then
+			self.MajorFactionIcon:ClearAllPoints()
+			self.MajorFactionIcon:SetAlpha(1)
+			self.MajorFactionIcon:SetTexture(icon)
+			self.MajorFactionIcon:SetTexCoord(texCoords.left, texCoords.right, texCoords.top, texCoords.bottom)
+			self.MajorFactionIcon:SetWidth(iconSize)
+			self.MajorFactionIcon:SetHeight(iconSize)
+			self.MajorFactionIcon:SetAllPoints(self.Icon)
+			self.Icon:SetNormalTexture(self.MajorFactionIcon)
+			if quality then
+				self.Icon:SetItemButtonQuality(quality)
 			end
+		-- Handle quality logic
+		elseif not quality then
+			self.Icon:SetItem(self.link)
+		else
+			self.Icon:SetItemButtonTexture(icon)
+			self.Icon:SetItemButtonQuality(quality, self.link)
+		end
 
-			if self.Icon.IconOverlay then
-				self.Icon.IconOverlay:SetSize(iconSize, iconSize)
-			end
-			if self.Icon.ProfessionQualityOverlay then
-				self.Icon.ProfessionQualityOverlay:SetSize(iconSize, iconSize)
-			end
+		if self.Icon.IconOverlay then
+			self.Icon.IconOverlay:SetSize(iconSize, iconSize)
+		end
+		if self.Icon.ProfessionQualityOverlay then
+			self.Icon.ProfessionQualityOverlay:SetSize(iconSize, iconSize)
+		end
 
-			self.Icon.NormalTexture:SetTexture(nil)
-			self.Icon.HighlightTexture:SetTexture(nil)
-			self.Icon.PushedTexture:SetTexture(nil)
+		if not texCoords then
+			self.Icon:ClearDisabledTexture()
+			self.Icon:ClearNormalTexture()
+			self.Icon:ClearPushedTexture()
+			self.Icon:ClearHighlightTexture()
+		end
 
-			-- Masque reskinning (may be costly, consider reducing frequency)
-			if G_RLF.Masque and G_RLF.iconGroup then
-				G_RLF.iconGroup:ReSkin(self.Icon)
-			end
-		end)
-	end
+		-- Masque reskinning (may be costly, consider reducing frequency)
+		if G_RLF.Masque and G_RLF.iconGroup then
+			G_RLF.iconGroup:ReSkin(self.Icon)
+		end
+	end)
 end
 
 -- Utility function to check if the mouse is over the parent or any of its children
@@ -1697,7 +1705,7 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 		self.SecondaryText:SetText(self.secondaryText)
 	end
 	if data.icon then
-		self:UpdateIcon(self.key, data.icon, self.quality, data.isAtlas)
+		self:UpdateIcon(self.key, data.icon, self.quality, data.texCoords)
 		self:SetupTooltip(true)
 	else
 		self.icon = nil
