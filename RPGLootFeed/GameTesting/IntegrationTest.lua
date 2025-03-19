@@ -141,9 +141,13 @@ end
 
 local function runProfessionIntegrationTest()
 	local module = G_RLF.RLF:GetModule("Professions") --[[@as RLF_Professions]]
-	local e = module.Element:new("Cooking", "Cooking", "4620671", 3, nil, 1)
+	local icon = "4620671"
+	if G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+		icon = G_RLF.DefaultIcons.PROFESSION
+	end
+	local e = module.Element:new("Cooking", "Cooking", icon, 3, nil, 1)
 	runTestSafely(e.Show, "LootDisplay: Professions", e)
-	e = module.Element:new("Cooking", "Cooking", "4620671", 4, nil, 2)
+	e = module.Element:new("Cooking", "Cooking", icon, 4, nil, 2)
 	runTestSafely(e.Show, "LootDisplay: Professions Quantity Update", e)
 	return 1
 end
