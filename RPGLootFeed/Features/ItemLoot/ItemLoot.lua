@@ -148,7 +148,7 @@ function ItemLoot.Element:new(...)
 	info, element.quantity, element.unit, fromLink = ...
 	itemLink = info.itemLink
 
-	element.key = info.itemId
+	element.key = info.itemLink
 	if fromLink then
 		element.key = "UPGRADE_" .. element.key
 	end
