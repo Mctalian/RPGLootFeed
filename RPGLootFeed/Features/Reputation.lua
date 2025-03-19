@@ -126,9 +126,23 @@ function Rep.Element:new(...)
 	end
 
 	if factionData ~= nil and factionData.textureKit then
-		element.atlas = true
 		local majorFactionIconFormat = "majorFactions_icons_%s512"
-		element.icon = majorFactionIconFormat:format(factionData.textureKit)
+		local atlas = majorFactionIconFormat:format(factionData.textureKit)
+		local atlasInfo = C_Texture.GetAtlasInfo(atlas)
+		if atlasInfo and atlasInfo.file then
+			G_RLF:Print("Atlas file: " .. atlasInfo.file)
+			element.icon = atlasInfo.file
+			---@class RLF_TexCoords
+			element.texCoords = {
+				left = atlasInfo.leftTexCoord,
+				right = atlasInfo.rightTexCoord,
+				top = atlasInfo.topTexCoord,
+				bottom = atlasInfo.bottomTexCoord,
+			}
+		else
+			element.icon = G_RLF.DefaultIcons.REPUTATION
+		end
+		element.quality = Enum.ItemQuality.Heirloom
 	else
 		element.atlas = false
 		element.icon = G_RLF.DefaultIcons.REPUTATION
