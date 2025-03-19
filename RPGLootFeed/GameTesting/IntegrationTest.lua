@@ -87,25 +87,27 @@ local function runItemLootIntegrationTest()
 	local info = TestMode.testItems[2]
 	local amountLooted = 1
 	local rowsShown = 0
-	local e = module.Element:new(info, amountLooted, false)
+	local e = module.Element:new(info, amountLooted)
 	if info.itemName == nil then
 		G_RLF:Print("Item not cached, skipping ItemLoot test")
 	else
 		e.highlight = true
 		runTestSafely(e.Show, "LootDisplay: Item", e, info.itemName, info.itemQuality)
-		e = module.Element:new(info, amountLooted, false)
+		e = module.Element:new(info, amountLooted)
 		e.highlight = true
 		runTestSafely(e.Show, "LootDisplay: Item Quantity Update", e, info.itemName, info.itemQuality)
 		rowsShown = rowsShown + 1
-		if G_RLF.db.global.partyLoot.enabled then
-			e = module.Element:new(info, amountLooted, "player")
-			runTestSafely(e.Show, "LootDisplay: Item Party", e, info.itemName, info.itemQuality)
-			rowsShown = rowsShown + 1
-		else
-			G_RLF:Print("Party loot disabled, skipping ItemLoot Party test")
-		end
 	end
 	return rowsShown
+end
+
+local function runPartyLootIntegrationTest()
+	local module = G_RLF.RLF:GetModule("PartyLoot") --[[@as RLF_PartyLoot]]
+	local info = TestMode.testItems[2]
+	local amountLooted = 1
+	local e = module.Element:new(info, amountLooted, "player")
+	runTestSafely(e.Show, "LootDisplay: Party Item", e, info.itemName, info.itemQuality)
+	return 1
 end
 
 local function runCurrencyIntegrationTest()
@@ -171,6 +173,9 @@ function TestMode:IntegrationTest()
 	newRowsExpected = newRowsExpected + runItemLootIntegrationTest()
 	if GetExpansionLevel() >= G_RLF.Expansion.SL then
 		newRowsExpected = newRowsExpected + runCurrencyIntegrationTest()
+	end
+	if G_RLF.db.global.partyLoot.enabled then
+		newRowsExpected = newRowsExpected + runPartyLootIntegrationTest()
 	end
 	newRowsExpected = newRowsExpected + runReputationIntegrationTest()
 	newRowsExpected = newRowsExpected + runProfessionIntegrationTest()

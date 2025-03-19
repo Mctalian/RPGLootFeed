@@ -24,46 +24,6 @@ function ItemLoot:ItemQualityName(enumValue)
 	return nil
 end
 
-function ItemLoot:SetNameUnitMap()
-	local units = {}
-	local groupMembers = GetNumGroupMembers()
-	if IsInRaid() then
-		for i = 1, groupMembers do
-			table.insert(units, "raid" .. i)
-		end
-	else
-		table.insert(units, "player")
-
-		for i = 2, groupMembers do
-			table.insert(units, "party" .. (i - 1))
-		end
-	end
-
-	self.nameUnitMap = {}
-	for _, unit in ipairs(units) do
-		local name, server = UnitName(unit)
-		if name then
-			self.nameUnitMap[name] = unit
-		else
-			G_RLF:LogError("Failed to get name for unit: " .. unit, addonName, self.moduleName)
-		end
-	end
-end
-
-function ItemLoot:SetPartyLootFilters()
-	if IsInRaid() and G_RLF.db.global.partyLoot.onlyEpicAndAboveInRaid then
-		onlyEpicPartyLoot = true
-		return
-	end
-
-	if IsInInstance() and G_RLF.db.global.partyLoot.onlyEpicAndAboveInInstance then
-		onlyEpicPartyLoot = true
-		return
-	end
-
-	onlyEpicPartyLoot = false
-end
-
 local function IsMount(info)
 	if G_RLF.db.global.item.itemHighlights.mounts then
 		return info:IsMount()
@@ -145,7 +105,7 @@ function ItemLoot.Element:new(...)
 	element.isLink = true
 
 	local itemLink, info, fromLink
-	info, element.quantity, element.unit, fromLink = ...
+	info, element.quantity, fromLink = ...
 	itemLink = info.itemLink
 
 	element.key = info.itemLink
@@ -155,10 +115,6 @@ function ItemLoot.Element:new(...)
 
 	element.icon = info.itemTexture
 	element.sellPrice = info.sellPrice
-
-	if not G_RLF.db.global.partyLoot.enabled then
-		element.unit = nil
-	end
 
 	function element:isPassingFilter(itemName, itemQuality)
 		if not G_RLF.db.global.item.itemQualityFilter[itemQuality] then
@@ -184,17 +140,6 @@ function ItemLoot.Element:new(...)
 	end
 
 	element.secondaryTextFn = function(...)
-		if element.unit then
-			local name, server = UnitName(element.unit)
-			if not name then
-				return "A former party member"
-			end
-			if server and G_RLF.db.global.partyLoot.hideServerNames then
-				return "    " .. name .. "-" .. server
-			end
-			return "    " .. name
-		end
-
 		local fontSize = G_RLF.db.global.styling.fontSize
 
 		if fromLink ~= "" and fromLink ~= nil then
@@ -305,8 +250,6 @@ end
 
 function ItemLoot:OnInitialize()
 	self.pendingItemRequests = {}
-	self.pendingPartyRequests = {}
-	self.nameUnitMap = {}
 	if G_RLF.db.global.item.enabled then
 		self:Enable()
 	else
@@ -317,38 +260,20 @@ end
 function ItemLoot:OnDisable()
 	self:UnregisterEvent("CHAT_MSG_LOOT")
 	self:UnregisterEvent("GET_ITEM_INFO_RECEIVED")
-	self:UnregisterEvent("GROUP_ROSTER_UPDATE")
 end
 
 function ItemLoot:OnEnable()
 	self:RegisterEvent("CHAT_MSG_LOOT")
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
-	self:RegisterEvent("GROUP_ROSTER_UPDATE")
-	self:SetNameUnitMap()
 	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
 function ItemLoot:OnItemReadyToShow(info, amount, fromLink)
 	self.pendingItemRequests[info.itemId] = nil
-	local e = ItemLoot.Element:new(info, amount, false, fromLink)
+	local e = ItemLoot.Element:new(info, amount, fromLink)
 	e:SetHighlight()
 	e:Show(info.itemName, info.itemQuality)
 	e:PlaySoundIfEnabled()
-end
-
-function ItemLoot:OnPartyReadyToShow(info, amount, unit)
-	if not unit then
-		return
-	end
-	if onlyEpicPartyLoot and info.itemQuality < Enum.ItemQuality.Epic then
-		return
-	end
-	if G_RLF.db.global.partyLoot.itemQualityFilter[info.itemQuality] == false then
-		return
-	end
-	self.pendingPartyRequests[info.itemId] = nil
-	local e = ItemLoot.Element:new(info, amount, unit)
-	e:Show(info.itemName, info.itemQuality)
 end
 
 function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
@@ -361,29 +286,6 @@ function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
 			local info = ItemInfo:new(itemID, C.Item.GetItemInfo(itemLink))
 			self:OnItemReadyToShow(info, amount, fromLink)
 		end
-		return
-	end
-
-	if self.pendingPartyRequests[itemID] then
-		local itemLink, amount, unit = unpack(self.pendingPartyRequests[itemID])
-
-		if not success then
-			error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount .. " for " .. unit)
-		else
-			local info = ItemInfo:new(itemID, C.Item.GetItemInfo(itemLink))
-			self:OnPartyReadyToShow(info, amount, unit)
-		end
-		return
-	end
-end
-
-function ItemLoot:ShowPartyLoot(msg, itemLink, unit)
-	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
-	local itemId = itemLink:match("Hitem:(%d+)")
-	self.pendingPartyRequests[itemId] = { itemLink, amount, unit }
-	local info = ItemInfo:new(itemId, C.Item.GetItemInfo(itemLink))
-	if info ~= nil then
-		self:OnPartyReadyToShow(info, amount, unit)
 	end
 end
 
@@ -423,6 +325,11 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 		me = playerName2 == UnitName("player")
 	end
 
+	-- Only process our own loot now, party loot is handled by PartyLoot module
+	if not me then
+		return
+	end
+
 	local itemLink, fromLink = nil, nil
 	local itemLinks = extractItemLinks(msg)
 
@@ -434,50 +341,9 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 		itemLink = itemLinks[1]
 	end
 
-	if not me then
-		if not G_RLF.db.global.partyLoot.enabled then
-			G_RLF:LogDebug("Party Loot Ignored", "WOWEVENT", self.moduleName, "", msg)
-			return
-		end
-		local name = playerName
-		if name == "" or name == nil then
-			name = playerName2
-		end
-		local sanitizedPlayerName = name:gsub("%-.+", "")
-		local unit = self.nameUnitMap[sanitizedPlayerName]
-		if not unit then
-			G_RLF:LogDebug(
-				"Party Loot Ignored - no matching party member (" .. sanitizedPlayerName .. ")",
-				"WOWEVENT",
-				self.moduleName,
-				"",
-				msg
-			)
-			return
-		end
-
-		if fromLink then
-			G_RLF:LogDebug(
-				"Party item upgrades are apparently captured in CHAT_MSG_LOOT. TODO: may need to support this."
-			)
-			return
-		end
-		if itemLink then
-			self:fn(self.ShowPartyLoot, self, msg, itemLink, unit)
-		end
-		return
-	end
-
 	if itemLink then
 		self:fn(self.ShowItemLoot, self, msg, itemLink, fromLink)
 	end
-end
-
-function ItemLoot:GROUP_ROSTER_UPDATE(eventName, ...)
-	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, nil, eventName)
-
-	self:SetNameUnitMap()
-	self:SetPartyLootFilters()
 end
 
 return ItemLoot
