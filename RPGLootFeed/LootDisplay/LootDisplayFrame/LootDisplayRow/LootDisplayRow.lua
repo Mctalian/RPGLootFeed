@@ -546,13 +546,14 @@ function LootDisplayRowMixin:StyleText()
 			if self.icon then
 				if self.unit then
 					self.SecondaryText:SetPoint(anchor, self.UnitPortrait, iconAnchor, xOffset, 0)
-					local classColor
-					if GetExpansionLevel() >= G_RLF.Expansion.BFA then
-						classColor = C_ClassColor.GetClassColor(select(2, UnitClass(self.unit)))
-					else
-						classColor = RAID_CLASS_COLORS[select(2, UnitClass(self.unit))]
+					if self.elementSecondaryTextColor then
+						self.SecondaryText:SetTextColor(
+							self.elementSecondaryTextColor.r,
+							self.elementSecondaryTextColor.g,
+							self.elementSecondaryTextColor.b,
+							1
+						)
 					end
-					self.SecondaryText:SetTextColor(classColor.r, classColor.g, classColor.b, 1)
 				else
 					self.SecondaryText:SetPoint(anchor, self.Icon, iconAnchor, xOffset, 0)
 				end
@@ -943,6 +944,9 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	local unit = element.unit
 	local itemCount = element.itemCount
 	local highlight = element.highlight
+	self.elementSecondaryText = element.secondaryText or nil
+	---@type ColorMixin|ColorMixin_RCC|nil
+	self.elementSecondaryTextColor = element.secondaryTextColor or nil
 	local text
 
 	if unit then
@@ -1106,9 +1110,18 @@ function LootDisplayRowMixin:UpdateFadeoutDelay()
 end
 
 function LootDisplayRowMixin:UpdateSecondaryText(secondaryTextFn)
+	if not G_RLF.db.global.styling.enabledSecondaryRowText then
+		self.secondaryText = nil
+		return
+	end
+
+	if self.elementSecondaryText then
+		self.secondaryText = self.elementSecondaryText
+		return
+	end
+
 	if
-		G_RLF.db.global.styling.enabledSecondaryRowText
-		and type(secondaryTextFn) == "function"
+		type(secondaryTextFn) == "function"
 		and secondaryTextFn(self.amount) ~= ""
 		and secondaryTextFn(self.amount) ~= nil
 	then
@@ -1700,9 +1713,10 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 
 	---@type RLF_ConfigStyling
 	local stylingDb = G_RLF.db.global.styling
-	if self.unit and data.secondaryText and stylingDb.enabledSecondaryRowText then
+	if data.unit and data.secondaryText and stylingDb.enabledSecondaryRowText then
 		self.secondaryText = data.secondaryText
-		self.SecondaryText:SetText(self.secondaryText)
+		self.SecondaryText:SetText(data.secondaryText)
+		self.SecondaryText:SetTextColor(unpack(data.secondaryTextColor))
 	end
 	if data.icon then
 		self:UpdateIcon(self.key, data.icon, self.quality, data.texCoords)

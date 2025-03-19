@@ -4,6 +4,7 @@
 ..\FrameXML\UI.xsd">
     <Script file="LootDisplayProperties.lua"/>
     <Include file="ItemLoot/ItemLoot.xml"/>
+    <Include file="PartyLoot/PartyLoot.xml"/>
     <Include file="Currency/Currency.xml"/>
     <Script file="Money.lua"/>
     <Script file="Experience.lua"/>

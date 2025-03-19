@@ -231,7 +231,7 @@ local function generateRandomLoot()
 			local info = TestMode.testItems[math.random(#TestMode.testItems)]
 			local amountLooted = math.random(1, 5)
 			local module = G_RLF.RLF:GetModule("ItemLoot") --[[@as RLF_ItemLoot]]
-			local e = module.Element:new(info, amountLooted, false)
+			local e = module.Element:new(info, amountLooted)
 			e:Show(info.itemName, info.itemQuality)
 			e:PlaySoundIfEnabled()
 			e:SetHighlight()
@@ -240,7 +240,7 @@ local function generateRandomLoot()
 			-- 10% chance of item loot to show up as a party member
 			if rng < 0.3 then
 				local unit = "player"
-				local module = G_RLF.RLF:GetModule("ItemLoot") --[[@as RLF_ItemLoot]]
+				local module = G_RLF.RLF:GetModule("PartyLoot") --[[@as RLF_PartyLoot]]
 				local e = module.Element:new(info, amountLooted, unit)
 				e:Show(info.itemName, info.itemQuality)
 				G_RLF:LogDebug("Party Item looted: " .. info.itemName, addonName)

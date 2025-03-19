@@ -305,6 +305,7 @@ function LootDisplayFrameMixin:StoreRowHistory(row)
 		textColor = { row.PrimaryText:GetTextColor() },
 		unit = row.unit,
 		secondaryText = row.SecondaryText:GetText(),
+		secondaryTextColor = { row.SecondaryText:GetTextColor() },
 	}
 	table.insert(self.rowHistory, 1, rowData)
 

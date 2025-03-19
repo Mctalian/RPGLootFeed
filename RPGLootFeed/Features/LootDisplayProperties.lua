@@ -8,6 +8,7 @@ G_RLF.LootDisplayProperties = {
 	"key",
 	"textFn",
 	"secondaryTextFn",
+	"secondaryText",
 	"unit",
 	"sellPrice",
 	"isLink",
@@ -21,6 +22,7 @@ G_RLF.LootDisplayProperties = {
 	"a",
 	"logFn",
 	"texCoords",
+	"eventChannel",
 }
 
 ---@class RLF_LootElement
@@ -32,6 +34,7 @@ G_RLF.LootDisplayProperties = {
 ---@field public isLink boolean
 ---@field public icon number
 ---@field public texCoords table
+---@field public eventChannel string
 ---@field public quantity number
 ---@field public quality number
 ---@field public totalCount number
@@ -50,6 +53,7 @@ function G_RLF.InitializeLootDisplayProperties(element)
 	end
 
 	element.isLink = false
+	element.eventChannel = "RLF_NEW_LOOT"
 
 	function element:isPassingFilter(_itemName, _itemQuality)
 		return true
@@ -58,7 +62,7 @@ function G_RLF.InitializeLootDisplayProperties(element)
 	element.Show = function(element, itemName, itemQuality)
 		G_RLF:LogDebug("Show", addonName, element.type, element.key, nil, element.quantity)
 		if element:isPassingFilter(itemName, itemQuality) then
-			G_RLF:SendMessage("RLF_NEW_LOOT", element)
+			G_RLF:SendMessage(element.eventChannel, element)
 		end
 	end
 
