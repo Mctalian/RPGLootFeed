@@ -81,6 +81,7 @@ G_RLF.options.args.features.args.currencyConfig = {
 							type = "color",
 							name = G_RLF.L["Currency Total Text Color"],
 							desc = G_RLF.L["CurrencyTotalTextColorDesc"],
+							hasAlpha = true,
 							disabled = function()
 								return not G_RLF.db.global.currency.currencyTotalTextEnabled
 							end,
