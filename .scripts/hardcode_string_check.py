@@ -17,12 +17,18 @@ def check_hardcoded_strings(file_content, filename):
     issues = []
 
     # Check for Print(...) calls with hard-coded strings
-    print_matches = re.findall(r'Print\(\s*"([^"]+)"\s*\)', file_content)
+    print_matches = re.findall(
+        r'(?:\w+:)?Print\(\s*"([^"]+)(?:"(?:\s*\+|\s*\.\.)\s*|\s*"\s*\))',
+        file_content,
+        re.DOTALL,
+    )
     for match in print_matches:
         issues.append(f'Hard-coded string in Print(...) in {filename}: "{match}"')
 
     # Check for config options with hard-coded name or desc fields
-    config_matches = re.findall(r'\b(name|desc)\s*=\s*"([^"]+)"', file_content)
+    config_matches = re.findall(
+        r'\b(name|desc)\s*=\s*"([^"]+)"', file_content, re.DOTALL
+    )
     for field, value in config_matches:
         issues.append(f'Hard-coded {field} in {filename}: "{value}"')
 
