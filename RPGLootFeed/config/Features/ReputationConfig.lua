@@ -54,6 +54,7 @@ G_RLF.options.args.features.args.repConfig = {
 			args = {
 				defaultRepColor = {
 					type = "color",
+					hasAlpha = true,
 					name = G_RLF.L["Default Rep Text Color"],
 					desc = G_RLF.L["RepColorDesc"],
 					get = function()

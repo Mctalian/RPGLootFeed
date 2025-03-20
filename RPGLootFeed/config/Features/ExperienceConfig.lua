@@ -50,6 +50,7 @@ G_RLF.options.args.features.args.experienceConfig = {
 					type = "color",
 					name = G_RLF.L["Experience Text Color"],
 					desc = G_RLF.L["ExperienceTextColorDesc"],
+					hasAlpha = true,
 					width = "double",
 					get = function()
 						return unpack(G_RLF.db.global.xp.experienceTextColor)
@@ -80,6 +81,7 @@ G_RLF.options.args.features.args.experienceConfig = {
 						},
 						currentLevelColor = {
 							type = "color",
+							hasAlpha = true,
 							name = G_RLF.L["Current Level Color"],
 							desc = G_RLF.L["CurrentLevelColorDesc"],
 							disabled = function()

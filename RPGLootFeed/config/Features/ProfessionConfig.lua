@@ -76,6 +76,7 @@ G_RLF.options.args.features.args.professionConfig = {
 							disabled = function()
 								return not G_RLF.db.global.prof.showSkillChange
 							end,
+							hasAlpha = true,
 							width = "double",
 							get = function()
 								return unpack(G_RLF.db.global.prof.skillColor)
