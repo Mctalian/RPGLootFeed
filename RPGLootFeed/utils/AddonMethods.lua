@@ -152,7 +152,7 @@ function G_RLF:OpenOptions(button)
 			table.insert(tmpMenu, {
 				text = G_RLF.L["Toggle Loot History"],
 				func = function()
-					LootDisplayFrame:ToggleHistoryFrame()
+					G_RLF.RLF_MainLootFrame:ToggleHistoryFrame()
 				end,
 			})
 		end

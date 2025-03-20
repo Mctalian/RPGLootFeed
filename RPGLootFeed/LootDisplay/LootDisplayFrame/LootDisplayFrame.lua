@@ -79,7 +79,7 @@ function LootDisplayFrameMixin:ConfigureTestArea()
 	self:CreateArrowsTestArea()
 end
 
--- Create the tab frame and anchor it to the LootDisplayFrame
+-- Create the tab frame and anchor it to the G_RLF.RLF_MainLootFrame
 function LootDisplayFrameMixin:CreateTab()
 	self.tab = CreateFrame("Button", nil, UIParent, "UIPanelButtonTemplate") --[[@as Button]]
 	self.tab:SetSize(14, 14)
