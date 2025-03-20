@@ -256,3 +256,5 @@ function PartyLoot:GROUP_ROSTER_UPDATE(eventName, ...)
 	self:SetNameUnitMap()
 	self:SetPartyLootFilters()
 end
+
+return PartyLoot
