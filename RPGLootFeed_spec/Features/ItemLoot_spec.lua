@@ -33,12 +33,10 @@ describe("ItemLoot module", function()
 		LootModule:OnEnable()
 		assert.spy(LootModule.RegisterEvent).was.called_with(_, "CHAT_MSG_LOOT")
 		assert.spy(LootModule.RegisterEvent).was.called_with(_, "GET_ITEM_INFO_RECEIVED")
-		assert.spy(LootModule.RegisterEvent).was.called_with(_, "GROUP_ROSTER_UPDATE")
 
 		LootModule:OnDisable()
 		assert.spy(LootModule.UnregisterEvent).was.called_with(_, "CHAT_MSG_LOOT")
 		assert.spy(LootModule.UnregisterEvent).was.called_with(_, "GET_ITEM_INFO_RECEIVED")
-		assert.spy(LootModule.UnregisterEvent).was.called_with(_, "GROUP_ROSTER_UPDATE")
 	end)
 
 	it("should handle CHAT_MSG_LOOT event", function()
@@ -59,52 +57,6 @@ describe("ItemLoot module", function()
 		LootModule.pendingItemRequests[itemID] = { itemLink, amount }
 		LootModule:GET_ITEM_INFO_RECEIVED("GET_ITEM_INFO_RECEIVED", itemID, success)
 		assert.is_nil(LootModule.pendingItemRequests[itemID])
-		assert.spy(showSpy).was.called(1)
-	end)
-
-	it("should handle GROUP_ROSTER_UPDATE event", function()
-		LootModule:GROUP_ROSTER_UPDATE("GROUP_ROSTER_UPDATE")
-		assert.spy(ns.LogInfo).was.called(1)
-		assert.spy(ns.LogInfo).called_with(_, "GROUP_ROSTER_UPDATE", _, _, _, _)
-	end)
-
-	it("should show party loot", function()
-		local msg = "PartyMember received |cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r"
-		local itemLink = "|cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r"
-		local playerName = "PartyMember"
-		local amount = 1
-		local itemId = 18803
-		ns.db.global.partyLoot.enabled = true
-		LootModule.nameUnitMap = { PartyMember = "party1" }
-
-		LootModule:CHAT_MSG_LOOT(
-			"CHAT_MSG_LOOT",
-			msg,
-			playerName,
-			nil,
-			nil,
-			nil,
-			nil,
-			nil,
-			nil,
-			nil,
-			nil,
-			nil,
-			"Party1"
-		)
-		assert.spy(showSpy).was.called(1)
-	end)
-
-	it("handles GET_ITEM_INFO_RECEIVED event for party loot", function()
-		local itemID = 18803
-		local success = true
-		local itemLink = "|cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r"
-		local amount = 1
-		local unit = "Party1"
-
-		LootModule.pendingPartyRequests[itemID] = { itemLink, amount, unit }
-		LootModule:GET_ITEM_INFO_RECEIVED("GET_ITEM_INFO_RECEIVED", itemID, success)
-		assert.is_nil(LootModule.pendingPartyRequests[itemID])
 		assert.spy(showSpy).was.called(1)
 	end)
 end)

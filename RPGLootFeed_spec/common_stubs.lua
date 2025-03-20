@@ -891,6 +891,14 @@ function common_stubs.stub_C_DelvesUI()
 	}
 end
 
+function common_stubs.stub_C_ClassColor()
+	_G.C_ClassColor = {
+		GetClassColor = function(class)
+			return 0.78, 0.61, 0.43
+		end,
+	}
+end
+
 function common_stubs.stub_Unit_Funcs()
 	_G.UnitGUID = function(unit)
 		return "player"
@@ -906,6 +914,9 @@ function common_stubs.stub_Unit_Funcs()
 	end
 	_G.UnitXPMax = function()
 		return 50
+	end
+	_G.UnitClass = function()
+		return "Warrior", "WARRIOR", 1
 	end
 end
 
