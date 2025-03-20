@@ -709,7 +709,7 @@ function LootDisplayRowMixin:StyleExitAnimation()
 			self.ExitAnimation = self:CreateAnimationGroup() --[[@as RLF_RowExitAnimationGroup]]
 			self.ExitAnimation:SetScript("OnFinished", function()
 				self:Hide()
-				local frame = LootDisplayFrame
+				local frame = G_RLF.RLF_MainLootFrame
 				frame:ReleaseRow(self)
 			end)
 		else
@@ -879,7 +879,7 @@ function LootDisplayRowMixin:StyleEnterAnimation()
 			-- Reset the final position after the animation completes
 			self.EnterAnimation.slideIn:SetScript("OnFinished", function()
 				self:ClearAllPoints()
-				self:UpdatePosition(LootDisplayFrame)
+				self:UpdatePosition(G_RLF.RLF_MainLootFrame)
 				self.waiting = false
 			end)
 		end

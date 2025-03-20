@@ -177,7 +177,7 @@ G_RLF.options.args.features = {
 					set = function(info, value)
 						G_RLF.db.global.lootHistory.hideTab = value
 						---@type RLF_LootDisplayFrame
-						local frame = LootDisplayFrame
+						local frame = G_RLF.RLF_MainLootFrame
 						frame:UpdateTabVisibility()
 					end,
 					order = 2.5,
@@ -230,7 +230,7 @@ end
 function Features:SetLootHistoryStatus(info, value)
 	G_RLF.db.global.lootHistory.enabled = value
 	---@type RLF_LootDisplayFrame
-	local frame = LootDisplayFrame
+	local frame = G_RLF.RLF_MainLootFrame
 	frame:UpdateTabVisibility()
 end
 

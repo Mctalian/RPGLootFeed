@@ -109,7 +109,7 @@ function RLF:SlashCommand(msg, editBox)
 			loggerModule:Show()
 		elseif msg == "history" and G_RLF.db.global.lootHistory.enabled then
 			---@type RLF_LootDisplayFrame
-			local frame = LootDisplayFrame
+			local frame = G_RLF.RLF_MainLootFrame
 			frame:ToggleHistoryFrame()
 		else
 			G_RLF.acd:Open(addonName)

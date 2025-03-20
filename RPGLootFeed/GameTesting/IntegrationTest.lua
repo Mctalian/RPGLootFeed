@@ -164,7 +164,7 @@ function TestMode:IntegrationTest()
 	prints = ""
 	successCount = 0
 	failureCount = 0
-	local frame = LootDisplayFrame
+	local frame = G_RLF.RLF_MainLootFrame
 	local snapshotRowHistory = #frame.rowHistory or 0
 
 	local newRowsExpected = 0
@@ -180,12 +180,12 @@ function TestMode:IntegrationTest()
 	newRowsExpected = newRowsExpected + runReputationIntegrationTest()
 	newRowsExpected = newRowsExpected + runProfessionIntegrationTest()
 
-	assertEqual(frame ~= nil, true, "LootDisplayFrame")
+	assertEqual(frame ~= nil, true, "G_RLF.RLF_MainLootFrame")
 	C_Timer.After(
 		G_RLF.db.global.animations.exit.fadeOutDelay + G_RLF.db.global.animations.exit.duration + 1,
 		function()
 			local newHistoryRows = #frame.rowHistory - snapshotRowHistory
-			assertEqual(newHistoryRows, newRowsExpected, "LootDisplayFrame: rowHistory")
+			assertEqual(newHistoryRows, newRowsExpected, "G_RLF.RLF_MainLootFrame: rowHistory")
 			displayResults()
 		end
 	)

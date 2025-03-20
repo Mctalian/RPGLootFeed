@@ -73,6 +73,6 @@ end
 
 function ConfigOptions:ToggleLootHistory()
 	---@type RLF_LootDisplayFrame
-	local frame = LootDisplayFrame
+	local frame = G_RLF.RLF_MainLootFrame
 	frame:ToggleHistoryFrame()
 end
