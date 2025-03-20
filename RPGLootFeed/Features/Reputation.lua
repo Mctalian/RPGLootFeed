@@ -130,7 +130,6 @@ function Rep.Element:new(...)
 		local atlas = majorFactionIconFormat:format(factionData.textureKit)
 		local atlasInfo = C_Texture.GetAtlasInfo(atlas)
 		if atlasInfo and atlasInfo.file then
-			G_RLF:Print("Atlas file: " .. atlasInfo.file)
 			element.icon = atlasInfo.file
 			---@class RLF_TexCoords
 			element.texCoords = {
