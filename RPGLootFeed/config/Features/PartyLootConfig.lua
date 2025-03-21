@@ -13,6 +13,7 @@ local globalDefaults = G_RLF.defaults.global
 ---@class RLF_ConfigPartyLoot
 G_RLF.defaults.global.partyLoot = {
 	enabled = false,
+	separateFrame = false,
 	itemQualityFilter = {
 		[G_RLF.ItemQualEnum.Poor] = true,
 		[G_RLF.ItemQualEnum.Common] = true,
@@ -26,6 +27,23 @@ G_RLF.defaults.global.partyLoot = {
 	hideServerNames = false,
 	onlyEpicAndAboveInRaid = true,
 	onlyEpicAndAboveInInstance = true,
+	---@type RLF_ConfigPositioning
+	positioning = {
+		---@type string | ScriptRegion
+		relativePoint = "UIParent",
+		anchorPoint = "LEFT",
+		xOffset = 0,
+		yOffset = 375,
+		frameStrata = "MEDIUM",
+	},
+	---@type RLF_ConfigSizing
+	sizing = {
+		feedWidth = 330,
+		maxRows = 10,
+		rowHeight = 22,
+		padding = 2,
+		iconSize = 18,
+	},
 }
 
 G_RLF.options.args.features.args.partyLootConfig = {
@@ -56,6 +74,223 @@ G_RLF.options.args.features.args.partyLootConfig = {
 			end,
 			order = 2,
 			args = {
+				separateFrame = {
+					type = "toggle",
+					name = G_RLF.L["Separate Frame"],
+					desc = G_RLF.L["SeparateFrameDesc"],
+					width = "double",
+					get = function()
+						return G_RLF.db.global.partyLoot.separateFrame
+					end,
+					set = function(_, value)
+						G_RLF.db.global.partyLoot.separateFrame = value
+					end,
+					order = 1,
+				},
+				positioning = {
+					type = "group",
+					name = G_RLF.L["Positioning"],
+					hidden = function()
+						return not G_RLF.db.global.partyLoot.separateFrame
+					end,
+					order = 1.1,
+					args = {
+						relativePoint = {
+							type = "select",
+							name = G_RLF.L["Anchor Relative To"],
+							desc = G_RLF.L["RelativeToDesc"],
+							values = {
+								["UIParent"] = G_RLF.L["UIParent"],
+								["PlayerFrame"] = G_RLF.L["PlayerFrame"],
+								["Minimap"] = G_RLF.L["Minimap"],
+								["MainMenuBarBackpackButton"] = G_RLF.L["BagBar"],
+							},
+							get = function()
+								return G_RLF.db.global.partyLoot.positioning.relativePoint
+							end,
+							set = function(_, value)
+								G_RLF.db.global.partyLoot.positioning.relativePoint = value
+								G_RLF.LootDisplay:UpdatePosition(G_RLF.Frames.PARTY)
+							end,
+							order = 1,
+						},
+						anchorPoint = {
+							type = "select",
+							name = G_RLF.L["Anchor Point"],
+							desc = G_RLF.L["AnchorPointDesc"],
+							values = {
+								["TOPLEFT"] = G_RLF.L["Top Left"],
+								["TOPRIGHT"] = G_RLF.L["Top Right"],
+								["BOTTOMLEFT"] = G_RLF.L["Bottom Left"],
+								["BOTTOMRIGHT"] = G_RLF.L["Bottom Right"],
+								["TOP"] = G_RLF.L["Top"],
+								["BOTTOM"] = G_RLF.L["Bottom"],
+								["LEFT"] = G_RLF.L["Left"],
+								["RIGHT"] = G_RLF.L["Right"],
+								["CENTER"] = G_RLF.L["Center"],
+							},
+							get = function()
+								return G_RLF.db.global.partyLoot.positioning.anchorPoint
+							end,
+							set = function(_, value)
+								G_RLF.db.global.partyLoot.positioning.anchorPoint = value
+								G_RLF.LootDisplay:UpdatePosition(G_RLF.Frames.PARTY)
+							end,
+							order = 2,
+						},
+						xOffset = {
+							type = "range",
+							name = G_RLF.L["X Offset"],
+							desc = G_RLF.L["XOffsetDesc"],
+							min = -1000,
+							max = 1000,
+							step = 1,
+							get = function()
+								return G_RLF.db.global.partyLoot.positioning.xOffset
+							end,
+							set = function(_, value)
+								G_RLF.db.global.partyLoot.positioning.xOffset = value
+								G_RLF.LootDisplay:UpdatePosition(G_RLF.Frames.PARTY)
+							end,
+							order = 3,
+						},
+						yOffset = {
+							type = "range",
+							name = G_RLF.L["Y Offset"],
+							desc = G_RLF.L["YOffsetDesc"],
+							min = -1000,
+							max = 1000,
+							step = 1,
+							get = function()
+								return G_RLF.db.global.partyLoot.positioning.yOffset
+							end,
+							set = function(_, value)
+								G_RLF.db.global.partyLoot.positioning.yOffset = value
+								G_RLF.LootDisplay:UpdatePosition(G_RLF.Frames.PARTY)
+							end,
+							order = 4,
+						},
+						frameStrata = {
+							type = "select",
+							name = G_RLF.L["Frame Strata"],
+							desc = G_RLF.L["FrameStrataDesc"],
+							values = {
+								["BACKGROUND"] = G_RLF.L["Background"],
+								["LOW"] = G_RLF.L["Low"],
+								["MEDIUM"] = G_RLF.L["Medium"],
+								["HIGH"] = G_RLF.L["High"],
+								["DIALOG"] = G_RLF.L["Dialog"],
+								["TOOLTIP"] = G_RLF.L["Tooltip"],
+							},
+							sorting = {
+								"BACKGROUND",
+								"LOW",
+								"MEDIUM",
+								"HIGH",
+								"DIALOG",
+								"TOOLTIP",
+							},
+							get = function()
+								return G_RLF.db.global.partyLoot.positioning.frameStrata
+							end,
+							set = function(_, value)
+								G_RLF.db.global.partyLoot.positioning.frameStrata = value
+								G_RLF.LootDisplay:UpdateStrata(G_RLF.Frames.PARTY)
+							end,
+							order = 5,
+						},
+					},
+				},
+				sizing = {
+					type = "group",
+					hidden = function()
+						return not G_RLF.db.global.partyLoot.separateFrame
+					end,
+					name = G_RLF.L["Sizing"],
+					order = 1.2,
+					args = {
+						feedWidth = {
+							type = "range",
+							name = G_RLF.L["Feed Width"],
+							desc = G_RLF.L["FeedWidthDesc"],
+							min = 100,
+							max = 1000,
+							step = 1,
+							get = function()
+								return G_RLF.db.global.partyLoot.sizing.feedWidth
+							end,
+							set = function(_, value)
+								G_RLF.db.global.partyLoot.sizing.feedWidth = value
+								G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+							end,
+							order = 1,
+						},
+						maxRows = {
+							type = "range",
+							name = G_RLF.L["Maximum Rows to Display"],
+							desc = G_RLF.L["MaxRowsDesc"],
+							min = 1,
+							max = 100,
+							step = 1,
+							get = function()
+								return G_RLF.db.global.partyLoot.sizing.maxRows
+							end,
+							set = function(_, value)
+								G_RLF.db.global.partyLoot.sizing.maxRows = value
+								G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+							end,
+							order = 2,
+						},
+						rowHeight = {
+							type = "range",
+							name = G_RLF.L["Loot Item Height"],
+							desc = G_RLF.L["RowHeightDesc"],
+							min = 5,
+							max = 100,
+							step = 1,
+							get = function()
+								return G_RLF.db.global.partyLoot.sizing.rowHeight
+							end,
+							set = function(_, value)
+								G_RLF.db.global.partyLoot.sizing.rowHeight = value
+								G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+							end,
+							order = 3,
+						},
+						iconSize = {
+							type = "range",
+							name = G_RLF.L["Loot Item Icon Size"],
+							desc = G_RLF.L["IconSizeDesc"],
+							min = 5,
+							max = 100,
+							step = 1,
+							get = function()
+								return G_RLF.db.global.partyLoot.sizing.iconSize
+							end,
+							set = function(_, value)
+								G_RLF.db.global.partyLoot.sizing.iconSize = value
+								G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+							end,
+							order = 4,
+						},
+						padding = {
+							type = "range",
+							name = G_RLF.L["Loot Item Padding"],
+							desc = G_RLF.L["RowPaddingDesc"],
+							min = 0,
+							max = 10,
+							step = 1,
+							get = function()
+								return G_RLF.db.global.partyLoot.sizing.padding
+							end,
+							set = function(_, value)
+								G_RLF.db.global.partyLoot.sizing.padding = value
+								G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+							end,
+							order = 5,
+						},
+					},
+				},
 				hideServerNames = {
 					type = "toggle",
 					name = G_RLF.L["Hide Server Names"],
@@ -67,7 +302,7 @@ G_RLF.options.args.features.args.partyLootConfig = {
 					set = function(_, value)
 						G_RLF.db.global.partyLoot.hideServerNames = value
 					end,
-					order = 1,
+					order = 1.5,
 				},
 				itemQualityFilter = {
 					type = "multiselect",

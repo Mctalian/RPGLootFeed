@@ -9,28 +9,41 @@ local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEven
 
 local lsm = G_RLF.lsm
 
--- Private method declaration
-local processFromQueue
-
 -- Private variable declaration
-local mainFrame = nil
-local auxFrame = nil
-local mainElementQueue = G_RLF.Queue:new()
-local auxElementQueue = G_RLF.Queue:new()
+---@type table<G_RLF.Frames, RLF_LootDisplayFrame | nil>
+local lootFrames = {
+	[G_RLF.Frames.MAIN] = nil,
+	[G_RLF.Frames.PARTY] = nil,
+}
+---@type table<G_RLF.Frames, Queue>
+local lootQueues = {
+	[G_RLF.Frames.MAIN] = G_RLF.Queue:new(),
+	[G_RLF.Frames.PARTY] = G_RLF.Queue:new(),
+}
 G_RLF.tempFontString = nil
 
 --@alpha@
-local TestLabelQueueSize
+local TestLabelMainQueueSize
 -- Create a label to display the queue size
-TestLabelQueueSize = UIParent:CreateFontString(nil, "ARTWORK")
-TestLabelQueueSize:SetFontObject(GameFontNormal)
-TestLabelQueueSize:SetPoint("TOPLEFT", 10, -10)
-TestLabelQueueSize:SetText("Main Queue Size: 0")
+TestLabelMainQueueSize = UIParent:CreateFontString(nil, "ARTWORK")
+TestLabelMainQueueSize:SetFontObject(GameFontNormal)
+TestLabelMainQueueSize:SetPoint("TOPLEFT", 10, -10)
+TestLabelMainQueueSize:SetText("Main Queue Size: 0")
+
+local TestLabelPartyQueueSize
+TestLabelPartyQueueSize = UIParent:CreateFontString(nil, "ARTWORK")
+TestLabelPartyQueueSize:SetFontObject(GameFontNormal)
+TestLabelPartyQueueSize:SetPoint("TOPLEFT", TestLabelMainQueueSize, "BOTTOMLEFT", 0, -10)
+TestLabelPartyQueueSize:SetText("Party Queue Size: 0")
 
 -- Function to update test labels
 local function updateTestLabels()
-	if TestLabelQueueSize then
-		TestLabelQueueSize:SetText("Main Queue Size: " .. mainElementQueue:size())
+	if TestLabelMainQueueSize then
+		TestLabelMainQueueSize:SetText("Main Queue Size: " .. lootQueues[G_RLF.Frames.MAIN]:size())
+	end
+
+	if TestLabelPartyQueueSize then
+		TestLabelPartyQueueSize:SetText("Party Queue Size: " .. lootQueues[G_RLF.Frames.PARTY]:size())
 	end
 end
 -- Wrapper function to update test labels after calling the original function
@@ -42,16 +55,23 @@ local function updateTestLabelsWrapper(func)
 	end
 end
 
-mainElementQueue.enqueue = updateTestLabelsWrapper(mainElementQueue.enqueue)
-mainElementQueue.dequeue = updateTestLabelsWrapper(mainElementQueue.dequeue)
+lootQueues[G_RLF.Frames.MAIN].enqueue = updateTestLabelsWrapper(lootQueues[G_RLF.Frames.MAIN].enqueue)
+lootQueues[G_RLF.Frames.MAIN].dequeue = updateTestLabelsWrapper(lootQueues[G_RLF.Frames.MAIN].dequeue)
+lootQueues[G_RLF.Frames.PARTY].enqueue = updateTestLabelsWrapper(lootQueues[G_RLF.Frames.PARTY].enqueue)
+lootQueues[G_RLF.Frames.PARTY].dequeue = updateTestLabelsWrapper(lootQueues[G_RLF.Frames.PARTY].dequeue)
 --@end-alpha@
 
 -- Public methods
 function LootDisplay:OnInitialize()
 	---@type RLF_LootDisplayFrame
-	mainFrame = CreateFrame("Frame", "RLF_MainLootFrame", UIParent, "RLF_LootDisplayFrameTemplate") --[[@as RLF_LootDisplayFrame]]
-	G_RLF.RLF_MainLootFrame = mainFrame
-	mainFrame:Load()
+	lootFrames[G_RLF.Frames.MAIN] = CreateFrame("Frame", "RLF_MainLootFrame", UIParent, "RLF_LootDisplayFrameTemplate") --[[@as RLF_LootDisplayFrame]]
+	G_RLF.RLF_MainLootFrame = lootFrames[G_RLF.Frames.MAIN]
+	lootFrames[G_RLF.Frames.MAIN]:Load(G_RLF.Frames.MAIN)
+	---@type RLF_LootDisplayFrame | nil
+	G_RLF.RLF_PartyLootFrame = nil
+	if G_RLF.db.global.partyLoot.enabled and G_RLF.db.global.partyLoot.separateFrame then
+		self:CreatePartyFrame()
+	end
 
 	G_RLF.tempFontString = UIParent:CreateFontString(nil, "ARTWORK")
 	G_RLF.tempFontString:Hide() -- Prevent it from showing up
@@ -105,105 +125,145 @@ function LootDisplay:OnEnable()
 end
 
 function LootDisplay:OnPlayerCombatChange()
-	if mainFrame == nil then
+	if lootFrames[G_RLF.Frames.MAIN] == nil then
 		return
 	end
 
-	mainFrame:UpdateTabVisibility()
+	lootFrames[G_RLF.Frames.MAIN]:UpdateTabVisibility()
+end
+
+function LootDisplay:CreatePartyFrame()
+	if lootFrames[G_RLF.Frames.PARTY] == nil then
+		lootFrames[G_RLF.Frames.PARTY] =
+			CreateFrame("Frame", "RLF_PartyLootFrame", UIParent, "RLF_LootDisplayFrameTemplate") --[[@as RLF_LootDisplayFrame]]
+		G_RLF.RLF_PartyLootFrame = lootFrames[G_RLF.Frames.PARTY]
+		lootFrames[G_RLF.Frames.PARTY]:Load(G_RLF.Frames.PARTY)
+
+		if lootFrames[G_RLF.Frames.MAIN] and lootFrames[G_RLF.Frames.MAIN].BoundingBox:IsVisible() then
+			lootFrames[G_RLF.Frames.PARTY]:ShowTestArea()
+		end
+	end
 end
 
 function LootDisplay:SetBoundingBoxVisibility(show)
-	if mainFrame == nil then
+	if lootFrames[G_RLF.Frames.MAIN] == nil then
 		return
 	end
 
 	if show then
-		mainFrame:ShowTestArea()
-		if auxFrame then
-			auxFrame:ShowTestArea()
+		lootFrames[G_RLF.Frames.MAIN]:ShowTestArea()
+		if lootFrames[G_RLF.Frames.PARTY] then
+			lootFrames[G_RLF.Frames.PARTY]:ShowTestArea()
 		end
 	else
-		mainFrame:HideTestArea()
-		if auxFrame then
-			auxFrame:HideTestArea()
+		lootFrames[G_RLF.Frames.MAIN]:HideTestArea()
+		if lootFrames[G_RLF.Frames.PARTY] then
+			lootFrames[G_RLF.Frames.PARTY]:HideTestArea()
 		end
 	end
 end
 
 function LootDisplay:ToggleBoundingBox()
-	if mainFrame == nil then
+	if lootFrames[G_RLF.Frames.MAIN] == nil then
 		return
 	end
-	self:SetBoundingBoxVisibility(not mainFrame.BoundingBox:IsVisible())
+	self:SetBoundingBoxVisibility(not lootFrames[G_RLF.Frames.MAIN].BoundingBox:IsVisible())
 
-	if auxFrame then
-		self:SetBoundingBoxVisibility(not auxFrame.BoundingBox:IsVisible())
+	if lootFrames[G_RLF.Frames.PARTY] and G_RLF.db.global.partyLoot.separateFrame then
+		self:SetBoundingBoxVisibility(not lootFrames[G_RLF.Frames.PARTY].BoundingBox:IsVisible())
 	end
 end
 
-function LootDisplay:UpdatePosition()
-	if mainFrame == nil then
+--- update the position of the frame
+--- @param frame? G_RLF.Frames
+function LootDisplay:UpdatePosition(frame)
+	frame = frame or G_RLF.Frames.MAIN
+	if lootFrames[frame] == nil then
 		return
 	end
-	mainFrame:ClearAllPoints()
-	mainFrame:SetPoint(
-		G_RLF.db.global.positioning.anchorPoint,
-		_G[G_RLF.db.global.positioning.relativePoint],
-		G_RLF.db.global.positioning.xOffset,
-		G_RLF.db.global.positioning.yOffset
+	local positioningDb = G_RLF.DbAccessor:Positioning(frame)
+	lootFrames[frame]:ClearAllPoints()
+	lootFrames[frame]:SetPoint(
+		positioningDb.anchorPoint,
+		_G[positioningDb.relativePoint],
+		positioningDb.xOffset,
+		positioningDb.yOffset
 	)
 end
 
-function LootDisplay:UpdateRowPositions()
-	if mainFrame == nil then
+--- Update row positions for the frame
+--- @param frame? G_RLF.Frames
+function LootDisplay:UpdateRowPositions(frame)
+	frame = frame or G_RLF.Frames.MAIN
+	if lootFrames[frame] == nil then
 		return
 	end
 
-	mainFrame:UpdateRowPositions()
+	lootFrames[frame]:UpdateRowPositions()
 end
 
-function LootDisplay:UpdateStrata()
-	if mainFrame then
-		mainFrame:SetFrameStrata(G_RLF.db.global.positioning.frameStrata)
+--- Update the strata of the frame
+--- @param frame? G_RLF.Frames
+function LootDisplay:UpdateStrata(frame)
+	frame = frame or G_RLF.Frames.MAIN
+	if lootFrames[frame] then
+		local positioningDb = G_RLF.DbAccessor:Positioning(frame)
+		lootFrames[frame]:SetFrameStrata(positioningDb.frameStrata)
 	end
 end
 
-function LootDisplay:UpdateRowStyles()
-	if mainFrame == nil then
+--- Update row styles for the frame
+--- @param frame? G_RLF.Frames
+function LootDisplay:UpdateRowStyles(frame)
+	frame = frame or G_RLF.Frames.MAIN
+	if lootFrames[frame] == nil then
 		return
 	end
 
-	mainFrame:UpdateSize()
+	lootFrames[frame]:UpdateSize()
 end
 
-function LootDisplay:UpdateEnterAnimation()
-	if mainFrame == nil then
+--- Update enter animation for the frame
+--- @param frame? G_RLF.Frames
+function LootDisplay:UpdateEnterAnimation(frame)
+	frame = frame or G_RLF.Frames.MAIN
+	if lootFrames[frame] == nil then
 		return
 	end
 
-	mainFrame:UpdateEnterAnimationType()
+	lootFrames[frame]:UpdateEnterAnimationType()
 end
 
-function LootDisplay:UpdateFadeDelay()
-	if mainFrame == nil then
+--- Update fade delay for the frame
+--- @param frame? G_RLF.Frames
+function LootDisplay:UpdateFadeDelay(frame)
+	frame = frame or G_RLF.Frames.MAIN
+	if lootFrames[frame] == nil then
 		return
 	end
 
-	mainFrame:UpdateFadeDelay()
+	lootFrames[frame]:UpdateFadeDelay()
 end
 
-function LootDisplay:BAG_UPDATE_DELAYED()
-	if mainFrame == nil then
+--- Handle the BAG_UPDATE_DELAYED event for the frame
+--- @param frame? G_RLF.Frames
+function LootDisplay:BAG_UPDATE_DELAYED(frame)
+	frame = frame or G_RLF.Frames.MAIN
+	if lootFrames[frame] == nil then
 		return
 	end
 
-	G_RLF:LogInfo("BAG_UPDATE_DELAYED", "WOWEVENT", self.moduleName, nil, "BAG_UPDATE_DELAYED")
+	G_RLF:LogInfo(frame .. " BAG_UPDATE_DELAYED", "WOWEVENT", self.moduleName, nil, "BAG_UPDATE_DELAYED")
 
-	mainFrame:UpdateRowItemCounts()
+	lootFrames[frame]:UpdateRowItemCounts()
 end
 
-local function processRow(element)
-	if mainFrame == nil then
+--- process the row for the proper frame
+--- @param element RLF_LootElement
+--- @param frame? G_RLF.Frames
+local function processRow(element, frame)
+	frame = frame or G_RLF.Frames.MAIN
+	if lootFrames[frame] == nil then
 		return
 	end
 
@@ -218,16 +278,17 @@ local function processRow(element)
 		key = unit .. "_" .. key
 	end
 
-	local row = mainFrame:GetRow(key)
+	---@type RLF_LootDisplayRow | nil
+	local row = lootFrames[frame]:GetRow(key)
 	if row then
 		RunNextFrame(function()
 			row:UpdateQuantity(element)
 		end)
 	else
 		-- New row
-		row = mainFrame:LeaseRow(key)
+		row = lootFrames[frame]:LeaseRow(key)
 		if row == nil then
-			mainElementQueue:enqueue(element)
+			lootQueues[frame]:enqueue(element)
 			return
 		end
 
@@ -237,50 +298,73 @@ local function processRow(element)
 	end
 end
 
-function LootDisplay:OnLootReady(_, element)
-	processRow(element)
-end
-
-function LootDisplay:OnPartyLootReady(_, element)
-	processRow(element)
-end
-
-function LootDisplay:OnRowReturn()
-	processFromQueue()
-end
-
-function LootDisplay:OnPartyRowReturn()
-	processFromQueue()
-end
-
-processFromQueue = function()
-	local snapshotQueueSize = mainElementQueue:size()
+--- process the row from the queue for the proper frame
+--- @param frame? G_RLF.Frames
+local function processFromQueue(frame)
+	frame = frame or G_RLF.Frames.MAIN
+	local queue = lootQueues[frame]
+	local snapshotQueueSize = queue:size()
 	if snapshotQueueSize > 0 then
-		local rowsToProcess = math.min(snapshotQueueSize, G_RLF.db.global.sizing.maxRows)
+		local sizingDb = G_RLF.DbAccessor:Sizing(frame)
+		local rowsToProcess = math.min(snapshotQueueSize, sizingDb.maxRows)
 		G_RLF:LogDebug("Processing " .. rowsToProcess .. " items from element queue")
 		for i = 1, rowsToProcess do
-			if mainElementQueue:isEmpty() then
+			if queue:isEmpty() then
 				return
 			end
-			local e = mainElementQueue:dequeue()
-			processRow(e)
+			local e = queue:dequeue()
+			if e then
+				processRow(e, frame)
+			end
 		end
 	end
 end
 
-local function emptyQueue()
-	while not mainElementQueue:isEmpty() do
-		mainElementQueue:dequeue()
+function LootDisplay:OnLootReady(_, element)
+	processRow(element, G_RLF.Frames.MAIN)
+end
+
+function LootDisplay:OnPartyLootReady(_, element)
+	local frameType = G_RLF.Frames.MAIN
+	if G_RLF.db.global.partyLoot.separateFrame then
+		frameType = G_RLF.Frames.PARTY
+	end
+	processRow(element, frameType)
+end
+
+function LootDisplay:OnRowReturn()
+	processFromQueue(G_RLF.Frames.MAIN)
+end
+
+function LootDisplay:OnPartyRowReturn()
+	local frameType = G_RLF.Frames.MAIN
+	if G_RLF.db.global.partyLoot.separateFrame then
+		frameType = G_RLF.Frames.PARTY
+	end
+	processFromQueue(frameType)
+end
+
+local function emptyQueues()
+	while not lootQueues[G_RLF.Frames.MAIN]:isEmpty() do
+		lootQueues[G_RLF.Frames.MAIN]:dequeue()
+	end
+
+	while not lootQueues[G_RLF.Frames.PARTY]:isEmpty() do
+		lootQueues[G_RLF.Frames.PARTY]:dequeue()
 	end
 end
 
 function LootDisplay:HideLoot()
-	if mainFrame == nil then
+	if lootFrames[G_RLF.Frames.MAIN] == nil then
 		return
 	end
 
-	emptyQueue()
-	mainFrame:ClearFeed()
+	emptyQueues()
+	lootFrames[G_RLF.Frames.MAIN]:ClearFeed()
+
+	if lootFrames[G_RLF.Frames.PARTY] then
+		lootFrames[G_RLF.Frames.PARTY]:ClearFeed()
+	end
 end
 
 G_RLF.LootDisplay = LootDisplay
@@ -302,7 +386,11 @@ function G_RLF:CalculateTextWidth(text)
 	return width
 end
 
-function G_RLF:TruncateItemLink(itemLink, extraWidth)
+--- Truncate an item link to fit within the feed width
+--- @param itemLink string
+--- @param extraWidth number
+--- @param frame? G_RLF.Frames
+function G_RLF:TruncateItemLink(itemLink, extraWidth, frame)
 	local originalLink = itemLink .. ""
 	local itemName = string.match(itemLink, "%[(.-)%]")
 	local begIndex, endIndex = string.find(originalLink, itemName, 1, true)
@@ -312,8 +400,9 @@ function G_RLF:TruncateItemLink(itemLink, extraWidth)
 	local linkStart = string.sub(originalLink, 0, begIndex - 1)
 	local linkEnd = string.sub(originalLink, endIndex + 1)
 
-	local iconSize = G_RLF.db.global.sizing.iconSize
-	local maxWidth = G_RLF.db.global.sizing.feedWidth - iconSize - (iconSize / 4) - (iconSize / 2) - extraWidth
+	local sizingDb = G_RLF.DbAccessor:Sizing(frame)
+	local iconSize = sizingDb.iconSize
+	local maxWidth = sizingDb.feedWidth - iconSize - (iconSize / 4) - (iconSize / 2) - extraWidth
 
 	-- Calculate the width of the item name plus the link start and end
 	local itemNameWidth = G_RLF:CalculateTextWidth("[" .. itemName .. "]")
