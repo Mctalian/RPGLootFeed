@@ -26,7 +26,7 @@ G_RLF.LootDisplayProperties = {
 }
 
 ---@class RLF_LootElement
----@field public key number
+---@field public key string
 ---@field public textFn fun(existingQuantity: number, truncatedLink: string): string
 ---@field public secondaryTextFn fun(...: any): string
 ---@field public unit string
@@ -45,6 +45,7 @@ G_RLF.LootDisplayProperties = {
 ---@field public logFn fun(text: string, amount: number, new: boolean): nil
 ---@field public Show fun(s: RLF_LootElement, itemName?: string, itemQuality?: number): nil
 ---@field public isPassingFilter fun(s: RLF_LootElement, itemName: string, itemQuality: number): boolean
+---@field public IsEnabled fun(s: RLF_LootElement): boolean
 ---@field public type string
 
 function G_RLF.InitializeLootDisplayProperties(element)

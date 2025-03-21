@@ -153,6 +153,10 @@ function G_RLF:OpenOptions(button)
 				text = G_RLF.L["Toggle Loot History"],
 				func = function()
 					G_RLF.RLF_MainLootFrame:ToggleHistoryFrame()
+					local partyFrame = G_RLF.RLF_PartyLootFrame
+					if partyFrame then
+						partyFrame:ToggleHistoryFrame()
+					end
 				end,
 			})
 		end

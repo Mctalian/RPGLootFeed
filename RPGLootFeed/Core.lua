@@ -111,6 +111,10 @@ function RLF:SlashCommand(msg, editBox)
 			---@type RLF_LootDisplayFrame
 			local frame = G_RLF.RLF_MainLootFrame
 			frame:ToggleHistoryFrame()
+			local partyFrame = G_RLF.RLF_PartyLootFrame
+			if partyFrame then
+				partyFrame:ToggleHistoryFrame()
+			end
 		else
 			G_RLF.acd:Open(addonName)
 		end

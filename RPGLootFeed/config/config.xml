@@ -10,5 +10,6 @@
     <Script file="Animations.lua"/>
     <Script file="BlizzardUI.lua"/>
     <Script file="DbMigrations.lua"/>
+    <Script file="DbAccessors.lua"/>
     <Include file="Migrations/migrations.xml"/>
 </Ui>

@@ -129,3 +129,9 @@ G_RLF.DefaultIcons = {
 	XP = "894556",
 	PROFESSION = "133740",
 }
+
+---@enum G_RLF.Frames
+G_RLF.Frames = {
+	MAIN = "RLF_MAIN",
+	PARTY = "RLF_PARTY",
+}

@@ -165,7 +165,20 @@ function TestMode:IntegrationTest()
 	successCount = 0
 	failureCount = 0
 	local frame = G_RLF.RLF_MainLootFrame
+	if not frame then
+		assertEqual(frame, true, "G_RLF.RLF_MainLootFrame")
+		return
+	end
 	local snapshotRowHistory = #frame.rowHistory or 0
+	local partyFrame = nil
+	if G_RLF.db.global.partyLoot.enabled and G_RLF.db.global.partyLoot.separateFrame then
+		partyFrame = G_RLF.RLF_PartyLootFrame
+		if not partyFrame then
+			assertEqual(partyFrame, true, "G_RLF.RLF_PartyLootFrame")
+			return
+		end
+		snapshotRowHistory = snapshotRowHistory + #partyFrame.rowHistory
+	end
 
 	local newRowsExpected = 0
 	newRowsExpected = newRowsExpected + runExperienceIntegrationTest()
@@ -185,6 +198,9 @@ function TestMode:IntegrationTest()
 		G_RLF.db.global.animations.exit.fadeOutDelay + G_RLF.db.global.animations.exit.duration + 1,
 		function()
 			local newHistoryRows = #frame.rowHistory - snapshotRowHistory
+			if partyFrame then
+				newHistoryRows = newHistoryRows + #partyFrame.rowHistory
+			end
 			assertEqual(newHistoryRows, newRowsExpected, "G_RLF.RLF_MainLootFrame: rowHistory")
 			displayResults()
 		end

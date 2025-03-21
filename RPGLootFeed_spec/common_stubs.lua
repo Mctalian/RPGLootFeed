@@ -280,6 +280,10 @@ function common_stubs.setup_G_RLF(spy)
 			XP = "894556",
 			PROFESSION = "133740",
 		},
+		Frames = {
+			MAIN = "RLF_MAIN",
+			PARTY = "RLF_PARTY",
+		},
 		IsRetail = spy.new(function()
 			return true
 		end),

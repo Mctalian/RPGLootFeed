@@ -35,6 +35,7 @@ local G_RLF = ns
 
 ---@class RLF_LootDisplayRow: Frame
 ---@field id number
+---@field frameType G_RLF.Frames
 ---@field amount number
 ---@field icon string
 ---@field link string
@@ -95,8 +96,7 @@ function LootDisplayRowMixin:Init()
 	self.ClickableButton:SetScript("OnMouseUp", nil)
 	self.ClickableButton:SetScript("OnEvent", nil)
 
-	---@type RLF_ConfigSizing
-	local sizingDb = G_RLF.db.global.sizing
+	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 
 	self:SetSize(sizingDb.feedWidth, sizingDb.rowHeight)
 	self:StyleBackground()
@@ -334,8 +334,7 @@ end
 function LootDisplayRowMixin:StyleIcon()
 	local changed = false
 
-	---@type RLF_ConfigSizing
-	local sizingDb = G_RLF.db.global.sizing
+	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 	---@type RLF_ConfigStyling
 	local stylingDb = G_RLF.db.global.styling
 	local iconSize = sizingDb.iconSize
@@ -370,8 +369,7 @@ end
 function LootDisplayRowMixin:StyleUnitPortrait()
 	local sizeChanged = false
 
-	---@type RLF_ConfigSizing
-	local sizingDb = G_RLF.db.global.sizing
+	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 	---@type RLF_ConfigStyling
 	local stylingDb = G_RLF.db.global.styling
 	local iconSize = sizingDb.iconSize
@@ -427,8 +425,7 @@ function LootDisplayRowMixin:StyleText()
 
 	---@type RLF_ConfigStyling
 	local stylingDb = G_RLF.db.global.styling
-	---@type RLF_ConfigSizing
-	local sizingDb = G_RLF.db.global.sizing
+	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 	local fontFace = stylingDb.fontFace
 	local useFontObjects = stylingDb.useFontObjects
 	local font = stylingDb.font
@@ -709,7 +706,10 @@ function LootDisplayRowMixin:StyleExitAnimation()
 			self.ExitAnimation = self:CreateAnimationGroup() --[[@as RLF_RowExitAnimationGroup]]
 			self.ExitAnimation:SetScript("OnFinished", function()
 				self:Hide()
-				local frame = G_RLF.RLF_MainLootFrame
+				local frame = self:GetParent() --[[@as RLF_LootDisplayFrame]]
+				if not frame then
+					return
+				end
 				frame:ReleaseRow(self)
 			end)
 		else
@@ -759,8 +759,7 @@ function LootDisplayRowMixin:StyleEnterAnimation()
 	---@type RLF_ConfigAnimations
 	local animationsDb = G_RLF.db.global.animations
 	local animationsEnterDb = animationsDb.enter
-	---@type RLF_ConfigSizing
-	local sizingDb = G_RLF.db.global.sizing
+	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 	local enterAnimationType = animationsEnterDb.type
 	local slideDirection = animationsEnterDb.slide.direction
 	local enterDuration = animationsEnterDb.duration
@@ -879,7 +878,11 @@ function LootDisplayRowMixin:StyleEnterAnimation()
 			-- Reset the final position after the animation completes
 			self.EnterAnimation.slideIn:SetScript("OnFinished", function()
 				self:ClearAllPoints()
-				self:UpdatePosition(G_RLF.RLF_MainLootFrame)
+				local frame = self:GetParent() --[[@as RLF_LootDisplayFrame]]
+				if not frame then
+					return
+				end
+				self:UpdatePosition(frame)
 				self.waiting = false
 			end)
 		end
@@ -968,7 +971,8 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 
 		local extraWidth = G_RLF:CalculateTextWidth(extraWidthStr)
 		if self.unit then
-			local portraitSize = G_RLF.db.global.sizing.iconSize * 0.8
+			local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
+			local portraitSize = sizingDb.iconSize * 0.8
 			extraWidth = extraWidth + portraitSize - (portraitSize / 2)
 		end
 		self.link = G_RLF:TruncateItemLink(textFn(), extraWidth)
@@ -1535,7 +1539,7 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality, texCoords)
 
 	RunNextFrame(function()
 		---@type RLF_ConfigSizing
-		local sizingDb = G_RLF.db.global.sizing
+		local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 		local iconSize = sizingDb.iconSize
 
 		---@type RLF_TexCoords
