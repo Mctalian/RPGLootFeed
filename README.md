@@ -4,6 +4,8 @@
 
 [![GitHub issue custom search in repo](https://img.shields.io/github/issues-search/McTalian/RPGLootFeed?query=is%3Aissue%20is%3Aopen%20-label%3Ai18n&style=for-the-badge&label=Open%20Tickets)](https://github.com/Mctalian/RPGLootFeed/issues?q=is%3Aissue+is%3Aopen+-label%3Ai18n) [![GitHub issue custom search in repo](https://img.shields.io/github/issues-search/McTalian/RPGLootFeed?query=is%3Aissue%20is%3Aopen%20-label%3Ai18n%20label%3Abug&style=for-the-badge&label=Known%20Bugs&color=red)](https://github.com/Mctalian/RPGLootFeed/issues?q=is%3Aissue+is%3Aopen+-label%3Ai18n+label%3Abug) [![GitHub issue custom search in repo](https://img.shields.io/github/issues-search/McTalian/RPGLootFeed?query=is%3Aissue%20is%3Aopen%20label%3Ai18n%20&style=for-the-badge&label=Locales%20Need%20Translation&color=orange)](https://github.com/Mctalian/RPGLootFeed/issues?q=is%3Aissue+is%3Aopen+label%3Ai18n)
 
+[![Discord](https://img.shields.io/discord/1349872309665660928?style=for-the-badge&logo=discord&label=Join%20the%20Community)](https://discord.gg/czRYVWhe33)
+
 RPGLootFeed is a World of Warcraft addon designed to declutter your chat and enhance your looting experience by providing a dynamic and immersive loot feed. Keep your chat just for chat and let RPGLootFeed handle the rest.
 
 As featured in SoulSoBreezy's _11 Useful Addons for Patch 11.0.7_
@@ -32,7 +34,7 @@ Pair RPGLootFeed with Speedy AutoLoot by Yuyuli for an even better looting exper
 
 ## Contributing
 
-We welcome contributions from the community! If you encounter any issues or have suggestions for improvements, please open an issue on [GitHub](https://github.com/Mctalian/RPGLootFeed/issues). Or head over to [Discussions](https://github.com/Mctalian/RPGLootFeed/discussions) if you have any questions or want to show off your UI.
+Contributions are welcome from the community! If you encounter any issues or have suggestions for improvements, please open an issue on [GitHub](https://github.com/Mctalian/RPGLootFeed/issues). Or head over to [Discussions](https://github.com/Mctalian/RPGLootFeed/discussions) if you have any questions or want to show off your UI. For the fastest response, join the [Discord Community](https://discord.gg/czRYVWhe33).
 
 If you're interested in contributing code, please see our [Contributing Guidelines](CONTRIBUTING.md) for more information.
 
