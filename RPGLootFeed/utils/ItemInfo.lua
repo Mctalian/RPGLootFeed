@@ -40,6 +40,7 @@ function ItemInfo:new(...)
 	if instance.itemId == nil then
 		instance.itemId = C_Item.GetItemIDForItemInfo(instance.itemLink)
 	end
+	instance.itemId = tonumber(instance.itemId)
 	return instance
 end
 

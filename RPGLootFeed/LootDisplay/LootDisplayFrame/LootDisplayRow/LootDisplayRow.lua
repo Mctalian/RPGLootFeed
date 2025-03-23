@@ -95,6 +95,8 @@ function LootDisplayRowMixin:Init()
 	self.ClickableButton:SetScript("OnMouseUp", nil)
 	self.ClickableButton:SetScript("OnEvent", nil)
 
+	self.showForSeconds = G_RLF.db.global.animations.exit.fadeOutDelay
+
 	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 
 	self:SetSize(sizingDb.feedWidth, sizingDb.rowHeight)
@@ -686,7 +688,7 @@ function LootDisplayRowMixin:StyleExitAnimation()
 	local animationsExitDb = animationsDb.exit
 	local exitAnimationType = animationsExitDb.type
 	local exitDuration = animationsExitDb.duration
-	local exitDelay = animationsExitDb.fadeOutDelay
+	local exitDelay = self.showForSeconds
 
 	if
 		self.cachedExitAnimationType ~= exitAnimationType
@@ -949,6 +951,9 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	---@type ColorMixin|ColorMixin_RCC|nil
 	self.elementSecondaryTextColor = element.secondaryTextColor or nil
 	local text
+	if element.showForSeconds ~= self.showForSeconds and element.showForSeconds ~= nil then
+		self.showForSeconds = element.showForSeconds
+	end
 
 	if unit then
 		key = unit .. "_" .. key

@@ -76,6 +76,7 @@ G_RLF.FeatureModule = {
 	Reputation = "Reputation",
 	Experience = "Experience",
 	Profession = "Professions",
+	PartyLoot = "PartyLoot",
 }
 
 ---@enum G_RLF.PricesEnum
