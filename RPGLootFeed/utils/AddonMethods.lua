@@ -79,20 +79,56 @@ local function log(...)
 	end)
 end
 
-function G_RLF:LogDebug(...)
-	log(G_RLF.LogLevel.debug, ...)
+--- Create debug log
+--- @see RLF_Logger.addLogEntry
+--- @param message string
+--- @param source? string
+--- @param type? string
+--- @param id? string
+--- @param content? string
+--- @param amount? number
+--- @param isNew? boolean
+function G_RLF:LogDebug(message, source, type, id, content, amount, isNew)
+	log(G_RLF.LogLevel.debug, message, source, type, id, content, amount, isNew)
 end
 
-function G_RLF:LogInfo(...)
-	log(G_RLF.LogLevel.info, ...)
+--- Create info log
+--- @see RLF_Logger.addLogEntry
+--- @param message string
+--- @param source string
+--- @param type? string
+--- @param id? string
+--- @param content? string
+--- @param amount? number
+--- @param isNew? boolean
+function G_RLF:LogInfo(message, source, type, id, content, amount, isNew)
+	log(G_RLF.LogLevel.info, message, source, type, id, content, amount, isNew)
 end
 
-function G_RLF:LogWarn(...)
-	log(G_RLF.LogLevel.warn, ...)
+--- Create warning log
+--- @see RLF_Logger.addLogEntry
+--- @param message string
+--- @param source string
+--- @param type? string
+--- @param id? string
+--- @param content? string
+--- @param amount? number
+--- @param isNew? boolean
+function G_RLF:LogWarn(message, source, type, id, content, amount, isNew)
+	log(G_RLF.LogLevel.warn, message, source, type, id, content, amount, isNew)
 end
 
-function G_RLF:LogError(...)
-	log(G_RLF.LogLevel.error, ...)
+--- Create error log
+--- @see RLF_Logger.addLogEntry
+--- @param message string
+--- @param source string
+--- @param type? string
+--- @param id? string
+--- @param content? string
+--- @param amount? number
+--- @param isNew? boolean
+function G_RLF:LogError(message, source, type, id, content, amount, isNew)
+	log(G_RLF.LogLevel.error, message, source, type, id, content, amount, isNew)
 end
 
 function G_RLF:CreatePatternSegmentsForStringNumber(localeString)
