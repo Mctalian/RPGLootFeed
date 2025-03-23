@@ -44,6 +44,7 @@ G_RLF.defaults.global.partyLoot = {
 		padding = 2,
 		iconSize = 18,
 	},
+	ignoreItemIds = {},
 }
 
 G_RLF.options.args.features.args.partyLootConfig = {
@@ -355,6 +356,24 @@ G_RLF.options.args.features.args.partyLootConfig = {
 						partyLoot:SetPartyLootFilters()
 					end,
 					order = 4,
+				},
+				ignoreItemIds = {
+					type = "input",
+					name = G_RLF.L["Ignore Item IDs"],
+					desc = G_RLF.L["IgnoreItemIDsDesc"],
+					multiline = true,
+					width = "double",
+					get = function()
+						return table.concat(G_RLF.db.global.partyLoot.ignoreItemIds, ", ")
+					end,
+					set = function(_, value)
+						local ids = {}
+						for id in value:gmatch("%d+") do
+							table.insert(ids, tonumber(id))
+						end
+						G_RLF.db.global.partyLoot.ignoreItemIds = ids
+					end,
+					order = 5,
 				},
 			},
 		},

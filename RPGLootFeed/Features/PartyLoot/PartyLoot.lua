@@ -31,6 +31,7 @@ function PartyLoot.Element:new(...)
 	info, element.quantity, element.unit = ...
 	local itemLink = info.itemLink
 
+	element.itemId = info.itemId
 	element.key = info.itemLink
 	element.icon = info.itemTexture
 
@@ -45,6 +46,20 @@ function PartyLoot.Element:new(...)
 				self.quantity
 			)
 			return false
+		end
+
+		for _, id in ipairs(G_RLF.db.global.partyLoot.ignoreItemIds) do
+			if id == self.itemId then
+				G_RLF:LogDebug(
+					itemName .. " ignored by item id in party loot",
+					addonName,
+					"PartyLoot",
+					"",
+					nil,
+					self.quantity
+				)
+				return false
+			end
 		end
 
 		return true
