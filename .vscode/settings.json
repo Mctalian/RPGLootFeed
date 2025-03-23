@@ -75,7 +75,8 @@
     "REPUTATION",
     "TextureKitConstants",
     "GetItemButtonIconTexture",
-    "PARTY"
+    "PARTY",
+    "message"
   ],
   "Lua.workspace.library": [
     "${addons}/busted/module/library",
