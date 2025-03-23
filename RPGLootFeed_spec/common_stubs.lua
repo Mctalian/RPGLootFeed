@@ -54,6 +54,12 @@ function common_stubs.setup_G_RLF(spy)
 				factionMap = {},
 			},
 			global = {
+				animations = {
+					exit = {
+						fadeOutDelay = 1,
+						duration = 1,
+					},
+				},
 				blizzOverrides = {
 					enableAutoLoot = false,
 				},
@@ -197,6 +203,7 @@ function common_stubs.setup_G_RLF(spy)
 			Reputation = "Reputation",
 			Experience = "Experience",
 			Profession = "Profession",
+			PartyLoot = "PartyLoot",
 		},
 		LogEventSource = {
 			ADDON = "TestAddon",

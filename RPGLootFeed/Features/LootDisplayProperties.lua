@@ -38,6 +38,7 @@ G_RLF.LootDisplayProperties = {
 ---@field public quantity number
 ---@field public quality number
 ---@field public totalCount number
+---@field public showForSeconds number
 ---@field public r number
 ---@field public g number
 ---@field public b number
@@ -55,14 +56,15 @@ function G_RLF.InitializeLootDisplayProperties(element)
 
 	element.isLink = false
 	element.eventChannel = "RLF_NEW_LOOT"
+	element.showForSeconds = G_RLF.db.global.animations.exit.fadeOutDelay
 
 	function element:isPassingFilter(_itemName, _itemQuality)
 		return true
 	end
 
 	element.Show = function(element, itemName, itemQuality)
-		G_RLF:LogDebug("Show", addonName, element.type, element.key, nil, element.quantity)
 		if element:isPassingFilter(itemName, itemQuality) then
+			G_RLF:LogDebug("Show", addonName, element.type, element.key, nil, element.quantity)
 			G_RLF:SendMessage(element.eventChannel, element)
 		end
 	end
