@@ -90,6 +90,50 @@ describe("Reputation module", function()
 		assert.equal(ns.db.locale.factionMap["Brann Bronzebeard"], 2640)
 	end)
 
+	it("handles delve companion experience when it causes companion to reach max level", function()
+		local newElement = spy.on(RepModule.Element, "new")
+		ns.ExtractDynamicsFromPattern = function()
+			return nil, nil
+		end
+		C_GossipInfo.GetFriendshipReputation = function()
+			return {
+				standing = 10,
+				reactionThreshold = 10,
+				nextThreshold = nil,
+			}
+		end
+		C_GossipInfo.GetFriendshipReputationRanks = function()
+			return {
+				currentLevel = 10,
+				maxLevel = 10,
+			}
+		end
+		C_Reputation.GetFactionDataByID = function()
+			return {
+				reaction = 8,
+			}
+		end
+		expectedFactionData = {
+			currentLevel = 10,
+			currentXp = 0,
+			reaction = 8,
+			nextLevelAt = 0,
+			maxLevel = 10,
+		}
+
+		local success = RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE(
+			"CHAT_MSG_COMBAT_FACTION_CHANGE",
+			"Brann Bronzebeard has gained 313 experience."
+		)
+
+		assert.is_true(success)
+
+		assert.spy(newElement).was.called_with(_, 313, "Brann Bronzebeard", 0, 1, 0, 2640, expectedFactionData, 4)
+		assert.spy(ns.SendMessage).was.called(1)
+		-- Successfully populates the locale cache
+		assert.equal(ns.db.locale.factionMap["Brann Bronzebeard"], 2640)
+	end)
+
 	describe("element.textFn", function()
 		it("handles positive rep gains", function()
 			local element = RepModule.Element:new(10, "Faction A", 1, 0, 0, 1, _, 3)
@@ -121,7 +165,7 @@ describe("Reputation module", function()
 			assert.equal(text, "")
 		end)
 
-		it("does not continue if this is a delve companion experience gain", function()
+		it("shows level percentage if delve companion experience gain (and not max level)", function()
 			local factionData = {
 				factionId = 2640,
 				factionName = "Brann Bronzebeard",
@@ -133,6 +177,20 @@ describe("Reputation module", function()
 			local element = RepModule.Element:new(10, "Brann Bronzebeard", 1, 0, 0, 2640, factionData, 4)
 			local text = element.secondaryTextFn()
 			assert.is_not_nil(string.match(text, "23.0%%"))
+		end)
+
+		it("does not show level percentage if delve companion experience gain (and max level)", function()
+			local factionData = {
+				factionId = 2640,
+				factionName = "Brann Bronzebeard",
+				currentLevel = 10,
+				maxLevel = 10,
+				currentXp = 23,
+				nextLevelAt = 0,
+			}
+			local element = RepModule.Element:new(10, "Brann Bronzebeard", 1, 0, 0, 2640, factionData, 4)
+			local text = element.secondaryTextFn()
+			assert.equal(text, "")
 		end)
 
 		describe("normal factions", function()

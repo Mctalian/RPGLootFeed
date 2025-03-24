@@ -167,8 +167,11 @@ function Rep.Element:new(...)
 		local color = G_RLF:RGBAToHexFormat(element.r, element.g, element.b, G_RLF.db.global.rep.secondaryTextAlpha)
 
 		if element.repType == RepType.DelveCompanion and factionData then
-			str = math.floor((factionData.currentXp / factionData.nextLevelAt) * 10000) / 100 .. "%"
-			return "    " .. color .. str .. "|r"
+			if factionData.nextLevelAt > 0 then
+				str = math.floor((factionData.currentXp / factionData.nextLevelAt) * 10000) / 100 .. "%"
+				return "    " .. color .. str .. "|r"
+			end
+			return ""
 		end
 
 		if element.repType == RepType.MajorFaction then
@@ -387,7 +390,11 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 				factionData.currentLevel = ranks and ranks.currentLevel or 0
 				factionData.maxLevel = ranks and ranks.maxLevel or 0
 				factionData.currentXp = info.standing - info.reactionThreshold
-				factionData.nextLevelAt = info.nextThreshold - info.reactionThreshold
+				if info.nextThreshold and info.nextThreshold > 1 then
+					factionData.nextLevelAt = info.nextThreshold - info.reactionThreshold
+				else
+					factionData.nextLevelAt = 0
+				end
 				repType = RepType.DelveCompanion
 			else
 				local friendInfo = C_GossipInfo.GetFriendshipReputation(fId)
