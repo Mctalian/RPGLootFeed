@@ -115,9 +115,13 @@ function ItemLoot.Element:new(...)
 
 	element.icon = info.itemTexture
 	element.sellPrice = info.sellPrice
+	local itemQualitySettings = G_RLF.db.global.item.itemQualitySettings[info.itemQuality]
+	if itemQualitySettings and itemQualitySettings.enabled and itemQualitySettings.duration > 0 then
+		element.showForSeconds = itemQualitySettings.duration
+	end
 
 	function element:isPassingFilter(itemName, itemQuality)
-		if not G_RLF.db.global.item.itemQualityFilter[itemQuality] then
+		if not G_RLF.db.global.item.itemQualitySettings[itemQuality].enabled then
 			G_RLF:LogDebug(
 				itemName .. " ignored by quality: " .. ItemLoot:ItemQualityName(itemQuality),
 				addonName,

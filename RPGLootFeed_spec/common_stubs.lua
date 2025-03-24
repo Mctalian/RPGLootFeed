@@ -71,6 +71,7 @@ function common_stubs.setup_G_RLF(spy)
 						mounts = true,
 						legendary = true,
 					},
+					itemQualitySettings = {},
 					sounds = {
 						mounts = {
 							enabled = false,

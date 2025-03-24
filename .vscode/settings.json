@@ -69,14 +69,8 @@
     "MoneyWonAlertSystem",
     "LootAlertSystem",
     "GetNameAndServerNameFromGUID",
-    "BossBanner",
-    "XP",
-    "MONEY",
-    "REPUTATION",
     "TextureKitConstants",
-    "GetItemButtonIconTexture",
-    "PARTY",
-    "message"
+    "GetItemButtonIconTexture"
   ],
   "Lua.workspace.library": [
     "${addons}/busted/module/library",

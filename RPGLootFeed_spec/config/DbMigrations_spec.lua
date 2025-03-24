@@ -95,4 +95,19 @@ describe("DbMigrations module", function()
 		assert.are.equal(ns.db.global.new.table.subTable.value, "subOld")
 		assert.is_nil(ns.db.global.oldTable)
 	end)
+
+	it("handles integer indices", function()
+		ns.db.global.oldTable = {
+			[1] = true,
+			[2] = false,
+		}
+		ns.db.global.new = {}
+		for k, v in pairs(ns.db.global.oldTable) do
+			dbMigrations:Migrate(ns.db, "global.oldTable." .. k, "global.new." .. k .. ".enabled")
+		end
+		assert.are.equal(ns.db.global.new[1].enabled, true)
+		assert.are.equal(ns.db.global.new[2].enabled, false)
+		assert.is_nil(ns.db.global.oldTable[1])
+		assert.is_nil(ns.db.global.oldTable[2])
+	end)
 end)
