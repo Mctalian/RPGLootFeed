@@ -145,6 +145,16 @@ function LootDisplay:CreatePartyFrame()
 	end
 end
 
+function LootDisplay:DestroyPartyFrame()
+	if lootFrames[G_RLF.Frames.PARTY] then
+		lootFrames[G_RLF.Frames.PARTY]:Hide()
+		lootFrames[G_RLF.Frames.PARTY]:ClearFeed()
+		lootFrames[G_RLF.Frames.PARTY]:HideTestArea()
+		lootFrames[G_RLF.Frames.PARTY] = nil
+		G_RLF.RLF_PartyLootFrame = nil
+	end
+end
+
 function LootDisplay:SetBoundingBoxVisibility(show)
 	if lootFrames[G_RLF.Frames.MAIN] == nil then
 		return
@@ -369,17 +379,23 @@ end
 
 G_RLF.LootDisplay = LootDisplay
 
-function G_RLF:CalculateTextWidth(text)
-	local fontFace = G_RLF.db.global.styling.fontFace
-	if G_RLF.db.global.styling.useFontObjects or not fontFace then
-		G_RLF.tempFontString:SetFontObject(G_RLF.db.global.styling.font)
+--- Calculate the width of a string of text using the frame's font settings
+--- @param text string
+--- @param frame? G_RLF.Frames
+--- @return number
+function G_RLF:CalculateTextWidth(text, frame)
+	frame = frame or G_RLF.Frames.MAIN
+	local stylingDb = G_RLF.DbAccessor:Styling(frame)
+	local fontFace = stylingDb.fontFace
+	if stylingDb.useFontObjects or not fontFace then
+		G_RLF.tempFontString:SetFontObject(stylingDb.font)
 	else
 		local fontPath = lsm:Fetch(lsm.MediaType.FONT, fontFace)
 		if not fontPath then
 			G_RLF:LogWarn("Font not found: " .. fontFace, addonName)
 			return 0
 		end
-		G_RLF.tempFontString:SetFont(fontPath, G_RLF.db.global.styling.fontSize, G_RLF:FontFlagsToString())
+		G_RLF.tempFontString:SetFont(fontPath, stylingDb.fontSize, G_RLF:FontFlagsToString())
 	end
 	G_RLF.tempFontString:SetText(text)
 	local width = G_RLF.tempFontString:GetStringWidth()
@@ -405,12 +421,12 @@ function G_RLF:TruncateItemLink(itemLink, extraWidth, frame)
 	local maxWidth = sizingDb.feedWidth - iconSize - (iconSize / 4) - (iconSize / 2) - extraWidth
 
 	-- Calculate the width of the item name plus the link start and end
-	local itemNameWidth = G_RLF:CalculateTextWidth("[" .. itemName .. "]")
+	local itemNameWidth = G_RLF:CalculateTextWidth("[" .. itemName .. "]", frame)
 
 	-- If the width exceeds maxWidth, truncate and add ellipses
 	if itemNameWidth > maxWidth then
 		-- Approximate truncation by progressively shortening the name
-		while G_RLF:CalculateTextWidth("[" .. itemName .. "...]") > maxWidth and #itemName > 0 do
+		while G_RLF:CalculateTextWidth("[" .. itemName .. "...]", frame) > maxWidth and #itemName > 0 do
 			itemName = string.sub(itemName, 1, -2)
 		end
 		itemName = itemName .. "..."

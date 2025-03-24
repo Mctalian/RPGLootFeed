@@ -4,6 +4,8 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
+G_RLF.ConfigHandlers = {}
+
 local ConfigOptions = {}
 
 G_RLF.WrapCharOptions = {

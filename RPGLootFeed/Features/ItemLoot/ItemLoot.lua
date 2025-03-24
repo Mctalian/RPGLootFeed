@@ -140,7 +140,8 @@ function ItemLoot.Element:new(...)
 	end
 
 	element.secondaryTextFn = function(...)
-		local fontSize = G_RLF.db.global.styling.fontSize
+		local stylingDb = G_RLF.DbAccessor:Styling(G_RLF.Frames.MAIN)
+		local fontSize = stylingDb.fontSize
 
 		if fromLink ~= "" and fromLink ~= nil then
 			local toItemLevel, fromItemLevel = getItemLevels(itemLink, fromLink)

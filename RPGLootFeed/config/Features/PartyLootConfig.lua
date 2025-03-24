@@ -4,7 +4,613 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
+local lsm = G_RLF.lsm
+
 local PartyLootConfig = {}
+
+---Check if a string starts with another string
+---@param str string
+---@param start string
+---@return boolean
+local function startswith(str, start)
+	return string.sub(str, 1, #start) == start
+end
+
+function PartyLootConfig:GetPositioningOptions(order)
+	order = order or 1.1
+	return {
+		type = "group",
+		inline = true,
+		name = G_RLF.L["Party Loot Frame Positioning"],
+		desc = G_RLF.L["PartyLootFrameDesc"],
+		hidden = function()
+			return not G_RLF.db.global.partyLoot.separateFrame
+		end,
+		order = order,
+		args = {
+			relativePoint = {
+				type = "select",
+				name = G_RLF.L["Anchor Relative To"],
+				desc = G_RLF.L["RelativeToDesc"],
+				values = {
+					["UIParent"] = G_RLF.L["UIParent"],
+					["PlayerFrame"] = G_RLF.L["PlayerFrame"],
+					["Minimap"] = G_RLF.L["Minimap"],
+					["MainMenuBarBackpackButton"] = G_RLF.L["BagBar"],
+				},
+				get = function()
+					return G_RLF.db.global.partyLoot.positioning.relativePoint
+				end,
+				set = function(_, value)
+					G_RLF.db.global.partyLoot.positioning.relativePoint = value
+					G_RLF.LootDisplay:UpdatePosition(G_RLF.Frames.PARTY)
+				end,
+				order = 1,
+			},
+			anchorPoint = {
+				type = "select",
+				name = G_RLF.L["Anchor Point"],
+				desc = G_RLF.L["AnchorPointDesc"],
+				values = {
+					["TOPLEFT"] = G_RLF.L["Top Left"],
+					["TOPRIGHT"] = G_RLF.L["Top Right"],
+					["BOTTOMLEFT"] = G_RLF.L["Bottom Left"],
+					["BOTTOMRIGHT"] = G_RLF.L["Bottom Right"],
+					["TOP"] = G_RLF.L["Top"],
+					["BOTTOM"] = G_RLF.L["Bottom"],
+					["LEFT"] = G_RLF.L["Left"],
+					["RIGHT"] = G_RLF.L["Right"],
+					["CENTER"] = G_RLF.L["Center"],
+				},
+				get = function()
+					return G_RLF.db.global.partyLoot.positioning.anchorPoint
+				end,
+				set = function(_, value)
+					G_RLF.db.global.partyLoot.positioning.anchorPoint = value
+					G_RLF.LootDisplay:UpdatePosition(G_RLF.Frames.PARTY)
+				end,
+				order = 2,
+			},
+			xOffset = {
+				type = "range",
+				name = G_RLF.L["X Offset"],
+				desc = G_RLF.L["XOffsetDesc"],
+				min = -1000,
+				max = 1000,
+				step = 1,
+				get = function()
+					return G_RLF.db.global.partyLoot.positioning.xOffset
+				end,
+				set = function(_, value)
+					G_RLF.db.global.partyLoot.positioning.xOffset = value
+					G_RLF.LootDisplay:UpdatePosition(G_RLF.Frames.PARTY)
+				end,
+				order = 3,
+			},
+			yOffset = {
+				type = "range",
+				name = G_RLF.L["Y Offset"],
+				desc = G_RLF.L["YOffsetDesc"],
+				min = -1000,
+				max = 1000,
+				step = 1,
+				get = function()
+					return G_RLF.db.global.partyLoot.positioning.yOffset
+				end,
+				set = function(_, value)
+					G_RLF.db.global.partyLoot.positioning.yOffset = value
+					G_RLF.LootDisplay:UpdatePosition(G_RLF.Frames.PARTY)
+				end,
+				order = 4,
+			},
+			frameStrata = {
+				type = "select",
+				name = G_RLF.L["Frame Strata"],
+				desc = G_RLF.L["FrameStrataDesc"],
+				values = {
+					["BACKGROUND"] = G_RLF.L["Background"],
+					["LOW"] = G_RLF.L["Low"],
+					["MEDIUM"] = G_RLF.L["Medium"],
+					["HIGH"] = G_RLF.L["High"],
+					["DIALOG"] = G_RLF.L["Dialog"],
+					["TOOLTIP"] = G_RLF.L["Tooltip"],
+				},
+				sorting = {
+					"BACKGROUND",
+					"LOW",
+					"MEDIUM",
+					"HIGH",
+					"DIALOG",
+					"TOOLTIP",
+				},
+				get = function()
+					return G_RLF.db.global.partyLoot.positioning.frameStrata
+				end,
+				set = function(_, value)
+					G_RLF.db.global.partyLoot.positioning.frameStrata = value
+					G_RLF.LootDisplay:UpdateStrata(G_RLF.Frames.PARTY)
+				end,
+				order = 5,
+			},
+		},
+	}
+end
+
+function PartyLootConfig:GetSizingOptions(order)
+	order = order or 1.2
+	return {
+		type = "group",
+		inline = true,
+		hidden = function()
+			return not G_RLF.db.global.partyLoot.separateFrame
+		end,
+		name = G_RLF.L["Party Loot Frame Sizing"],
+		desc = G_RLF.L["PartyLootFrameSizeDesc"],
+		order = order,
+		args = {
+			copySizingFromMainFrame = {
+				type = "execute",
+				name = G_RLF.L["Copy Sizing from Main Frame"],
+				desc = G_RLF.L["CopySizingFromMainFrameDesc"],
+				func = function()
+					local sizingDb = G_RLF.db.global.sizing
+					for k, v in pairs(sizingDb) do
+						G_RLF.db.global.partyLoot.sizing[k] = v
+					end
+					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+				end,
+				order = 0.5,
+				width = "full",
+			},
+			feedWidth = {
+				type = "range",
+				name = G_RLF.L["Feed Width"],
+				desc = G_RLF.L["FeedWidthDesc"],
+				min = 100,
+				max = 1000,
+				step = 1,
+				get = function()
+					return G_RLF.db.global.partyLoot.sizing.feedWidth
+				end,
+				set = function(_, value)
+					G_RLF.db.global.partyLoot.sizing.feedWidth = value
+					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+				end,
+				order = 1,
+			},
+			maxRows = {
+				type = "range",
+				name = G_RLF.L["Maximum Rows to Display"],
+				desc = G_RLF.L["MaxRowsDesc"],
+				min = 1,
+				max = 100,
+				step = 1,
+				get = function()
+					return G_RLF.db.global.partyLoot.sizing.maxRows
+				end,
+				set = function(_, value)
+					G_RLF.db.global.partyLoot.sizing.maxRows = value
+					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+				end,
+				order = 2,
+			},
+			rowHeight = {
+				type = "range",
+				name = G_RLF.L["Loot Item Height"],
+				desc = G_RLF.L["RowHeightDesc"],
+				min = 5,
+				max = 100,
+				step = 1,
+				get = function()
+					return G_RLF.db.global.partyLoot.sizing.rowHeight
+				end,
+				set = function(_, value)
+					G_RLF.db.global.partyLoot.sizing.rowHeight = value
+					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+				end,
+				order = 3,
+			},
+			iconSize = {
+				type = "range",
+				name = G_RLF.L["Loot Item Icon Size"],
+				desc = G_RLF.L["IconSizeDesc"],
+				min = 5,
+				max = 100,
+				step = 1,
+				get = function()
+					return G_RLF.db.global.partyLoot.sizing.iconSize
+				end,
+				set = function(_, value)
+					G_RLF.db.global.partyLoot.sizing.iconSize = value
+					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+				end,
+				order = 4,
+			},
+			padding = {
+				type = "range",
+				name = G_RLF.L["Loot Item Padding"],
+				desc = G_RLF.L["RowPaddingDesc"],
+				min = 0,
+				max = 10,
+				step = 1,
+				get = function()
+					return G_RLF.db.global.partyLoot.sizing.padding
+				end,
+				set = function(_, value)
+					G_RLF.db.global.partyLoot.sizing.padding = value
+					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+				end,
+				order = 5,
+			},
+		},
+	}
+end
+
+function PartyLootConfig:GetStylingOptions(order)
+	order = order or 1.3
+	return {
+		type = "group",
+		inline = true,
+		hidden = function()
+			return not G_RLF.db.global.partyLoot.separateFrame
+		end,
+		name = G_RLF.L["Party Loot Frame Styling"],
+		desc = G_RLF.L["PartyLootFrameStyleDesc"],
+		order = order,
+		args = {
+			copyStylingFromMainFrame = {
+				type = "execute",
+				name = G_RLF.L["Copy Styling from Main Frame"],
+				desc = G_RLF.L["CopyStylingFromMainFrameDesc"],
+				func = function()
+					local stylingDb = G_RLF.DbAccessor:Styling(G_RLF.Frames.MAIN)
+					for k, v in pairs(stylingDb) do
+						G_RLF.db.global.partyLoot.styling[k] = v
+					end
+					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+				end,
+				order = 0.5,
+				width = "full",
+			},
+			leftAlign = {
+				type = "toggle",
+				name = G_RLF.L["Left Align"],
+				desc = G_RLF.L["LeftAlignDesc"],
+				width = "double",
+				get = function(info, value)
+					return G_RLF.db.global.partyLoot.styling.leftAlign
+				end,
+				set = function(info, value)
+					G_RLF.db.global.partyLoot.styling.leftAlign = value
+					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+				end,
+				order = 1,
+			},
+			growUp = {
+				type = "toggle",
+				name = G_RLF.L["Grow Up"],
+				desc = G_RLF.L["GrowUpDesc"],
+				width = "double",
+				get = function(info, value)
+					return G_RLF.db.global.partyLoot.styling.growUp
+				end,
+				set = function(info, value)
+					G_RLF.db.global.partyLoot.styling.growUp = value
+					G_RLF.LootDisplay:UpdateRowPositions()
+				end,
+				order = 2,
+			},
+			gradientStart = {
+				type = "color",
+				name = G_RLF.L["Background Gradient Start"],
+				desc = G_RLF.L["GradientStartDesc"],
+				hasAlpha = true,
+				get = function(info, value)
+					local r, g, b, a = unpack(G_RLF.db.global.partyLoot.styling.rowBackgroundGradientStart)
+					return r, g, b, a
+				end,
+				set = function(info, r, g, b, a)
+					G_RLF.db.global.partyLoot.styling.rowBackgroundGradientStart = { r, g, b, a }
+					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+				end,
+				order = 3,
+			},
+			gradientEnd = {
+				type = "color",
+				name = G_RLF.L["Background Gradient End"],
+				desc = G_RLF.L["GradientEndDesc"],
+				hasAlpha = true,
+				get = function(info, value)
+					local r, g, b, a = unpack(G_RLF.db.global.partyLoot.styling.rowBackgroundGradientEnd)
+					return r, g, b, a
+				end,
+				set = function(info, r, g, b, a)
+					G_RLF.db.global.partyLoot.styling.rowBackgroundGradientEnd = { r, g, b, a }
+					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+				end,
+				order = 4,
+			},
+			rowBorders = {
+				type = "group",
+				name = G_RLF.L["Row Borders"],
+				desc = G_RLF.L["RowBordersDesc"],
+				inline = true,
+				order = 5,
+				args = {
+					rowBordersEnabled = {
+						type = "toggle",
+						name = G_RLF.L["Enable Row Borders"],
+						desc = G_RLF.L["EnableRowBordersDesc"],
+						width = "double",
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.enableRowBorder
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.enableRowBorder = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 1,
+					},
+					rowBorderThickness = {
+						type = "range",
+						name = G_RLF.L["Row Border Thickness"],
+						desc = G_RLF.L["RowBorderThicknessDesc"],
+						min = 1,
+						max = 10,
+						step = 1,
+						disabled = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.enableRowBorder == false
+						end,
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.rowBorderSize
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.rowBorderSize = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 2,
+					},
+					rowBorderColor = {
+						type = "color",
+						name = G_RLF.L["Row Border Color"],
+						desc = G_RLF.L["RowBorderColorDesc"],
+						hasAlpha = true,
+						disabled = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.enableRowBorder == false
+								or G_RLF.db.global.partyLoot.styling.rowBorderClassColors
+						end,
+						get = function(info, value)
+							local r, g, b, a = unpack(G_RLF.db.global.partyLoot.styling.rowBorderColor)
+							return r, g, b, a
+						end,
+						set = function(info, r, g, b, a)
+							G_RLF.db.global.partyLoot.styling.rowBorderColor = { r, g, b, a }
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 3,
+					},
+					rowBorderClassColors = {
+						type = "toggle",
+						name = G_RLF.L["Use Class Colors for Borders"],
+						desc = G_RLF.L["UseClassColorsForBordersDesc"],
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.rowBorderClassColors = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.rowBorderClassColors
+						end,
+						disabled = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.enableRowBorder == false
+						end,
+						order = 4,
+					},
+				},
+			},
+			enableSecondaryRowText = {
+				type = "toggle",
+				name = G_RLF.L["Enable Secondary Row Text"],
+				desc = G_RLF.L["EnableSecondaryRowTextDesc"],
+				width = "double",
+				get = function(info, value)
+					return G_RLF.db.global.partyLoot.styling.enabledSecondaryRowText
+				end,
+				set = function(info, value)
+					G_RLF.db.global.partyLoot.styling.enabledSecondaryRowText = value
+					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+				end,
+				order = 6,
+			},
+			useFontObjects = {
+				type = "toggle",
+				name = G_RLF.L["Use Font Objects"],
+				desc = G_RLF.L["UseFontObjectsDesc"],
+				width = "double",
+				get = function(info, value)
+					return G_RLF.db.global.partyLoot.styling.useFontObjects
+				end,
+				set = function(info, value)
+					G_RLF.db.global.partyLoot.styling.useFontObjects = value
+				end,
+				order = 7,
+			},
+			font = {
+				type = "select",
+				name = G_RLF.L["Font"],
+				desc = G_RLF.L["FontDesc"],
+				disabled = function(info, value)
+					return G_RLF.db.global.partyLoot.styling.useFontObjects == false
+				end,
+				width = "double",
+				values = function()
+					local fonts = _G.GetFonts()
+					local allFonts = {}
+					for k, v in pairs(fonts) do
+						if type(v) == "string" then
+							if startswith(v, "table") then
+							-- Skip
+							else
+								allFonts[v] = v
+							end
+						end
+					end
+					return allFonts
+				end,
+				get = function(info, value)
+					return G_RLF.db.global.partyLoot.styling.font
+				end,
+				set = function(info, value)
+					G_RLF.db.global.partyLoot.styling.font = value
+					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+				end,
+				order = 8,
+			},
+			customFonts = {
+				type = "group",
+				name = G_RLF.L["Custom Fonts"],
+				desc = G_RLF.L["CustomFontsDesc"],
+				disabled = function(info, value)
+					return G_RLF.db.global.partyLoot.styling.useFontObjects == true
+				end,
+				inline = true,
+				order = 9,
+				args = {
+					font = {
+						type = "select",
+						dialogControl = "LSM30_Font",
+						name = G_RLF.L["Font Face"],
+						desc = G_RLF.L["FontFaceDesc"],
+						width = "double",
+						values = lsm:HashTable(lsm.MediaType.FONT),
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.fontFace
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.fontFace = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 1,
+					},
+					fontSize = {
+						type = "range",
+						name = G_RLF.L["Font Size"],
+						desc = G_RLF.L["FontSizeDesc"],
+						softMin = 6,
+						softMax = 24,
+						min = 1,
+						max = 72,
+						bigStep = 1,
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.fontSize
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.fontSize = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 2,
+					},
+					secondaryFontSize = {
+						type = "range",
+						name = G_RLF.L["Secondary Font Size"],
+						desc = G_RLF.L["SecondaryFontSizeDesc"],
+						disabled = function()
+							return not G_RLF.db.global.partyLoot.styling.enabledSecondaryRowText
+						end,
+						softMin = 6,
+						softMax = 24,
+						min = 1,
+						max = 72,
+						bigStep = 1,
+						get = function()
+							return G_RLF.db.global.partyLoot.styling.secondaryFontSize
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.secondaryFontSize = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 3,
+					},
+					fontFlags = {
+						type = "multiselect",
+						name = G_RLF.L["Font Flags"],
+						desc = G_RLF.L["FontFlagsDesc"],
+						width = "double",
+						values = {
+							[G_RLF.FontFlags.NONE] = G_RLF.L["None"],
+							[G_RLF.FontFlags.OUTLINE] = G_RLF.L["Outline"],
+							[G_RLF.FontFlags.THICKOUTLINE] = G_RLF.L["Thick Outline"],
+							[G_RLF.FontFlags.MONOCHROME] = G_RLF.L["Monochrome"],
+						},
+						get = function(info, key)
+							return G_RLF.db.global.partyLoot.styling.fontFlags[key]
+						end,
+						set = function(info, key, value)
+							G_RLF.db.global.partyLoot.styling.fontFlags[key] = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 4,
+					},
+					shadowColor = {
+						type = "color",
+						name = G_RLF.L["Shadow Color"],
+						desc = G_RLF.L["ShadowColorDesc"],
+						hasAlpha = true,
+						get = function(info, value)
+							local r, g, b, a = unpack(G_RLF.db.global.partyLoot.styling.fontShadowColor)
+							return r, g, b, a
+						end,
+						set = function(info, r, g, b, a)
+							G_RLF.db.global.partyLoot.styling.fontShadowColor = { r, g, b, a }
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 5,
+						width = "double",
+					},
+					shadowHelp = {
+						type = "description",
+						name = G_RLF.L["ShadowOffsetHelp"],
+						order = 5.1,
+						width = "full",
+					},
+					shadowOffsetX = {
+						type = "range",
+						name = G_RLF.L["Shadow Offset X"],
+						desc = G_RLF.L["ShadowOffsetXDesc"],
+						min = -10,
+						max = 10,
+						step = 1,
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.fontShadowOffsetX
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.fontShadowOffsetX = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 6,
+					},
+					shadowOffsetY = {
+						type = "range",
+						name = G_RLF.L["Shadow Offset Y"],
+						desc = G_RLF.L["ShadowOffsetYDesc"],
+						min = -10,
+						max = 10,
+						step = 1,
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.fontShadowOffsetY
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.fontShadowOffsetY = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 7,
+					},
+				},
+			},
+		},
+	}
+end
+
+G_RLF.ConfigHandlers.PartyLootConfig = PartyLootConfig
 
 ---@class RLF_DBGlobal
 ---@field partyLoot RLF_ConfigPartyLoot
@@ -43,6 +649,32 @@ G_RLF.defaults.global.partyLoot = {
 		rowHeight = 22,
 		padding = 2,
 		iconSize = 18,
+	},
+	---@type RLF_ConfigStyling
+	styling = {
+		enabledSecondaryRowText = false,
+		leftAlign = true,
+		growUp = true,
+		rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 },
+		rowBackgroundGradientEnd = { 0.1, 0.1, 0.1, 0 },
+		enableRowBorder = false,
+		rowBorderSize = 1,
+		rowBorderColor = { 0, 0, 0, 1 },
+		rowBorderClassColors = false,
+		useFontObjects = true,
+		font = "GameFontNormalSmall",
+		fontFace = "Friz Quadrata TT",
+		fontSize = 10,
+		secondaryFontSize = 8,
+		fontFlags = {
+			[G_RLF.FontFlags.NONE] = true,
+			[G_RLF.FontFlags.OUTLINE] = false,
+			[G_RLF.FontFlags.THICKOUTLINE] = false,
+			[G_RLF.FontFlags.MONOCHROME] = false,
+		},
+		fontShadowColor = { 0, 0, 0, 1 },
+		fontShadowOffsetX = 1,
+		fontShadowOffsetY = -1,
 	},
 	---@type number[]
 	ignoreItemIds = {},
@@ -86,213 +718,17 @@ G_RLF.options.args.features.args.partyLootConfig = {
 					end,
 					set = function(_, value)
 						G_RLF.db.global.partyLoot.separateFrame = value
+						if value then
+							G_RLF.LootDisplay:CreatePartyFrame()
+						else
+							G_RLF.LootDisplay:DestroyPartyFrame()
+						end
 					end,
 					order = 1,
 				},
-				positioning = {
-					type = "group",
-					name = G_RLF.L["Positioning"],
-					hidden = function()
-						return not G_RLF.db.global.partyLoot.separateFrame
-					end,
-					order = 1.1,
-					args = {
-						relativePoint = {
-							type = "select",
-							name = G_RLF.L["Anchor Relative To"],
-							desc = G_RLF.L["RelativeToDesc"],
-							values = {
-								["UIParent"] = G_RLF.L["UIParent"],
-								["PlayerFrame"] = G_RLF.L["PlayerFrame"],
-								["Minimap"] = G_RLF.L["Minimap"],
-								["MainMenuBarBackpackButton"] = G_RLF.L["BagBar"],
-							},
-							get = function()
-								return G_RLF.db.global.partyLoot.positioning.relativePoint
-							end,
-							set = function(_, value)
-								G_RLF.db.global.partyLoot.positioning.relativePoint = value
-								G_RLF.LootDisplay:UpdatePosition(G_RLF.Frames.PARTY)
-							end,
-							order = 1,
-						},
-						anchorPoint = {
-							type = "select",
-							name = G_RLF.L["Anchor Point"],
-							desc = G_RLF.L["AnchorPointDesc"],
-							values = {
-								["TOPLEFT"] = G_RLF.L["Top Left"],
-								["TOPRIGHT"] = G_RLF.L["Top Right"],
-								["BOTTOMLEFT"] = G_RLF.L["Bottom Left"],
-								["BOTTOMRIGHT"] = G_RLF.L["Bottom Right"],
-								["TOP"] = G_RLF.L["Top"],
-								["BOTTOM"] = G_RLF.L["Bottom"],
-								["LEFT"] = G_RLF.L["Left"],
-								["RIGHT"] = G_RLF.L["Right"],
-								["CENTER"] = G_RLF.L["Center"],
-							},
-							get = function()
-								return G_RLF.db.global.partyLoot.positioning.anchorPoint
-							end,
-							set = function(_, value)
-								G_RLF.db.global.partyLoot.positioning.anchorPoint = value
-								G_RLF.LootDisplay:UpdatePosition(G_RLF.Frames.PARTY)
-							end,
-							order = 2,
-						},
-						xOffset = {
-							type = "range",
-							name = G_RLF.L["X Offset"],
-							desc = G_RLF.L["XOffsetDesc"],
-							min = -1000,
-							max = 1000,
-							step = 1,
-							get = function()
-								return G_RLF.db.global.partyLoot.positioning.xOffset
-							end,
-							set = function(_, value)
-								G_RLF.db.global.partyLoot.positioning.xOffset = value
-								G_RLF.LootDisplay:UpdatePosition(G_RLF.Frames.PARTY)
-							end,
-							order = 3,
-						},
-						yOffset = {
-							type = "range",
-							name = G_RLF.L["Y Offset"],
-							desc = G_RLF.L["YOffsetDesc"],
-							min = -1000,
-							max = 1000,
-							step = 1,
-							get = function()
-								return G_RLF.db.global.partyLoot.positioning.yOffset
-							end,
-							set = function(_, value)
-								G_RLF.db.global.partyLoot.positioning.yOffset = value
-								G_RLF.LootDisplay:UpdatePosition(G_RLF.Frames.PARTY)
-							end,
-							order = 4,
-						},
-						frameStrata = {
-							type = "select",
-							name = G_RLF.L["Frame Strata"],
-							desc = G_RLF.L["FrameStrataDesc"],
-							values = {
-								["BACKGROUND"] = G_RLF.L["Background"],
-								["LOW"] = G_RLF.L["Low"],
-								["MEDIUM"] = G_RLF.L["Medium"],
-								["HIGH"] = G_RLF.L["High"],
-								["DIALOG"] = G_RLF.L["Dialog"],
-								["TOOLTIP"] = G_RLF.L["Tooltip"],
-							},
-							sorting = {
-								"BACKGROUND",
-								"LOW",
-								"MEDIUM",
-								"HIGH",
-								"DIALOG",
-								"TOOLTIP",
-							},
-							get = function()
-								return G_RLF.db.global.partyLoot.positioning.frameStrata
-							end,
-							set = function(_, value)
-								G_RLF.db.global.partyLoot.positioning.frameStrata = value
-								G_RLF.LootDisplay:UpdateStrata(G_RLF.Frames.PARTY)
-							end,
-							order = 5,
-						},
-					},
-				},
-				sizing = {
-					type = "group",
-					hidden = function()
-						return not G_RLF.db.global.partyLoot.separateFrame
-					end,
-					name = G_RLF.L["Sizing"],
-					order = 1.2,
-					args = {
-						feedWidth = {
-							type = "range",
-							name = G_RLF.L["Feed Width"],
-							desc = G_RLF.L["FeedWidthDesc"],
-							min = 100,
-							max = 1000,
-							step = 1,
-							get = function()
-								return G_RLF.db.global.partyLoot.sizing.feedWidth
-							end,
-							set = function(_, value)
-								G_RLF.db.global.partyLoot.sizing.feedWidth = value
-								G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
-							end,
-							order = 1,
-						},
-						maxRows = {
-							type = "range",
-							name = G_RLF.L["Maximum Rows to Display"],
-							desc = G_RLF.L["MaxRowsDesc"],
-							min = 1,
-							max = 100,
-							step = 1,
-							get = function()
-								return G_RLF.db.global.partyLoot.sizing.maxRows
-							end,
-							set = function(_, value)
-								G_RLF.db.global.partyLoot.sizing.maxRows = value
-								G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
-							end,
-							order = 2,
-						},
-						rowHeight = {
-							type = "range",
-							name = G_RLF.L["Loot Item Height"],
-							desc = G_RLF.L["RowHeightDesc"],
-							min = 5,
-							max = 100,
-							step = 1,
-							get = function()
-								return G_RLF.db.global.partyLoot.sizing.rowHeight
-							end,
-							set = function(_, value)
-								G_RLF.db.global.partyLoot.sizing.rowHeight = value
-								G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
-							end,
-							order = 3,
-						},
-						iconSize = {
-							type = "range",
-							name = G_RLF.L["Loot Item Icon Size"],
-							desc = G_RLF.L["IconSizeDesc"],
-							min = 5,
-							max = 100,
-							step = 1,
-							get = function()
-								return G_RLF.db.global.partyLoot.sizing.iconSize
-							end,
-							set = function(_, value)
-								G_RLF.db.global.partyLoot.sizing.iconSize = value
-								G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
-							end,
-							order = 4,
-						},
-						padding = {
-							type = "range",
-							name = G_RLF.L["Loot Item Padding"],
-							desc = G_RLF.L["RowPaddingDesc"],
-							min = 0,
-							max = 10,
-							step = 1,
-							get = function()
-								return G_RLF.db.global.partyLoot.sizing.padding
-							end,
-							set = function(_, value)
-								G_RLF.db.global.partyLoot.sizing.padding = value
-								G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
-							end,
-							order = 5,
-						},
-					},
-				},
+				positioning = PartyLootConfig:GetPositioningOptions(),
+				sizing = PartyLootConfig:GetSizingOptions(),
+				styling = PartyLootConfig:GetStylingOptions(),
 				hideServerNames = {
 					type = "toggle",
 					name = G_RLF.L["Hide Server Names"],

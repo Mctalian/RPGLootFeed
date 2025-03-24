@@ -31,8 +31,13 @@ G_RLF.options.args.sizing = {
 			desc = G_RLF.L["FeedWidthDesc"],
 			min = 10,
 			max = 1000,
-			get = "GetFeedWidth",
-			set = "SetFeedWidth",
+			get = function()
+				return G_RLF.db.global.sizing.feedWidth
+			end,
+			set = function(_, value)
+				G_RLF.db.global.sizing.feedWidth = value
+				G_RLF.LootDisplay:UpdateRowStyles()
+			end,
 			order = 1,
 		},
 		maxRows = {
@@ -44,8 +49,13 @@ G_RLF.options.args.sizing = {
 			max = 20,
 			step = 1,
 			bigStep = 5,
-			get = "GetMaxRows",
-			set = "SetMaxRows",
+			get = function()
+				return G_RLF.db.global.sizing.maxRows
+			end,
+			set = function(_, value)
+				G_RLF.db.global.sizing.maxRows = value
+				G_RLF.LootDisplay:UpdateRowStyles()
+			end,
 			order = 2,
 		},
 		rowHeight = {
@@ -54,8 +64,13 @@ G_RLF.options.args.sizing = {
 			desc = G_RLF.L["RowHeightDesc"],
 			min = 5,
 			max = 100,
-			get = "GetRowHeight",
-			set = "SetRowHeight",
+			get = function()
+				return G_RLF.db.global.sizing.rowHeight
+			end,
+			set = function(_, value)
+				G_RLF.db.global.sizing.rowHeight = value
+				G_RLF.LootDisplay:UpdateRowStyles()
+			end,
 			order = 3,
 		},
 		iconSize = {
@@ -64,8 +79,13 @@ G_RLF.options.args.sizing = {
 			desc = G_RLF.L["IconSizeDesc"],
 			min = 5,
 			max = 100,
-			get = "GetIconSize",
-			set = "SetIconSize",
+			get = function()
+				return G_RLF.db.global.sizing.iconSize
+			end,
+			set = function(_, value)
+				G_RLF.db.global.sizing.iconSize = value
+				G_RLF.LootDisplay:UpdateRowStyles()
+			end,
 			order = 4,
 		},
 		rowPadding = {
@@ -74,54 +94,15 @@ G_RLF.options.args.sizing = {
 			desc = G_RLF.L["RowPaddingDesc"],
 			min = 0,
 			max = 10,
-			get = "GetRowPadding",
-			set = "SetRowPadding",
+			get = function()
+				return G_RLF.db.global.sizing.padding
+			end,
+			set = function(_, value)
+				G_RLF.db.global.sizing.padding = value
+				G_RLF.LootDisplay:UpdateRowStyles()
+			end,
 			order = 5,
 		},
+		partyLootFrame = G_RLF.ConfigHandlers.PartyLootConfig:GetSizingOptions(6),
 	},
 }
-
-function Sizing:SetFeedWidth(info, value)
-	G_RLF.db.global.sizing.feedWidth = value
-	G_RLF.LootDisplay:UpdateRowStyles()
-end
-
-function Sizing:GetFeedWidth(info)
-	return G_RLF.db.global.sizing.feedWidth
-end
-
-function Sizing:SetMaxRows(info, value)
-	G_RLF.db.global.sizing.maxRows = value
-	G_RLF.LootDisplay:UpdateRowStyles()
-end
-
-function Sizing:GetMaxRows(info)
-	return G_RLF.db.global.sizing.maxRows
-end
-
-function Sizing:SetRowHeight(info, value)
-	G_RLF.db.global.sizing.rowHeight = value
-	G_RLF.LootDisplay:UpdateRowStyles()
-end
-
-function Sizing:GetRowHeight(info, value)
-	return G_RLF.db.global.sizing.rowHeight
-end
-
-function Sizing:SetIconSize(info, value)
-	G_RLF.db.global.sizing.iconSize = value
-	G_RLF.LootDisplay:UpdateRowStyles()
-end
-
-function Sizing:GetIconSize(info, value)
-	return G_RLF.db.global.sizing.iconSize
-end
-
-function Sizing:SetRowPadding(info, value)
-	G_RLF.db.global.sizing.padding = value
-	G_RLF.LootDisplay:UpdateRowStyles()
-end
-
-function Sizing:GetRowPadding(info, value)
-	return G_RLF.db.global.sizing.padding
-end

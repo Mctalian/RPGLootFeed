@@ -24,7 +24,8 @@ function LootDisplayFrameMixin:getNumberOfRows()
 end
 
 function LootDisplayFrameMixin:getPositioningDetails()
-	local growUp = G_RLF.db.global.styling.growUp
+	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
+	local growUp = stylingDb.growUp
 	-- Position the new row at the bottom (or top if growing down)
 	local vertDir = growUp and "BOTTOM" or "TOP"
 	local opposite = growUp and "TOP" or "BOTTOM"
@@ -85,7 +86,8 @@ end
 function LootDisplayFrameMixin:CreateTab()
 	self.tab = CreateFrame("Button", nil, UIParent, "UIPanelButtonTemplate") --[[@as Button]]
 	self.tab:SetSize(14, 14)
-	if G_RLF.db.global.styling.growUp then
+	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
+	if stylingDb.growUp then
 		self.tab:SetPoint("BOTTOMLEFT", self, "BOTTOMLEFT", -14, 0)
 	else
 		self.tab:SetPoint("TOPLEFT", self, "TOPLEFT", 0, 0)

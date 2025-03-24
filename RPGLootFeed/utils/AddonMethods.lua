@@ -217,7 +217,12 @@ function G_RLF:TableToCommaSeparatedString(tbl)
 	return table.concat(result, ", ")
 end
 
-function G_RLF:FontFlagsToString()
-	local flags = G_RLF.db.global.styling.fontFlags
+--- Get the frame's font flags as a string
+--- @param frame? G_RLF.Frames
+--- @return string
+function G_RLF:FontFlagsToString(frame)
+	frame = frame or G_RLF.Frames.MAIN
+	local stylingDb = G_RLF.DbAccessor:Styling(frame)
+	local flags = stylingDb.fontFlags
 	return self:TableToCommaSeparatedString(flags)
 end
