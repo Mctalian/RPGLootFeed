@@ -953,6 +953,7 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	local text
 	if element.showForSeconds ~= self.showForSeconds and element.showForSeconds ~= nil then
 		self.showForSeconds = element.showForSeconds
+		self:StyleExitAnimation()
 	end
 
 	if unit then
