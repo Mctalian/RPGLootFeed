@@ -116,6 +116,13 @@ function common_stubs.setup_G_RLF(spy)
 		L = {
 			Issues = "Issues",
 		},
+		ConfigHandlers = {
+			PartyLootConfig = {
+				GetPositioningOptions = spy.new(),
+				GetSizingOptions = spy.new(),
+				GetStylingOptions = spy.new(),
+			},
+		},
 		LootDisplay = {},
 		list = function()
 			return {}
@@ -195,6 +202,12 @@ function common_stubs.setup_G_RLF(spy)
 					end,
 				}
 			end,
+		},
+		lsm = {
+			HashTable = spy.new(),
+			MediaType = {
+				FONT = "font",
+			},
 		},
 		FeatureModule = {
 			ItemLoot = "ItemLoot",
@@ -277,6 +290,12 @@ function common_stubs.setup_G_RLF(spy)
 			BRACE = 4,
 			ANGLE = 5,
 			BAR = 6,
+		},
+		FontFlags = {
+			NONE = "NONE",
+			OUTLINE = "OUTLINE",
+			THICKOUTLINE = "THICKOUTLINE",
+			MONOCHROME = "MONOCHROME",
 		},
 		GameSounds = {
 			LOOT_SMALL_COIN = 567428,
