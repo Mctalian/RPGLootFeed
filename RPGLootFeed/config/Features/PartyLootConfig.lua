@@ -44,6 +44,7 @@ G_RLF.defaults.global.partyLoot = {
 		padding = 2,
 		iconSize = 18,
 	},
+	---@type number[]
 	ignoreItemIds = {},
 }
 

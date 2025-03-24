@@ -365,18 +365,18 @@ end
 ---@field type string
 ---@field id string
 ---@field content string
----@field amount string
+---@field amount string|number
 ---@field new boolean
 
 ---Add a log entry to the log table
 ---@param level string
 ---@param message string
----@param source string
----@param type string
----@param id string
----@param content string
----@param amount string
----@param isNew boolean
+---@param source? string
+---@param type? string
+---@param id? string
+---@param content? string
+---@param amount? string | number
+---@param isNew? boolean
 ---@return nil
 function Logger:addLogEntry(level, message, source, type, id, content, amount, isNew)
 	---@type LogEntry
@@ -388,7 +388,7 @@ function Logger:addLogEntry(level, message, source, type, id, content, amount, i
 		id = id or "",
 		content = content or "",
 		amount = amount or "",
-		new = isNew,
+		new = isNew or false,
 		message = message,
 	}
 	local logTable = getLogger()

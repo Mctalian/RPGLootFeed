@@ -48,17 +48,40 @@ function PartyLoot.Element:new(...)
 			return false
 		end
 
+		local ignoredIds = G_RLF.db.global.partyLoot.ignoreItemIds
+
+		if #ignoredIds == 0 then
+			G_RLF:LogDebug(
+				itemName .. " passed because there are no configured ignored item ids",
+				addonName,
+				PartyLoot.moduleName,
+				"",
+				nil,
+				self.quantity
+			)
+			return true
+		end
+
 		for _, id in ipairs(G_RLF.db.global.partyLoot.ignoreItemIds) do
 			if id == self.itemId then
 				G_RLF:LogDebug(
 					itemName .. " ignored by item id in party loot",
 					addonName,
-					"PartyLoot",
-					"",
+					PartyLoot.moduleName,
+					self.itemId,
 					nil,
 					self.quantity
 				)
 				return false
+			else
+				G_RLF:LogDebug(
+					itemName .. " passed because it does not match the configured ignored item id: " .. id,
+					addonName,
+					PartyLoot.moduleName,
+					self.itemId,
+					nil,
+					self.quantity
+				)
 			end
 		end
 
@@ -204,6 +227,7 @@ function PartyLoot:CHAT_MSG_LOOT(eventName, ...)
 	end
 
 	local msg, playerName, _, _, playerName2, _, _, _, _, _, _, guid = ...
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, nil, eventName .. " " .. msg)
 	local raidLoot = msg:match("HlootHistory:")
 	if raidLoot then
 		-- Ignore this message as it's a raid loot message
@@ -244,7 +268,11 @@ function PartyLoot:CHAT_MSG_LOOT(eventName, ...)
 
 	if #itemLinks == 2 then
 		-- Item upgrades are not supported for party members currently
-		G_RLF:LogDebug("Party item upgrades are apparently captured in CHAT_MSG_LOOT. TODO: may need to support this.")
+		G_RLF:LogDebug(
+			"Party item upgrades are apparently captured in CHAT_MSG_LOOT. TODO: may need to support this.",
+			addonName,
+			self.moduleName
+		)
 		return
 	end
 
