@@ -19,15 +19,39 @@ globalDefaults.item = {
 	itemCountTextEnabled = true,
 	itemCountTextColor = { 0.737, 0.737, 0.737, 1 },
 	itemCountTextWrapChar = G_RLF.WrapCharEnum.PARENTHESIS,
-	itemQualityFilter = {
-		[G_RLF.ItemQualEnum.Poor] = true,
-		[G_RLF.ItemQualEnum.Common] = true,
-		[G_RLF.ItemQualEnum.Uncommon] = true,
-		[G_RLF.ItemQualEnum.Rare] = true,
-		[G_RLF.ItemQualEnum.Epic] = true,
-		[G_RLF.ItemQualEnum.Legendary] = true,
-		[G_RLF.ItemQualEnum.Artifact] = true,
-		[G_RLF.ItemQualEnum.Heirloom] = true,
+	itemQualitySettings = {
+		[G_RLF.ItemQualEnum.Poor] = {
+			enabled = true,
+			duration = 0,
+		},
+		[G_RLF.ItemQualEnum.Common] = {
+			enabled = true,
+			duration = 0,
+		},
+		[G_RLF.ItemQualEnum.Uncommon] = {
+			enabled = true,
+			duration = 0,
+		},
+		[G_RLF.ItemQualEnum.Rare] = {
+			enabled = true,
+			duration = 0,
+		},
+		[G_RLF.ItemQualEnum.Epic] = {
+			enabled = true,
+			duration = 0,
+		},
+		[G_RLF.ItemQualEnum.Legendary] = {
+			enabled = true,
+			duration = 0,
+		},
+		[G_RLF.ItemQualEnum.Artifact] = {
+			enabled = true,
+			duration = 0,
+		},
+		[G_RLF.ItemQualEnum.Heirloom] = {
+			enabled = true,
+			duration = 0,
+		},
 	},
 	itemHighlights = {
 		boe = false,
@@ -257,27 +281,257 @@ G_RLF.options.args.features.args.itemLootConfig = {
 					},
 				},
 				itemQualityFilter = {
-					type = "multiselect",
+					type = "group",
 					name = G_RLF.L["Item Quality Filter"],
 					desc = G_RLF.L["ItemQualityFilterDesc"],
-					values = {
-						[G_RLF.ItemQualEnum.Poor] = G_RLF.L["Poor"],
-						[G_RLF.ItemQualEnum.Common] = G_RLF.L["Common"],
-						[G_RLF.ItemQualEnum.Uncommon] = G_RLF.L["Uncommon"],
-						[G_RLF.ItemQualEnum.Rare] = G_RLF.L["Rare"],
-						[G_RLF.ItemQualEnum.Epic] = G_RLF.L["Epic"],
-						[G_RLF.ItemQualEnum.Legendary] = G_RLF.L["Legendary"],
-						[G_RLF.ItemQualEnum.Artifact] = G_RLF.L["Artifact"],
-						[G_RLF.ItemQualEnum.Heirloom] = G_RLF.L["Heirloom"],
-					},
-					width = "double",
-					get = function(info, quality)
-						return G_RLF.db.global.item.itemQualityFilter[quality]
-					end,
-					set = function(info, quality, value)
-						G_RLF.db.global.item.itemQualityFilter[quality] = value
-					end,
+					inline = true,
 					order = 2,
+					args = {
+						resetAllDurationOverrides = {
+							type = "execute",
+							name = G_RLF.L["Reset All Duration Overrides"],
+							desc = G_RLF.L["ResetAllDurationOverridesDesc"],
+							func = function()
+								for _, v in pairs(G_RLF.db.global.item.itemQualitySettings) do
+									v.duration = 0
+								end
+							end,
+							order = 0.5,
+							width = "full",
+						},
+						poorEnabled = {
+							type = "toggle",
+							name = G_RLF.L["Poor"],
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Poor].enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Poor].enabled = value
+							end,
+							order = 2,
+						},
+						poorDuration = {
+							type = "range",
+							name = string.format(G_RLF.L["Duration (seconds)"], G_RLF.L["Poor"]),
+							desc = string.format(G_RLF.L["DurationDesc"], G_RLF.L["Poor"]),
+							min = 0,
+							max = 30,
+							step = 1,
+							hidden = function()
+								return not G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Poor].enabled
+							end,
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Poor].duration
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Poor].duration = value
+							end,
+							order = 3,
+						},
+						commonEnabled = {
+							type = "toggle",
+							name = G_RLF.L["Common"],
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Common].enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Common].enabled = value
+							end,
+							order = 5,
+						},
+						commonDuration = {
+							type = "range",
+							name = string.format(G_RLF.L["Duration (seconds)"], G_RLF.L["Common"]),
+							desc = string.format(G_RLF.L["DurationDesc"], G_RLF.L["Common"]),
+							min = 0,
+							max = 30,
+							step = 1,
+							hidden = function()
+								return not G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Common].enabled
+							end,
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Common].duration
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Common].duration = value
+							end,
+							order = 6,
+						},
+						uncommonEnabled = {
+							type = "toggle",
+							name = G_RLF.L["Uncommon"],
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Uncommon].enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Uncommon].enabled = value
+							end,
+							order = 8,
+						},
+						uncommonDuration = {
+							type = "range",
+							name = string.format(G_RLF.L["Duration (seconds)"], G_RLF.L["Uncommon"]),
+							desc = string.format(G_RLF.L["DurationDesc"], G_RLF.L["Uncommon"]),
+							min = 0,
+							max = 30,
+							step = 1,
+							hidden = function()
+								return not G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Uncommon].enabled
+							end,
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Uncommon].duration
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Uncommon].duration = value
+							end,
+							order = 9,
+						},
+						rareEnabled = {
+							type = "toggle",
+							name = G_RLF.L["Rare"],
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Rare].enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Rare].enabled = value
+							end,
+							order = 11,
+						},
+						rareDuration = {
+							type = "range",
+							name = string.format(G_RLF.L["Duration (seconds)"], G_RLF.L["Rare"]),
+							desc = string.format(G_RLF.L["DurationDesc"], G_RLF.L["Rare"]),
+							min = 0,
+							max = 30,
+							step = 1,
+							hidden = function()
+								return not G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Rare].enabled
+							end,
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Rare].duration
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Rare].duration = value
+							end,
+							order = 12,
+						},
+						epicEnabled = {
+							type = "toggle",
+							name = G_RLF.L["Epic"],
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Epic].enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Epic].enabled = value
+							end,
+							order = 14,
+						},
+						epicDuration = {
+							type = "range",
+							name = string.format(G_RLF.L["Duration (seconds)"], G_RLF.L["Epic"]),
+							desc = string.format(G_RLF.L["DurationDesc"], G_RLF.L["Epic"]),
+							min = 0,
+							max = 30,
+							step = 1,
+							hidden = function()
+								return not G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Epic].enabled
+							end,
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Epic].duration
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Epic].duration = value
+							end,
+							order = 15,
+						},
+						legendaryEnabled = {
+							type = "toggle",
+							name = G_RLF.L["Legendary"],
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Legendary].enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Legendary].enabled = value
+							end,
+							order = 17,
+						},
+						legendaryDuration = {
+							type = "range",
+							name = string.format(G_RLF.L["Duration (seconds)"], G_RLF.L["Legendary"]),
+							desc = string.format(G_RLF.L["DurationDesc"], G_RLF.L["Legendary"]),
+							min = 0,
+							max = 30,
+							step = 1,
+							hidden = function()
+								return not G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Legendary].enabled
+							end,
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Legendary].duration
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Legendary].duration = value
+							end,
+							order = 18,
+						},
+						artifactEnabled = {
+							type = "toggle",
+							name = G_RLF.L["Artifact"],
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Artifact].enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Artifact].enabled = value
+							end,
+							order = 20,
+						},
+						artifactDuration = {
+							type = "range",
+							name = string.format(G_RLF.L["Duration (seconds)"], G_RLF.L["Artifact"]),
+							desc = string.format(G_RLF.L["DurationDesc"], G_RLF.L["Artifact"]),
+							min = 0,
+							max = 30,
+							step = 1,
+							hidden = function()
+								return not G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Artifact].enabled
+							end,
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Artifact].duration
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Artifact].duration = value
+							end,
+							order = 21,
+						},
+						heirloomEnabled = {
+							type = "toggle",
+							name = G_RLF.L["Heirloom"],
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Heirloom].enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Heirloom].enabled = value
+							end,
+							order = 23,
+						},
+						heirloomDuration = {
+							type = "range",
+							name = string.format(G_RLF.L["Duration (seconds)"], G_RLF.L["Heirloom"]),
+							desc = string.format(G_RLF.L["DurationDesc"], G_RLF.L["Heirloom"]),
+							min = 0,
+							max = 30,
+							step = 1,
+							hidden = function()
+								return not G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Heirloom].enabled
+							end,
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Heirloom].duration
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Heirloom].duration = value
+							end,
+							order = 24,
+						},
+					},
 				},
 				itemHighlights = {
 					type = "group",
