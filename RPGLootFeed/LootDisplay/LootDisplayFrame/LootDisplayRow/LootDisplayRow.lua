@@ -301,7 +301,7 @@ end
 function LootDisplayRowMixin:StyleBackground()
 	local changed = false
 
-	local stylingDb = G_RLF.db.global.styling
+	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
 	local gradientStart = stylingDb.rowBackgroundGradientStart
 	local gradientEnd = stylingDb.rowBackgroundGradientEnd
 	local leftAlign = stylingDb.leftAlign
@@ -336,7 +336,7 @@ function LootDisplayRowMixin:StyleIcon()
 
 	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 	---@type RLF_ConfigStyling
-	local stylingDb = G_RLF.db.global.styling
+	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
 	local iconSize = sizingDb.iconSize
 	local leftAlign = stylingDb.leftAlign
 
@@ -371,7 +371,7 @@ function LootDisplayRowMixin:StyleUnitPortrait()
 
 	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 	---@type RLF_ConfigStyling
-	local stylingDb = G_RLF.db.global.styling
+	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
 	local iconSize = sizingDb.iconSize
 	local leftAlign = stylingDb.leftAlign
 
@@ -424,7 +424,7 @@ function LootDisplayRowMixin:StyleText()
 	local fontChanged = false
 
 	---@type RLF_ConfigStyling
-	local stylingDb = G_RLF.db.global.styling
+	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
 	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 	local fontFace = stylingDb.fontFace
 	local useFontObjects = stylingDb.useFontObjects
@@ -568,7 +568,7 @@ end
 
 function LootDisplayRowMixin:StyleRowBorders()
 	---@type RLF_ConfigStyling
-	local stylingDb = G_RLF.db.global.styling
+	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
 	local enableRowBorder = stylingDb.enableRowBorder
 	if not enableRowBorder then
 		self.StaticTopBorder:Hide()
@@ -971,7 +971,7 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 			extraWidthStr = extraWidthStr .. " (" .. itemCount .. ")"
 		end
 
-		local extraWidth = G_RLF:CalculateTextWidth(extraWidthStr)
+		local extraWidth = G_RLF:CalculateTextWidth(extraWidthStr, self.frameType)
 		if self.unit then
 			local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 			local portraitSize = sizingDb.iconSize * 0.8
@@ -1116,7 +1116,8 @@ function LootDisplayRowMixin:UpdateFadeoutDelay()
 end
 
 function LootDisplayRowMixin:UpdateSecondaryText(secondaryTextFn)
-	if not G_RLF.db.global.styling.enabledSecondaryRowText then
+	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
+	if not stylingDb.enabledSecondaryRowText then
 		self.secondaryText = nil
 		return
 	end
@@ -1527,7 +1528,7 @@ function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 	self.PrimaryText:SetTextColor(r, g, b, a)
 
 	---@type RLF_ConfigStyling
-	local stylingDb = G_RLF.db.global.styling
+	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
 	if stylingDb.enabledSecondaryRowText and self.secondaryText ~= nil and self.secondaryText ~= "" then
 		self.SecondaryText:SetText(self.secondaryText)
 		self.SecondaryText:Show()
@@ -1702,7 +1703,7 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 	self.PrimaryText:SetTextColor(unpack(data.textColor))
 
 	---@type RLF_ConfigStyling
-	local stylingDb = G_RLF.db.global.styling
+	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
 	if data.unit and data.secondaryText and stylingDb.enabledSecondaryRowText then
 		self.secondaryText = data.secondaryText
 		self.SecondaryText:SetText(data.secondaryText)

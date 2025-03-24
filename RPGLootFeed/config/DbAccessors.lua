@@ -6,10 +6,6 @@ local G_RLF = ns
 
 local DbAccessor = {}
 
-function DbAccessor:Styling()
-	return G_RLF.db.global.styling
-end
-
 --- Get the frame's sizing config from the db
 --- @param frame? G_RLF.Frames
 --- @return RLF_ConfigSizing
@@ -28,6 +24,16 @@ function DbAccessor:Positioning(frame)
 		return G_RLF.db.global.partyLoot.positioning
 	end
 	return G_RLF.db.global.positioning
+end
+
+--- Get the frame's styling config from the db
+--- @param frame? G_RLF.Frames
+--- @return RLF_ConfigStyling
+function DbAccessor:Styling(frame)
+	if frame == G_RLF.Frames.PARTY then
+		return G_RLF.db.global.partyLoot.styling
+	end
+	return G_RLF.db.global.styling
 end
 
 G_RLF.DbAccessor = DbAccessor

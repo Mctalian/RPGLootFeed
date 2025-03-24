@@ -1,38 +1,10 @@
+local common_stubs = require("RPGLootFeed_spec/common_stubs")
+
 describe("Styling module", function()
+	local ns = {}
 	before_each(function()
 		-- Define the global G_RLF
-		local ns = {
-			defaults = {
-				global = {},
-			},
-			L = {},
-			options = {
-				args = {},
-			},
-			DisableBossBanner = {
-				ENABLED = 0,
-				FULLY_DISABLE = 1,
-				DISABLE_LOOT = 2,
-				DISABLE_MY_LOOT = 3,
-				DISABLE_GROUP_LOOT = 4,
-			},
-			FontFlags = {
-				NONE = "",
-				OUTLINE = "OUTLINE",
-				THICKOUTLINE = "THICKOUTLINE",
-				MONOCHROME = "MONOCHROME",
-			},
-			lsm = {
-				MediaType = {
-					["FONT"] = "font",
-				},
-			},
-		}
-		function ns.lsm:HashTable()
-			return {
-				["Test"] = "Test",
-			}
-		end
+		ns = common_stubs.setup_G_RLF(spy)
 		-- Load the list module before each test
 		assert(loadfile("RPGLootFeed/config/Styling.lua"))("TestAddon", ns)
 	end)

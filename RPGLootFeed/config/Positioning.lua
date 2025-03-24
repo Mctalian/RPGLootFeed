@@ -48,8 +48,13 @@ G_RLF.options.args.positioning = {
 			type = "select",
 			name = G_RLF.L["Anchor Relative To"],
 			desc = G_RLF.L["RelativeToDesc"],
-			get = "GetRelativeTo",
-			set = "SetRelativeTo",
+			get = function()
+				return G_RLF.db.global.positioning.relativePoint
+			end,
+			set = function(_, value)
+				G_RLF.db.global.positioning.relativePoint = value
+				G_RLF.LootDisplay:UpdatePosition()
+			end,
 			values = EnumerateFrames(),
 			order = 1,
 		},
@@ -57,8 +62,13 @@ G_RLF.options.args.positioning = {
 			type = "select",
 			name = G_RLF.L["Anchor Point"],
 			desc = G_RLF.L["AnchorPointDesc"],
-			get = "GetRelativePosition",
-			set = "SetRelativePosition",
+			get = function()
+				return G_RLF.db.global.positioning.anchorPoint
+			end,
+			set = function(_, value)
+				G_RLF.db.global.positioning.anchorPoint = value
+				G_RLF.LootDisplay:UpdatePosition()
+			end,
 			values = {
 				["TOPLEFT"] = G_RLF.L["Top Left"],
 				["TOPRIGHT"] = G_RLF.L["Top Right"],
@@ -78,8 +88,13 @@ G_RLF.options.args.positioning = {
 			desc = G_RLF.L["XOffsetDesc"],
 			min = -1500,
 			max = 1500,
-			get = "GetXOffset",
-			set = "SetXOffset",
+			get = function()
+				return G_RLF.db.global.positioning.xOffset
+			end,
+			set = function(_, value)
+				G_RLF.db.global.positioning.xOffset = value
+				G_RLF.LootDisplay:UpdatePosition()
+			end,
 			order = 3,
 		},
 		yOffset = {
@@ -88,16 +103,26 @@ G_RLF.options.args.positioning = {
 			desc = G_RLF.L["YOffsetDesc"],
 			min = -1500,
 			max = 1500,
-			get = "GetYOffset",
-			set = "SetYOffset",
+			get = function()
+				return G_RLF.db.global.positioning.yOffset
+			end,
+			set = function(_, value)
+				G_RLF.db.global.positioning.yOffset = value
+				G_RLF.LootDisplay:UpdatePosition()
+			end,
 			order = 4,
 		},
 		frameStrata = {
 			type = "select",
 			name = G_RLF.L["Frame Strata"],
 			desc = G_RLF.L["FrameStrataDesc"],
-			get = "GetFrameStrata",
-			set = "SetFrameStrata",
+			get = function()
+				return G_RLF.db.global.positioning.frameStrata
+			end,
+			set = function(_, value)
+				G_RLF.db.global.positioning.frameStrata = value
+				G_RLF.LootDisplay:UpdateStrata()
+			end,
 			values = {
 				["BACKGROUND"] = G_RLF.L["Background"],
 				["LOW"] = G_RLF.L["Low"],
@@ -116,50 +141,6 @@ G_RLF.options.args.positioning = {
 			},
 			order = 5,
 		},
+		partyLootFrame = G_RLF.ConfigHandlers.PartyLootConfig:GetPositioningOptions(6),
 	},
 }
-
-function Positioning:SetRelativeTo(info, value)
-	G_RLF.db.global.positioning.relativePoint = value
-	G_RLF.LootDisplay:UpdatePosition()
-end
-
-function Positioning:GetRelativeTo(info)
-	return G_RLF.db.global.positioning.relativePoint
-end
-
-function Positioning:SetRelativePosition(info, value)
-	G_RLF.db.global.positioning.anchorPoint = value
-	G_RLF.LootDisplay:UpdatePosition()
-end
-
-function Positioning:GetRelativePosition(info)
-	return G_RLF.db.global.positioning.anchorPoint
-end
-
-function Positioning:SetXOffset(info, value)
-	G_RLF.db.global.positioning.xOffset = value
-	G_RLF.LootDisplay:UpdatePosition()
-end
-
-function Positioning:GetXOffset(info)
-	return G_RLF.db.global.positioning.xOffset
-end
-
-function Positioning:SetYOffset(info, value)
-	G_RLF.db.global.positioning.yOffset = value
-	G_RLF.LootDisplay:UpdatePosition()
-end
-
-function Positioning:GetYOffset(info)
-	return G_RLF.db.global.positioning.yOffset
-end
-
-function Positioning:SetFrameStrata(info, value)
-	G_RLF.db.global.positioning.frameStrata = value
-	G_RLF.LootDisplay:UpdateStrata()
-end
-
-function Positioning:GetFrameStrata(info)
-	return G_RLF.db.global.positioning.frameStrata
-end
