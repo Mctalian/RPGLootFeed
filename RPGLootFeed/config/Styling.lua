@@ -388,5 +388,6 @@ G_RLF.options.args.styles = {
 				},
 			},
 		},
+		partyLootFrame = G_RLF.ConfigHandlers.PartyLootConfig:GetStylingOptions(10),
 	},
 }
