@@ -63,7 +63,6 @@ local G_RLF = ns
 ---@field RightBorder RLF_RowBorderTexture
 ---@field BottomBorder RLF_RowBorderTexture
 ---@field LeftBorder RLF_RowBorderTexture
----@field MajorFactionIcon Texture
 ---@field ClickableButton Button
 ---@field Icon RLF_RowItemButton
 ---@field glowTexture table
@@ -143,7 +142,6 @@ function LootDisplayRowMixin:Reset()
 	self.id = nil
 	self.amount = nil
 	self.icon = nil
-	self.isAtlas = false
 	self.link = nil
 	self.secondaryText = nil
 	self.unit = nil
@@ -960,7 +958,6 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	self.id = key
 	self.amount = quantity
 	self.type = element.type
-	self.texCoords = element.texCoords or nil
 	self.quality = quality
 
 	if isLink then
@@ -983,7 +980,7 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	end
 
 	if icon then
-		self:UpdateIcon(key, icon, quality, element.texCoords)
+		self:UpdateIcon(key, icon, quality)
 	end
 
 	self:UpdateSecondaryText(secondaryTextFn)
@@ -1534,7 +1531,7 @@ function LootDisplayRowMixin:ShowText(text, r, g, b, a)
 	end
 end
 
-function LootDisplayRowMixin:UpdateIcon(key, icon, quality, texCoords)
+function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 	self.icon = icon
 
 	RunNextFrame(function()
@@ -1542,21 +1539,7 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality, texCoords)
 		local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 		local iconSize = sizingDb.iconSize
 
-		---@type RLF_TexCoords
-		if texCoords then
-			self.MajorFactionIcon:ClearAllPoints()
-			self.MajorFactionIcon:SetAlpha(1)
-			self.MajorFactionIcon:SetTexture(icon)
-			self.MajorFactionIcon:SetTexCoord(texCoords.left, texCoords.right, texCoords.top, texCoords.bottom)
-			self.MajorFactionIcon:SetWidth(iconSize)
-			self.MajorFactionIcon:SetHeight(iconSize)
-			self.MajorFactionIcon:SetAllPoints(self.Icon)
-			self.Icon:SetNormalTexture(self.MajorFactionIcon)
-			if quality then
-				self.Icon:SetItemButtonQuality(quality)
-			end
-		-- Handle quality logic
-		elseif not quality then
+		if not quality then
 			self.Icon:SetItem(self.link)
 		else
 			self.Icon:SetItemButtonTexture(icon)
@@ -1570,12 +1553,10 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality, texCoords)
 			self.Icon.ProfessionQualityOverlay:SetSize(iconSize, iconSize)
 		end
 
-		if not texCoords then
-			self.Icon:ClearDisabledTexture()
-			self.Icon:ClearNormalTexture()
-			self.Icon:ClearPushedTexture()
-			self.Icon:ClearHighlightTexture()
-		end
+		self.Icon:ClearDisabledTexture()
+		self.Icon:ClearNormalTexture()
+		self.Icon:ClearPushedTexture()
+		self.Icon:ClearHighlightTexture()
 
 		-- Masque reskinning (may be costly, consider reducing frequency)
 		if G_RLF.Masque and G_RLF.iconGroup then
@@ -1723,7 +1704,7 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 		self.SecondaryText:SetTextColor(unpack(data.secondaryTextColor))
 	end
 	if data.icon then
-		self:UpdateIcon(self.key, data.icon, self.quality, data.texCoords)
+		self:UpdateIcon(self.key, data.icon, self.quality)
 		self:SetupTooltip(true)
 	else
 		self.icon = nil

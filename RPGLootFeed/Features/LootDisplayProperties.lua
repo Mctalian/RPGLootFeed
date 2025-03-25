@@ -21,7 +21,6 @@ G_RLF.LootDisplayProperties = {
 	"b",
 	"a",
 	"logFn",
-	"texCoords",
 	"eventChannel",
 }
 
@@ -33,7 +32,6 @@ G_RLF.LootDisplayProperties = {
 ---@field public sellPrice number
 ---@field public isLink boolean
 ---@field public icon number
----@field public texCoords table
 ---@field public eventChannel string
 ---@field public quantity number
 ---@field public quality number

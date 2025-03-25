@@ -319,7 +319,6 @@ function LootDisplayFrameMixin:StoreRowHistory(row)
 		amount = row.amount,
 		quality = row.quality,
 		icon = row.icon,
-		texCoords = row.texCoords,
 		link = row.link,
 		rowText = row.PrimaryText:GetText(),
 		textColor = { row.PrimaryText:GetTextColor() },
