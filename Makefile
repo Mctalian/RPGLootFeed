@@ -16,6 +16,9 @@ missing_translation_check:
 missing_locale_key_check:
 	@poetry run python .scripts/check_for_missing_locale_keys.py
 
+generate_hidden_currencies:
+	@poetry run python .scripts/get_wowhead_hidden_currencies.py RPGLootFeed/Features/Currency/HiddenCurrencies.lua
+
 test:
 	@rm -rf luacov-html && rm -rf luacov.*out && mkdir -p luacov-html && $(ROCKSBIN)/busted --coverage RPGLootFeed_spec && $(ROCKSBIN)/luacov && echo "\nCoverage report generated at luacov-html/index.html"
 
