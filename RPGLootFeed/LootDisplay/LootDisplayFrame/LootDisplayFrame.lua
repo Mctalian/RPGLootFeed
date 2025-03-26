@@ -127,7 +127,6 @@ function LootDisplayFrameMixin:UpdateTabVisibility()
 	if not inCombat and not hasItems and isEnabled then
 		self.tab:Show()
 	else
-		self.tab:Hide()
 		self:HideHistoryFrame()
 	end
 
@@ -450,10 +449,29 @@ function LootDisplayFrameMixin:ShowHistoryFrame()
 	self.historyFrame:Show()
 end
 
-function LootDisplayFrameMixin:HideHistoryFrame()
+function LootDisplayFrameMixin:HideHistoryFrame(otherFrame)
+	if self.tab then
+		self.tab:Hide()
+	end
 	if self.historyFrame then
 		self.historyFrame:Hide()
 		self.historyFrame:SetVerticalScroll(0)
+	end
+
+	if otherFrame then
+		return
+	end
+
+	if self.frameType == G_RLF.Frames.MAIN then
+		local partyFrame = G_RLF.RLF_PartyLootFrame
+		if partyFrame then
+			partyFrame:HideHistoryFrame(true)
+		end
+	else
+		local mainFrame = G_RLF.RLF_MainLootFrame
+		if mainFrame then
+			mainFrame:HideHistoryFrame(true)
+		end
 	end
 end
 
