@@ -306,7 +306,11 @@ function LootDisplayFrameMixin:ReleaseRow(row)
 	row.key = nil
 	row:Reset()
 	self.rowFramePool:Release(row)
-	G_RLF:SendMessage("RLF_ROW_RETURNED")
+	if self.frameType == G_RLF.Frames.MAIN then
+		G_RLF:SendMessage("RLF_ROW_RETURNED")
+	else
+		G_RLF:SendMessage("RLF_PARTY_ROW_RETURNED")
+	end
 	self:UpdateTabVisibility()
 end
 
