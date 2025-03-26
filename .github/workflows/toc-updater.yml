@@ -38,6 +38,7 @@ jobs:
               - [ ] Classic PTR
               - [ ] Classic Era
               - [ ] Classic Era PTR
+            - [ ] Check for new Hidden Currencies
 
             ----------------------------------------------------
             _This PR was automatically created to update the supported interface versions in RPGLootFeed.toc._
