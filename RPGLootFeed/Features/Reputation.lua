@@ -99,6 +99,33 @@ local function buildFactionLocaleMap(findName)
 	end
 end
 
+local majorFactionTextureKitIconMap = {
+	["centaur"] = 4687627, -- Maruuk Centaur
+	["expedition"] = 4687628, -- Dragonscale Expedition
+	["tuskarr"] = 4687629, -- Iskaara Tuskarr
+	["valdrakken"] = 4687630, -- Valdrakken Accord
+	["niffen"] = 5140835, -- Loamm Niffen
+	["dream"] = 5244643, -- Dream Wardens
+	["storm"] = 5891369, -- Council of Dornogal
+	["candle"] = 5891367, -- The Assembly of the Deeps
+	["flame"] = 5891368, -- Hallowfall Arathi
+	["web"] = 5891370, -- Severed Threads
+	["rocket"] = 6252691, -- The Cartels of Undermine
+	["stars"] = 6351805, -- Gallagio Loyalty Rewards Club
+	["nightfall"] = 6694197, -- 11.1.5?
+}
+
+local factionIdIconMap = {
+	[2601] = 5862764, -- The Weaver
+	[2605] = 5862762, -- The General
+	[2607] = 5862763, -- The Vizier
+	[2669] = 6439629, -- Darkfuse Solutions
+	[2671] = 6439631, -- Venture Company
+	[2673] = 6439627, -- Bilgewater Cartel
+	[2675] = 6439628, -- Blackwater Cartel
+	[2677] = 6439630, -- Steamwheedle Cartel
+}
+
 function Rep.Element:new(...)
 	---@class Rep.Element: RLF_LootElement
 	---@field public repType RepType
@@ -126,24 +153,17 @@ function Rep.Element:new(...)
 	end
 
 	if factionData ~= nil and factionData.textureKit then
-		local majorFactionIconFormat = "majorFactions_icons_%s512"
-		local atlas = majorFactionIconFormat:format(factionData.textureKit)
-		local atlasInfo = C_Texture.GetAtlasInfo(atlas)
-		if atlasInfo and atlasInfo.file then
-			element.icon = atlasInfo.file
-			---@class RLF_TexCoords
-			element.texCoords = {
-				left = atlasInfo.leftTexCoord,
-				right = atlasInfo.rightTexCoord,
-				top = atlasInfo.topTexCoord,
-				bottom = atlasInfo.bottomTexCoord,
-			}
+		local key = string.lower(factionData.textureKit)
+		if majorFactionTextureKitIconMap and majorFactionTextureKitIconMap[key] then
+			element.icon = majorFactionTextureKitIconMap[key]
 		else
 			element.icon = G_RLF.DefaultIcons.REPUTATION
 		end
 		element.quality = Enum.ItemQuality.Heirloom
+	elseif factionIdIconMap[element.factionId] then
+		element.icon = factionIdIconMap[element.factionId]
+		element.quality = Enum.ItemQuality.Rare
 	else
-		element.atlas = false
 		element.icon = G_RLF.DefaultIcons.REPUTATION
 		element.quality = Enum.ItemQuality.Rare
 	end
