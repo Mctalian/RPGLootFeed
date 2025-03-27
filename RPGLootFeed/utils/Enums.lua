@@ -136,3 +136,12 @@ G_RLF.Frames = {
 	MAIN = "RLF_MAIN",
 	PARTY = "RLF_PARTY",
 }
+
+---@enum G_RLF.TertiaryStats
+G_RLF.TertiaryStats = {
+	None = 0,
+	Speed = 1,
+	Leech = 2,
+	Avoid = 3,
+	Indestructible = 4,
+}

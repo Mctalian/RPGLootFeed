@@ -61,6 +61,7 @@ globalDefaults.item = {
 		mounts = true,
 		legendary = true,
 		betterThanEquipped = true,
+		hasTertiaryOrSocket = true,
 	},
 	---@type string
 	auctionHouseSource = G_RLF.L["None"] --[[@as string]],
@@ -578,6 +579,19 @@ G_RLF.options.args.features.args.itemLootConfig = {
 								G_RLF.db.global.item.itemHighlights.betterThanEquipped = value
 							end,
 							order = 3,
+						},
+						hasTertiaryOrSocket = {
+							type = "toggle",
+							name = G_RLF.L["Highlight Items with Tertiary Stats or Sockets"],
+							desc = G_RLF.L["HighlightTertiaryOrSocketDesc"],
+							width = "double",
+							get = function(info)
+								return G_RLF.db.global.item.itemHighlights.hasTertiaryOrSocket
+							end,
+							set = function(info, value)
+								G_RLF.db.global.item.itemHighlights.hasTertiaryOrSocket = value
+							end,
+							order = 4,
 						},
 						-- highlightBoE = {
 						--   type = "toggle",
