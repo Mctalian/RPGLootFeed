@@ -9,11 +9,42 @@ local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 
 local C = LibStub("C_Everywhere")
 
-local onlyEpicPartyLoot = false
-
 ItemLoot.Element = {}
 
 local ItemInfo = G_RLF.ItemInfo
+local TertiaryStats = G_RLF.TertiaryStats
+
+local SocketFDIDMap = {
+	["EMPTY_SOCKET_BLUE"] = 136256,
+	["EMPTY_SOCKET_META"] = 136257,
+	["EMPTY_SOCKET_RED"] = 136258,
+	["EMPTY_SOCKET_YELLOW"] = 136259,
+	["EMPTY_SOCKET_NO_COLOR"] = 458977,
+	["EMPTY_SOCKET_HYDRAULIC"] = 407325,
+	["EMPTY_SOCKET_COGWHEEL"] = 407324,
+	["EMPTY_SOCKET_PRISMATIC"] = 458977,
+	["EMPTY_SOCKET_PUNCHCARDRED"] = 2958630,
+	["EMPTY_SOCKET_PUNCHCARDYELLOW"] = 2958631,
+	["EMPTY_SOCKET_PUNCHCARDBLUE"] = 2958629,
+	["EMPTY_SOCKET_DOMINATION"] = 4095404,
+	["EMPTY_SOCKET_CYPHER"] = 407324,
+	["EMPTY_SOCKET_TINKER"] = 2958630,
+	["EMPTY_SOCKET_PRIMORDIAL"] = 407324,
+	["EMPTY_SOCKET_FRAGRANCE"] = 407324,
+	["EMPTY_SOCKET_SINGING_THUNDER"] = 2958631,
+	["EMPTY_SOCKET_SINGING_SEA"] = 2958629,
+	["EMPTY_SOCKET_SINGING_WIND"] = 2958630,
+	["EMPTY_SOCKET_SINGINGTHUNDER"] = 2958631,
+	["EMPTY_SOCKET_SINGINGSEA"] = 2958629,
+	["EMPTY_SOCKET_SINGINGWIND"] = 2958630,
+}
+
+local TertiaryStatMap = {
+	["ITEM_MOD_CR_SPEED_SHORT"] = TertiaryStats.Speed,
+	["ITEM_MOD_CR_LIFESTEAL_SHORT"] = TertiaryStats.Leech,
+	["ITEM_MOD_CR_AVOIDANCE_SHORT"] = TertiaryStats.Avoid,
+	["ITEM_MOD_CR_STURDINESS_SHORT"] = TertiaryStats.Indestructible,
+}
 
 function ItemLoot:ItemQualityName(enumValue)
 	for k, v in pairs(Enum.ItemQuality) do
@@ -25,20 +56,53 @@ function ItemLoot:ItemQualityName(enumValue)
 end
 
 local function IsMount(info)
-	if G_RLF.db.global.item.itemHighlights.mounts then
-		return info:IsMount()
-	end
+	return info:IsMount()
 end
 
 local function IsLegendary(info)
-	if G_RLF.db.global.item.itemHighlights.legendaries then
-		return info:IsLegendary()
+	return info:IsLegendary()
+end
+
+---@class RLF_ItemRolls
+---@field tertiaryStat G_RLF.TertiaryStats
+---@field socketString string
+
+--- Get the tertiary stat and socket string for an item
+--- @param info RLF_ItemInfo
+--- @return RLF_ItemRolls
+local function GetItemStats(info)
+	local itemRolls = {
+		tertiaryStat = TertiaryStats.None,
+		socketString = "",
+	}
+	local stats = C.Item.GetItemStats(info.itemLink)
+	if not stats then
+		return itemRolls
 	end
+
+	for k, v in pairs(stats) do
+		if k:find("ITEM_MOD_CR_") and v > 0 then
+			if TertiaryStatMap[k] then
+				itemRolls.tertiaryStat = TertiaryStatMap[k]
+			else
+				G_RLF:LogWarn("Unknown tertiary stat: " .. k, addonName, ItemLoot.moduleName)
+			end
+		end
+
+		if k:find("EMPTY_SOCKET_") and v > 0 then
+			if SocketFDIDMap[k] then
+				itemRolls.socketString = "|T" .. SocketFDIDMap[k] .. ":0|t"
+			else
+				G_RLF:LogWarn("Unknown socket type: " .. k, addonName, ItemLoot.moduleName)
+			end
+		end
+	end
+
+	return itemRolls
 end
 
 local function IsBetterThanEquipped(info)
-	-- Highlight Better Than Equipped
-	if G_RLF.db.global.item.itemHighlights.betterThanEquipped and info:IsEligibleEquipment() then
+	if info:IsEligibleEquipment() then
 		local equippedLink
 		local slot = G_RLF.equipSlotMap[info.itemEquipLoc]
 		if type(slot) == "table" then
@@ -53,13 +117,13 @@ local function IsBetterThanEquipped(info)
 		end
 
 		if not equippedLink then
-			return
+			return false
 		end
 
 		local equippedId = C.Item.GetItemIDForItemInfo(equippedLink)
 		local equippedInfo = ItemInfo:new(equippedId, C.Item.GetItemInfo(equippedLink))
 		if not equippedInfo then
-			return
+			return false
 		end
 
 		if equippedInfo.itemLevel and equippedInfo.itemLevel < info.itemLevel then
@@ -78,6 +142,14 @@ local function IsBetterThanEquipped(info)
 			end
 		end
 	end
+
+	return false
+end
+
+--- Return true if it has a tertiary stat or a socket
+--- @param stats RLF_ItemRolls
+local function HasTertiaryOrSocket(stats)
+	return stats.tertiaryStat ~= TertiaryStats.None or stats.socketString ~= ""
 end
 
 local function getItemLevels(toLink, fromLink)
@@ -92,7 +164,10 @@ local function getItemLevels(toLink, fromLink)
 	return toInfo.itemLevel, fromInfo.itemLevel
 end
 
-function ItemLoot.Element:new(...)
+---@param info RLF_ItemInfo
+---@param quantity number
+---@param fromLink? string
+function ItemLoot.Element:new(info, quantity, fromLink)
 	---@class ItemLoot.Element: RLF_LootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
@@ -103,10 +178,9 @@ function ItemLoot.Element:new(...)
 	end
 
 	element.isLink = true
+	element.quantity = quantity
 
-	local itemLink, info, fromLink
-	info, element.quantity, fromLink = ...
-	itemLink = info.itemLink
+	local itemLink = info.itemLink
 
 	element.key = info.itemLink
 	if fromLink then
@@ -119,6 +193,10 @@ function ItemLoot.Element:new(...)
 	if itemQualitySettings and itemQualitySettings.enabled and itemQualitySettings.duration > 0 then
 		element.showForSeconds = itemQualitySettings.duration
 	end
+
+	local stats = GetItemStats(info)
+	element.tertiaryStat = stats.tertiaryStat
+	element.socketString = stats.socketString
 
 	function element:isPassingFilter(itemName, itemQuality)
 		if not G_RLF.db.global.item.itemQualitySettings[itemQuality].enabled then
@@ -155,6 +233,19 @@ function ItemLoot.Element:new(...)
 			local atlasIconSize = fontSize * 1.5
 			local atlasArrow = CreateAtlasMarkup("npe_arrowrightglow", atlasIconSize, atlasIconSize, 0, 0)
 			return "    " .. fromItemLevel .. " " .. atlasArrow .. " " .. toItemLevel
+		end
+
+		if info:IsEligibleEquipment() then
+			local secondaryText = _G["ITEM_LEVEL_ABBR"] .. " " .. info.itemLevel .. " "
+			if HasTertiaryOrSocket(stats) then
+				if self.socketString ~= "" then
+					secondaryText = string.format("%s%s %s ", secondaryText, self.socketString, G_RLF.L["Socket"])
+				end
+				if self.tertiaryStat ~= TertiaryStats.None then
+					secondaryText = string.format("%s%s", secondaryText, G_RLF.tertiaryToString[self.tertiaryStat])
+				end
+				return secondaryText
+			end
 		end
 
 		local quantity = ...
@@ -199,7 +290,7 @@ function ItemLoot.Element:new(...)
 	element.isMount = IsMount(info)
 	element.isLegendary = IsLegendary(info)
 	element.isBetterThanEquipped = IsBetterThanEquipped(info)
-
+	element.hasTertiaryOrSocket = HasTertiaryOrSocket(stats)
 	function element:PlaySoundIfEnabled()
 		local soundsConfig = G_RLF.db.global.item.sounds
 		if self.isMount and soundsConfig.mounts.enabled and soundsConfig.mounts.sound ~= "" then
@@ -247,7 +338,11 @@ function ItemLoot.Element:new(...)
 	end
 
 	function element:SetHighlight()
-		self.highlight = self.isMount or self.isLegendary or self.isBetterThanEquipped
+		local itemHighlights = G_RLF.db.global.item.itemHighlights
+		self.highlight = (self.isMount and itemHighlights.mounts)
+			or (self.isLegendary and itemHighlights.legendary)
+			or (self.isBetterThanEquipped and itemHighlights.betterThanEquipped)
+			or (self.hasTertiaryOrSocket and itemHighlights.tertiaryOrSocket)
 	end
 
 	return element
@@ -273,6 +368,9 @@ function ItemLoot:OnEnable()
 	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
+---@param info RLF_ItemInfo
+---@param amount number
+---@param fromLink? string
 function ItemLoot:OnItemReadyToShow(info, amount, fromLink)
 	self.pendingItemRequests[info.itemId] = nil
 	local e = ItemLoot.Element:new(info, amount, fromLink)
@@ -289,13 +387,17 @@ function ItemLoot:GET_ITEM_INFO_RECEIVED(eventName, itemID, success)
 			error("Failed to load item: " .. itemID .. " " .. itemLink .. " x" .. amount)
 		else
 			local info = ItemInfo:new(itemID, C.Item.GetItemInfo(itemLink))
+			if info == nil then
+				G_RLF:LogDebug("ItemInfo is nil for " .. itemLink, addonName, self.moduleName)
+				return
+			end
 			self:OnItemReadyToShow(info, amount, fromLink)
 		end
 	end
 end
 
 function ItemLoot:ShowItemLoot(msg, itemLink, fromLink)
-	local amount = tonumber(msg:match("r ?x(%d+)") or 1)
+	local amount = tonumber(msg:match("r ?x(%d+)") or 1) or 1
 	local itemId = C.Item.GetItemIDForItemInfo(itemLink)
 	self.pendingItemRequests[itemId] = { itemLink, amount, fromLink }
 	local info = ItemInfo:new(itemId, C.Item.GetItemInfo(itemLink))

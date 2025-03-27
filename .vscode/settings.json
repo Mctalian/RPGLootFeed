@@ -70,7 +70,9 @@
     "LootAlertSystem",
     "GetNameAndServerNameFromGUID",
     "TextureKitConstants",
-    "GetItemButtonIconTexture"
+    "GetItemButtonIconTexture",
+    "ITEM_MOD_CR_AVOIDANCE_SHORT",
+    "ITEM_MOD_CR_SPEED_SHORT"
   ],
   "Lua.workspace.library": [
     "${addons}/busted/module/library",
