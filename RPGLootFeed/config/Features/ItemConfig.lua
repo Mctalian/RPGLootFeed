@@ -66,6 +66,7 @@ globalDefaults.item = {
 	---@type string
 	auctionHouseSource = G_RLF.L["None"] --[[@as string]],
 	pricesForSellableItems = PricesEnum.Vendor,
+	---@class RLF_ConfigItemLoot.Sounds
 	sounds = {
 		mounts = {
 			enabled = false,
