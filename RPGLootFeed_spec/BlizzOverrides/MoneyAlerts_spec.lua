@@ -1,9 +1,15 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+local spy = busted.spy
 
 describe("MoneyAlerts module", function()
 	local ns, MoneyAlertOverride
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 		_G.MoneyWonAlertSystem = {
 			AddAlert = function() end,
 		}
@@ -36,7 +42,7 @@ describe("MoneyAlerts module", function()
 			return true
 		end
 		MoneyAlertOverride:MoneyAlertHook()
-		assert.spy(MoneyAlertOverride.RawHook).was_not_called()
+		assert.spy(MoneyAlertOverride.RawHook).was.not_called()
 	end)
 
 	describe("InterceptMoneyAddAlert", function()
@@ -47,14 +53,16 @@ describe("MoneyAlerts module", function()
 
 		it("completely skips MoneyWonAlertSystem alert if disabled", function()
 			ns.db.global.blizzOverrides.disableBlizzMoneyAlerts = true
+			local addAlertSpy = spy.on(MoneyAlertOverride.hooks[MoneyWonAlertSystem], "AddAlert")
 			MoneyAlertOverride:InterceptMoneyAddAlert(nil)
-			assert.spy(MoneyAlertOverride.hooks[MoneyWonAlertSystem].AddAlert).was_not_called()
+			assert.spy(addAlertSpy).was.not_called()
 		end)
 
 		it("calls the original AddAlert function if not disabled", function()
 			ns.db.global.blizzOverrides.disableBlizzMoneyAlerts = false
+			local addAlertSpy = spy.on(MoneyAlertOverride.hooks[MoneyWonAlertSystem], "AddAlert")
 			MoneyAlertOverride:InterceptMoneyAddAlert(nil)
-			assert.spy(MoneyAlertOverride.hooks[MoneyWonAlertSystem].AddAlert).was_called()
+			assert.spy(addAlertSpy).was.called(1)
 		end)
 	end)
 end)

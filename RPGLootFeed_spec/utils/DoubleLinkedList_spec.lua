@@ -1,3 +1,10 @@
+local assert = require("luassert")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+local setup = busted.setup
+
 describe("List module", function()
 	local list
 
@@ -7,7 +14,7 @@ describe("List module", function()
 	end
 
 	local ns
-	before_each(function()
+	setup(function()
 		-- Define the global G_RLF
 		ns = ns or {}
 		-- Load the list module before each test

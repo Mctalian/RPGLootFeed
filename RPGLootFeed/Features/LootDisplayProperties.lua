@@ -4,7 +4,7 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
-G_RLF.LootDisplayProperties = {
+local lootDisplayProperties = {
 	"key",
 	"textFn",
 	"secondaryTextFn",
@@ -48,7 +48,7 @@ G_RLF.LootDisplayProperties = {
 ---@field public type string
 
 function G_RLF.InitializeLootDisplayProperties(element)
-	for _, prop in ipairs(G_RLF.LootDisplayProperties) do
+	for _, prop in ipairs(lootDisplayProperties) do
 		element[prop] = nil
 	end
 
@@ -81,4 +81,4 @@ function G_RLF.InitializeLootDisplayProperties(element)
 	end
 end
 
-return G_RLF.LootDisplayProperties
+return {}

@@ -12,7 +12,7 @@ G_RLF.ClassicToRetail = {}
 ---Convert faction info from Classic to Retail format
 ---@param t table
 ---@return table | nil
-local function ConvertFactionInfo(t)
+local function convertFactionInfo(t)
 	if not t[1] then
 		return nil
 	end
@@ -39,12 +39,12 @@ end
 
 function G_RLF.ClassicToRetail:ConvertFactionInfoByID(id)
 	local legacyFactionData = { GetFactionInfoByID(id) }
-	return ConvertFactionInfo(legacyFactionData)
+	return convertFactionInfo(legacyFactionData)
 end
 
 function G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(index)
 	local legacyFactionData = { GetFactionInfo(index) }
-	return ConvertFactionInfo(legacyFactionData)
+	return convertFactionInfo(legacyFactionData)
 end
 
 if G_RLF:IsClassic() or G_RLF:IsCataClassic() then
@@ -54,3 +54,5 @@ if G_RLF:IsClassic() or G_RLF:IsCataClassic() then
 		end
 	end
 end
+
+return G_RLF.ClassicToRetail

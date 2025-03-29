@@ -2,7 +2,7 @@ statsfile = "luacov.stats.out"
 reporter = "html"
 reportfile = "luacov-html/index.html"
 includeuntestedfiles = true
-exclude = { "RPGLootFeed/locale", "RPGLootFeed/GameTesting" }
+exclude = { "RPGLootFeed/locale", "RPGLootFeed/GameTesting", "RPGLootFeed/config/Migrations" }
 include = {
     "^RPGLootFeed%/.+$",
 }

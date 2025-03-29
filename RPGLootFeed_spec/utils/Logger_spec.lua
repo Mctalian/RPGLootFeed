@@ -1,12 +1,22 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
+local match = require("luassert.match")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+local spy = busted.spy
 
 describe("Logger module", function()
 	local ns, Logger
 	local _ = match._
 
 	before_each(function()
+		-- Load the mock WoW globals
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		require("RPGLootFeed_spec._mocks.Libs.LibStub")
 		-- Define the global G_RLF
-		ns = ns or common_stubs.setup_G_RLF(spy)
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 		ns.db.global.logger = {
 			{
 				timestamp = "2023-01-01 12:00:00",

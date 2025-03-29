@@ -1,5 +1,14 @@
+local assert = require("luassert")
+local match = require("luassert.match")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+local spy = busted.spy
+
 describe("retryHook function", function()
 	local module, ns
+	local _ = match._
 
 	before_each(function()
 		module = {
@@ -27,9 +36,9 @@ describe("retryHook function", function()
 		spy.on(ns, "Print")
 		local attempts = ns.retryHook(module, 30, "hookFunctionName", "TestLocaleKey")
 		assert.are.equal(attempts, 30)
-		assert.spy(module.ScheduleTimer).was_not_called()
+		assert.spy(module.ScheduleTimer).was.not_called()
 		assert.spy(ns.Print).was.called(2)
-		-- assert.spy(ns.Print).was.called_with(ns.L["TestLocaleKey"])
-		-- assert.spy(ns.Print).was.called_with(ns.L["Issues"])
+		assert.spy(ns.Print).was.called_with(_, ns.L["TestLocaleKey"])
+		assert.spy(ns.Print).was.called_with(_, ns.L["Issues"])
 	end)
 end)

@@ -1,19 +1,27 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
+local match = require("luassert.match")
+local busted = require("busted")
+local spy = busted.spy
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+local stub = busted.stub
 
 describe("Experience module", function()
 	local _ = match._
 	local XpModule, ns
 
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
-		common_stubs.stub_Unit_Funcs()
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 
 		-- Load the LootDisplayProperties module to populate `ns`
 		assert(loadfile("RPGLootFeed/Features/LootDisplayProperties.lua"))("TestAddon", ns)
 
 		-- Ensure `ns` has been populated correctly by LootDisplayProperties
 		assert.is_not_nil(ns.InitializeLootDisplayProperties)
-		assert.is_not_nil(ns.LootDisplayProperties)
 
 		-- Load the list module before each test
 		XpModule = assert(loadfile("RPGLootFeed/Features/Experience.lua"))("TestAddon", ns)

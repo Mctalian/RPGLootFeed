@@ -1,23 +1,32 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
+local match = require("luassert.match")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+local mock = busted.mock
+local spy = busted.spy
+local stub = busted.stub
 
 describe("ItemLoot module", function()
 	local _ = match._
-	local LootModule, ns, showSpy
+	local LootModule, ns
+	local itemMocks
 
 	before_each(function()
-		-- Define the global G_RLF
-		common_stubs.stub_C_Item()
-		showSpy = spy.new(function() end)
-		ns = ns or common_stubs.setup_G_RLF(spy)
-		ns.InitializeLootDisplayProperties = function(element)
-			element.Show = function(...)
-				showSpy(...)
-			end
-		end
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		itemMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_Item")
+		require("RPGLootFeed_spec._mocks.Libs.LibStub")
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
+		-- Load the LootDisplayProperties module to populate `ns`
+		assert(loadfile("RPGLootFeed/Features/LootDisplayProperties.lua"))("TestAddon", ns)
+		-- Ensure `ns` has been populated correctly by LootDisplayProperties
+		assert.is_not_nil(ns.InitializeLootDisplayProperties)
 		-- Load the list module before each test
 		LootModule = assert(loadfile("RPGLootFeed/Features/ItemLoot/ItemLoot.lua"))("TestAddon", ns)
 		LootModule:OnInitialize()
-		ns.LogInfo:clear()
+		nsMocks.LogInfo:clear()
 	end)
 
 	it("should initialize correctly", function()
@@ -42,10 +51,36 @@ describe("ItemLoot module", function()
 	it("should handle CHAT_MSG_LOOT event", function()
 		local msg = "You received |cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r"
 		local playerName = "Player"
+		local spyIsMount = spy.new(function()
+			return false
+		end)
+		local spyIsLegendary = spy.new(function()
+			return false
+		end)
+		local spyIsEligibleEquipment = spy.new(function()
+			return false
+		end)
 		local guid = UnitGUID("player")
+		nsMocks.ItemInfo.new.returns({
+			itemId = 18803,
+			itemName = "Finkle's Lava Dredger",
+			itemQuality = 2,
+			itemTexture = 123456,
+			sellPrice = 10000,
+			itemLink = "|cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r",
+			IsMount = spyIsMount,
+			IsLegendary = spyIsLegendary,
+			IsEligibleEquipment = spyIsEligibleEquipment,
+		})
+		local elementMock = mock(LootModule.Element, false)
+		local elementShowSpy
+		local stubInitializeLootDisplayProperties = stub(ns, "InitializeLootDisplayProperties", function(e)
+			elementShowSpy = spy.on(e, "Show")
+		end)
 
 		LootModule:CHAT_MSG_LOOT("CHAT_MSG_LOOT", msg, playerName, nil, nil, nil, nil, nil, nil, nil, nil, nil, guid)
-		assert.spy(showSpy).was.called(1)
+		assert.spy(elementShowSpy).was.called(1)
+		stubInitializeLootDisplayProperties:revert()
 	end)
 
 	it("should handle GET_ITEM_INFO_RECEIVED event", function()
@@ -53,10 +88,36 @@ describe("ItemLoot module", function()
 		local success = true
 		local itemLink = "|cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r"
 		local amount = 1
+		local elementMock = mock(LootModule.Element, false)
+		local elementShowSpy
+		local stubInitializeLootDisplayProperties = stub(ns, "InitializeLootDisplayProperties", function(e)
+			elementShowSpy = spy.on(e, "Show")
+		end)
+		local spyIsMount = spy.new(function()
+			return false
+		end)
+		local spyIsLegendary = spy.new(function()
+			return false
+		end)
+		local spyIsEligibleEquipment = spy.new(function()
+			return false
+		end)
+		nsMocks.ItemInfo.new.returns({
+			itemId = 18803,
+			itemName = "Finkle's Lava Dredger",
+			itemQuality = 2,
+			itemTexture = 123456,
+			sellPrice = 10000,
+			itemLink = "|cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r",
+			IsMount = spyIsMount,
+			IsLegendary = spyIsLegendary,
+			IsEligibleEquipment = spyIsEligibleEquipment,
+		})
 
 		LootModule.pendingItemRequests[itemID] = { itemLink, amount }
 		LootModule:GET_ITEM_INFO_RECEIVED("GET_ITEM_INFO_RECEIVED", itemID, success)
 		assert.is_nil(LootModule.pendingItemRequests[itemID])
-		assert.spy(showSpy).was.called(1)
+		assert.spy(elementShowSpy).was.called(1)
+		stubInitializeLootDisplayProperties:revert()
 	end)
 end)

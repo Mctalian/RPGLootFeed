@@ -268,3 +268,7 @@
 ---@field public ScheduleRepeatingTimer fun(self: AceTimer, func: string|function, delay: number, ...): any
 ---@field public ScheduleTimer fun(self: AceTimer, func: string|function, delay: number, ...): any
 ---@field public TimeLeft fun(self: AceTimer, id: any): number
+
+---@class TSM_API
+---@field public ToItemString fun(item: string)
+---@field public GetCustomPriceValue fun(priceSource: string, itemString: string)
