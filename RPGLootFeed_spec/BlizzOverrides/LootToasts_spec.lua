@@ -1,10 +1,10 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
 local assert = require("luassert")
 
 describe("LootToasts module", function()
 	local ns, LootToastOverride
 	before_each(function()
-		ns = common_stubs.setup_G_RLF()
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 		_G.LootAlertSystem = {
 			AddAlert = function() end,
 		}

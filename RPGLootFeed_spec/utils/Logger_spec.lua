@@ -1,4 +1,4 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
 local assert = require("luassert")
 
 describe("Logger module", function()
@@ -10,7 +10,7 @@ describe("Logger module", function()
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
 		require("RPGLootFeed_spec._mocks.Libs.LibStub")
 		-- Define the global G_RLF
-		ns = common_stubs.setup_G_RLF()
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 		ns.db.global.logger = {
 			{
 				timestamp = "2023-01-01 12:00:00",

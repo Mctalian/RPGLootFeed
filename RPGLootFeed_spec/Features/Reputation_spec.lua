@@ -4,13 +4,16 @@ local assert = require("luassert")
 describe("Reputation module", function()
 	local _ = match._
 	local RepModule, ns
+	local reputationMocks, gossipInfoMocks, delvesUIMocks
 
 	before_each(function()
+		require("RPGLootFeed_spec._mocks.WoWGlobals")
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		reputationMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_Reputation")
+		gossipInfoMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_GossipInfo")
+		delvesUIMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_DelvesUI")
 		ns = common_stubs.setup_G_RLF()
-		common_stubs.stub_C_Reputation()
-		common_stubs.stub_C_DelvesUI()
 
 		-- Load the LootDisplayProperties module to populate `ns`
 		assert(loadfile("RPGLootFeed/Features/LootDisplayProperties.lua"))("TestAddon", ns)
@@ -98,28 +101,20 @@ describe("Reputation module", function()
 		ns.ExtractDynamicsFromPattern = function()
 			return nil, nil
 		end
-		---@diagnostic disable-next-line: duplicate-set-field
-		C_GossipInfo.GetFriendshipReputation = function()
-			return {
-				standing = 10,
-				reactionThreshold = 10,
-				nextThreshold = nil,
-			}
-		end
-		---@diagnostic disable-next-line: duplicate-set-field
-		C_GossipInfo.GetFriendshipReputationRanks = function()
-			return {
-				currentLevel = 10,
-				maxLevel = 10,
-			}
-		end
-		---@diagnostic disable-next-line: duplicate-set-field
-		C_Reputation.GetFactionDataByID = function()
-			return {
-				reaction = 8,
-			}
-		end
-		expectedFactionData = {
+		gossipInfoMocks.GetFriendshipReputation.returns({
+			standing = 10,
+			reactionThreshold = 10,
+			nextThreshold = nil,
+		})
+		gossipInfoMocks.GetFriendshipReputationRanks.returns({
+			currentLevel = 10,
+			maxLevel = 10,
+		})
+		reputationMocks.GetFactionDataByID.returns({
+			reaction = 8,
+		})
+
+		local expectedFactionData = {
 			currentLevel = 10,
 			currentXp = 0,
 			reaction = 8,

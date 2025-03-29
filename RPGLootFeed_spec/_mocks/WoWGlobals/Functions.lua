@@ -4,17 +4,6 @@ local spy = busted.spy
 
 local functions = {}
 
-stub(_G, "CreateFrame")
-stub(_G, "GetExpansionLevel", function()
-	return 10
-end)
-stub(_G, "GetInventoryItemLink")
-_G.date = spy.new(function(format)
-	return "2023-01-01 12:00:00"
-end)
-_G.debugprofilestop = spy.new(function()
-	return 0
-end)
 _G.format = string.format
 _G.handledError = function(err)
 	print("\n")
@@ -31,45 +20,28 @@ _G.RunNextFrame = spy.new(function(func)
 	func()
 end)
 
-stub(_G, "IsInRaid", function()
-	return false
+functions.CreateFrame = stub(_G, "CreateFrame")
+functions.GetExpansionLevel = stub(_G, "GetExpansionLevel").returns(10)
+functions.GetInventoryItemLink = stub(_G, "GetInventoryItemLink")
+functions.date = stub(_G, "date").returns("2023-01-01 12:00:00")
+functions.debugprofilestop = stub(_G, "debugprofilestop").returns(0)
+functions.errorhandlerSpy = spy.new(function() end)
+functions.geterrorhandler = stub(_G, "geterrorhandler", function()
+	return functions.errorhandlerSpy
 end)
-stub(_G, "IsInInstance", function()
-	return false, ""
-end)
-_G.MEMBERS_PER_RAID_GROUP = 5
-stub(_G, "GetNumGroupMembers", function()
-	return 1
-end)
-stub(_G, "GetPlayerGuid", function()
-	return "player"
-end)
-stub(_G, "GetLocale", function()
-	return "enUS"
-end)
-stub(_G, "MuteSoundFile")
-stub(_G, "UnmuteSoundFile")
-
-stub(_G, "UnitGUID", function(unit)
-	return "player"
-end)
-stub(_G, "UnitLevel", function()
-	return 2
-end)
-stub(_G, "UnitName", function()
-	return "Player"
-end)
-stub(_G, "UnitXP", function()
-	return 10
-end)
-stub(_G, "UnitXPMax", function()
-	return 50
-end)
-stub(_G, "UnitClass", function()
-	return "Warrior", "WARRIOR", 1
-end)
-stub(_G, "GetMoney", function()
-	return 123456
-end)
+functions.IsInRaid = stub(_G, "IsInRaid").returns(false)
+functions.IsInInstance = stub(_G, "IsInInstance").returns(false)
+functions.GetNumGroupMembers = stub(_G, "GetNumGroupMembers").returns(1)
+functions.GetPlayerGuid = stub(_G, "GetPlayerGuid").returns("player")
+functions.GetLocale = stub(_G, "GetLocale").returns("enUS")
+functions.MuteSoundFile = stub(_G, "MuteSoundFile")
+functions.UnmuteSoundFile = stub(_G, "UnmuteSoundFile")
+functions.UnitGUID = stub(_G, "UnitGUID").returns("player")
+functions.UnitLevel = stub(_G, "UnitLevel").returns(2)
+functions.UnitName = stub(_G, "UnitName").returns("Player")
+functions.UnitXP = stub(_G, "UnitXP").returns(10)
+functions.UnitXPMax = stub(_G, "UnitXPMax").returns(50)
+functions.UnitClass = stub(_G, "UnitClass").returns("Warrior", "WARRIOR", 1)
+functions.GetMoney = stub(_G, "GetMoney").returns(123456)
 
 return functions

@@ -1,13 +1,17 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
 local assert = require("luassert")
+local busted = require("busted")
+local setup = busted.setup
+local describe = busted.describe
+local it = busted.it
 
 describe("Enums", function()
 	local ns
 
-	before_each(function()
+	setup(function()
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
-		ns = common_stubs.setup_G_RLF()
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.UtilsList)
 		assert(loadfile("RPGLootFeed/utils/Enums.lua"))("TestAddon", ns)
 	end)
 

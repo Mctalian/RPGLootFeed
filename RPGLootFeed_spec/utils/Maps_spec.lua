@@ -1,12 +1,11 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
 local assert = require("luassert")
 
 describe("Maps", function()
 	local ns
 
 	before_each(function()
-		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
-		ns = common_stubs.setup_G_RLF()
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.UtilsLogger)
 		assert(loadfile("RPGLootFeed/utils/Maps.lua"))("TestAddon", ns)
 	end)
 

@@ -81,7 +81,7 @@ function Integ_Base:Init()
 end
 
 function Integ_Base:ToString()
-	return G_RLF.L["None"]
+	return G_RLF.L["None"] --[[@as string]]
 end
 
 function Integ_Base:GetAHPrice(_)
@@ -104,7 +104,7 @@ end
 ---String representation of the Auctionator integration
 ---@return string localized "Auctionator"
 function Integ_Auctionator:ToString()
-	return G_RLF.L["Auctionator"]
+	return G_RLF.L["Auctionator"] --[[@as string]]
 end
 
 ---Get the AH price for an item
@@ -128,7 +128,7 @@ end
 ---String representation of the TSM integration
 ---@return string localized "TSM"
 function Integ_TSM:ToString()
-	return G_RLF.L["TSM"]
+	return G_RLF.L["TSM"] --[[@as string]]
 end
 
 ---Get the AH price for an item

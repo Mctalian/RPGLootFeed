@@ -210,4 +210,93 @@ stub(_G.UIParent, "GetAnimationGroups")
 stub(_G.UIParent, "CreateAnimationGroup")
 stub(_G.UIParent, "StopAnimating")
 
+_G.MEMBERS_PER_RAID_GROUP = 5
+
+---@diagnostic disable-next-line: missing-fields
+_G.ACCOUNT_WIDE_FONT_COLOR = {
+	r = 0,
+	g = 0,
+	b = 1,
+}
+stub(_G.ACCOUNT_WIDE_FONT_COLOR, "WrapTextInColorCode", function(text)
+	return text
+end)
+stub(_G.ACCOUNT_WIDE_FONT_COLOR, "GetRGB", function(self)
+	return self.r, self.g, self.b
+end)
+stub(_G.ACCOUNT_WIDE_FONT_COLOR, "IsEqualTo", function(self, other)
+	return self.r == other.r and self.g == other.g and self.b == other.b
+end)
+stub(_G.ACCOUNT_WIDE_FONT_COLOR, "SetRGB", function(self, r, g, b)
+	self.r, self.g, self.b = r, g, b
+end)
+stub(_G.ACCOUNT_WIDE_FONT_COLOR, "GetRGBA", function(self)
+	return self.r, self.g, self.b, 1
+end)
+stub(_G.ACCOUNT_WIDE_FONT_COLOR, "GenerateHexColorMarkup", function(self)
+	return string.format("|cff%02x%02x%02x", self.r * 255, self.g * 255, self.b * 255)
+end)
+stub(_G.ACCOUNT_WIDE_FONT_COLOR, "GenerateHexColor", function(self)
+	return string.format("%02x%02x%02x", self.r * 255, self.g * 255, self.b * 255)
+end)
+stub(_G.ACCOUNT_WIDE_FONT_COLOR, "GetRGBAsBytes", function(self)
+	return self.r * 255, self.g * 255, self.b * 255
+end)
+stub(_G.ACCOUNT_WIDE_FONT_COLOR, "SetRGBA", function(self, r, g, b, a)
+	self.r, self.g, self.b, self.a = r, g, b, a or 1
+end)
+stub(_G.ACCOUNT_WIDE_FONT_COLOR, "GetRGBAAsBytes", function(self)
+	return self.r * 255, self.g * 255, self.b * 255, (self.a or 1) * 255
+end)
+
+---@diagnostic disable-next-line: missing-fields
+_G.FACTION_GREEN_COLOR = {
+	r = 0,
+	g = 1,
+	b = 0,
+}
+stub(_G.FACTION_GREEN_COLOR, "WrapTextInColorCode", function(text)
+	return text
+end)
+stub(_G.FACTION_GREEN_COLOR, "GetRGB", function(self)
+	return self.r, self.g, self.b
+end)
+stub(_G.FACTION_GREEN_COLOR, "IsEqualTo", function(self, other)
+	return self.r == other.r and self.g == other.g and self.b == other.b
+end)
+stub(_G.FACTION_GREEN_COLOR, "SetRGB", function(self, r, g, b)
+	self.r, self.g, self.b = r, g, b
+end)
+stub(_G.FACTION_GREEN_COLOR, "GetRGBA", function(self)
+	return self.r, self.g, self.b, 1
+end)
+stub(_G.FACTION_GREEN_COLOR, "GenerateHexColorMarkup", function(self)
+	return string.format("|cff%02x%02x%02x", self.r * 255, self.g * 255, self.b * 255)
+end)
+stub(_G.FACTION_GREEN_COLOR, "GenerateHexColor", function(self)
+	return string.format("%02x%02x%02x", self.r * 255, self.g * 255, self.b * 255)
+end)
+stub(_G.FACTION_GREEN_COLOR, "GetRGBAsBytes", function(self)
+	return self.r * 255, self.g * 255, self.b * 255
+end)
+stub(_G.FACTION_GREEN_COLOR, "SetRGBA", function(self, r, g, b, a)
+	self.r, self.g, self.b, self.a = r, g, b, a or 1
+end)
+stub(_G.FACTION_GREEN_COLOR, "GetRGBAAsBytes", function(self)
+	return self.r * 255, self.g * 255, self.b * 255, (self.a or 1) * 255
+end)
+
+_G.FACTION_BAR_COLORS = {
+	[1] = { r = 1, g = 0, b = 0 },
+	[8] = { r = 0, g = 1, b = 0 },
+}
+_G.FACTION_STANDING_INCREASED = "Rep with %s inc by %d."
+_G.FACTION_STANDING_INCREASED_ACCOUNT_WIDE = "AccRep with %s inc by %d."
+_G.FACTION_STANDING_INCREASED_ACH_BONUS = "Rep with %s inc by %d (+.1f bonus)."
+_G.FACTION_STANDING_INCREASED_ACH_BONUS_ACCOUNT_WIDE = "AccRep with %s inc by %d (+.1f bonus)."
+_G.FACTION_STANDING_INCREASED_BONUS = "Rep with %s inc by %d (+.1f bonus)."
+_G.FACTION_STANDING_INCREASED_DOUBLE_BONUS = "Rep with %s inc by %d (+.1f bonus)."
+_G.FACTION_STANDING_DECREASED = "Rep with %s dec by %d."
+_G.FACTION_STANDING_DECREASED_ACCOUNT_WIDE = "AccRep with %s dec by %d."
+
 return wowGlobals

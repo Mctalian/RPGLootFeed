@@ -1,4 +1,4 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
 local assert = require("luassert")
 local busted = require("busted")
 local setup = busted.setup
@@ -9,7 +9,9 @@ local it = busted.it
 
 describe("Currency module", function()
 	local _ = match._
+	---@type RLF_Currency, test_G_RLF
 	local CurrencyModule, ns
+	local currencyInfoMocks
 
 	setup(function() end)
 
@@ -17,18 +19,18 @@ describe("Currency module", function()
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Constants")
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
 		require("RPGLootFeed_spec._mocks.Libs.LibStub")
-		ns = common_stubs.setup_G_RLF()
-		common_stubs.stub_C_CurrencyInfo()
+		currencyInfoMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_CurrencyInfo")
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 
 		-- Load the LootDisplayProperties module to populate `ns`
 		assert(loadfile("RPGLootFeed/Features/LootDisplayProperties.lua"))("TestAddon", ns)
 
 		-- Ensure `ns` has been populated correctly by LootDisplayProperties
 		assert.is_not_nil(ns.InitializeLootDisplayProperties)
-		assert.is_not_nil(ns.LootDisplayProperties)
 
 		-- Load the list module before each test
-		CurrencyModule = assert(loadfile("RPGLootFeed/Features/Currency/Currency.lua"))("TestAddon", ns)
+		---@type RLF_Currency
+		CurrencyModule = assert(loadfile("RPGLootFeed/Features/Currency/Currency.lua"))("TestAddon", ns) ---[[@as RLF_Currency]]
 	end)
 
 	it("does not show loot if the currency type is nil", function()
@@ -57,19 +59,19 @@ describe("Currency module", function()
 
 	it("does not show loot if the currency info cannot be found", function()
 		ns.db.global.currency.enabled = true
-		---@diagnostic disable-next-line: undefined-field
-		local stubGetCurrencyInfo = stub(_G.C_CurrencyInfo, "GetCurrencyInfo").returns(nil)
+		currencyInfoMocks.GetCurrencyInfo:revert()
+		currencyInfoMocks.GetCurrencyInfo = stub(_G.C_CurrencyInfo, "GetCurrencyInfo").returns(nil)
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, 1, 1)
 
 		assert.stub(ns.SendMessage).was.not_called()
-		stubGetCurrencyInfo:revert()
+		currencyInfoMocks.GetCurrencyInfo:revert()
 	end)
 
 	it("does not show loot if the currency has an empty description", function()
 		ns.db.global.currency.enabled = true
-		---@diagnostic disable-next-line: undefined-field
-		local stubGetCurrencyInfo = stub(_G.C_CurrencyInfo, "GetCurrencyInfo").returns({
+		currencyInfoMocks.GetCurrencyInfo:revert()
+		currencyInfoMocks.GetCurrencyInfo = stub(_G.C_CurrencyInfo, "GetCurrencyInfo").returns({
 			currencyID = 123,
 			description = "",
 			iconFileID = 123456,
@@ -78,7 +80,7 @@ describe("Currency module", function()
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE(_, 123, 5, 2)
 
 		assert.stub(ns.SendMessage).was.not_called()
-		stubGetCurrencyInfo:revert()
+		currencyInfoMocks.GetCurrencyInfo:revert()
 	end)
 
 	it("shows loot if the currency info is valid", function()
@@ -99,12 +101,12 @@ describe("Currency module", function()
 			displayAmount = 2,
 			actualAmount = 2,
 		}
-		---@diagnostic disable-next-line: undefined-field
-		local stubGetCurrencyInfo = stub(_G.C_CurrencyInfo, "GetCurrencyInfo").returns(info)
-		---@diagnostic disable-next-line: undefined-field
-		local stubGetCurrencyLink = stub(_G, "GetCurrencyLink").returns(link)
-		---@diagnostic disable-next-line: undefined-field
-		local stubGetBasicCurrencyInfo = stub(_G, "GetBasicCurrencyInfo").returns(basicInfo)
+		currencyInfoMocks.GetCurrencyInfo:revert()
+		currencyInfoMocks.GetCurrencyLink:revert()
+		currencyInfoMocks.GetBasicCurrencyInfo:revert()
+		currencyInfoMocks.GetCurrencyInfo = stub(_G.C_CurrencyInfo, "GetCurrencyInfo").returns(info)
+		currencyInfoMocks.GetCurrencyLink = stub(_G.C_CurrencyInfo, "GetCurrencyLink").returns(link)
+		currencyInfoMocks.GetBasicCurrencyInfo = stub(_G.C_CurrencyInfo, "GetBasicCurrencyInfo").returns(basicInfo)
 
 		local newElement = spy.on(CurrencyModule.Element, "new")
 
@@ -112,8 +114,8 @@ describe("Currency module", function()
 
 		assert.spy(newElement).was.called_with(_, "|c12345678|Hcurrency:123|r", info, basicInfo)
 		assert.stub(ns.SendMessage).was.called(1)
-		stubGetBasicCurrencyInfo:revert()
-		stubGetCurrencyLink:revert()
-		stubGetCurrencyInfo:revert()
+		currencyInfoMocks.GetBasicCurrencyInfo:revert()
+		currencyInfoMocks.GetCurrencyLink:revert()
+		currencyInfoMocks.GetCurrencyInfo:revert()
 	end)
 end)

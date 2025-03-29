@@ -1,4 +1,8 @@
 local assert = require("luassert")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
 
 describe("Queue module", function()
 	local Queue
@@ -8,13 +12,11 @@ describe("Queue module", function()
 		return { value = value }
 	end
 
-	local ns
 	before_each(function()
 		-- Define the global G_RLF
-		ns = ns or {}
+		local ns = {}
 		-- Load the Queue module before each test
 		assert(loadfile("RPGLootFeed/utils/Queue.lua"))("TestAddon", ns)
-
 		Queue = ns.Queue
 	end)
 

@@ -86,7 +86,7 @@ end
 --- @param type? string
 --- @param id? string
 --- @param content? string
---- @param amount? number
+--- @param amount? number | string
 --- @param isNew? boolean
 function G_RLF:LogDebug(message, source, type, id, content, amount, isNew)
 	log(G_RLF.LogLevel.debug, message, source, type, id, content, amount, isNew)
@@ -99,7 +99,7 @@ end
 --- @param type? string
 --- @param id? string
 --- @param content? string
---- @param amount? number
+--- @param amount? number | string
 --- @param isNew? boolean
 function G_RLF:LogInfo(message, source, type, id, content, amount, isNew)
 	log(G_RLF.LogLevel.info, message, source, type, id, content, amount, isNew)
@@ -112,7 +112,7 @@ end
 --- @param type? string
 --- @param id? string
 --- @param content? string
---- @param amount? number
+--- @param amount? number | string
 --- @param isNew? boolean
 function G_RLF:LogWarn(message, source, type, id, content, amount, isNew)
 	log(G_RLF.LogLevel.warn, message, source, type, id, content, amount, isNew)
@@ -125,7 +125,7 @@ end
 --- @param type? string
 --- @param id? string
 --- @param content? string
---- @param amount? number
+--- @param amount? number | string
 --- @param isNew? boolean
 function G_RLF:LogError(message, source, type, id, content, amount, isNew)
 	log(G_RLF.LogLevel.error, message, source, type, id, content, amount, isNew)

@@ -14,9 +14,7 @@ local function mockLibStub(lib, silence)
 		libStubReturn[lib] = {
 			NewAddon = function(...)
 				local addon = {}
-				embedLibs(addon, ...)
-				stub(addon, "SetDefaultModuleState")
-				stub(addon, "SetDefaultModulePrototype")
+				embedLibs(addon, "AceAddon-3.0", ...)
 				return addon
 			end,
 		}

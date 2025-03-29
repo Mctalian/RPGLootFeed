@@ -1,4 +1,4 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
 local assert = require("luassert")
 
 describe("AlphaHelpers", function()
@@ -6,7 +6,7 @@ describe("AlphaHelpers", function()
 
 	before_each(function()
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
-		ns = common_stubs.setup_G_RLF()
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 		assert(loadfile("RPGLootFeed/utils/AlphaHelpers.lua"))("TestAddon", ns)
 	end)
 

@@ -9,15 +9,16 @@ local it = busted.it
 describe("ItemLoot module", function()
 	local _ = match._
 	local LootModule, ns, showSpy
+	local itemMocks
 
 	setup(function()
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
 		require("RPGLootFeed_spec._mocks.Libs.LibStub")
+		itemMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_Item")
 	end)
 
 	before_each(function()
 		-- Define the global G_RLF
-		common_stubs.stub_C_Item()
 		showSpy = spy.new(function() end)
 		ns = common_stubs.setup_G_RLF()
 		ns.InitializeLootDisplayProperties = function(element)

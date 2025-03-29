@@ -1,7 +1,5 @@
 {
   "Lua.diagnostics.globals": [
-    "spy",
-    "describe",
     "RunNextFrame",
     "ChatFrame_RemoveMessageGroup",
     "ChatFrameUtil",
@@ -72,9 +70,7 @@
     "TextureKitConstants",
     "GetItemButtonIconTexture",
     "ITEM_MOD_CR_AVOIDANCE_SHORT",
-    "ITEM_MOD_CR_SPEED_SHORT",
-    "before_each",
-    "it"
+    "ITEM_MOD_CR_SPEED_SHORT"
   ],
   "Lua.workspace.library": [
     "${addons}/busted/module/library",

@@ -4,13 +4,13 @@ local assert = require("luassert")
 describe("PartyLoot module", function()
 	local _ = match._
 	local PartyModule, ns, showSpy
+	local itemMocks, classColorMocks
 
 	before_each(function()
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
 		require("RPGLootFeed_spec._mocks.Libs.LibStub")
-		-- Define the global G_RLF
-		common_stubs.stub_C_Item()
-		common_stubs.stub_C_ClassColor()
+		itemMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_Item")
+		classColorMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_ClassColor")
 		showSpy = spy.new(function() end)
 		ns = common_stubs.setup_G_RLF()
 		ns.InitializeLootDisplayProperties = function(element)
@@ -54,10 +54,7 @@ describe("PartyLoot module", function()
 
 	it("should show party loot", function()
 		local msg = "PartyMember received |cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r"
-		local itemLink = "|cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r"
 		local playerName = "PartyMember"
-		local amount = 1
-		local itemId = 18803
 		ns.db.global.partyLoot.enabled = true
 		PartyModule.nameUnitMap = { PartyMember = "party1" }
 
