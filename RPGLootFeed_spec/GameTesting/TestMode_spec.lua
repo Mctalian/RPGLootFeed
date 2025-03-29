@@ -1,4 +1,4 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
 local assert = require("luassert")
 
 describe("TestMode module", function()
@@ -6,7 +6,7 @@ describe("TestMode module", function()
 	before_each(function()
 		require("RPGLootFeed_spec._mocks.Libs.LibStub")
 		-- Define the global G_RLF
-		ns = common_stubs.setup_G_RLF()
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 
 		-- Load the module before each test
 		assert(loadfile("RPGLootFeed/GameTesting/TestMode.lua"))("TestAddon", ns)

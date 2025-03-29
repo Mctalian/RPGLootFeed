@@ -60,8 +60,12 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 				},
 				blizzOverrides = {},
 				currency = {},
-				item = {},
-				prof = {},
+				item = {
+					itemQualitySettings = {},
+				},
+				prof = {
+					skillColor = { 1, 1, 1, 1 },
+				},
 				partyLoot = {
 					enabled = true,
 					separateFrame = false,
@@ -79,7 +83,9 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 				xp = {
 					experienceTextColor = { 1, 1, 1, 1 },
 				},
-				rep = {},
+				rep = {
+					defaultRepColor = { 1, 1, 1, 1 },
+				},
 				styling = {},
 				lootHistory = {},
 				minimap = {},
@@ -87,7 +93,9 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 				sizing = {},
 				positioning = {},
 			},
-			locale = {},
+			locale = {
+				factionMap = {},
+			},
 			profile = {},
 		}
 		ns.RLF = {}
@@ -108,9 +116,9 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 		end)
 		addonNamespaceMocks.NotifyChange = stub(ns, "NotifyChange")
 		addonNamespaceMocks.Print = stub(ns, "Print")
-		addonNamespaceMocks.IsRetail = stub(ns, "IsRetail")
-		addonNamespaceMocks.IsClassic = stub(ns, "IsClassic")
-		addonNamespaceMocks.IsCataClassic = stub(ns, "IsCataClassic")
+		addonNamespaceMocks.IsRetail = stub(ns, "IsRetail").returns(true)
+		addonNamespaceMocks.IsClassic = stub(ns, "IsClassic").returns(false)
+		addonNamespaceMocks.IsCataClassic = stub(ns, "IsCataClassic").returns(false)
 		addonNamespaceMocks.SendMessage = stub(ns, "SendMessage")
 		addonNamespaceMocks.RGBAToHexFormat = stub(ns, "RGBAToHexFormat")
 		addonNamespaceMocks.LogDebug = stub(ns, "LogDebug")
@@ -196,7 +204,9 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 			},
 			profile = {},
 		}
-		ns.options = {}
+		ns.options = {
+			args = {},
+		}
 		ns.mainFeatureOrder = {
 			ItemLoot = 1,
 			PartyLoot = 2,

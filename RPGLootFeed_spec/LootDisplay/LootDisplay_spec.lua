@@ -1,4 +1,4 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
 local assert = require("luassert")
 
 describe("LootDisplay module", function()
@@ -6,7 +6,19 @@ describe("LootDisplay module", function()
 	before_each(function()
 		require("RPGLootFeed_spec._mocks.WoWGlobals")
 		-- Define the global G_RLF
-		ns = common_stubs.setup_G_RLF()
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
+		local mockQueue = {
+			enqueue = spy.new(function() end),
+			dequeue = spy.new(function() end),
+			peek = spy.new(function() end),
+			isEmpty = spy.new(function()
+				return true
+			end),
+			size = spy.new(function()
+				return 0
+			end),
+		}
+		nsMocks.Queue.new.returns(mockQueue)
 
 		-- Load the list module before each test
 		LootDisplayModule = assert(loadfile("RPGLootFeed/LootDisplay/LootDisplay.lua"))("TestAddon", ns)

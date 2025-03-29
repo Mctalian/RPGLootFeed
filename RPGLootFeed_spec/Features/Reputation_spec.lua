@@ -1,5 +1,8 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
 local assert = require("luassert")
+local busted = require("busted")
+local stub = busted.stub
+local spy = busted.spy
 
 describe("Reputation module", function()
 	local _ = match._
@@ -13,14 +16,19 @@ describe("Reputation module", function()
 		reputationMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_Reputation")
 		gossipInfoMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_GossipInfo")
 		delvesUIMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_DelvesUI")
-		ns = common_stubs.setup_G_RLF()
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 
 		-- Load the LootDisplayProperties module to populate `ns`
 		assert(loadfile("RPGLootFeed/Features/LootDisplayProperties.lua"))("TestAddon", ns)
 
 		-- Ensure `ns` has been populated correctly by LootDisplayProperties
 		assert.is_not_nil(ns.InitializeLootDisplayProperties)
-		assert.is_not_nil(ns.LootDisplayProperties)
+		nsMocks.RGBAToHexFormat.returns("COLORSTRING")
+		nsMocks.CreatePatternSegmentsForStringNumber.returns({
+			"Rep with ",
+			" inc by ",
+			".",
+		})
 
 		-- Load the list module before each test
 		RepModule = assert(loadfile("RPGLootFeed/Features/Reputation.lua"))("TestAddon", ns)
@@ -47,32 +55,27 @@ describe("Reputation module", function()
 	end)
 
 	it("handles rep increases", function()
-		local newElement = spy.on(RepModule.Element, "new")
-		ns.ExtractDynamicsFromPattern = function()
-			return "Faction A", 10
-		end
+		local elementMock = mock(RepModule.Element, false)
+		nsMocks.ExtractDynamicsFromPattern.returns("Faction A", 10)
 		local success =
 			RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE("CHAT_MSG_COMBAT_FACTION_CHANGE", "Rep with Faction A inc by 10.")
 
 		assert.is_true(success)
-
-		assert.spy(newElement).was.called_with(_, 10, "Faction A", 1, 0, 0, 1, _, 3)
+		assert.spy(elementMock.new).was.called_with(RepModule.Element, 10, "Faction A", 1, 0, 0, 1, _, 3)
 		assert.spy(ns.SendMessage).was.called(1)
 		-- Successfully populates the locale cache
 		assert.equal(ns.db.locale.factionMap["Faction A"], 1)
 	end)
 
 	it("handles rep increases despite locale cache miss", function()
-		local newElement = spy.on(RepModule.Element, "new")
-		ns.ExtractDynamicsFromPattern = function()
-			return "Faction B", 100
-		end
+		local elementMock = mock(RepModule.Element, false)
+		nsMocks.ExtractDynamicsFromPattern.returns("Faction B", 100)
 		local success =
 			RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE("CHAT_MSG_COMBAT_FACTION_CHANGE", "Rep with Faction B inc by 100.")
 
 		assert.is_true(success)
 
-		assert.spy(newElement).was.called_with(_, 100, "Faction B", nil, nil, nil, nil, nil, nil)
+		assert.spy(elementMock.new).was.called_with(RepModule.Element, 100, "Faction B", nil, nil, nil, nil, nil, nil)
 		assert.spy(ns.SendMessage).was.called(1)
 		assert.spy(ns.LogWarn).was.called(1)
 		assert.spy(ns.LogWarn).was.called_with(_, "Faction B is STILL not cached for enUS", _, _)
@@ -90,7 +93,7 @@ describe("Reputation module", function()
 
 		assert.is_true(success)
 
-		assert.spy(newElement).was.called_with(_, 313, "Brann Bronzebeard", 0, 1, 0, 2640, _, 4)
+		assert.spy(newElement).was.called_with(RepModule.Element, 313, "Brann Bronzebeard", 0, 1, 0, 2640, _, 4)
 		assert.spy(ns.SendMessage).was.called(1)
 		-- Successfully populates the locale cache
 		assert.equal(ns.db.locale.factionMap["Brann Bronzebeard"], 2640)

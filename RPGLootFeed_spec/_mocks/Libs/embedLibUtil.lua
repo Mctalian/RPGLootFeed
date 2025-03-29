@@ -13,7 +13,7 @@ local function embedLibs(addonOrModule, ...)
 			stub(addonOrModule, "IterateModules")
 			stub(addonOrModule, "NewModule", function(self, name, ...)
 				local module = {}
-				embedLibs(module, ...)
+				embedLibs(module, "AceAddon-3.0", ...)
 				module.moduleName = name
 				module.fn = function(s, func, ...)
 					if type(func) == "function" then
