@@ -1,11 +1,23 @@
 local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local assert = require("luassert")
+local busted = require("busted")
+local setup = busted.setup
+local stub = busted.stub
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
 
 describe("Currency module", function()
 	local _ = match._
 	local CurrencyModule, ns
 
+	setup(function() end)
+
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Constants")
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		require("RPGLootFeed_spec._mocks.Libs.LibStub")
+		ns = common_stubs.setup_G_RLF()
 		common_stubs.stub_C_CurrencyInfo()
 
 		-- Load the LootDisplayProperties module to populate `ns`

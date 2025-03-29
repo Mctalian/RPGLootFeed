@@ -1,10 +1,13 @@
 local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local assert = require("luassert")
 
 describe("ItemInfo", function()
 	local ns, ItemInfo
 
 	before_each(function()
-		ns = common_stubs.setup_G_RLF(spy)
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
+		ns = common_stubs.setup_G_RLF()
 		common_stubs.stub_C_Item()
 
 		assert(loadfile("RPGLootFeed/utils/ItemInfo.lua"))("TestAddon", ns)
@@ -182,6 +185,7 @@ describe("ItemInfo", function()
 
 	describe("IsEligibleEquipment", function()
 		it("checks if an item is eligible equipment", function()
+			---@diagnostic disable-next-line: duplicate-set-field
 			_G.UnitClass = function(unit)
 				return nil, "Warrior"
 			end
@@ -260,6 +264,7 @@ describe("ItemInfo", function()
 		end)
 
 		it("checks if an item is not eligible equipment due to mismatched armor class", function()
+			---@diagnostic disable-next-line: duplicate-set-field
 			_G.UnitClass = function(unit)
 				return nil, "Mage"
 			end
@@ -289,6 +294,7 @@ describe("ItemInfo", function()
 		end)
 
 		it("checks if an item is not eligible equipment due to missing equip slot", function()
+			---@diagnostic disable-next-line: duplicate-set-field
 			_G.UnitClass = function(unit)
 				return nil, "Warrior"
 			end

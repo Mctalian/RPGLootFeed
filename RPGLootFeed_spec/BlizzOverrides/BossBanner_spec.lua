@@ -1,9 +1,11 @@
 local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local assert = require("luassert")
 
 describe("BossBanner module", function()
 	local ns, BossBannerOverride
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		ns = common_stubs.setup_G_RLF()
 		ns.DisableBossBanner = {
 			ENABLED = 0,
 			FULLY_DISABLE = 1,

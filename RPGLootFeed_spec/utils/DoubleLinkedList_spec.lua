@@ -1,3 +1,5 @@
+local assert = require("luassert")
+
 describe("List module", function()
 	local list
 

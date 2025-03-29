@@ -1,11 +1,12 @@
 local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local assert = require("luassert")
 
 describe("LootDisplayProperties module", function()
 	local LootModule, ns
 
 	before_each(function()
 		-- Define the global G_RLF
-		ns = ns or common_stubs.setup_G_RLF(spy)
+		ns = common_stubs.setup_G_RLF()
 		-- Load the list module before each test
 		LootModule = assert(loadfile("RPGLootFeed/Features/LootDisplayProperties.lua"))("TestAddon", ns)
 	end)

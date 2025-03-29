@@ -1,12 +1,15 @@
 local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local assert = require("luassert")
+local busted = require("busted")
+local stub = busted.stub
 
 describe("Money module", function()
 	local _ = match._
 	local MoneyModule, ns
 
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
-		common_stubs.stub_Money_Funcs()
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		ns = common_stubs.setup_G_RLF()
 		-- Load the list module before each test
 		MoneyModule = assert(loadfile("RPGLootFeed/Features/Money.lua"))("TestAddon", ns)
 	end)

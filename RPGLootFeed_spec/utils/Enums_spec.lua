@@ -1,15 +1,30 @@
 local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local assert = require("luassert")
 
 describe("Enums", function()
 	local ns
 
 	before_each(function()
-		ns = common_stubs.setup_G_RLF(spy)
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		ns = common_stubs.setup_G_RLF()
 		assert(loadfile("RPGLootFeed/utils/Enums.lua"))("TestAddon", ns)
+	end)
+
+	it("defines Expansion enum", function()
+		assert.is_not_nil(ns.Expansion)
 	end)
 
 	it("defines DisableBossBanner enum", function()
 		assert.is_not_nil(ns.DisableBossBanner)
+	end)
+
+	it("defines FontFlags enum", function()
+		assert.is_not_nil(ns.FontFlags)
+	end)
+
+	it("defines ItemQualEnum enum", function()
+		assert.is_not_nil(ns.ItemQualEnum)
 	end)
 
 	it("defines LogEventSource enum", function()
@@ -24,7 +39,39 @@ describe("Enums", function()
 		assert.is_not_nil(ns.FeatureModule)
 	end)
 
+	it("defines PricesEnum enum", function()
+		assert.is_not_nil(ns.PricesEnum)
+	end)
+
+	it("defines EnterAnimationType enum", function()
+		assert.is_not_nil(ns.EnterAnimationType)
+	end)
+
+	it("defines ExitAnimationType enum", function()
+		assert.is_not_nil(ns.ExitAnimationType)
+	end)
+
+	it("defines SlideDirection enum", function()
+		assert.is_not_nil(ns.SlideDirection)
+	end)
+
 	it("defines WrapCharEnum enum", function()
 		assert.is_not_nil(ns.WrapCharEnum)
+	end)
+
+	it("defines GameSounds enum", function()
+		assert.is_not_nil(ns.GameSounds)
+	end)
+
+	it("defines DefaultIcons enum", function()
+		assert.is_not_nil(ns.DefaultIcons)
+	end)
+
+	it("defines Frames enum", function()
+		assert.is_not_nil(ns.Frames)
+	end)
+
+	it("defines TertiaryStats enum", function()
+		assert.is_not_nil(ns.TertiaryStats)
 	end)
 end)

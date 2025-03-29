@@ -1,4 +1,5 @@
 local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local assert = require("luassert")
 
 local function contains_string(state, arguments)
 	local expected = arguments[1]
@@ -19,12 +20,14 @@ describe("AddonMethods", function()
 	local _ = match._
 	local ns, errorHandlerSpy
 	before_each(function()
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		require("RPGLootFeed_spec._mocks.Libs.LibStub")
 		errorHandlerSpy = spy.new(function() end)
 		_G.geterrorhandler = function()
 			return errorHandlerSpy
 		end
 		-- Define the global G_RLF
-		ns = ns or common_stubs.setup_G_RLF(spy)
+		ns = common_stubs.setup_G_RLF()
 
 		-- Load the module before each test
 		assert(loadfile("RPGLootFeed/utils/AddonMethods.lua"))("TestAddon", ns)

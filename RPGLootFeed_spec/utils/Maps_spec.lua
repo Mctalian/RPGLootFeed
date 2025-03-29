@@ -1,25 +1,24 @@
+local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local assert = require("luassert")
+
 describe("Maps", function()
-	local G_RLF
+	local ns
 
 	before_each(function()
-		G_RLF = {}
-		_G.G_RLF = G_RLF
-		_G.Enum = {
-			ItemArmorSubclass = {
-				Plate = 4,
-				Mail = 3,
-				Leather = 2,
-				Cloth = 1,
-			},
-		}
-		assert(loadfile("RPGLootFeed/utils/Maps.lua"))("TestAddon", G_RLF)
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
+		ns = common_stubs.setup_G_RLF()
+		assert(loadfile("RPGLootFeed/utils/Maps.lua"))("TestAddon", ns)
 	end)
 
 	it("defines armorClassMapping", function()
-		assert.is_not_nil(G_RLF.armorClassMapping)
+		assert.is_not_nil(ns.armorClassMapping)
 	end)
 
 	it("defines equipSlotMap", function()
-		assert.is_not_nil(G_RLF.equipSlotMap)
+		assert.is_not_nil(ns.equipSlotMap)
+	end)
+
+	it("defines tertiaryToString", function()
+		assert.is_not_nil(ns.tertiaryToString)
 	end)
 end)

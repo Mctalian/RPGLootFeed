@@ -1,3 +1,5 @@
+local assert = require("luassert")
+
 describe("DbMigrations module", function()
 	local ns, dbMigrations
 	before_each(function()

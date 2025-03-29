@@ -1,3 +1,5 @@
+local assert = require("luassert")
+
 describe("Queue module", function()
 	local Queue
 

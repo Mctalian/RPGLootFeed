@@ -1,11 +1,13 @@
 local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local assert = require("luassert")
 
 describe("Professions Module", function()
 	local _ = match._
 	local Professions, ns
 
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		ns = common_stubs.setup_G_RLF()
 		_G.Enum = { ItemQuality = { Rare = 3 } }
 		_G.GetProfessions = function()
 			return 1, 2, 3, 4, 5

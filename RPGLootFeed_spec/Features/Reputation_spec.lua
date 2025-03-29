@@ -1,11 +1,14 @@
 local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local assert = require("luassert")
 
 describe("Reputation module", function()
 	local _ = match._
 	local RepModule, ns
 
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		ns = common_stubs.setup_G_RLF()
 		common_stubs.stub_C_Reputation()
 		common_stubs.stub_C_DelvesUI()
 
@@ -95,6 +98,7 @@ describe("Reputation module", function()
 		ns.ExtractDynamicsFromPattern = function()
 			return nil, nil
 		end
+		---@diagnostic disable-next-line: duplicate-set-field
 		C_GossipInfo.GetFriendshipReputation = function()
 			return {
 				standing = 10,
@@ -102,12 +106,14 @@ describe("Reputation module", function()
 				nextThreshold = nil,
 			}
 		end
+		---@diagnostic disable-next-line: duplicate-set-field
 		C_GossipInfo.GetFriendshipReputationRanks = function()
 			return {
 				currentLevel = 10,
 				maxLevel = 10,
 			}
 		end
+		---@diagnostic disable-next-line: duplicate-set-field
 		C_Reputation.GetFactionDataByID = function()
 			return {
 				reaction = 8,

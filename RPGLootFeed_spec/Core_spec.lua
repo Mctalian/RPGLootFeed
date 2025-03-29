@@ -1,11 +1,25 @@
 local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local assert = require("luassert")
+local busted = require("busted")
+local setup = busted.setup
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
 
 describe("Core module", function()
 	local ns, RLF
 	local _ = match._
+	local libStubReturn
+
+	setup(function()
+		-- Mocking the global environment
+		require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_CVar")
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		libStubReturn = require("RPGLootFeed_spec._mocks.Libs.LibStub")
+	end)
 
 	before_each(function()
-		ns = common_stubs.setup_G_RLF(spy)
+		ns = common_stubs.setup_G_RLF()
 		ns.L = {
 			Welcome = "Welcome",
 		}
@@ -57,7 +71,7 @@ describe("Core module", function()
 		end)
 
 		it("should handle unknown command correctly", function()
-			local acd = ns.LibStubReturn["AceConfigDialog-3.0"]
+			local acd = libStubReturn["AceConfigDialog-3.0"]
 			spy.on(acd, "Open")
 			RLF:OnInitialize()
 			RLF:SlashCommand("unknown")

@@ -1,16 +1,20 @@
 local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local assert = require("luassert")
 
 describe("PartyLoot module", function()
 	local _ = match._
 	local PartyModule, ns, showSpy
 
 	before_each(function()
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		require("RPGLootFeed_spec._mocks.Libs.LibStub")
 		-- Define the global G_RLF
 		common_stubs.stub_C_Item()
 		common_stubs.stub_C_ClassColor()
 		showSpy = spy.new(function() end)
-		ns = ns or common_stubs.setup_G_RLF(spy)
+		ns = common_stubs.setup_G_RLF()
 		ns.InitializeLootDisplayProperties = function(element)
+			---@diagnostic disable-next-line: duplicate-set-field
 			element.Show = function(...)
 				showSpy(...)
 			end
