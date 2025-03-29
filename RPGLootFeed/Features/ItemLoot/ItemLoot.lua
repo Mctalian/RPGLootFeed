@@ -304,13 +304,13 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 					ItemLoot.moduleName
 				)
 			end
-		elseif self.isLegendary and soundsConfig.legendaries.enabled and soundsConfig.legendaries.sound ~= "" then
-			local willPlay, handle = PlaySoundFile(soundsConfig.legendaries.sound)
+		elseif self.isLegendary and soundsConfig.legendary.enabled and soundsConfig.legendary.sound ~= "" then
+			local willPlay, handle = PlaySoundFile(soundsConfig.legendary.sound)
 			if not willPlay then
-				G_RLF:LogWarn("Failed to play sound " .. soundsConfig.legendaries.sound, addonName, ItemLoot.moduleName)
+				G_RLF:LogWarn("Failed to play sound " .. soundsConfig.legendary.sound, addonName, ItemLoot.moduleName)
 			else
 				G_RLF:LogDebug(
-					"Sound queued to play " .. soundsConfig.legendaries.sound .. " " .. handle,
+					"Sound queued to play " .. soundsConfig.legendary.sound .. " " .. handle,
 					addonName,
 					ItemLoot.moduleName
 				)
