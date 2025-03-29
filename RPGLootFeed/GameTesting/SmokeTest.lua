@@ -9,7 +9,7 @@ local C = LibStub("C_Everywhere")
 --@alpha@
 -- trunk-ignore-begin(no-invalid-prints/invalid-print)
 ---@type RLF_TestMode
-local TestMode = G_RLF.RLF:GetModule("TestMode")
+local TestMode = G_RLF.RLF:GetModule("TestMode") --[[@as RLF_TestMode]]
 
 local tests = {}
 local prints = ""

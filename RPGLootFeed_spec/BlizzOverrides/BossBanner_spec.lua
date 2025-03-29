@@ -1,16 +1,11 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
 
 describe("BossBanner module", function()
 	local ns, BossBannerOverride
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
-		ns.DisableBossBanner = {
-			ENABLED = 0,
-			FULLY_DISABLE = 1,
-			DISABLE_LOOT = 2,
-			DISABLE_MY_LOOT = 3,
-			DISABLE_GROUP_LOOT = 4,
-		}
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 		_G.BossBanner = {
 			OnEvent = function() end,
 		}

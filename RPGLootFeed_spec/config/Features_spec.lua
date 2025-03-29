@@ -1,3 +1,5 @@
+local assert = require("luassert")
+
 describe("Features module", function()
 	before_each(function()
 		-- Define the global G_RLF

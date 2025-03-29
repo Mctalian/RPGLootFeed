@@ -35,6 +35,7 @@ L["XP"] = true
 L["Close"] = true
 L["LauncherLeftClick"] = "|cffeda55fClick|r to open addon config menu."
 L["LauncherRightClick"] = "|cffeda55fRight-click|r to open a quick-menu."
+L["Socket"] = true
 
 -- ConfigOptions
 L["Toggle Test Mode"] = true
@@ -101,6 +102,8 @@ L["Highlight Legendary Items"] = true
 L["HighlightLegendaryDesc"] = "Highlight Legendary items in the Loot Feed"
 L["Highlight Items Better Than Equipped"] = true
 L["HighlightBetterThanEquippedDesc"] = "Highlight items that are better than what you have equipped in the Loot Feed"
+L["Highlight Items with Tertiary Stats or Sockets"] = true
+L["HighlightTertiaryOrSocketDesc"] = "Highlight items with tertiary stats or sockets in the Loot Feed"
 L["Play Sound for Mounts"] = true
 L["PlaySoundForMountsDesc"] = "Play a sound when a mount is looted"
 L["Mount Sound"] = true

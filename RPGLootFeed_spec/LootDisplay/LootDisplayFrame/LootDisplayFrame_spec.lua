@@ -1,10 +1,11 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
 
 describe("LootDisplayFrameMixin", function()
 	local ns
 	before_each(function()
 		-- Define the global G_RLF
-		ns = ns or common_stubs.setup_G_RLF(spy)
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 
 		-- Load the module before each test
 		assert(loadfile("RPGLootFeed/LootDisplay/LootDisplayFrame/LootDisplayFrame.lua"))("TestAddon", ns)

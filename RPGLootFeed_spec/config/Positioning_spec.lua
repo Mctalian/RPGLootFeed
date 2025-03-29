@@ -1,10 +1,11 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
 
 describe("Positioning module", function()
-	local ns = {}
+	local ns
 	before_each(function()
 		-- Define the global G_RLF
-		ns = common_stubs.setup_G_RLF(spy)
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 		-- Load the list module before each test
 		assert(loadfile("RPGLootFeed/config/Positioning.lua"))("TestAddon", ns)
 	end)

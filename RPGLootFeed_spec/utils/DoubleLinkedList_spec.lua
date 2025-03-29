@@ -1,3 +1,9 @@
+local assert = require("luassert")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+
 describe("List module", function()
 	local list
 

@@ -43,3 +43,20 @@ G_RLF.equipSlotMap = {
 	INVTYPE_RANGED = 18, -- Bows, guns, wands
 	INVTYPE_TABARD = 19,
 }
+
+---@type table<G_RLF.TertiaryStats, string>
+G_RLF.tertiaryToString = {
+	[G_RLF.TertiaryStats.Speed] = _G["ITEM_MOD_CR_SPEED_SHORT"],
+	[G_RLF.TertiaryStats.Leech] = _G["ITEM_MOD_CR_LIFESTEAL_SHORT"],
+	[G_RLF.TertiaryStats.Avoid] = _G["ITEM_MOD_CR_AVOIDANCE_SHORT"],
+	[G_RLF.TertiaryStats.Indestructible] = _G["ITEM_MOD_CR_STURDINESS_SHORT"],
+}
+
+G_RLF.WrapCharOptions = {
+	[G_RLF.WrapCharEnum.SPACE] = G_RLF.L["Spaces"],
+	[G_RLF.WrapCharEnum.PARENTHESIS] = G_RLF.L["Parentheses"],
+	[G_RLF.WrapCharEnum.BRACKET] = G_RLF.L["Square Brackets"],
+	[G_RLF.WrapCharEnum.BRACE] = G_RLF.L["Curly Braces"],
+	[G_RLF.WrapCharEnum.ANGLE] = G_RLF.L["Angle Brackets"],
+	[G_RLF.WrapCharEnum.BAR] = G_RLF.L["Bars"],
+}
