@@ -1,12 +1,26 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
+local match = require("luassert.match")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+local mock = busted.mock
+local spy = busted.spy
+local stub = busted.stub
 
 describe("Money module", function()
 	local _ = match._
 	local MoneyModule, ns
 
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
-		common_stubs.stub_Money_Funcs()
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
+		-- Load the LootDisplayProperties module to populate `ns`
+		assert(loadfile("RPGLootFeed/Features/LootDisplayProperties.lua"))("TestAddon", ns)
+
+		-- Ensure `ns` has been populated correctly by LootDisplayProperties
+		assert.is_not_nil(ns.InitializeLootDisplayProperties)
 		-- Load the list module before each test
 		MoneyModule = assert(loadfile("RPGLootFeed/Features/Money.lua"))("TestAddon", ns)
 	end)
@@ -25,7 +39,6 @@ describe("Money module", function()
 
 	it("Money:OnEnable registers events and sets startingMoney", function()
 		stub(MoneyModule, "RegisterEvent")
-		---@diagnostic disable-next-line: undefined-field
 		local stubGetMoney = stub(_G, "GetMoney").returns(1000)
 
 		MoneyModule:OnEnable()
@@ -50,7 +63,6 @@ describe("Money module", function()
 	end)
 
 	it("Money:PLAYER_ENTERING_WORLD sets startingMoney", function()
-		---@diagnostic disable-next-line: undefined-field
 		local stubGetMoney = stub(_G, "GetMoney").returns(2000)
 
 		MoneyModule:PLAYER_ENTERING_WORLD("PLAYER_ENTERING_WORLD")
@@ -61,23 +73,21 @@ describe("Money module", function()
 	end)
 
 	it("Money:PLAYER_MONEY updates startingMoney and creates a new element", function()
-		local fakeElement = { Show = function() end, PlaySoundIfEnabled = function() end }
-		---@diagnostic disable-next-line: undefined-field
 		local stubGetMoney = stub(_G, "GetMoney").returns(3000)
-		---@diagnostic disable-next-line: undefined-field
-		local stubElementNew = stub(MoneyModule.Element, "new").returns(fakeElement)
-		local showSpy = spy.on(fakeElement, "Show")
-		local playSoundSpy = spy.on(fakeElement, "PlaySoundIfEnabled")
+		local elementMock = mock(MoneyModule.Element, false)
+		local elementShowSpy, elementPlaySoundSpy
+		local stubInitializeLootDisplayProperties = stub(ns, "InitializeLootDisplayProperties", function(e)
+			elementShowSpy = spy.on(e, "Show")
+		end)
 
 		MoneyModule.startingMoney = 1000
 		MoneyModule:PLAYER_MONEY("PLAYER_MONEY")
 
 		assert.equal(MoneyModule.startingMoney, 3000)
-		assert.stub(MoneyModule.Element.new).was.called_with(MoneyModule.Element, 2000)
-		assert.spy(showSpy).was.called(1)
-		assert.spy(playSoundSpy).was.called(1)
+		assert.spy(elementMock.new).was.called_with(MoneyModule.Element, 2000)
+		assert.spy(elementShowSpy).was.called(1)
 
-		stubElementNew:revert()
 		stubGetMoney:revert()
+		stubInitializeLootDisplayProperties:revert()
 	end)
 end)

@@ -1,27 +1,49 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
+local match = require("luassert.match")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+local mock = busted.mock
+local setup = busted.setup
+local spy = busted.spy
 
 describe("Reputation module", function()
 	local _ = match._
 	local RepModule, ns
+	local reputationMocks, gossipInfoMocks, delvesUIMocks
+
+	setup(function()
+		require("RPGLootFeed_spec._mocks.WoWGlobals")
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		reputationMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_Reputation")
+		gossipInfoMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_GossipInfo")
+		delvesUIMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_DelvesUI")
+	end)
 
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
-		common_stubs.stub_C_Reputation()
-		common_stubs.stub_C_DelvesUI()
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 
 		-- Load the LootDisplayProperties module to populate `ns`
 		assert(loadfile("RPGLootFeed/Features/LootDisplayProperties.lua"))("TestAddon", ns)
 
 		-- Ensure `ns` has been populated correctly by LootDisplayProperties
 		assert.is_not_nil(ns.InitializeLootDisplayProperties)
-		assert.is_not_nil(ns.LootDisplayProperties)
+		nsMocks.RGBAToHexFormat.returns("COLORSTRING")
+		nsMocks.CreatePatternSegmentsForStringNumber.returns({
+			"Rep with ",
+			" inc by ",
+			".",
+		})
 
 		-- Load the list module before each test
 		RepModule = assert(loadfile("RPGLootFeed/Features/Reputation.lua"))("TestAddon", ns)
 		RepModule:OnInitialize()
 		RepModule:PLAYER_ENTERING_WORLD(true, false)
-		ns.SendMessage:clear()
-		ns.LogWarn:clear()
+		nsMocks.SendMessage:clear()
+		nsMocks.LogWarn:clear()
 	end)
 
 	it("RepModule is not nil", function()
@@ -37,39 +59,34 @@ describe("Reputation module", function()
 
 		assert.is_true(success)
 
-		assert.spy(ns.SendMessage).was.not_called()
+		assert.spy(nsMocks.SendMessage).was.not_called()
 	end)
 
 	it("handles rep increases", function()
-		local newElement = spy.on(RepModule.Element, "new")
-		ns.ExtractDynamicsFromPattern = function()
-			return "Faction A", 10
-		end
+		local elementMock = mock(RepModule.Element, false)
+		nsMocks.ExtractDynamicsFromPattern.returns("Faction A", 10)
 		local success =
 			RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE("CHAT_MSG_COMBAT_FACTION_CHANGE", "Rep with Faction A inc by 10.")
 
 		assert.is_true(success)
-
-		assert.spy(newElement).was.called_with(_, 10, "Faction A", 1, 0, 0, 1, _, 3)
-		assert.spy(ns.SendMessage).was.called(1)
+		assert.spy(elementMock.new).was.called_with(RepModule.Element, 10, "Faction A", 1, 0, 0, 1, _, 3)
+		assert.spy(nsMocks.SendMessage).was.called(1)
 		-- Successfully populates the locale cache
 		assert.equal(ns.db.locale.factionMap["Faction A"], 1)
 	end)
 
 	it("handles rep increases despite locale cache miss", function()
-		local newElement = spy.on(RepModule.Element, "new")
-		ns.ExtractDynamicsFromPattern = function()
-			return "Faction B", 100
-		end
+		local elementMock = mock(RepModule.Element, false)
+		nsMocks.ExtractDynamicsFromPattern.returns("Faction B", 100)
 		local success =
 			RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE("CHAT_MSG_COMBAT_FACTION_CHANGE", "Rep with Faction B inc by 100.")
 
 		assert.is_true(success)
 
-		assert.spy(newElement).was.called_with(_, 100, "Faction B", nil, nil, nil, nil, nil, nil)
-		assert.spy(ns.SendMessage).was.called(1)
-		assert.spy(ns.LogWarn).was.called(1)
-		assert.spy(ns.LogWarn).was.called_with(_, "Faction B is STILL not cached for enUS", _, _)
+		assert.spy(elementMock.new).was.called_with(RepModule.Element, 100, "Faction B", nil, nil, nil, nil, nil, nil)
+		assert.spy(nsMocks.SendMessage).was.called(1)
+		assert.spy(nsMocks.LogWarn).was.called(1)
+		assert.spy(nsMocks.LogWarn).was.called_with(_, "Faction B is STILL not cached for enUS", _, _)
 	end)
 
 	it("handles delve companion experience gains", function()
@@ -84,8 +101,8 @@ describe("Reputation module", function()
 
 		assert.is_true(success)
 
-		assert.spy(newElement).was.called_with(_, 313, "Brann Bronzebeard", 0, 1, 0, 2640, _, 4)
-		assert.spy(ns.SendMessage).was.called(1)
+		assert.spy(newElement).was.called_with(RepModule.Element, 313, "Brann Bronzebeard", 0, 1, 0, 2640, _, 4)
+		assert.spy(nsMocks.SendMessage).was.called(1)
 		-- Successfully populates the locale cache
 		assert.equal(ns.db.locale.factionMap["Brann Bronzebeard"], 2640)
 	end)
@@ -95,25 +112,20 @@ describe("Reputation module", function()
 		ns.ExtractDynamicsFromPattern = function()
 			return nil, nil
 		end
-		C_GossipInfo.GetFriendshipReputation = function()
-			return {
-				standing = 10,
-				reactionThreshold = 10,
-				nextThreshold = nil,
-			}
-		end
-		C_GossipInfo.GetFriendshipReputationRanks = function()
-			return {
-				currentLevel = 10,
-				maxLevel = 10,
-			}
-		end
-		C_Reputation.GetFactionDataByID = function()
-			return {
-				reaction = 8,
-			}
-		end
-		expectedFactionData = {
+		gossipInfoMocks.GetFriendshipReputation.returns({
+			standing = 10,
+			reactionThreshold = 10,
+			nextThreshold = nil,
+		})
+		gossipInfoMocks.GetFriendshipReputationRanks.returns({
+			currentLevel = 10,
+			maxLevel = 10,
+		})
+		reputationMocks.GetFactionDataByID.returns({
+			reaction = 8,
+		})
+
+		local expectedFactionData = {
 			currentLevel = 10,
 			currentXp = 0,
 			reaction = 8,
@@ -129,7 +141,7 @@ describe("Reputation module", function()
 		assert.is_true(success)
 
 		assert.spy(newElement).was.called_with(_, 313, "Brann Bronzebeard", 0, 1, 0, 2640, expectedFactionData, 4)
-		assert.spy(ns.SendMessage).was.called(1)
+		assert.spy(nsMocks.SendMessage).was.called(1)
 		-- Successfully populates the locale cache
 		assert.equal(ns.db.locale.factionMap["Brann Bronzebeard"], 2640)
 	end)

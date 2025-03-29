@@ -136,9 +136,9 @@ end
 ---@return number | nil marketValue in copper or nil if not found
 function Integ_TSM:GetAHPrice(itemLink)
 	if TSM_API and TSM_API.ToItemString and TSM_API.GetCustomPriceValue then
-		local itemString = TSM_API.Item:ToItemString(itemLink)
+		local itemString = TSM_API.ToItemString(itemLink)
 		if itemString then
-			local marketValue = TSM_API:GetCustomPriceValue("DBMarket", itemString)
+			local marketValue = TSM_API.GetCustomPriceValue("DBMarket", itemString)
 			if marketValue then
 				return marketValue
 			end

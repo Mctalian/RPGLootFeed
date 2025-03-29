@@ -1,25 +1,28 @@
-describe("Maps", function()
-	local G_RLF
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+local setup = busted.setup
 
-	before_each(function()
-		G_RLF = {}
-		_G.G_RLF = G_RLF
-		_G.Enum = {
-			ItemArmorSubclass = {
-				Plate = 4,
-				Mail = 3,
-				Leather = 2,
-				Cloth = 1,
-			},
-		}
-		assert(loadfile("RPGLootFeed/utils/Maps.lua"))("TestAddon", G_RLF)
+describe("Maps", function()
+	local ns
+
+	setup(function()
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.UtilsLogger)
+		assert(loadfile("RPGLootFeed/utils/Maps.lua"))("TestAddon", ns)
 	end)
 
 	it("defines armorClassMapping", function()
-		assert.is_not_nil(G_RLF.armorClassMapping)
+		assert.is_not_nil(ns.armorClassMapping)
 	end)
 
 	it("defines equipSlotMap", function()
-		assert.is_not_nil(G_RLF.equipSlotMap)
+		assert.is_not_nil(ns.equipSlotMap)
+	end)
+
+	it("defines tertiaryToString", function()
+		assert.is_not_nil(ns.tertiaryToString)
 	end)
 end)

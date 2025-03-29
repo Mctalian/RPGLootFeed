@@ -484,3 +484,5 @@ function LootDisplayFrameMixin:UpdateRowItemCounts()
 		end
 	end
 end
+
+return LootDisplayFrameMixin

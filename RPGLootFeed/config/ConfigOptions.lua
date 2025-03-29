@@ -8,15 +8,6 @@ G_RLF.ConfigHandlers = {}
 
 local ConfigOptions = {}
 
-G_RLF.WrapCharOptions = {
-	[G_RLF.WrapCharEnum.SPACE] = G_RLF.L["Spaces"],
-	[G_RLF.WrapCharEnum.PARENTHESIS] = G_RLF.L["Parentheses"],
-	[G_RLF.WrapCharEnum.BRACKET] = G_RLF.L["Square Brackets"],
-	[G_RLF.WrapCharEnum.BRACE] = G_RLF.L["Curly Braces"],
-	[G_RLF.WrapCharEnum.ANGLE] = G_RLF.L["Angle Brackets"],
-	[G_RLF.WrapCharEnum.BAR] = G_RLF.L["Bars"],
-}
-
 ---@class RLF_DB
 G_RLF.defaults = {
 	---@class RLF_DBProfile

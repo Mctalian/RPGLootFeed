@@ -1,18 +1,20 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
+local match = require("luassert.match")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+local spy = busted.spy
 
 describe("Professions Module", function()
 	local _ = match._
 	local Professions, ns
 
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
-		_G.Enum = { ItemQuality = { Rare = 3 } }
-		_G.GetProfessions = function()
-			return 1, 2, 3, 4, 5
-		end
-		_G.GetProfessionInfo = function(id)
-			return "Profession" .. id, "icon" .. id, id * 10, id * 20, nil, nil, nil, nil, nil, nil, "Expansion" .. id
-		end
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 
 		Professions = assert(loadfile("RPGLootFeed/Features/Professions.lua"))("TestAddon", ns)
 		Professions:OnInitialize()

@@ -1,9 +1,15 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+local spy = busted.spy
 
 describe("LootToasts module", function()
 	local ns, LootToastOverride
 	before_each(function()
-		ns = ns or common_stubs.setup_G_RLF(spy)
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 		_G.LootAlertSystem = {
 			AddAlert = function() end,
 		}
@@ -36,7 +42,7 @@ describe("LootToasts module", function()
 			return true
 		end
 		LootToastOverride:LootToastHook()
-		assert.spy(LootToastOverride.RawHook).was_not_called()
+		assert.spy(LootToastOverride.RawHook).was.not_called()
 	end)
 
 	describe("InterceptAddAlert", function()
@@ -47,14 +53,16 @@ describe("LootToasts module", function()
 
 		it("completely skips LootAlertSystem alert if disabled", function()
 			ns.db.global.blizzOverrides.disableBlizzLootToasts = true
+			local addAlertSpy = spy.on(LootToastOverride.hooks[LootAlertSystem], "AddAlert")
 			LootToastOverride:InterceptAddAlert(nil)
-			assert.spy(LootToastOverride.hooks[LootAlertSystem].AddAlert).was_not_called()
+			assert.spy(addAlertSpy).was.not_called()
 		end)
 
 		it("calls the original AddAlert function if not disabled", function()
 			ns.db.global.blizzOverrides.disableBlizzLootToasts = false
+			local addAlertSpy = spy.on(LootToastOverride.hooks[LootAlertSystem], "AddAlert")
 			LootToastOverride:InterceptAddAlert(nil)
-			assert.spy(LootToastOverride.hooks[LootAlertSystem].AddAlert).was_called()
+			assert.spy(addAlertSpy).was.called(1)
 		end)
 	end)
 end)

@@ -27,20 +27,79 @@ local ItemInfo = {}
 ItemInfo.__index = ItemInfo
 
 --- Create a new ItemInfo object
---- @param ... number | string | boolean | nil
+--- @param itemId? string|number
+--- @param itemName? string
+--- @param itemLink? string
+--- @param itemQuality? number
+--- @param itemLevel? number
+--- @param itemMinLevel? number
+--- @param itemType? string
+--- @param itemSubType? string
+--- @param itemStackCount? number
+--- @param itemEquipLoc? string
+--- @param itemTexture? string
+--- @param sellPrice? number
+--- @param classID? number
+--- @param subclassID? number
+--- @param bindType? number
+--- @param expansionID? number
+--- @param setID? number
+--- @param isCraftingReagent? boolean
 --- @return RLF_ItemInfo | nil
-function ItemInfo:new(...)
+function ItemInfo:new(
+	itemId,
+	itemName,
+	itemLink,
+	itemQuality,
+	itemLevel,
+	itemMinLevel,
+	itemType,
+	itemSubType,
+	itemStackCount,
+	itemEquipLoc,
+	itemTexture,
+	sellPrice,
+	classID,
+	subclassID,
+	bindType,
+	expansionID,
+	setID,
+	isCraftingReagent
+)
 	local instance = {}
 	setmetatable(instance, ItemInfo)
-	instance.itemId, instance.itemName, instance.itemLink, instance.itemQuality, instance.itemLevel, instance.itemMinLevel, instance.itemType, instance.itemSubType, instance.itemStackCount, instance.itemEquipLoc, instance.itemTexture, instance.sellPrice, instance.classID, instance.subclassID, instance.bindType, instance.expansionID, instance.setID, instance.isCraftingReagent =
-		...
+	if type(itemId) == "string" then
+		instance.itemId = tonumber(itemId)
+	else
+		instance.itemId = itemId
+	end
+	instance.itemName = itemName
+	instance.itemLink = itemLink
+	instance.itemQuality = itemQuality
+	instance.itemLevel = itemLevel
+	instance.itemMinLevel = itemMinLevel
+	instance.itemType = itemType
+	instance.itemSubType = itemSubType
+	instance.itemStackCount = itemStackCount
+	instance.itemEquipLoc = itemEquipLoc
+	instance.itemTexture = itemTexture
+	instance.sellPrice = sellPrice
+	instance.classID = classID
+	instance.subclassID = subclassID
+	instance.bindType = bindType
+	instance.expansionID = expansionID
+	instance.setID = setID
+	instance.isCraftingReagent = isCraftingReagent
+
 	if instance.itemName == nil then
 		return nil
 	end
+
 	if instance.itemId == nil then
 		instance.itemId = C_Item.GetItemIDForItemInfo(instance.itemLink)
 	end
 	instance.itemId = tonumber(instance.itemId)
+
 	return instance
 end
 

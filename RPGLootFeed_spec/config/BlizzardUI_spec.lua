@@ -1,22 +1,15 @@
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+
 describe("BlizzardUI module", function()
+	local ns
 	before_each(function()
 		-- Define the global G_RLF
-		local ns = {
-			defaults = {
-				global = {},
-			},
-			L = {},
-			options = {
-				args = {},
-			},
-			DisableBossBanner = {
-				ENABLED = 0,
-				FULLY_DISABLE = 1,
-				DISABLE_LOOT = 2,
-				DISABLE_MY_LOOT = 3,
-				DISABLE_GROUP_LOOT = 4,
-			},
-		}
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.ConfigFeaturesAll)
 		-- Load the list module before each test
 		assert(loadfile("RPGLootFeed/config/BlizzardUI.lua"))("TestAddon", ns)
 	end)

@@ -1,13 +1,23 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
 
 describe("ItemInfo", function()
+	---@type test_G_RLF, RLF_ItemInfo
 	local ns, ItemInfo
+	local itemMocks, functionMocks
 
 	before_each(function()
-		ns = common_stubs.setup_G_RLF(spy)
-		common_stubs.stub_C_Item()
+		functionMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
+		itemMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_Item")
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 
 		assert(loadfile("RPGLootFeed/utils/ItemInfo.lua"))("TestAddon", ns)
+		---@type RLF_ItemInfo
 		ItemInfo = ns.ItemInfo
 	end)
 
@@ -32,6 +42,10 @@ describe("ItemInfo", function()
 			1,
 			false
 		)
+		if not item then
+			assert.is_not_nil(item)
+			return
+		end
 		assert.are.equal(item.itemId, 18803)
 		assert.are.equal(item.itemName, "Test Item")
 	end)
@@ -81,6 +95,10 @@ describe("ItemInfo", function()
 			1,
 			false
 		)
+		if not item then
+			assert.is_not_nil(item)
+			return
+		end
 		assert.are.equal(item.itemId, 18803)
 	end)
 
@@ -105,6 +123,10 @@ describe("ItemInfo", function()
 			1,
 			false
 		)
+		if not item then
+			assert.is_not_nil(item)
+			return
+		end
 		assert.is_true(item:IsMount())
 	end)
 
@@ -129,6 +151,10 @@ describe("ItemInfo", function()
 			1,
 			false
 		)
+		if not item then
+			assert.is_not_nil(item)
+			return
+		end
 		assert.is_false(item:IsMount())
 	end)
 
@@ -153,6 +179,10 @@ describe("ItemInfo", function()
 			1,
 			false
 		)
+		if not item then
+			assert.is_not_nil(item)
+			return
+		end
 		assert.is_true(item:IsLegendary())
 	end)
 
@@ -177,15 +207,16 @@ describe("ItemInfo", function()
 			1,
 			false
 		)
+		if not item then
+			assert.is_not_nil(item)
+			return
+		end
 		assert.is_false(item:IsLegendary())
 	end)
 
 	describe("IsEligibleEquipment", function()
 		it("checks if an item is eligible equipment", function()
-			_G.UnitClass = function(unit)
-				return nil, "Warrior"
-			end
-			ns.armorClassMapping = { Warrior = 4 }
+			ns.armorClassMapping = { WARRIOR = 4 }
 			ns.equipSlotMap = { INVTYPE_CHEST = 5 }
 
 			local item = ItemInfo:new(
@@ -208,6 +239,10 @@ describe("ItemInfo", function()
 				1,
 				false
 			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
 			assert.is_true(item:IsEligibleEquipment())
 		end)
 
@@ -232,6 +267,10 @@ describe("ItemInfo", function()
 				1,
 				false
 			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
 			assert.is_false(item:IsEligibleEquipment())
 		end)
 
@@ -256,10 +295,15 @@ describe("ItemInfo", function()
 				1,
 				false
 			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
 			assert.is_false(item:IsEligibleEquipment())
 		end)
 
 		it("checks if an item is not eligible equipment due to mismatched armor class", function()
+			---@diagnostic disable-next-line: duplicate-set-field
 			_G.UnitClass = function(unit)
 				return nil, "Mage"
 			end
@@ -285,10 +329,15 @@ describe("ItemInfo", function()
 				1,
 				false
 			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
 			assert.is_false(item:IsEligibleEquipment())
 		end)
 
 		it("checks if an item is not eligible equipment due to missing equip slot", function()
+			---@diagnostic disable-next-line: duplicate-set-field
 			_G.UnitClass = function(unit)
 				return nil, "Warrior"
 			end
@@ -315,6 +364,10 @@ describe("ItemInfo", function()
 				1,
 				false
 			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
 			assert.is_false(item:IsEligibleEquipment())
 		end)
 	end)

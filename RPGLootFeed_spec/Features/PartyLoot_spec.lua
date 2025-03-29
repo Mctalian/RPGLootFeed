@@ -1,24 +1,33 @@
-local common_stubs = require("RPGLootFeed_spec/common_stubs")
+local nsMocks = require("RPGLootFeed_spec._mocks.Internal.addonNamespace")
+local assert = require("luassert")
+local match = require("luassert.match")
+local busted = require("busted")
+local before_each = busted.before_each
+local describe = busted.describe
+local it = busted.it
+local mock = busted.mock
+local spy = busted.spy
+local stub = busted.stub
 
 describe("PartyLoot module", function()
 	local _ = match._
-	local PartyModule, ns, showSpy
+	local PartyModule, ns
+	local itemMocks, classColorMocks
 
 	before_each(function()
-		-- Define the global G_RLF
-		common_stubs.stub_C_Item()
-		common_stubs.stub_C_ClassColor()
-		showSpy = spy.new(function() end)
-		ns = ns or common_stubs.setup_G_RLF(spy)
-		ns.InitializeLootDisplayProperties = function(element)
-			element.Show = function(...)
-				showSpy(...)
-			end
-		end
+		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		require("RPGLootFeed_spec._mocks.Libs.LibStub")
+		itemMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_Item")
+		classColorMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_ClassColor")
+		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
+		-- Load the LootDisplayProperties module to populate `ns`
+		assert(loadfile("RPGLootFeed/Features/LootDisplayProperties.lua"))("TestAddon", ns)
+		-- Ensure `ns` has been populated correctly by LootDisplayProperties
+		assert.is_not_nil(ns.InitializeLootDisplayProperties)
 		-- Load the list module before each test
 		PartyModule = assert(loadfile("RPGLootFeed/Features/PartyLoot/PartyLoot.lua"))("TestAddon", ns)
 		PartyModule:OnInitialize()
-		ns.LogInfo:clear()
+		nsMocks.LogInfo:clear()
 	end)
 
 	it("should initialize correctly", function()
@@ -50,12 +59,34 @@ describe("PartyLoot module", function()
 
 	it("should show party loot", function()
 		local msg = "PartyMember received |cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r"
-		local itemLink = "|cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r"
 		local playerName = "PartyMember"
-		local amount = 1
-		local itemId = 18803
 		ns.db.global.partyLoot.enabled = true
 		PartyModule.nameUnitMap = { PartyMember = "party1" }
+		local elementMock = mock(PartyModule.Element, false)
+		local elementShowSpy
+		local stubInitializeLootDisplayProperties = stub(ns, "InitializeLootDisplayProperties", function(e)
+			elementShowSpy = spy.on(e, "Show")
+		end)
+		local spyIsMount = spy.new(function()
+			return false
+		end)
+		local spyIsLegendary = spy.new(function()
+			return false
+		end)
+		local spyIsEligibleEquipment = spy.new(function()
+			return false
+		end)
+		nsMocks.ItemInfo.new.returns({
+			itemId = 18803,
+			itemName = "Finkle's Lava Dredger",
+			itemQuality = 2,
+			itemTexture = 123456,
+			sellPrice = 10000,
+			itemLink = "|cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r",
+			IsMount = spyIsMount,
+			IsLegendary = spyIsLegendary,
+			IsEligibleEquipment = spyIsEligibleEquipment,
+		})
 
 		PartyModule:CHAT_MSG_LOOT(
 			"CHAT_MSG_LOOT",
@@ -72,7 +103,7 @@ describe("PartyLoot module", function()
 			nil,
 			"Party1"
 		)
-		assert.spy(showSpy).was.called(1)
+		assert.spy(elementShowSpy).was.called(1)
 	end)
 
 	it("handles GET_ITEM_INFO_RECEIVED event for party loot", function()
@@ -81,10 +112,35 @@ describe("PartyLoot module", function()
 		local itemLink = "|cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r"
 		local amount = 1
 		local unit = "Party1"
+		local elementMock = mock(PartyModule.Element, false)
+		local elementShowSpy
+		local stubInitializeLootDisplayProperties = stub(ns, "InitializeLootDisplayProperties", function(e)
+			elementShowSpy = spy.on(e, "Show")
+		end)
+		local spyIsMount = spy.new(function()
+			return false
+		end)
+		local spyIsLegendary = spy.new(function()
+			return false
+		end)
+		local spyIsEligibleEquipment = spy.new(function()
+			return false
+		end)
+		nsMocks.ItemInfo.new.returns({
+			itemId = 18803,
+			itemName = "Finkle's Lava Dredger",
+			itemQuality = 2,
+			itemTexture = 123456,
+			sellPrice = 10000,
+			itemLink = "|cffa335ee|Hitem:18803::::::::60:::::|h[Finkle's Lava Dredger]|h|r",
+			IsMount = spyIsMount,
+			IsLegendary = spyIsLegendary,
+			IsEligibleEquipment = spyIsEligibleEquipment,
+		})
 
 		PartyModule.pendingPartyRequests[itemID] = { itemLink, amount, unit }
 		PartyModule:GET_ITEM_INFO_RECEIVED("GET_ITEM_INFO_RECEIVED", itemID, success)
 		assert.is_nil(PartyModule.pendingPartyRequests[itemID])
-		assert.spy(showSpy).was.called(1)
+		assert.spy(elementShowSpy).was.called(1)
 	end)
 end)
