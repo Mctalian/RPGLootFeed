@@ -183,7 +183,6 @@ local function GetKeystoneLevels(toLink, fromLink)
 end
 
 local function getItemLevels(toLink, fromLink)
-	print(toLink, fromLink)
 	if isKeystoneLink(toLink) and isKeystoneLink(fromLink) then
 		return GetKeystoneLevels(toLink, fromLink)
 	end
@@ -277,7 +276,6 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 
 		if fromLink ~= "" and fromLink ~= nil then
 			local toItemLevel, fromItemLevel = getItemLevels(itemLink, fromLink)
-			print(toItemLevel, fromItemLevel)
 			if toItemLevel == 0 or fromItemLevel == 0 then
 				return ""
 			end
