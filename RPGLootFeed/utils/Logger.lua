@@ -388,7 +388,7 @@ function Logger:addLogEntry(level, message, source, type, id, content, amount, i
 		id = id or "",
 		content = content or "",
 		amount = amount or "",
-		new = isNew or false,
+		new = isNew or true,
 		message = message,
 	}
 	local logTable = getLogger()
