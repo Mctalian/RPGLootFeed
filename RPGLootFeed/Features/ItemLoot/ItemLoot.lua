@@ -43,6 +43,8 @@ local TertiaryStatMap = {
 	["ITEM_MOD_CR_SPEED_SHORT"] = TertiaryStats.Speed,
 	["ITEM_MOD_CR_LIFESTEAL_SHORT"] = TertiaryStats.Leech,
 	["ITEM_MOD_CR_AVOIDANCE_SHORT"] = TertiaryStats.Avoid,
+}
+local IndestructibleMap = {
 	["ITEM_MOD_CR_STURDINESS_SHORT"] = TertiaryStats.Indestructible,
 }
 
@@ -66,13 +68,17 @@ end
 ---@class RLF_ItemRolls
 ---@field tertiaryStat G_RLF.TertiaryStats
 ---@field socketString string
+---@field isSocketed boolean
+---@field isIndestructible boolean
 
 --- Get the tertiary stat and socket string for an item
 --- @param info RLF_ItemInfo
 --- @return RLF_ItemRolls
-local function GetItemStats(info)
+local function getItemStats(info)
 	local itemRolls = {
+		isIndestructible = false,
 		tertiaryStat = TertiaryStats.None,
+		isSocketed = false,
 		socketString = "",
 	}
 	local stats = C.Item.GetItemStats(info.itemLink)
@@ -84,6 +90,8 @@ local function GetItemStats(info)
 		if k:find("ITEM_MOD_CR_") and v > 0 then
 			if TertiaryStatMap[k] then
 				itemRolls.tertiaryStat = TertiaryStatMap[k]
+			elseif IndestructibleMap[k] then
+				itemRolls.isIndestructible = true
 			else
 				G_RLF:LogWarn("Unknown tertiary stat: " .. k, addonName, ItemLoot.moduleName)
 			end
@@ -91,6 +99,7 @@ local function GetItemStats(info)
 
 		if k:find("EMPTY_SOCKET_") and v > 0 then
 			if SocketFDIDMap[k] then
+				itemRolls.isSocketed = true
 				itemRolls.socketString = "|T" .. SocketFDIDMap[k] .. ":0|t"
 			else
 				G_RLF:LogWarn("Unknown socket type: " .. k, addonName, ItemLoot.moduleName)
@@ -148,11 +157,36 @@ end
 
 --- Return true if it has a tertiary stat or a socket
 --- @param stats RLF_ItemRolls
-local function HasTertiaryOrSocket(stats)
-	return stats.tertiaryStat ~= TertiaryStats.None or stats.socketString ~= ""
+local function HasItemRollBonus(stats)
+	return stats.tertiaryStat ~= TertiaryStats.None or stats.isSocketed or stats.isIndestructible
+end
+
+local function isKeystoneLink(link)
+	local start, stop = link:find("|Hkeystone:")
+	if start and stop then
+		return true
+	end
+	return false
+end
+
+local function GetKeystoneLevels(toLink, fromLink)
+	-- split each link by the ":" character
+	local toLinkParts = { strsplit(":", toLink) }
+	local fromLinkParts = { strsplit(":", fromLink) }
+	local levelIndex = 4
+	local toLevel = tonumber(toLinkParts[levelIndex])
+	local fromLevel = tonumber(fromLinkParts[levelIndex])
+	if toLevel and fromLevel then
+		return toLevel, fromLevel
+	end
+	return 0, 0
 end
 
 local function getItemLevels(toLink, fromLink)
+	print(toLink, fromLink)
+	if isKeystoneLink(toLink) and isKeystoneLink(fromLink) then
+		return GetKeystoneLevels(toLink, fromLink)
+	end
 	local toInfo = ItemInfo:new(C.Item.GetItemIDForItemInfo(toLink), C.Item.GetItemInfo(toLink))
 	if not toInfo then
 		return 0, 0
@@ -193,10 +227,17 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 	if itemQualitySettings and itemQualitySettings.enabled and itemQualitySettings.duration > 0 then
 		element.showForSeconds = itemQualitySettings.duration
 	end
+	local fromInfo = nil
+	element.isKeystone = info.keystoneInfo ~= nil
+	if element.isKeystone then
+		-- Force icon to be the item texture, not using the link
+		element.quality = Enum.ItemQuality.Epic
+		if fromLink then
+			fromInfo = ItemInfo:new(C.Item.GetItemIDForItemInfo(fromLink), C.Item.GetItemInfo(fromLink))
+		end
+	end
 
-	local stats = GetItemStats(info)
-	element.tertiaryStat = stats.tertiaryStat
-	element.socketString = stats.socketString
+	local stats = getItemStats(info)
 
 	function element:isPassingFilter(itemName, itemQuality)
 		if not G_RLF.db.global.item.itemQualitySettings[itemQuality].enabled then
@@ -223,33 +264,61 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 
 	element.secondaryTextFn = function(...)
 		local stylingDb = G_RLF.DbAccessor:Styling(G_RLF.Frames.MAIN)
-		local fontSize = stylingDb.fontSize
+		local secondaryFontSize = stylingDb.secondaryFontSize
+		local atlasIconSize = secondaryFontSize * 1.5
+
+		if element.isKeystone and fromInfo then
+			local toItemLevel, fromItemLevel = getItemLevels(info.itemLink, fromInfo.itemLink)
+			if toItemLevel ~= 0 and fromItemLevel ~= 0 then
+				local atlasArrow = CreateAtlasMarkup("npe_arrowrightglow", atlasIconSize, atlasIconSize, 0, 0)
+				return "    " .. fromItemLevel .. " " .. atlasArrow .. " " .. toItemLevel
+			end
+		end
 
 		if fromLink ~= "" and fromLink ~= nil then
 			local toItemLevel, fromItemLevel = getItemLevels(itemLink, fromLink)
+			print(toItemLevel, fromItemLevel)
 			if toItemLevel == 0 or fromItemLevel == 0 then
 				return ""
 			end
-			local atlasIconSize = fontSize * 1.5
+
 			local atlasArrow = CreateAtlasMarkup("npe_arrowrightglow", atlasIconSize, atlasIconSize, 0, 0)
 			return "    " .. fromItemLevel .. " " .. atlasArrow .. " " .. toItemLevel
 		end
 
 		if info:IsEligibleEquipment() then
 			local secondaryText = _G["ITEM_LEVEL_ABBR"] .. " " .. info.itemLevel .. " "
-			if HasTertiaryOrSocket(stats) then
-				if self.socketString ~= "" then
-					secondaryText = string.format("%s%s %s ", secondaryText, self.socketString, G_RLF.L["Socket"])
+			if HasItemRollBonus(stats) then
+				if stats.isSocketed then
+					secondaryText = string.format(
+						"%s%s%s %s|r ",
+						G_RLF:RGBAToHexFormat(0.95, 0.90, 0.60, 1),
+						secondaryText,
+						stats.socketString,
+						G_RLF.L["Socket"]
+					)
 				end
-				if self.tertiaryStat ~= TertiaryStats.None then
-					secondaryText = string.format("%s%s", secondaryText, G_RLF.tertiaryToString[self.tertiaryStat])
+				if stats.tertiaryStat ~= TertiaryStats.None then
+					secondaryText = string.format(
+						"%s%s%s|r ",
+						G_RLF:RGBAToHexFormat(0.00, 0.55, 0.50, 1),
+						secondaryText,
+						G_RLF.tertiaryToString[stats.tertiaryStat]
+					)
+				end
+				if stats.isIndestructible then
+					secondaryText = string.format(
+						"%s%s%s|r",
+						G_RLF:RGBAToHexFormat(0.80, 0.60, 0.00, 1),
+						secondaryText,
+						G_RLF.tertiaryToString[TertiaryStats.Indestructible]
+					)
 				end
 				return secondaryText
 			end
 		end
 
 		local quantity = ...
-		local atlasIconSize = fontSize * 1.5
 		local atlasIcon
 		local unitPrice
 		local pricesForSellableItems = G_RLF.db.global.item.pricesForSellableItems
@@ -290,7 +359,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 	element.isMount = IsMount(info)
 	element.isLegendary = IsLegendary(info)
 	element.isBetterThanEquipped = IsBetterThanEquipped(info)
-	element.hasTertiaryOrSocket = HasTertiaryOrSocket(stats)
+	element.hasTertiaryOrSocket = HasItemRollBonus(stats)
 	function element:PlaySoundIfEnabled()
 		local soundsConfig = G_RLF.db.global.item.sounds
 		if self.isMount and soundsConfig.mounts.enabled and soundsConfig.mounts.sound ~= "" then
@@ -434,6 +503,7 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 
 	-- Only process our own loot now, party loot is handled by PartyLoot module
 	if not me then
+		G_RLF:LogDebug("Loot ignored, not me", "WOWEVENT", self.moduleName, "", msg)
 		return
 	end
 
