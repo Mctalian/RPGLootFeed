@@ -95,9 +95,17 @@ end
 
 function RLF:SlashCommand(msg, editBox)
 	G_RLF:fn(function()
+		--@alpha@
+		local start, stop = msg:find("test ")
+		--@end-alpha@
 		if msg == "test" then
 			TestMode:ToggleTestMode()
 		--@alpha@
+		-- Quick testing of item links
+		elseif start then
+			local itemLink = msg:sub(stop + 1)
+			local itemModule = G_RLF.RLF:GetModule("ItemLoot") --[[@as RLF_ItemLoot]]
+			itemModule:CHAT_MSG_LOOT("CHAT_MSG_LOOT", itemLink, "", "", "", "", "", "", "", "", "", "", GetPlayerGuid())
 		elseif msg == "i" then
 			TestMode:IntegrationTest()
 		--@end-alpha@
