@@ -264,13 +264,22 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 	element.secondaryTextFn = function(...)
 		local stylingDb = G_RLF.DbAccessor:Styling(G_RLF.Frames.MAIN)
 		local secondaryFontSize = stylingDb.secondaryFontSize
-		local atlasIconSize = secondaryFontSize * 1.5
 
 		if element.isKeystone and fromInfo then
 			local toItemLevel, fromItemLevel = getItemLevels(info.itemLink, fromInfo.itemLink)
 			if toItemLevel ~= 0 and fromItemLevel ~= 0 then
-				local atlasArrow = CreateAtlasMarkup("npe_arrowrightglow", atlasIconSize, atlasIconSize, 0, 0)
-				return "    " .. fromItemLevel .. " " .. atlasArrow .. " " .. toItemLevel
+				local fromStr = G_RLF:RGBAToHexFormat(1, 1, 1, 1) .. fromItemLevel .. "|r"
+				local toStr
+				if toItemLevel > fromItemLevel then
+					toStr = G_RLF:RGBAToHexFormat(0.12, 1.0, 0, 1) .. toItemLevel .. "|r"
+				else
+					toStr = G_RLF:RGBAToHexFormat(1.0, 0.12, 0.12, 1) .. toItemLevel .. "|r"
+				end
+				local atlasIcon = "npe_arrowrightglow"
+				local sizeCoeff = G_RLF.AtlastIconCoefficients[atlasIcon]
+				local atlasIconSize = secondaryFontSize * sizeCoeff
+				local atlasArrow = CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0)
+				return "    " .. fromStr .. " " .. atlasArrow .. " " .. toStr
 			end
 		end
 
@@ -279,9 +288,18 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 			if toItemLevel == 0 or fromItemLevel == 0 then
 				return ""
 			end
-
-			local atlasArrow = CreateAtlasMarkup("npe_arrowrightglow", atlasIconSize, atlasIconSize, 0, 0)
-			return "    " .. fromItemLevel .. " " .. atlasArrow .. " " .. toItemLevel
+			local fromStr = G_RLF:RGBAToHexFormat(1, 1, 1, 1) .. fromItemLevel .. "|r"
+			local toStr
+			if toItemLevel > fromItemLevel then
+				toStr = G_RLF:RGBAToHexFormat(0.12, 1.0, 0, 1) .. toItemLevel .. "|r"
+			else
+				toStr = G_RLF:RGBAToHexFormat(1.0, 0.12, 0.12, 1) .. toItemLevel .. "|r"
+			end
+			local atlasIcon = "npe_arrowrightglow"
+			local sizeCoeff = G_RLF.AtlastIconCoefficients[atlasIcon]
+			local atlasIconSize = secondaryFontSize * sizeCoeff
+			local atlasArrow = CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0)
+			return "    " .. fromStr .. " " .. atlasArrow .. " " .. toStr
 		end
 
 		if info:IsEligibleEquipment() then
@@ -345,6 +363,8 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 		if unitPrice then
 			local str = "    "
 			if atlasIcon then
+				local sizeCoeff = G_RLF.AtlastIconCoefficients[atlasIcon]
+				local atlasIconSize = secondaryFontSize * sizeCoeff
 				str = str .. CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0) .. "  "
 			end
 			str = str .. C_CurrencyInfo.GetCoinTextureString(unitPrice * (quantity or 1))

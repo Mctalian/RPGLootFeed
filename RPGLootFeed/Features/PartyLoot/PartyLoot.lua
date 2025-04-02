@@ -36,6 +36,10 @@ function PartyLoot.Element:new(...)
 	element.key = info.itemLink
 	element.icon = info.itemTexture
 
+	if info.keystoneInfo ~= nil then
+		element.quality = Enum.ItemQuality.Epic
+	end
+
 	function element:isPassingFilter(itemName, itemQuality)
 		if not G_RLF.db.global.partyLoot.itemQualityFilter[itemQuality] then
 			G_RLF:LogDebug(
