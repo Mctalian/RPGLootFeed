@@ -23,6 +23,7 @@ local G_RLF = ns
 ---@field expansionID number
 ---@field setID number
 ---@field isCraftingReagent boolean
+---@field keystoneInfo table
 local ItemInfo = {}
 ItemInfo.__index = ItemInfo
 
@@ -99,8 +100,76 @@ function ItemInfo:new(
 		instance.itemId = C_Item.GetItemIDForItemInfo(instance.itemLink)
 	end
 	instance.itemId = tonumber(instance.itemId)
+	instance:populateKeystoneInfo()
 
 	return instance
+end
+
+function ItemInfo:populateKeystoneInfo()
+	self.keystoneInfo = nil
+	if not self.itemLink then
+		return
+	end
+
+	if not (C_Item.IsItemKeystoneByID and C_Item.IsItemKeystoneByID(self.itemId)) then
+		return
+	end
+
+	local itemLink = self.itemLink
+	-- "|cffa335ee|Hitem:180653::::::::60:250::::6:17:381:18:13:19:9:20:7:21:124:22:121:::::|h[Mythic Keystone]|h|r"
+	-- Need to strip off everything before and including |Hitem:
+	local start, stop = string.find(itemLink, "|Hitem:")
+	if not start then
+		return
+	end
+	local fieldString = string.sub(itemLink, stop + 1)
+	start, stop = string.find(fieldString, "|h")
+	fieldString = string.sub(fieldString, 1, start - 1)
+	-- 180653::::::::60:250::::6:17:381:18:13:19:9:20:7:21:124:22:121:::::
+	-- Now we need to split the string by ":", include the empty fields
+	local fields = {}
+	for field in string.gmatch(fieldString, "(.-)" .. ":") do
+		table.insert(fields, field)
+	end
+	local keystoneInfo = {}
+	keystoneInfo.itemId = tonumber(fields[1])
+	local numModifiers = fields[14]
+	for i = 1, numModifiers do
+		local modifierValue = tonumber(fields[14 + i * 2])
+		if i == 1 then
+			keystoneInfo.dungeonId = modifierValue
+			keystoneInfo.dungeonName = C_ChallengeMode.GetMapUIInfo(keystoneInfo.dungeonId)
+		elseif i == 2 then
+			keystoneInfo.level = modifierValue
+		elseif i == 3 then
+			keystoneInfo.affixId1 = modifierValue
+		elseif i == 4 then
+			keystoneInfo.affixId2 = modifierValue
+		elseif i == 5 then
+			keystoneInfo.affixId3 = modifierValue
+		elseif i == 6 then
+			keystoneInfo.affixId4 = modifierValue
+		end
+	end
+	self.keystoneInfo = keystoneInfo
+	local linkPrefix = string.format(
+		"|cffa335ee|Hkeystone:%d:%d:%d:%d:%d:%d:%d|h[",
+		self.keystoneInfo.itemId,
+		self.keystoneInfo.dungeonId,
+		self.keystoneInfo.level,
+		self.keystoneInfo.affixId1 or 0,
+		self.keystoneInfo.affixId2 or 0,
+		self.keystoneInfo.affixId3 or 0,
+		self.keystoneInfo.affixId4 or 0
+	)
+	local linkText =
+		string.format(CHALLENGE_MODE_KEYSTONE_NAME, keystoneInfo.dungeonName .. " (" .. keystoneInfo.level .. ")")
+	local linkPostFix = "]|h|r"
+	self.keystoneInfo.link = linkPrefix .. linkText .. linkPostFix
+
+	self.itemLink = self.keystoneInfo.link
+	self.itemName = linkText
+	self.itemLevel = keystoneInfo.level
 end
 
 ---Determine if the item is a mount
