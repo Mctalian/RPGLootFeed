@@ -30,7 +30,7 @@ describe("ExperienceConfig module", function()
 		assert.is_table(ns.options.args.features.args.experienceConfig)
 		assert.equal("group", ns.options.args.features.args.experienceConfig.type)
 		assert.is_not_nil(ns.options.args.features.args.experienceConfig.name)
-		assert.equal(ns.mainFeatureOrder.XP, ns.options.args.features.args.experienceConfig.order)
+		assert.equal(ns.mainFeatureOrder.Experience, ns.options.args.features.args.experienceConfig.order)
 	end)
 
 	it("should have correct color defaults for experience text", function()

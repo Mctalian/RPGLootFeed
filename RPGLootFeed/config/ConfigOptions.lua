@@ -32,44 +32,33 @@ G_RLF.options = {
 		testMode = {
 			type = "execute",
 			name = G_RLF.L["Toggle Test Mode"],
-			func = "ToggleTestMode",
+			func = function()
+				local TestMode = G_RLF.RLF:GetModule("TestMode") --[[@as RLF_TestMode]]
+				TestMode:ToggleTestMode()
+			end,
 			order = 1,
 		},
 		clearRows = {
 			type = "execute",
 			name = G_RLF.L["Clear rows"],
-			func = "ClearRows",
+			func = function()
+				G_RLF.LootDisplay:HideLoot()
+			end,
 			order = 2,
 		},
 		lootHistory = {
 			type = "execute",
 			name = G_RLF.L["Toggle Loot History"],
-			func = "ToggleLootHistory",
+			func = function()
+				---@type RLF_LootDisplayFrame
+				local frame = G_RLF.RLF_MainLootFrame
+				frame:ToggleHistoryFrame()
+				local partyFrame = G_RLF.RLF_PartyLootFrame
+				if partyFrame then
+					partyFrame:ToggleHistoryFrame()
+				end
+			end,
 			order = 3,
 		},
 	},
 }
-
-function ConfigOptions:ToggleBoundingBox()
-	G_RLF.LootDisplay:ToggleBoundingBox()
-end
-
-local TestMode
-function ConfigOptions:ToggleTestMode()
-	TestMode = TestMode or G_RLF.RLF:GetModule("TestMode") --[[@as RLF_TestMode]]
-	TestMode:ToggleTestMode()
-end
-
-function ConfigOptions:ClearRows()
-	G_RLF.LootDisplay:HideLoot()
-end
-
-function ConfigOptions:ToggleLootHistory()
-	---@type RLF_LootDisplayFrame
-	local frame = G_RLF.RLF_MainLootFrame
-	frame:ToggleHistoryFrame()
-	local partyFrame = G_RLF.RLF_PartyLootFrame
-	if partyFrame then
-		partyFrame:ToggleHistoryFrame()
-	end
-end

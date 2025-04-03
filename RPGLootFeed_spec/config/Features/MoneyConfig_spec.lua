@@ -53,6 +53,5 @@ describe("MoneyConfig module", function()
 		local handler = ns.options.args.features.args.moneyConfig.handler
 		assert.is_table(handler)
 		assert.is_function(handler.OverrideSound)
-		assert.is_function(handler.SoundOptionValues)
 	end)
 end)

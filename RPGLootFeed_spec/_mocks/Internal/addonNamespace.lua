@@ -175,9 +175,10 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 			PartyLoot = 2,
 			Currency = 3,
 			Money = 4,
-			XP = 5,
-			Rep = 6,
-			Skills = 7,
+			Experience = 5,
+			Reputation = 6,
+			Profession = 7,
+			TravelPoints = 8,
 		}
 		ns.options.args.features = {
 			args = {},
