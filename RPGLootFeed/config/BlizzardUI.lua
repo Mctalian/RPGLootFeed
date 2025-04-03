@@ -28,8 +28,13 @@ G_RLF.options.args.blizz = {
 			type = "toggle",
 			name = G_RLF.L["Enable Auto Loot"],
 			desc = G_RLF.L["EnableAutoLootDesc"],
-			get = "GetEnableAutoLoot",
-			set = "SetEnableAutoLoot",
+			get = function(info, value)
+				return G_RLF.db.global.blizzOverrides.enableAutoLoot
+			end,
+			set = function(info, value)
+				C_CVar.SetCVar("autoLootDefault", value and "1" or "0")
+				G_RLF.db.global.blizzOverrides.enableAutoLoot = value
+			end,
 			order = 1,
 		},
 		alerts = {
@@ -41,24 +46,36 @@ G_RLF.options.args.blizz = {
 			type = "toggle",
 			name = G_RLF.L["Disable Loot Toasts"],
 			desc = G_RLF.L["DisableLootToastDesc"],
-			get = "GetDisableLootToast",
-			set = "SetDisableLootToast",
+			get = function(info, value)
+				return G_RLF.db.global.blizzOverrides.disableBlizzLootToasts
+			end,
+			set = function(info, value)
+				G_RLF.db.global.blizzOverrides.disableBlizzLootToasts = value
+			end,
 			order = 3,
 		},
 		disableMoneyAlert = {
 			type = "toggle",
 			name = G_RLF.L["Disable Money Alerts"],
 			desc = G_RLF.L["DisableMoneyAlertsDesc"],
-			get = "GetDisableMoneyAlerts",
-			set = "SetDisableMoneyAlerts",
+			get = function(info, value)
+				return G_RLF.db.global.blizzOverrides.disableBlizzMoneyAlerts
+			end,
+			set = function(info, value)
+				G_RLF.db.global.blizzOverrides.disableBlizzMoneyAlerts = value
+			end,
 			order = 4,
 		},
 		bossBanner = {
 			type = "select",
 			name = G_RLF.L["Disable Boss Banner Elements"],
 			desc = G_RLF.L["DisableBossBannerDesc"],
-			get = "GetBossBannerConfig",
-			set = "SetBossBannerConfig",
+			get = function(info, value)
+				return G_RLF.db.global.blizzOverrides.bossBannerConfig
+			end,
+			set = function(info, value)
+				G_RLF.db.global.blizzOverrides.bossBannerConfig = value
+			end,
 			width = "double",
 			values = {
 				[G_RLF.DisableBossBanner.ENABLED] = G_RLF.L["Do not disable BossBanner"],
@@ -79,7 +96,12 @@ G_RLF.options.args.blizz = {
 			name = G_RLF.L["Disable Loot Chat Messages"],
 			desc = G_RLF.L["DisableLootChatMessagesDesc"],
 			width = "double",
-			func = "DisableLootChatMessages",
+			func = function()
+				ChatFrameUtil.ForEachChatFrame(function(frame)
+					ChatFrame_RemoveMessageGroup(frame, "LOOT")
+				end)
+				G_RLF:Print(G_RLF.L["Item Loot messages Disabled"])
+			end,
 			order = 7,
 		},
 		disableCurrencyChatMessages = {
@@ -87,7 +109,12 @@ G_RLF.options.args.blizz = {
 			name = G_RLF.L["Disable Currency Chat Messages"],
 			desc = G_RLF.L["DisableCurrencyChatMessagesDesc"],
 			width = "double",
-			func = "DisableCurrencyChatMessages",
+			func = function()
+				ChatFrameUtil.ForEachChatFrame(function(frame)
+					ChatFrame_RemoveMessageGroup(frame, "CURRENCY")
+				end)
+				G_RLF:Print(G_RLF.L["Currency messages Disabled"])
+			end,
 			order = 8,
 		},
 		disableMoneyChatMessages = {
@@ -95,7 +122,12 @@ G_RLF.options.args.blizz = {
 			name = G_RLF.L["Disable Money Chat Messages"],
 			desc = G_RLF.L["DisableMoneyChatMessagesDesc"],
 			width = "double",
-			func = "DisableMoneyChatMessages",
+			func = function()
+				ChatFrameUtil.ForEachChatFrame(function(frame)
+					ChatFrame_RemoveMessageGroup(frame, "MONEY")
+				end)
+				G_RLF:Print(G_RLF.L["Money messages Disabled"])
+			end,
 			order = 9,
 		},
 		disableXpChatMessages = {
@@ -103,7 +135,12 @@ G_RLF.options.args.blizz = {
 			name = G_RLF.L["Disable Experience Chat Messages"],
 			desc = G_RLF.L["DisableExperienceChatMessagesDesc"],
 			width = "double",
-			func = "DisableExperienceChatMessages",
+			func = function()
+				ChatFrameUtil.ForEachChatFrame(function(frame)
+					ChatFrame_RemoveMessageGroup(frame, "COMBAT_XP_GAIN")
+				end)
+				G_RLF:Print(G_RLF.L["XP messages Disabled"])
+			end,
 			order = 10,
 		},
 		disableRepChatMessages = {
@@ -111,76 +148,13 @@ G_RLF.options.args.blizz = {
 			name = G_RLF.L["Disable Reputation Chat Messages"],
 			desc = G_RLF.L["DisableReputationChatMessagesDesc"],
 			width = "double",
-			func = "DisableReputationChatMessages",
+			func = function()
+				ChatFrameUtil.ForEachChatFrame(function(frame)
+					ChatFrame_RemoveMessageGroup(frame, "COMBAT_FACTION_CHANGE")
+				end)
+				G_RLF:Print(G_RLF.L["Rep messages Disabled"])
+			end,
 			order = 11,
 		},
 	},
 }
-
-function BlizzardUI:SetDisableLootToast(info, value)
-	G_RLF.db.global.blizzOverrides.disableBlizzLootToasts = value
-end
-
-function BlizzardUI:GetDisableLootToast(info, value)
-	return G_RLF.db.global.blizzOverrides.disableBlizzLootToasts
-end
-
-function BlizzardUI:GetDisableMoneyAlerts(info, value)
-	return G_RLF.db.global.blizzOverrides.disableBlizzMoneyAlerts
-end
-
-function BlizzardUI:SetDisableMoneyAlerts(info, value)
-	G_RLF.db.global.blizzOverrides.disableBlizzMoneyAlerts = value
-end
-
-function BlizzardUI:GetEnableAutoLoot(info, value)
-	return G_RLF.db.global.blizzOverrides.enableAutoLoot
-end
-
-function BlizzardUI:SetEnableAutoLoot(info, value)
-	C_CVar.SetCVar("autoLootDefault", value and "1" or "0")
-	G_RLF.db.global.blizzOverrides.enableAutoLoot = value
-end
-
-function BlizzardUI:SetBossBannerConfig(info, value)
-	G_RLF.db.global.blizzOverrides.bossBannerConfig = value
-end
-
-function BlizzardUI:GetBossBannerConfig(info, value)
-	return G_RLF.db.global.blizzOverrides.bossBannerConfig
-end
-
-function BlizzardUI:DisableLootChatMessages()
-	ChatFrameUtil.ForEachChatFrame(function(frame)
-		ChatFrame_RemoveMessageGroup(frame, "LOOT")
-	end)
-	G_RLF:Print(G_RLF.L["Item Loot messages Disabled"])
-end
-
-function BlizzardUI:DisableCurrencyChatMessages()
-	ChatFrameUtil.ForEachChatFrame(function(frame)
-		ChatFrame_RemoveMessageGroup(frame, "CURRENCY")
-	end)
-	G_RLF:Print(G_RLF.L["Currency messages Disabled"])
-end
-
-function BlizzardUI:DisableMoneyChatMessages()
-	ChatFrameUtil.ForEachChatFrame(function(frame)
-		ChatFrame_RemoveMessageGroup(frame, "MONEY")
-	end)
-	G_RLF:Print(G_RLF.L["Money messages Disabled"])
-end
-
-function BlizzardUI:DisableExperienceChatMessages()
-	ChatFrameUtil.ForEachChatFrame(function(frame)
-		ChatFrame_RemoveMessageGroup(frame, "COMBAT_XP_GAIN")
-	end)
-	G_RLF:Print(G_RLF.L["XP messages Disabled"])
-end
-
-function BlizzardUI:DisableReputationChatMessages()
-	ChatFrameUtil.ForEachChatFrame(function(frame)
-		ChatFrame_RemoveMessageGroup(frame, "COMBAT_FACTION_CHANGE")
-	end)
-	G_RLF:Print(G_RLF.L["Rep messages Disabled"])
-end

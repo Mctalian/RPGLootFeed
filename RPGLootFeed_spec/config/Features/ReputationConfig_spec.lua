@@ -31,7 +31,7 @@ describe("ReputationConfig module", function()
 		assert.is_table(ns.options.args.features.args.repConfig)
 		assert.equal("group", ns.options.args.features.args.repConfig.type)
 		assert.is_not_nil(ns.options.args.features.args.repConfig.name)
-		assert.equal(ns.mainFeatureOrder.Rep, ns.options.args.features.args.repConfig.order)
+		assert.equal(ns.mainFeatureOrder.Reputation, ns.options.args.features.args.repConfig.order)
 	end)
 
 	it("should have correct color defaults for reputation text", function()
