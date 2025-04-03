@@ -9,10 +9,8 @@ local spy = busted.spy
 describe("LootToasts module", function()
 	local ns, LootToastOverride
 	before_each(function()
+		require("RPGLootFeed_spec._mocks.WoWGlobals")
 		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
-		_G.LootAlertSystem = {
-			AddAlert = function() end,
-		}
 
 		LootToastOverride = assert(loadfile("RPGLootFeed/BlizzOverrides/LootToasts.lua"))("TestAddon", ns)
 	end)
