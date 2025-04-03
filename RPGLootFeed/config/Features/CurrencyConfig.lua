@@ -7,10 +7,10 @@ local G_RLF = ns
 local CurrencyConfig = {}
 
 ---@class RLF_DBGlobal
-local globalDefaults = G_RLF.defaults.global
+G_RLF.defaults.global = G_RLF.defaults.global or {}
 
 ---@class RLF_ConfigCurrency
-globalDefaults.currency = {
+G_RLF.defaults.global.currency = {
 	enabled = true,
 	currencyTotalTextEnabled = true,
 	currencyTotalTextColor = { 0.737, 0.737, 0.737, 1 },

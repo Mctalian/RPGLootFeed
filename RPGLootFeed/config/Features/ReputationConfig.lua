@@ -7,10 +7,10 @@ local G_RLF = ns
 local ReputationConfig = {}
 
 ---@class RLF_DBGlobal
-local globalDefaults = G_RLF.defaults.global
+G_RLF.defaults.global = G_RLF.defaults.global or {}
 
 ---@class RLF_ConfigReputation
-globalDefaults.rep = {
+G_RLF.defaults.global.rep = {
 	enabled = true,
 	defaultRepColor = { 0.5, 0.5, 1 },
 	secondaryTextAlpha = 0.7,

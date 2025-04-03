@@ -7,16 +7,16 @@ local G_RLF = ns
 local Features = {}
 
 ---@class RLF_DBGlobal
-local globalDefaults = G_RLF.defaults.global
+G_RLF.defaults.global = G_RLF.defaults.global or {}
 
 ---@class RLF_ConfigLootHistory
-globalDefaults.lootHistory = {
+G_RLF.defaults.global.lootHistory = {
 	enabled = true,
 	hideTab = false,
 	historyLimit = 100,
 }
 ---@class RLF_ConfigTooltips
-globalDefaults.tooltips = {
+G_RLF.defaults.global.tooltips = {
 	hover = {
 		enabled = true,
 		onShift = false,
@@ -26,7 +26,7 @@ globalDefaults.tooltips = {
 ---@field hide boolean
 ---@field lock boolean
 ---@field minimapPos integer
-globalDefaults.minimap = {
+G_RLF.defaults.global.minimap = {
 	hide = true,
 	lock = false,
 	minimapPos = 220,
@@ -40,8 +40,9 @@ G_RLF.mainFeatureOrder = {
 	XP = 5,
 	Rep = 6,
 	Skills = 7,
+	TravelPoints = 8,
 }
-local lastFeature = G_RLF.mainFeatureOrder.Skills
+local lastFeature = G_RLF.mainFeatureOrder.TravelPoints
 
 G_RLF.options.args.features = {
 	type = "group",
@@ -120,6 +121,19 @@ G_RLF.options.args.features = {
 			get = "GetProfStatus",
 			set = "SetProfStatus",
 			order = G_RLF.mainFeatureOrder.Skills,
+		},
+		enableTravelPoints = {
+			type = "toggle",
+			name = G_RLF.L["Enable Travel Points in Feed"],
+			desc = G_RLF.L["EnableTravelPointsDesc"],
+			width = "double",
+			get = function()
+				return G_RLF.db.global.travelPoints.enabled
+			end,
+			set = function(_, value)
+				G_RLF.db.global.travelPoints.enabled = value
+			end,
+			order = G_RLF.mainFeatureOrder.TravelPoints,
 		},
 
 		misc = {

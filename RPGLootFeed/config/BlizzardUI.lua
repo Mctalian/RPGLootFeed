@@ -7,10 +7,10 @@ local G_RLF = ns
 local BlizzardUI = {}
 
 ---@class RLF_DBGlobal
-local globalDefaults = G_RLF.defaults.global
+G_RLF.defaults.global = G_RLF.defaults.global or {}
 
 ---@class RLF_ConfigBlizzardUI
-globalDefaults.blizzOverrides = {
+G_RLF.defaults.global.blizzOverrides = {
 	enableAutoLoot = false,
 	disableBlizzLootToasts = false,
 	disableBlizzMoneyAlerts = false,

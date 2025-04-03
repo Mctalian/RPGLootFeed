@@ -18,10 +18,10 @@ local function startswith(str, start)
 end
 
 ---@class RLF_DBGlobal
-local globalDefaults = G_RLF.defaults.global
+G_RLF.defaults.global = G_RLF.defaults.global or {}
 
 ---@class RLF_ConfigStyling
-globalDefaults.styling = {
+G_RLF.defaults.global.styling = {
 	enabledSecondaryRowText = false,
 	leftAlign = true,
 	growUp = true,

@@ -9,10 +9,10 @@ local MoneyConfig = {}
 local lsm = G_RLF.lsm
 
 ---@class RLF_DBGlobal
-local globalDefaults = G_RLF.defaults.global
+G_RLF.defaults.global = G_RLF.defaults.global or {}
 
 ---@class RLF_ConfigMoney
-globalDefaults.money = {
+G_RLF.defaults.global.money = {
 	enabled = true,
 	showMoneyTotal = true,
 	moneyTotalColor = { 0.333, 0.333, 1.0, 1.0 },
