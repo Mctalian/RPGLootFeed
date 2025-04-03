@@ -70,8 +70,17 @@ G_RLF.options.args.features = {
 			name = G_RLF.L["Enable Party Loot in Feed"],
 			desc = G_RLF.L["EnablePartyLootDesc"],
 			width = "double",
-			get = "GetPartyLootStatus",
-			set = "SetPartyLootStatus",
+			get = function()
+				return G_RLF.db.global.partyLoot.enabled
+			end,
+			set = function(info, value)
+				G_RLF.db.global.partyLoot.enabled = value
+				if value then
+					G_RLF.RLF:EnableModule(G_RLF.FeatureModule.PartyLoot)
+				else
+					G_RLF.RLF:DisableModule(G_RLF.FeatureModule.PartyLoot)
+				end
+			end,
 			order = G_RLF.mainFeatureOrder.PartyLoot,
 		},
 		enableCurrency = {
@@ -132,6 +141,11 @@ G_RLF.options.args.features = {
 			end,
 			set = function(_, value)
 				G_RLF.db.global.travelPoints.enabled = value
+				if value then
+					G_RLF.RLF:EnableModule(G_RLF.FeatureModule.TravelPoints)
+				else
+					G_RLF.RLF:DisableModule(G_RLF.FeatureModule.TravelPoints)
+				end
 			end,
 			order = G_RLF.mainFeatureOrder.TravelPoints,
 		},
