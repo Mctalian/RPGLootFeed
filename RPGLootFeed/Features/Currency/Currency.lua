@@ -107,6 +107,7 @@ function Currency:OnDisable()
 	self:UnregisterEvent("CURRENCY_DISPLAY_UPDATE")
 	if G_RLF:IsRetail() then
 		self:UnregisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
+		self:UnregisterEvent("PERKS_PROGRAM_CURRENCY_REFRESH")
 	end
 end
 
@@ -186,8 +187,19 @@ function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
 end
 
 function Currency:PERKS_PROGRAM_CURRENCY_AWARDED(eventName, quantityChange)
+	self:RegisterEvent("PERKS_PROGRAM_CURRENCY_REFRESH")
+	local currencyType = Constants.CurrencyConsts.CURRENCY_ID_PERKS_PROGRAM_DISPLAY_INFO
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, tostring(currencyType), eventName, quantityChange)
+	self:UnregisterEvent("PERKS_PROGRAM_CURRENCY_AWARDED")
+end
+
+function Currency:PERKS_PROGRAM_CURRENCY_REFRESH(eventName, oldQuantity, newQuantity)
 	local currencyType = Constants.CurrencyConsts.CURRENCY_ID_PERKS_PROGRAM_DISPLAY_INFO
 
+	local quantityChange = newQuantity - oldQuantity
+	if quantityChange == 0 then
+		return
+	end
 	self:Process(eventName, currencyType, quantityChange)
 end
 
