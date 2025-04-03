@@ -7,10 +7,10 @@ local G_RLF = ns
 local Positioning = {}
 
 ---@class RLF_DBGlobal
-local globalDefaults = G_RLF.defaults.global
+G_RLF.defaults.global = G_RLF.defaults.global or {}
 
 ---@class RLF_ConfigPositioning
-globalDefaults.positioning = {
+G_RLF.defaults.global.positioning = {
 	---@type string | ScriptRegion
 	relativePoint = "UIParent",
 	anchorPoint = "BOTTOMLEFT",

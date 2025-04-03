@@ -11,10 +11,10 @@ local lsm = G_RLF.lsm
 local PricesEnum = G_RLF.PricesEnum
 
 ---@class RLF_DBGlobal
-local globalDefaults = G_RLF.defaults.global
+G_RLF.defaults.global = G_RLF.defaults.global or {}
 
 ---@class RLF_ConfigItemLoot
-globalDefaults.item = {
+G_RLF.defaults.global.item = {
 	enabled = true,
 	itemCountTextEnabled = true,
 	itemCountTextColor = { 0.737, 0.737, 0.737, 1 },

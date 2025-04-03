@@ -7,10 +7,10 @@ local G_RLF = ns
 local ExperienceConfig = {}
 
 ---@class RLF_DBGlobal
-local globalDefaults = G_RLF.defaults.global
+G_RLF.defaults.global = G_RLF.defaults.global or {}
 
 ---@class RLF_ConfigExperience
-globalDefaults.xp = {
+G_RLF.defaults.global.xp = {
 	enabled = true,
 	experienceTextColor = { 1, 0, 1, 0.8 },
 	showCurrentLevel = true,
