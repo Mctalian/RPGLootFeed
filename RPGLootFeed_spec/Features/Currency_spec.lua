@@ -129,9 +129,10 @@ describe("Currency module", function()
 
 			CurrencyModule:OnDisable()
 
-			assert.stub(spyUnregisterEvent).was.called(2)
+			assert.stub(spyUnregisterEvent).was.called(3)
 			assert.stub(spyUnregisterEvent).was.called_with(CurrencyModule, "CURRENCY_DISPLAY_UPDATE")
 			assert.stub(spyUnregisterEvent).was.called_with(CurrencyModule, "PERKS_PROGRAM_CURRENCY_AWARDED")
+			assert.stub(spyUnregisterEvent).was.called_with(CurrencyModule, "PERKS_PROGRAM_CURRENCY_REFRESH")
 		end)
 
 		it("OnDisable unregisters events correctly for Classic expansions gte SL", function()
@@ -296,6 +297,7 @@ describe("Currency module", function()
 		local newElement = spy.on(CurrencyModule.Element, "new")
 
 		CurrencyModule:PERKS_PROGRAM_CURRENCY_AWARDED("PERKS_PROGRAM_CURRENCY_AWARDED", 5)
+		CurrencyModule:PERKS_PROGRAM_CURRENCY_REFRESH("PERKS_PROGRAM_CURRENCY_REFRESH", 10, 15)
 
 		assert.spy(newElement).was.called_with(_, "|c12345678|Hcurrency:123|r", info, basicInfo)
 		assert.stub(nsMocks.SendMessage).was.called(1)
