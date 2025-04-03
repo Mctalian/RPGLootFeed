@@ -11,7 +11,7 @@ local G_RLF = ns
 ---@field Stock Alpha
 ---@field Count Alpha
 
----@class RLF_RowItemButton: ItemButton
+---@class RLF_RowItemButton: g_ItemButton
 ---@field elementFadeIn RLF_RowItemButtonElementFadeIn
 
 ---@class RLF_RowFontString: FontString

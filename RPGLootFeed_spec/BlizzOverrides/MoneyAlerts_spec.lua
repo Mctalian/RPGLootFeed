@@ -9,10 +9,8 @@ local spy = busted.spy
 describe("MoneyAlerts module", function()
 	local ns, MoneyAlertOverride
 	before_each(function()
+		require("RPGLootFeed_spec._mocks.WoWGlobals")
 		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
-		_G.MoneyWonAlertSystem = {
-			AddAlert = function() end,
-		}
 
 		MoneyAlertOverride = assert(loadfile("RPGLootFeed/BlizzOverrides/MoneyAlerts.lua"))("TestAddon", ns)
 	end)

@@ -614,7 +614,7 @@ G_RLF.ConfigHandlers.PartyLootConfig = PartyLootConfig
 
 ---@class RLF_DBGlobal
 ---@field partyLoot RLF_ConfigPartyLoot
-local globalDefaults = G_RLF.defaults.global
+G_RLF.defaults.global = G_RLF.defaults.global or {}
 
 ---@class RLF_ConfigPartyLoot
 G_RLF.defaults.global.partyLoot = {
