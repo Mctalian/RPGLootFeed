@@ -215,6 +215,12 @@ L["Skill Text Color"] = "Skill Text Color"
 L["SkillColorDesc"] = "The color of the skill text in the loot feed."
 L["Skill Text Wrap Character"] = "Skill Text Wrap Character"
 L["SkillTextWrapCharDesc"] = "The characters to wrap the skill text with."
+L["Travel Points Config"] = "Travel Points Config"
+L["Enable Travel Points in Feed"] = "Enable Travel Points in Feed"
+L["EnableTravelPointsDesc"] = "Show travel points (activities completed to earn Trader Tender) in the Loot Feed"
+L["Travel Point Options"] = "Travel Point Options"
+L["Travel Points Text Color"] = "Travel Points Text Color"
+L["TravelPointsTextColorDesc"] = "The color of the travel points text in the loot feed."
 
 -- ConfigOptions - Positioning Group
 L["Positioning"] = "Positioning"

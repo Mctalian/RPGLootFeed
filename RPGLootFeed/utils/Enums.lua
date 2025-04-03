@@ -77,6 +77,7 @@ G_RLF.FeatureModule = {
 	Experience = "Experience",
 	Profession = "Professions",
 	PartyLoot = "PartyLoot",
+	TravelPoints = "TravelPoints",
 }
 
 ---@enum G_RLF.PricesEnum
@@ -129,6 +130,7 @@ G_RLF.DefaultIcons = {
 	REPUTATION = "236681",
 	XP = "894556",
 	PROFESSION = "133740",
+	TRAVELPOINTS = "4635200",
 }
 
 ---@enum G_RLF.Frames

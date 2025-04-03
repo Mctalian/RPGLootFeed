@@ -10,4 +10,5 @@
     <Script file="ExperienceConfig.lua"/>
     <Script file="ReputationConfig.lua"/>
     <Script file="ProfessionConfig.lua"/>
+    <Script file="TravelPointsConfig.lua"/>
 </Ui>
