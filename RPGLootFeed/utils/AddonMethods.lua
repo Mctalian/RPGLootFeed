@@ -184,6 +184,18 @@ function G_RLF:OpenOptions(button)
 		for _, item in ipairs(menu) do
 			table.insert(tmpMenu, item)
 		end
+		local unseenNotifications = G_RLF.Notifications:GetNumUnseenNotifications()
+		if unseenNotifications > 0 then
+			table.insert(tmpMenu, {
+				text = string.format(G_RLF.L["View Notifications"], unseenNotifications),
+				func = function()
+					local notifModule = G_RLF.RLF:GetModule("Notifications") --[[@as RLF_Notifications]]
+					if notifModule then
+						notifModule:ViewAllNotifications()
+					end
+				end,
+			})
+		end
 		if G_RLF.db.global.lootHistory.enabled then
 			table.insert(tmpMenu, {
 				text = G_RLF.L["Toggle Loot History"],

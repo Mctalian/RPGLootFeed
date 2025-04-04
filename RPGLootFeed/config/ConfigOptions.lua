@@ -21,6 +21,7 @@ G_RLF.defaults = {
 		lastVersionLoaded = "v1.0.0",
 		logger = {},
 		migrationVersion = 0,
+		notifications = {},
 	},
 }
 

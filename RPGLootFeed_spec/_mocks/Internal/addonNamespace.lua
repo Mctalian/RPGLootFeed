@@ -8,6 +8,7 @@ addonNamespaceMocks.LoadSections = {
 	None = 0,
 	Core = 1,
 	Locale = 2,
+	UtilsNotifications = 2.001,
 	UtilsAddonMethods = 2.01,
 	UtilsAlphaHelpers = 2.02,
 	UtilsList = 2.03,
@@ -80,6 +81,19 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 	if loadSection >= addonNamespaceMocks.LoadSections.Locale then
 		require("RPGLootFeed_spec._mocks.Libs.LibStub")
 		ns.L = assert(loadfile("RPGLootFeed/locale/enUS.lua"))("TestAddon", ns)
+	end
+	if loadSection >= addonNamespaceMocks.LoadSections.UtilsNotifications then
+		ns.Notifications = {}
+		addonNamespaceMocks.Notifications = {}
+		addonNamespaceMocks.Notifications.CheckForNotifications = stub(ns.Notifications, "CheckForNotifications")
+		addonNamespaceMocks.Notifications.GetNumUnseenNotifications =
+			stub(ns.Notifications, "GetNumUnseenNotifications").returns(0)
+		addonNamespaceMocks.Notifications.AddNotification = stub(ns.Notifications, "AddNotification")
+		addonNamespaceMocks.Notifications.AckAllNotifications = stub(ns.Notifications, "AckAllNotifications")
+		addonNamespaceMocks.Notifications.AckNotification = stub(ns.Notifications, "AckNotification")
+		addonNamespaceMocks.Notifications.RemoveSeenNotifications = stub(ns.Notifications, "RemoveSeenNotifications")
+		addonNamespaceMocks.Notifications.NotifyGlow = stub(ns.Notifications, "NotifyGlow")
+		addonNamespaceMocks.Notifications.StopNotifyGlow = stub(ns.Notifications, "StopNotifyGlow")
 	end
 	if loadSection >= addonNamespaceMocks.LoadSections.UtilsAddonMethods then
 		addonNamespaceMocks.fn = stub(ns, "fn", function(s, func, ...)
@@ -310,6 +324,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 				tooltips = {},
 				sizing = {},
 				positioning = {},
+				notifications = {},
 			},
 			locale = {
 				factionMap = {},
