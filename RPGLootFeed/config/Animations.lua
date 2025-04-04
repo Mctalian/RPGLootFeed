@@ -19,6 +19,7 @@ G_RLF.defaults.global.animations = {
 		},
 	},
 	exit = {
+		disable = false,
 		type = G_RLF.ExitAnimationType.FADE,
 		duration = 1,
 		fadeOutDelay = 5,
@@ -114,12 +115,29 @@ G_RLF.options.args.timing = {
 			inline = true,
 			order = 2,
 			args = {
+				disableExitAnimation = {
+					type = "toggle",
+					width = "double",
+					name = G_RLF.L["Disable Automatic Exit"],
+					desc = G_RLF.L["DisableAutomaticExitDesc"],
+					get = function()
+						return G_RLF.db.global.animations.exit.disable
+					end,
+					set = function(info, value)
+						G_RLF.db.global.animations.exit.disable = value
+						G_RLF.LootDisplay:UpdateFadeDelay()
+					end,
+					order = 0.1,
+				},
 				fadeOutDelay = {
 					type = "range",
 					name = G_RLF.L["Fade Out Delay"],
 					desc = G_RLF.L["FadeOutDelayDesc"],
 					min = 1,
 					max = 60,
+					disabled = function()
+						return G_RLF.db.global.animations.exit.disable
+					end,
 					get = function()
 						return G_RLF.db.global.animations.exit.fadeOutDelay
 					end,
@@ -133,6 +151,9 @@ G_RLF.options.args.timing = {
 					type = "select",
 					name = G_RLF.L["Exit Animation Type"],
 					desc = G_RLF.L["ExitAnimationTypeDesc"],
+					disabled = function()
+						return G_RLF.db.global.animations.exit.disable
+					end,
 					values = {
 						[G_RLF.ExitAnimationType.NONE] = G_RLF.L["None"],
 						[G_RLF.ExitAnimationType.FADE] = G_RLF.L["Fade"],
@@ -149,6 +170,9 @@ G_RLF.options.args.timing = {
 					type = "range",
 					name = G_RLF.L["Exit Animation Duration"],
 					desc = G_RLF.L["ExitAnimationDurationDesc"],
+					disabled = function()
+						return G_RLF.db.global.animations.exit.disable
+					end,
 					min = 0.1,
 					max = 3,
 					step = 0.1,

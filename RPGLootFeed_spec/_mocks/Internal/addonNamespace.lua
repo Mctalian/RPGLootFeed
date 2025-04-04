@@ -63,6 +63,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 		}
 		addonNamespaceMocks.lsm = {}
 		addonNamespaceMocks.lsm.HashTable = stub(ns.lsm, "HashTable")
+		addonNamespaceMocks.lsm.Fetch = stub(ns.lsm, "Fetch")
 		local iconGroupMock = {}
 		addonNamespaceMocks.iconGroup = {}
 		addonNamespaceMocks.iconGroup.AddButton = stub(iconGroupMock, "AddButton")

@@ -27,6 +27,7 @@ function LootDisplayFrameMixin:getPositioningDetails()
 	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
 	local growUp = stylingDb.growUp
 	-- Position the new row at the bottom (or top if growing down)
+	local horizDir = stylingDb.leftAlign and "LEFT" or "RIGHT"
 	local vertDir = growUp and "BOTTOM" or "TOP"
 	local opposite = growUp and "TOP" or "BOTTOM"
 	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
@@ -35,7 +36,7 @@ function LootDisplayFrameMixin:getPositioningDetails()
 		yOffset = -yOffset
 	end
 
-	return vertDir, opposite, yOffset
+	return vertDir, opposite, yOffset, horizDir
 end
 
 local function configureArrowRotation(arrow, direction)
@@ -151,7 +152,7 @@ function LootDisplayFrameMixin:Load(frame)
 	---@type RLF_LootHistoryRowData[]
 	self.rowHistory = {}
 	self.rowFramePool = CreateFramePool("Frame", self, "LootDisplayRowTemplate")
-	self.vertDir, self.opposite, self.yOffset = self:getPositioningDetails()
+	self.vertDir, self.opposite, self.yOffset, self.horizDir = self:getPositioningDetails()
 	local positioningDb = G_RLF.DbAccessor:Positioning(self.frameType)
 	self:UpdateSize()
 	self:SetPoint(
@@ -163,8 +164,51 @@ function LootDisplayFrameMixin:Load(frame)
 
 	self:SetFrameStrata(positioningDb.frameStrata) -- Set the frame strata here
 
+	self:InitQueueLabel()
 	self:ConfigureTestArea()
 	self:CreateTab()
+end
+
+function LootDisplayFrameMixin:InitQueueLabel()
+	self.QueueLabel = UIParent:CreateFontString(nil, "OVERLAY")
+	local anchorPoint = self.vertDir .. self.horizDir
+	local relativePoint = self.opposite .. self.horizDir
+	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
+	if stylingDb.useFontObjects then
+		self.QueueLabel:SetFontObject(stylingDb.font)
+	else
+		local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, stylingDb.fontFace)
+		if not fontPath then
+			error("Font not found: " .. tostring(stylingDb.fontFace))
+		end
+		self.QueueLabel:SetFont(fontPath, stylingDb.fontSize, G_RLF:FontFlagsToString())
+	end
+	self.QueueLabel:SetPoint(anchorPoint, self, relativePoint, 0, 0)
+	self.QueueLabel:Hide()
+end
+
+function LootDisplayFrameMixin:ShowQueueLabel()
+	if self.QueueLabel:IsShown() then
+		return
+	end
+	local vertDir, opposite, _, horizDir = self:getPositioningDetails()
+	self.QueueLabel:SetPoint(vertDir .. horizDir, self, opposite .. horizDir, 0, 0)
+	self.QueueLabel:Show()
+end
+
+function LootDisplayFrameMixin:HideQueueLabel()
+	self.QueueLabel:Hide()
+end
+
+function LootDisplayFrameMixin:UpdateQueueLabel(count)
+	if count > 0 then
+		self.QueueLabel:SetText(
+			"|Tinterface/timer/challengesglow-logo:0|t" .. string.format(G_RLF.L["Pending Items"], count)
+		)
+		self:ShowQueueLabel()
+	else
+		self.QueueLabel:Hide()
+	end
 end
 
 function LootDisplayFrameMixin:ClearFeed()
@@ -190,6 +234,8 @@ end
 
 function LootDisplayFrameMixin:UpdateFadeDelay()
 	for row in self.rows:iterate() do
+		---@type RLF_LootDisplayRow
+		local row = row --[[@as RLF_LootDisplayRow]]
 		row:UpdateFadeoutDelay()
 	end
 end
