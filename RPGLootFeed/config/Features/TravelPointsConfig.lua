@@ -20,12 +20,18 @@ G_RLF.options.args.features.args.travelPoints = {
 	handler = TravelPointsConfig,
 	name = G_RLF.L["Travel Points Config"],
 	order = G_RLF.mainFeatureOrder.TravelPoints,
+	disabled = function()
+		return not G_RLF:IsRetail()
+	end,
 	args = {
 		enable = {
 			type = "toggle",
 			name = G_RLF.L["Enable Travel Points in Feed"],
 			desc = G_RLF.L["EnableTravelPointsDesc"],
 			width = "double",
+			disabled = function()
+				return not G_RLF:IsRetail()
+			end,
 			get = function()
 				return G_RLF.db.global.travelPoints.enabled
 			end,

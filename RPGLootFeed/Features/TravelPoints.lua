@@ -69,7 +69,7 @@ local function initTravelersJourneyValues()
 end
 
 function TravelPoints:OnInitialize()
-	if G_RLF.db.global.travelPoints.enabled then
+	if G_RLF:IsRetail() and G_RLF.db.global.travelPoints.enabled then
 		self:Enable()
 	else
 		self:Disable()
@@ -77,11 +77,18 @@ function TravelPoints:OnInitialize()
 end
 
 function TravelPoints:OnDisable()
+	if not G_RLF:IsRetail() then
+		return
+	end
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PERKS_ACTIVITY_COMPLETED")
 end
 
 function TravelPoints:OnEnable()
+	if not G_RLF:IsRetail() then
+		return
+	end
+
 	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PERKS_ACTIVITY_COMPLETED")
