@@ -686,6 +686,7 @@ function LootDisplayRowMixin:StyleExitAnimation()
 	---@type RLF_ConfigAnimations
 	local animationsDb = G_RLF.db.global.animations
 	local animationsExitDb = animationsDb.exit
+	local disableExitAnimation = animationsExitDb.disable
 	local exitAnimationType = animationsExitDb.type
 	local exitDuration = animationsExitDb.duration
 	local exitDelay = self.showForSeconds
@@ -694,10 +695,12 @@ function LootDisplayRowMixin:StyleExitAnimation()
 		self.cachedExitAnimationType ~= exitAnimationType
 		or self.cachedExitAnimationDuration ~= exitDuration
 		or self.cachedExitFadeOutDelay ~= exitDelay
+		or self.cachedExitDisableAnimation ~= disableExitAnimation
 	then
 		self.cachedExitAnimationType = exitAnimationType
 		self.cachedExitAnimationDuration = exitDuration
 		self.cachedExitFadeOutDelay = exitDelay
+		self.cachedExitDisableAnimation = disableExitAnimation
 		animationChanged = true
 	end
 
@@ -715,6 +718,11 @@ function LootDisplayRowMixin:StyleExitAnimation()
 		else
 			self.ExitAnimation:Stop()
 			self.ExitAnimation:RemoveAnimations()
+		end
+
+		if disableExitAnimation then
+			exitDelay = math.pow(2, 19)
+			exitAnimationType = G_RLF.ExitAnimationType.NONE
 		end
 
 		if exitAnimationType == G_RLF.ExitAnimationType.NONE then

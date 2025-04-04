@@ -29,6 +29,7 @@ describe("LootDisplayFrameMixin #only", function()
 
 	local frame, mockSizing, mockPositioning, mockStyling, mockGlobalFns
 	before_each(function()
+		require("RPGLootFeed_spec._mocks.WoWGlobals")
 		mockGlobalFns = require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
 		-- Define the global G_RLF
 		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
@@ -63,6 +64,7 @@ describe("LootDisplayFrameMixin #only", function()
 		local testList = {}
 		nsMocks.list.returns(testList)
 		local stubGetPositioningDetails = stub(frame, "getPositioningDetails")
+		local stubInitQueueLabel = stub(frame, "InitQueueLabel")
 		local stubUpdateSize = stub(frame, "UpdateSize")
 		local stubSetPoint = stub(frame, "SetPoint")
 		local stubSetFrameStrata = stub(frame, "SetFrameStrata")
