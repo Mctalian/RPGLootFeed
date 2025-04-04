@@ -72,7 +72,8 @@
     "ITEM_MOD_CR_AVOIDANCE_SHORT",
     "ITEM_MOD_CR_SPEED_SHORT",
     "CHAT_MSG_LOOT",
-    "CHALLENGE_MODE_KEYSTONE_NAME"
+    "CHALLENGE_MODE_KEYSTONE_NAME",
+    "CreateAtlasMarkup"
   ],
   "Lua.workspace.library": [
     "${addons}/busted/module/library",
