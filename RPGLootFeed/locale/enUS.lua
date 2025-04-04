@@ -21,6 +21,20 @@ L["Money messages Disabled"] = "Money messages Disabled"
 L["XP messages Disabled"] = "XP messages Disabled"
 L["Rep messages Disabled"] = "Rep messages Disabled"
 
+L["About"] = "About"
+L["AboutDesc"] = "About the addon and its author"
+L["AboutTitle"] = "Thank you for using RPGLootFeed!"
+L["Version"] = "RPGLootFeed Version: %s"
+L["JoinDiscordDesc"] = "Join the RPGLootFeed Discord Community for support, feedback, suggestions, and for news on the latest updates."
+L["JoinDiscord"] = "Join the Discord Community (copy/paste below)"
+L["IssuesAndRequests"] = "You can also report any issues or feature requests on the GitHub issues page."
+L["GitHubIssuesLink"] = "GitHub Issues (copy/paste below)"
+L["Author"] = "This addon is created and maintained by McTalian."
+L["AuthorGitHub"] = "GitHub (copy/paste below)"
+L["TipsLink"] = "Tips appreciated, never expected |T166311:0|t (copy/paste below)"
+L["Credits"] = "%sSpecial thanks to all translation contributors!%s"
+
+
 -- Count Text Wrap Character
 L["Spaces"] = " Spaces "
 L["Parentheses"] = "(Parentheses)"

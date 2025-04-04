@@ -8,7 +8,7 @@ local it = busted.it
 local setup = busted.setup
 local _ = require("luassert.match")._
 
-describe("Features module #only", function()
+describe("Features module", function()
 	describe("load order", function()
 		it("loads after ConfigOptions", function()
 			local ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.ConfigOptions)

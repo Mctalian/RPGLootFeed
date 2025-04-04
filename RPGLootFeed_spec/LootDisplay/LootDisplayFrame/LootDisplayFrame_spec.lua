@@ -8,7 +8,7 @@ local it = busted.it
 local spy = busted.spy
 local stub = busted.stub
 
-describe("LootDisplayFrameMixin #only", function()
+describe("LootDisplayFrameMixin", function()
 	local ns, _
 	_ = match._
 
