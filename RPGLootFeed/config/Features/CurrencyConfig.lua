@@ -27,6 +27,9 @@ G_RLF.options.args.features.args.currencyConfig = {
 	handler = CurrencyConfig,
 	name = G_RLF.L["Currency Config"],
 	order = G_RLF.mainFeatureOrder.Currency,
+	disabled = function()
+		return GetExpansionLevel() < G_RLF.Expansion.SL
+	end,
 	args = {
 		enableCurrency = {
 			type = "toggle",
@@ -44,7 +47,7 @@ G_RLF.options.args.features.args.currencyConfig = {
 					G_RLF.RLF:DisableModule("Currency")
 				end
 			end,
-			hidden = function()
+			disabled = function()
 				return GetExpansionLevel() < G_RLF.Expansion.SL
 			end,
 			order = 1,

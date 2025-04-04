@@ -90,7 +90,7 @@ G_RLF.options.args.features = {
 			width = "double",
 			get = "GetCurrencyStatus",
 			set = "SetCurrencyStatus",
-			hidden = function()
+			disabled = function()
 				return GetExpansionLevel() < G_RLF.Expansion.SL
 			end,
 			order = G_RLF.mainFeatureOrder.Currency,
@@ -136,6 +136,9 @@ G_RLF.options.args.features = {
 			name = G_RLF.L["Enable Travel Points in Feed"],
 			desc = G_RLF.L["EnableTravelPointsDesc"],
 			width = "double",
+			disabled = function()
+				return not G_RLF:IsRetail()
+			end,
 			get = function()
 				return G_RLF.db.global.travelPoints.enabled
 			end,
