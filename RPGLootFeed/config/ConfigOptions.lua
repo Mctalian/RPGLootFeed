@@ -24,6 +24,20 @@ G_RLF.defaults = {
 	},
 }
 
+---@type table<string, number>
+G_RLF.level1OptionsOrder = {
+	["testMode"] = 1,
+	["clearRows"] = 2,
+	["lootHistory"] = 3,
+	["features"] = 4,
+	["positioning"] = 5,
+	["sizing"] = 6,
+	["styling"] = 7,
+	["animations"] = 8,
+	["blizz"] = 9,
+	["about"] = -1,
+}
+
 G_RLF.options = {
 	name = addonName,
 	handler = ConfigOptions,
@@ -36,7 +50,7 @@ G_RLF.options = {
 				local TestMode = G_RLF.RLF:GetModule("TestMode") --[[@as RLF_TestMode]]
 				TestMode:ToggleTestMode()
 			end,
-			order = 1,
+			order = G_RLF.level1OptionsOrder.testMode,
 		},
 		clearRows = {
 			type = "execute",
@@ -44,7 +58,7 @@ G_RLF.options = {
 			func = function()
 				G_RLF.LootDisplay:HideLoot()
 			end,
-			order = 2,
+			order = G_RLF.level1OptionsOrder.clearRows,
 		},
 		lootHistory = {
 			type = "execute",
@@ -58,7 +72,7 @@ G_RLF.options = {
 					partyFrame:ToggleHistoryFrame()
 				end
 			end,
-			order = 3,
+			order = G_RLF.level1OptionsOrder.lootHistory,
 		},
 	},
 }

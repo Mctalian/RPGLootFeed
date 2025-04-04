@@ -166,6 +166,18 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 			},
 			profile = {},
 		}
+		ns.level1OptionsOrder = {
+			["testMode"] = 1,
+			["clearRows"] = 2,
+			["lootHistory"] = 3,
+			["features"] = 4,
+			["positioning"] = 5,
+			["sizing"] = 6,
+			["styling"] = 7,
+			["animations"] = 8,
+			["blizz"] = 9,
+			["about"] = -1,
+		}
 		ns.options = {
 			args = {},
 		}
@@ -259,6 +271,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 				lastVersionLoaded = "v1.0.0",
 				logger = {},
 				migrationVersion = 0,
+				about = {},
 				animations = {
 					exit = {},
 				},

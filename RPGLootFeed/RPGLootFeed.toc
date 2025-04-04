@@ -1,5 +1,5 @@
 ## Interface: 11506, 11507, 40402, 110100, 110105
-## Title: RPG Loot Feed
+## Title: |cFFFF8000RPGLootFeed|r
 ## Author: McTalian
 ## Version: @project-version@
 ## Notes: A non-intrusive way to see what you just looted.|n|n|cffFFC700Slash command: /rlf, /rpgLootFeed|r
@@ -17,7 +17,7 @@
 ## Category-ruRU: Добыча
 ## Category-zhCN: 战利品
 ## Category-zhTW: 戰利品
-## OptionalDeps: Ace3, Masque
+## OptionalDeps: Masque, Auctionator, TradeSkillMaster
 ## X-GitHub: https://github.com/Mctalian/RPGLootFeed
 ## X-Curse-Project-ID: 1082791
 ## X-WoWI-ID: 26799
