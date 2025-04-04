@@ -59,6 +59,12 @@ function RLF:OnInitialize()
 					.. "|r"
 			)
 			tooltip:AddLine(" ")
+			local unseenNotifications = G_RLF.Notifications:GetNumUnseenNotifications()
+			if unseenNotifications > 0 then
+				local notifStr = string.format(G_RLF.L["You have Notifications"], unseenNotifications)
+				tooltip:AddLine(notifStr, 1, 1, 1, 1)
+				tooltip:AddLine(" ")
+			end
 			tooltip:AddLine(G_RLF.L["LauncherLeftClick"], 1, 1, 1, 1)
 			if G_RLF.db.global.lootHistory.enabled then
 				tooltip:AddLine(G_RLF.L["LauncherRightClick"], 1, 1, 1, 1)

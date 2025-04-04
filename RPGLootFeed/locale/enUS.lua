@@ -34,6 +34,9 @@ L["AuthorGitHub"] = "GitHub (copy/paste below)"
 L["TipsLink"] = "Tips appreciated, never expected |T166311:0|t (copy/paste below)"
 L["Credits"] = "%sSpecial thanks to all translation contributors!%s"
 
+L["New version available"] = "New version available: %s"
+L["You have Notifications"] = "You have %d Notifications"
+L["View Notifications"] = "View %d Notifications"
 
 -- Count Text Wrap Character
 L["Spaces"] = " Spaces "

@@ -66,7 +66,7 @@ describe("Features module", function()
 		for line in file:lines() do
 			if line:find("file=") then
 				-- Skip lines that do not contain "file="
-				if not line:find('file="LootDisplayProperties.lua"') then
+				if not (line:find('file="LootDisplayProperties.lua"') or line:find('file="RLF_Notifications.lua"')) then
 					featureImports = featureImports + 1
 				end
 			end
