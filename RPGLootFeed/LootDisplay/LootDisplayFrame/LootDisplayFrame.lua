@@ -203,7 +203,7 @@ end
 function LootDisplayFrameMixin:UpdateQueueLabel(count)
 	if count > 0 then
 		self.QueueLabel:SetText(
-			"|Tinterface/timer/challengesglow-logo:0|t" .. string.format(G_RLF.L["Pending Items"], count)
+			"|Tinterface/Widgets/azsharawards-state2-fill:0|t" .. string.format(G_RLF.L["Pending Items"], count)
 		)
 		self:ShowQueueLabel()
 	else
