@@ -156,7 +156,13 @@ G_RLF.options.args.features.args.moneyConfig = {
 					type = "select",
 					name = G_RLF.L["Money Loot Sound"],
 					desc = G_RLF.L["MoneyLootSoundDesc"],
-					values = "SoundOptionValues",
+					values = function()
+						local sounds = {}
+						for k, v in pairs(lsm:HashTable(lsm.MediaType.SOUND)) do
+							sounds[v] = k
+						end
+						return sounds
+					end,
 					get = function()
 						return G_RLF.db.global.money.moneyLootSound
 					end,
@@ -181,12 +187,4 @@ function MoneyConfig:OverrideSound()
 	else
 		UnmuteSoundFile(G_RLF.GameSounds.LOOT_SMALL_COIN)
 	end
-end
-
-function MoneyConfig:SoundOptionValues()
-	local sounds = {}
-	for k, v in pairs(lsm:HashTable(lsm.MediaType.SOUND)) do
-		sounds[v] = k
-	end
-	return sounds
 end

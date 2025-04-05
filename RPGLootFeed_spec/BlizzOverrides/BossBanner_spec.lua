@@ -12,11 +12,9 @@ local stub = busted.stub
 describe("BossBanner module", function()
 	local ns, BossBannerOverride
 	before_each(function()
+		require("RPGLootFeed_spec._mocks.WoWGlobals")
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
 		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
-		_G.BossBanner = {
-			OnEvent = function() end,
-		}
 
 		BossBannerOverride = assert(loadfile("RPGLootFeed/BlizzOverrides/BossBanner.lua"))("TestAddon", ns)
 	end)
@@ -32,7 +30,6 @@ describe("BossBanner module", function()
 	end)
 
 	it("hooks BossBanner OnEvent when available", function()
-		_G.BossBanner = {}
 		spy.on(BossBannerOverride, "RawHookScript")
 		BossBannerOverride:BossBannerHook()
 		assert
@@ -41,7 +38,6 @@ describe("BossBanner module", function()
 	end)
 
 	it("does not hook BossBanner OnEvent if already hooked", function()
-		_G.BossBanner = {}
 		spy.on(BossBannerOverride, "IsHooked")
 		spy.on(BossBannerOverride, "RawHookScript")
 		BossBannerOverride.IsHooked = function()

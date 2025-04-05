@@ -4,6 +4,17 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
+---@class RLF_KeystoneInfo
+---@field itemId number
+---@field dungeonId number
+---@field dungeonName string
+---@field level number
+---@field affixId1? number
+---@field affixId2? number
+---@field affixId3? number
+---@field affixId4? number
+---@field link string
+
 ---@class RLF_ItemInfo
 ---@field itemId number
 ---@field itemName string
@@ -23,7 +34,7 @@ local G_RLF = ns
 ---@field expansionID number
 ---@field setID number
 ---@field isCraftingReagent boolean
----@field keystoneInfo table
+---@field keystoneInfo RLF_KeystoneInfo
 local ItemInfo = {}
 ItemInfo.__index = ItemInfo
 
@@ -131,24 +142,31 @@ function ItemInfo:populateKeystoneInfo()
 	for field in string.gmatch(fieldString, "(.-)" .. ":") do
 		table.insert(fields, field)
 	end
+
 	local keystoneInfo = {}
-	keystoneInfo.itemId = tonumber(fields[1])
+	local itemId = tonumber(fields[1])
+	if not itemId then
+		return
+	end
+	keystoneInfo.itemId = itemId
 	local numModifiers = fields[14]
 	for i = 1, numModifiers do
 		local modifierValue = tonumber(fields[14 + i * 2])
-		if i == 1 then
-			keystoneInfo.dungeonId = modifierValue
-			keystoneInfo.dungeonName = C_ChallengeMode.GetMapUIInfo(keystoneInfo.dungeonId)
-		elseif i == 2 then
-			keystoneInfo.level = modifierValue
-		elseif i == 3 then
-			keystoneInfo.affixId1 = modifierValue
-		elseif i == 4 then
-			keystoneInfo.affixId2 = modifierValue
-		elseif i == 5 then
-			keystoneInfo.affixId3 = modifierValue
-		elseif i == 6 then
-			keystoneInfo.affixId4 = modifierValue
+		if modifierValue then
+			if i == 1 then
+				keystoneInfo.dungeonId = modifierValue
+				keystoneInfo.dungeonName = C_ChallengeMode.GetMapUIInfo(keystoneInfo.dungeonId)
+			elseif i == 2 then
+				keystoneInfo.level = modifierValue
+			elseif i == 3 then
+				keystoneInfo.affixId1 = modifierValue
+			elseif i == 4 then
+				keystoneInfo.affixId2 = modifierValue
+			elseif i == 5 then
+				keystoneInfo.affixId3 = modifierValue
+			elseif i == 6 then
+				keystoneInfo.affixId4 = modifierValue
+			end
 		end
 	end
 	self.keystoneInfo = keystoneInfo

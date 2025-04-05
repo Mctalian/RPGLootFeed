@@ -22,44 +22,29 @@ local lootQueues = {
 }
 G_RLF.tempFontString = nil
 
---@alpha@
-local TestLabelMainQueueSize
--- Create a label to display the queue size
-TestLabelMainQueueSize = UIParent:CreateFontString(nil, "ARTWORK")
-TestLabelMainQueueSize:SetFontObject(GameFontNormal)
-TestLabelMainQueueSize:SetPoint("TOPLEFT", 10, -10)
-TestLabelMainQueueSize:SetText("Main Queue Size: 0")
-
-local TestLabelPartyQueueSize
-TestLabelPartyQueueSize = UIParent:CreateFontString(nil, "ARTWORK")
-TestLabelPartyQueueSize:SetFontObject(GameFontNormal)
-TestLabelPartyQueueSize:SetPoint("TOPLEFT", TestLabelMainQueueSize, "BOTTOMLEFT", 0, -10)
-TestLabelPartyQueueSize:SetText("Party Queue Size: 0")
-
--- Function to update test labels
-local function updateTestLabels()
-	if TestLabelMainQueueSize then
-		TestLabelMainQueueSize:SetText("Main Queue Size: " .. lootQueues[G_RLF.Frames.MAIN]:size())
+-- Function to update queue labels
+local function updateQueueLabels()
+	if lootFrames[G_RLF.Frames.MAIN] ~= nil then
+		lootFrames[G_RLF.Frames.MAIN]:UpdateQueueLabel(lootQueues[G_RLF.Frames.MAIN]:size())
 	end
 
-	if TestLabelPartyQueueSize then
-		TestLabelPartyQueueSize:SetText("Party Queue Size: " .. lootQueues[G_RLF.Frames.PARTY]:size())
+	if lootFrames[G_RLF.Frames.PARTY] ~= nil then
+		lootFrames[G_RLF.Frames.PARTY]:UpdateQueueLabel(lootQueues[G_RLF.Frames.PARTY]:size())
 	end
 end
--- Wrapper function to update test labels after calling the original function
-local function updateTestLabelsWrapper(func)
+-- Wrapper function to update queue labels after calling the original function
+local function updateQueueLabelsWrapper(func)
 	return function(...)
 		local result = { func(...) }
-		updateTestLabels()
+		updateQueueLabels()
 		return unpack(result)
 	end
 end
 
-lootQueues[G_RLF.Frames.MAIN].enqueue = updateTestLabelsWrapper(lootQueues[G_RLF.Frames.MAIN].enqueue)
-lootQueues[G_RLF.Frames.MAIN].dequeue = updateTestLabelsWrapper(lootQueues[G_RLF.Frames.MAIN].dequeue)
-lootQueues[G_RLF.Frames.PARTY].enqueue = updateTestLabelsWrapper(lootQueues[G_RLF.Frames.PARTY].enqueue)
-lootQueues[G_RLF.Frames.PARTY].dequeue = updateTestLabelsWrapper(lootQueues[G_RLF.Frames.PARTY].dequeue)
---@end-alpha@
+lootQueues[G_RLF.Frames.MAIN].enqueue = updateQueueLabelsWrapper(lootQueues[G_RLF.Frames.MAIN].enqueue)
+lootQueues[G_RLF.Frames.MAIN].dequeue = updateQueueLabelsWrapper(lootQueues[G_RLF.Frames.MAIN].dequeue)
+lootQueues[G_RLF.Frames.PARTY].enqueue = updateQueueLabelsWrapper(lootQueues[G_RLF.Frames.PARTY].enqueue)
+lootQueues[G_RLF.Frames.PARTY].dequeue = updateQueueLabelsWrapper(lootQueues[G_RLF.Frames.PARTY].dequeue)
 
 -- Public methods
 function LootDisplay:OnInitialize()

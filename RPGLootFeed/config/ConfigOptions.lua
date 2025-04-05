@@ -21,7 +21,23 @@ G_RLF.defaults = {
 		lastVersionLoaded = "v1.0.0",
 		logger = {},
 		migrationVersion = 0,
+		notifications = {},
+		guid = nil,
 	},
+}
+
+---@type table<string, number>
+G_RLF.level1OptionsOrder = {
+	["testMode"] = 1,
+	["clearRows"] = 2,
+	["lootHistory"] = 3,
+	["features"] = 4,
+	["positioning"] = 5,
+	["sizing"] = 6,
+	["styling"] = 7,
+	["animations"] = 8,
+	["blizz"] = 9,
+	["about"] = -1,
 }
 
 G_RLF.options = {
@@ -32,44 +48,33 @@ G_RLF.options = {
 		testMode = {
 			type = "execute",
 			name = G_RLF.L["Toggle Test Mode"],
-			func = "ToggleTestMode",
-			order = 1,
+			func = function()
+				local TestMode = G_RLF.RLF:GetModule("TestMode") --[[@as RLF_TestMode]]
+				TestMode:ToggleTestMode()
+			end,
+			order = G_RLF.level1OptionsOrder.testMode,
 		},
 		clearRows = {
 			type = "execute",
 			name = G_RLF.L["Clear rows"],
-			func = "ClearRows",
-			order = 2,
+			func = function()
+				G_RLF.LootDisplay:HideLoot()
+			end,
+			order = G_RLF.level1OptionsOrder.clearRows,
 		},
 		lootHistory = {
 			type = "execute",
 			name = G_RLF.L["Toggle Loot History"],
-			func = "ToggleLootHistory",
-			order = 3,
+			func = function()
+				---@type RLF_LootDisplayFrame
+				local frame = G_RLF.RLF_MainLootFrame
+				frame:ToggleHistoryFrame()
+				local partyFrame = G_RLF.RLF_PartyLootFrame
+				if partyFrame then
+					partyFrame:ToggleHistoryFrame()
+				end
+			end,
+			order = G_RLF.level1OptionsOrder.lootHistory,
 		},
 	},
 }
-
-function ConfigOptions:ToggleBoundingBox()
-	G_RLF.LootDisplay:ToggleBoundingBox()
-end
-
-local TestMode
-function ConfigOptions:ToggleTestMode()
-	TestMode = TestMode or G_RLF.RLF:GetModule("TestMode") --[[@as RLF_TestMode]]
-	TestMode:ToggleTestMode()
-end
-
-function ConfigOptions:ClearRows()
-	G_RLF.LootDisplay:HideLoot()
-end
-
-function ConfigOptions:ToggleLootHistory()
-	---@type RLF_LootDisplayFrame
-	local frame = G_RLF.RLF_MainLootFrame
-	frame:ToggleHistoryFrame()
-	local partyFrame = G_RLF.RLF_PartyLootFrame
-	if partyFrame then
-		partyFrame:ToggleHistoryFrame()
-	end
-end

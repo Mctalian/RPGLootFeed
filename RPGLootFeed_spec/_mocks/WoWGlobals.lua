@@ -4,11 +4,25 @@ local spy = busted.spy
 
 local wowGlobals = {}
 
+--#region:BossBanner
+---@diagnostic disable-next-line: missing-fields
+_G.BossBanner = {}
+wowGlobals.BossBanner = {}
+wowGlobals.BossBanner.OnEvent = stub(_G.BossBanner, "OnEvent")
+--#endregion
+
+--#region:C_CVar
 _G.C_CVar = {}
 stub(_G.C_CVar, "SetCVar")
+--#endregion
+
+--#region:EditModeManagerFrame
+---@diagnostic disable-next-line: missing-fields
 _G.EditModeManagerFrame = {}
 stub(_G.EditModeManagerFrame, "IsInMode")
+--#endregion
 
+--#region:EventRegistry
 ---@diagnostic disable-next-line: missing-fields
 _G.EventRegistry = {}
 stub(_G.EventRegistry, "RegisterCallback")
@@ -35,7 +49,23 @@ stub(_G.EventRegistry, "UnregisterCallback")
 stub(_G.EventRegistry, "OnLoad")
 stub(_G.EventRegistry, "RegisterCallbackWithHandle")
 stub(_G.EventRegistry, "GenerateCallbackEvents")
+--#endregion
 
+--#region:LootAlertSystem
+---@diagnostic disable-next-line: missing-fields
+_G.LootAlertSystem = {}
+wowGlobals.LootAlertSystem = {}
+wowGlobals.LootAlertSystem.AddAlert = stub(_G.LootAlertSystem, "AddAlert")
+--#endregion
+
+--#region:MoneyWonAlertSystem
+---@diagnostic disable-next-line: missing-fields
+_G.MoneyWonAlertSystem = {}
+wowGlobals.MoneyWonAlertSystem = {}
+wowGlobals.MoneyWonAlertSystem.AddAlert = stub(_G.MoneyWonAlertSystem, "AddAlert")
+--#endregion
+
+--#region:UIParent
 ---@diagnostic disable-next-line: missing-fields
 _G.UIParent = {
 	firstTimeLoaded = 0,
@@ -209,9 +239,9 @@ stub(_G.UIParent, "GetPoint")
 stub(_G.UIParent, "GetAnimationGroups")
 stub(_G.UIParent, "CreateAnimationGroup")
 stub(_G.UIParent, "StopAnimating")
+--#endregion
 
-_G.MEMBERS_PER_RAID_GROUP = 5
-
+--#region:ACCOUNT_WIDE_FONT_COLOR
 ---@diagnostic disable-next-line: missing-fields
 _G.ACCOUNT_WIDE_FONT_COLOR = {
 	r = 0,
@@ -248,7 +278,9 @@ end)
 stub(_G.ACCOUNT_WIDE_FONT_COLOR, "GetRGBAAsBytes", function(self)
 	return self.r * 255, self.g * 255, self.b * 255, (self.a or 1) * 255
 end)
+--#endregion
 
+--#region:FACTION_GREEN_COLOR
 ---@diagnostic disable-next-line: missing-fields
 _G.FACTION_GREEN_COLOR = {
 	r = 0,
@@ -285,11 +317,16 @@ end)
 stub(_G.FACTION_GREEN_COLOR, "GetRGBAAsBytes", function(self)
 	return self.r * 255, self.g * 255, self.b * 255, (self.a or 1) * 255
 end)
+--#endregion
 
+--#region:FACTION_BAR_COLORS
 _G.FACTION_BAR_COLORS = {
 	[1] = { r = 1, g = 0, b = 0 },
 	[8] = { r = 0, g = 1, b = 0 },
 }
+--#endregion
+
+--#region:FACTION_STANDING* Global strings
 _G.FACTION_STANDING_INCREASED = "Rep with %s inc by %d."
 _G.FACTION_STANDING_INCREASED_ACCOUNT_WIDE = "AccRep with %s inc by %d."
 _G.FACTION_STANDING_INCREASED_ACH_BONUS = "Rep with %s inc by %d (+.1f bonus)."
@@ -298,5 +335,10 @@ _G.FACTION_STANDING_INCREASED_BONUS = "Rep with %s inc by %d (+.1f bonus)."
 _G.FACTION_STANDING_INCREASED_DOUBLE_BONUS = "Rep with %s inc by %d (+.1f bonus)."
 _G.FACTION_STANDING_DECREASED = "Rep with %s dec by %d."
 _G.FACTION_STANDING_DECREASED_ACCOUNT_WIDE = "AccRep with %s dec by %d."
+--#endregion
+
+--#region:Global consts
+_G.MEMBERS_PER_RAID_GROUP = 5
+--#endregion
 
 return wowGlobals

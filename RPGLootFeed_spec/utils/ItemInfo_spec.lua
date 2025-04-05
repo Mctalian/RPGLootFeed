@@ -303,11 +303,8 @@ describe("ItemInfo", function()
 		end)
 
 		it("checks if an item is not eligible equipment due to mismatched armor class", function()
-			---@diagnostic disable-next-line: duplicate-set-field
-			_G.UnitClass = function(unit)
-				return nil, "Mage"
-			end
-			ns.armorClassMapping = { Mage = 1 }
+			functionMocks.UnitClass.returns("Mage", "MAGE", 1)
+			ns.armorClassMapping = { MAGE = 1 }
 
 			local item = ItemInfo:new(
 				18803,
@@ -337,11 +334,8 @@ describe("ItemInfo", function()
 		end)
 
 		it("checks if an item is not eligible equipment due to missing equip slot", function()
-			---@diagnostic disable-next-line: duplicate-set-field
-			_G.UnitClass = function(unit)
-				return nil, "Warrior"
-			end
-			ns.armorClassMapping = { Warrior = 4 }
+			functionMocks.UnitClass.returns("Warrior", "WARRIOR", 1)
+			ns.armorClassMapping = { WARRIOR = 4 }
 			ns.equipSlotMap = {}
 
 			local item = ItemInfo:new(

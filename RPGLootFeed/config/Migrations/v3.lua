@@ -14,6 +14,8 @@ function migration:run()
 	end
 
 	G_RLF.DbMigrations:Migrate(G_RLF.db, "global.sizing.feedWidthedWidth", "global.sizing.feedWidth")
+
+	G_RLF.db.global.migrationVersion = version
 end
 
 G_RLF.migrations[version] = migration

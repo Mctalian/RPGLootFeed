@@ -71,12 +71,12 @@ G_RLF.LogLevel = {
 ---@enum G_RLF.FeatureModule
 G_RLF.FeatureModule = {
 	ItemLoot = "ItemLoot",
+	PartyLoot = "PartyLoot",
 	Currency = "Currency",
 	Money = "Money",
-	Reputation = "Reputation",
 	Experience = "Experience",
+	Reputation = "Reputation",
 	Profession = "Professions",
-	PartyLoot = "PartyLoot",
 	TravelPoints = "TravelPoints",
 }
 

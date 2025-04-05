@@ -11,7 +11,7 @@ local G_RLF = ns
 ---@field Stock Alpha
 ---@field Count Alpha
 
----@class RLF_RowItemButton: ItemButton
+---@class RLF_RowItemButton: g_ItemButton
 ---@field elementFadeIn RLF_RowItemButtonElementFadeIn
 
 ---@class RLF_RowFontString: FontString
@@ -34,7 +34,7 @@ local G_RLF = ns
 ---@field slideIn Translation
 
 ---@class RLF_LootDisplayRow: Frame
----@field id number
+---@field key string
 ---@field frameType G_RLF.Frames
 ---@field amount number
 ---@field icon string
@@ -56,6 +56,7 @@ local G_RLF = ns
 ---@field StaticBottomBorder Texture
 ---@field StaticLeftBorder Texture
 ---@field UnitPortrait RLF_RowTexture
+---@field RLFUser RLF_RowTexture
 ---@field PrimaryText RLF_RowFontString
 ---@field SecondaryText RLF_RowFontString
 ---@field ItemCountText RLF_RowFontString
@@ -100,6 +101,9 @@ function LootDisplayRowMixin:Init()
 	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 
 	self:SetSize(sizingDb.feedWidth, sizingDb.rowHeight)
+	self.RLFUser:SetTexture("Interface/AddOns/RPGLootFeed/Icons/logo.blp")
+	self.RLFUser:SetDrawLayer("OVERLAY")
+	self.RLFUser:Hide()
 	self:StyleBackground()
 	self:StyleRowBorders()
 	self:StyleExitAnimation()
@@ -141,7 +145,7 @@ function LootDisplayRowMixin:Reset()
 	self:ClearAllPoints()
 
 	-- Reset row-specific data
-	self.id = nil
+	self.key = nil
 	self.amount = nil
 	self.icon = nil
 	self.link = nil
@@ -385,6 +389,9 @@ function LootDisplayRowMixin:StyleUnitPortrait()
 		local portraitSize = iconSize * 0.8
 		self.UnitPortrait:SetSize(portraitSize, portraitSize)
 		self.UnitPortrait:ClearAllPoints()
+		local rlfIconSize = portraitSize * 0.6
+		self.RLFUser:SetSize(rlfIconSize, rlfIconSize)
+		self.RLFUser:ClearAllPoints()
 
 		local anchor, iconAnchor, xOffset = "LEFT", "RIGHT", iconSize / 4
 		if not leftAlign then
@@ -392,6 +399,7 @@ function LootDisplayRowMixin:StyleUnitPortrait()
 		end
 
 		self.UnitPortrait:SetPoint(anchor, self.Icon, iconAnchor, xOffset, 0)
+		self.RLFUser:SetPoint("BOTTOMRIGHT", self.UnitPortrait, "BOTTOMRIGHT", rlfIconSize / 2, 0)
 	end
 
 	if self.unit then
@@ -401,8 +409,12 @@ function LootDisplayRowMixin:StyleUnitPortrait()
 			end
 		end)
 		self.UnitPortrait:Show()
+		if false then -- TODO: Coming soon
+			self.RLFUser:Show()
+		end
 	else
 		self.UnitPortrait:Hide()
+		self.RLFUser:Hide()
 	end
 end
 
@@ -686,6 +698,7 @@ function LootDisplayRowMixin:StyleExitAnimation()
 	---@type RLF_ConfigAnimations
 	local animationsDb = G_RLF.db.global.animations
 	local animationsExitDb = animationsDb.exit
+	local disableExitAnimation = animationsExitDb.disable
 	local exitAnimationType = animationsExitDb.type
 	local exitDuration = animationsExitDb.duration
 	local exitDelay = self.showForSeconds
@@ -694,10 +707,12 @@ function LootDisplayRowMixin:StyleExitAnimation()
 		self.cachedExitAnimationType ~= exitAnimationType
 		or self.cachedExitAnimationDuration ~= exitDuration
 		or self.cachedExitFadeOutDelay ~= exitDelay
+		or self.cachedExitDisableAnimation ~= disableExitAnimation
 	then
 		self.cachedExitAnimationType = exitAnimationType
 		self.cachedExitAnimationDuration = exitDuration
 		self.cachedExitFadeOutDelay = exitDelay
+		self.cachedExitDisableAnimation = disableExitAnimation
 		animationChanged = true
 	end
 
@@ -715,6 +730,11 @@ function LootDisplayRowMixin:StyleExitAnimation()
 		else
 			self.ExitAnimation:Stop()
 			self.ExitAnimation:RemoveAnimations()
+		end
+
+		if disableExitAnimation then
+			exitDelay = math.pow(2, 19)
+			exitAnimationType = G_RLF.ExitAnimationType.NONE
 		end
 
 		if exitAnimationType == G_RLF.ExitAnimationType.NONE then
@@ -917,7 +937,7 @@ function LootDisplayRowMixin:StyleIconHighlight()
 		self.glowAnimationGroup.scaleUp:SetScaleFrom(1 / factor, 1 / factor)
 		self.glowAnimationGroup.scaleUp:SetScaleTo(factor, factor)
 		self.glowAnimationGroup.scaleUp:SetDuration(0.5)
-		self.glowAnimationGroup.scaleUp:SetSmoothing("OUT_IN")
+		self.glowAnimationGroup.scaleUp:SetSmoothing("OUT")
 	end
 end
 
@@ -961,7 +981,7 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 		self.unit = unit
 	end
 
-	self.id = key
+	self.key = key
 	self.amount = quantity
 	self.type = element.type
 	self.quality = quality
@@ -1183,9 +1203,12 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 		if not itemDb.itemCountTextEnabled then
 			return
 		end
-
+		if not self.key or not element.key then
+			G_RLF:LogDebug("Item key is nil")
+			return
+		end
 		RunNextFrame(function()
-			local itemCount = C_Item.GetItemCount(self.id or element.key, true, false, true, true)
+			local itemCount = C_Item.GetItemCount(self.key or element.key, true, false, true, true)
 			self:ShowItemCountText(itemCount, {
 				color = G_RLF:RGBAToHexFormat(unpack(itemDb.itemCountTextColor)),
 				wrapChar = itemDb.itemCountTextWrapChar,

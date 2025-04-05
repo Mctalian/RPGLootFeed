@@ -12,4 +12,5 @@
     <Script file="DbMigrations.lua"/>
     <Script file="DbAccessors.lua"/>
     <Include file="Migrations/migrations.xml"/>
+    <Script file="About.lua"/>
 </Ui>

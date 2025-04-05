@@ -29,7 +29,7 @@ describe("ProfessionConfig module", function()
 		assert.is_table(ns.options.args.features.args.professionConfig)
 		assert.equal("group", ns.options.args.features.args.professionConfig.type)
 		assert.is_not_nil(ns.options.args.features.args.professionConfig.name)
-		assert.equal(ns.mainFeatureOrder.Skills, ns.options.args.features.args.professionConfig.order)
+		assert.equal(ns.mainFeatureOrder.Profession, ns.options.args.features.args.professionConfig.order)
 	end)
 
 	it("should have correct color defaults for skill text", function()

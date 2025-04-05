@@ -1,5 +1,5 @@
 ---@meta _
----@class ItemButton: Button
+---@class g_ItemButton: ItemButton
 ---@field item string|number|nil ItemID, item link, or item name
 ---@field itemLink string|nil The item link of the current item
 ---@field itemLocation table|nil The location information of the item
@@ -11,19 +11,8 @@
 ---@field pendingInfo table|nil Pending item information while waiting for item info
 ---@field noProfessionQualityOverlay boolean Whether to hide profession quality overlay
 ---@field professionQualityOverlayOverride any Override for profession quality display
----@field showMatchHighlight boolean Shows system-specific highlight when matching current context
----@field icon Texture The item icon texture
----@field Count FontString The count text for stackable items
----@field Stock FontString The stock text display
----@field searchOverlay Texture Overlay shown when searching
----@field ItemContextOverlay Texture Overlay for item context display
----@field IconBorder Texture Border around the item icon
----@field IconOverlay Texture Primary overlay on the icon
----@field IconOverlay2 Texture Secondary overlay on the icon
 ---@field ProfessionQualityOverlay Texture|nil Overlay showing profession quality
----@field NormalTexture Texture Normal button texture
 ---@field PushedTexture Texture Texture shown when button is pushed
----@field HighlightTexture Texture Highlight texture when hovering
 ---@field GetItemContextMatchResult fun(self: ItemButton): number Function to get item context match results
 ---@field OnItemContextChanged fun(self: ItemButton) Called when item context changes
 ---@field PostOnShow fun(self: ItemButton) Called after OnShow

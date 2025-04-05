@@ -184,6 +184,18 @@ function G_RLF:OpenOptions(button)
 		for _, item in ipairs(menu) do
 			table.insert(tmpMenu, item)
 		end
+		local unseenNotifications = G_RLF.Notifications:GetNumUnseenNotifications()
+		if unseenNotifications > 0 then
+			table.insert(tmpMenu, {
+				text = string.format(G_RLF.L["View Notifications"], unseenNotifications),
+				func = function()
+					local notifModule = G_RLF.RLF:GetModule("Notifications") --[[@as RLF_Notifications]]
+					if notifModule then
+						notifModule:ViewAllNotifications()
+					end
+				end,
+			})
+		end
 		if G_RLF.db.global.lootHistory.enabled then
 			table.insert(tmpMenu, {
 				text = G_RLF.L["Toggle Loot History"],
@@ -225,4 +237,13 @@ function G_RLF:FontFlagsToString(frame)
 	local stylingDb = G_RLF.DbAccessor:Styling(frame)
 	local flags = stylingDb.fontFlags
 	return self:TableToCommaSeparatedString(flags)
+end
+
+function G_RLF:GenerateGUID()
+	local random = math.random
+	local template = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx"
+	return string.gsub(template, "[xy]", function(c)
+		local v = (c == "x") and random(0, 15) or random(8, 11)
+		return string.format("%x", v)
+	end)
 end

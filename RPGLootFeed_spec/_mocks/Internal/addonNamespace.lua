@@ -8,6 +8,7 @@ addonNamespaceMocks.LoadSections = {
 	None = 0,
 	Core = 1,
 	Locale = 2,
+	UtilsNotifications = 2.001,
 	UtilsAddonMethods = 2.01,
 	UtilsAlphaHelpers = 2.02,
 	UtilsList = 2.03,
@@ -63,6 +64,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 		}
 		addonNamespaceMocks.lsm = {}
 		addonNamespaceMocks.lsm.HashTable = stub(ns.lsm, "HashTable")
+		addonNamespaceMocks.lsm.Fetch = stub(ns.lsm, "Fetch")
 		local iconGroupMock = {}
 		addonNamespaceMocks.iconGroup = {}
 		addonNamespaceMocks.iconGroup.AddButton = stub(iconGroupMock, "AddButton")
@@ -79,6 +81,19 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 	if loadSection >= addonNamespaceMocks.LoadSections.Locale then
 		require("RPGLootFeed_spec._mocks.Libs.LibStub")
 		ns.L = assert(loadfile("RPGLootFeed/locale/enUS.lua"))("TestAddon", ns)
+	end
+	if loadSection >= addonNamespaceMocks.LoadSections.UtilsNotifications then
+		ns.Notifications = {}
+		addonNamespaceMocks.Notifications = {}
+		addonNamespaceMocks.Notifications.CheckForNotifications = stub(ns.Notifications, "CheckForNotifications")
+		addonNamespaceMocks.Notifications.GetNumUnseenNotifications =
+			stub(ns.Notifications, "GetNumUnseenNotifications").returns(0)
+		addonNamespaceMocks.Notifications.AddNotification = stub(ns.Notifications, "AddNotification")
+		addonNamespaceMocks.Notifications.AckAllNotifications = stub(ns.Notifications, "AckAllNotifications")
+		addonNamespaceMocks.Notifications.AckNotification = stub(ns.Notifications, "AckNotification")
+		addonNamespaceMocks.Notifications.RemoveSeenNotifications = stub(ns.Notifications, "RemoveSeenNotifications")
+		addonNamespaceMocks.Notifications.NotifyGlow = stub(ns.Notifications, "NotifyGlow")
+		addonNamespaceMocks.Notifications.StopNotifyGlow = stub(ns.Notifications, "StopNotifyGlow")
 	end
 	if loadSection >= addonNamespaceMocks.LoadSections.UtilsAddonMethods then
 		addonNamespaceMocks.fn = stub(ns, "fn", function(s, func, ...)
@@ -102,6 +117,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 		addonNamespaceMocks.OpenOptions = stub(ns, "OpenOptions")
 		addonNamespaceMocks.TableToCommaSeparatedString = stub(ns, "TableToCommaSeparatedString")
 		addonNamespaceMocks.FontFlagsToString = stub(ns, "FontFlagsToString")
+		addonNamespaceMocks.GenerateGUID = stub(ns, "GenerateGUID").returns("1234567890")
 	end
 	if loadSection >= addonNamespaceMocks.LoadSections.UtilsAlphaHelpers then
 		addonNamespaceMocks.dump = stub(ns, "dump")
@@ -165,6 +181,18 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 			},
 			profile = {},
 		}
+		ns.level1OptionsOrder = {
+			["testMode"] = 1,
+			["clearRows"] = 2,
+			["lootHistory"] = 3,
+			["features"] = 4,
+			["positioning"] = 5,
+			["sizing"] = 6,
+			["styling"] = 7,
+			["animations"] = 8,
+			["blizz"] = 9,
+			["about"] = -1,
+		}
 		ns.options = {
 			args = {},
 		}
@@ -175,9 +203,10 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 			PartyLoot = 2,
 			Currency = 3,
 			Money = 4,
-			XP = 5,
-			Rep = 6,
-			Skills = 7,
+			Experience = 5,
+			Reputation = 6,
+			Profession = 7,
+			TravelPoints = 8,
 		}
 		ns.options.args.features = {
 			args = {},
@@ -257,6 +286,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 				lastVersionLoaded = "v1.0.0",
 				logger = {},
 				migrationVersion = 0,
+				about = {},
 				animations = {
 					exit = {},
 				},
@@ -295,6 +325,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 				tooltips = {},
 				sizing = {},
 				positioning = {},
+				notifications = {},
 			},
 			locale = {
 				factionMap = {},
