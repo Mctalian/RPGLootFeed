@@ -41,6 +41,12 @@ function RLF:OnInitialize()
 	---@field locale RLF_DBLocale
 	---@field profile RLF_DBProfile
 	G_RLF.db = LibStub("AceDB-3.0"):New(dbName, G_RLF.defaults, true)
+	if G_RLF.db.global.guid == nil then
+		-- This is not an identifier associated with your character, but a way
+		-- to identify a unique installation of the addon. It cannot be used to
+		-- identify a specific character or account.
+		G_RLF.db.global.guid = G_RLF:GenerateGUID()
+	end
 	DbMigrations()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
 	local rlfLDB = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {
