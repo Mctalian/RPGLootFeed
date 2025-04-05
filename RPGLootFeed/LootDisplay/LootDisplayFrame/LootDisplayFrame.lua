@@ -525,7 +525,9 @@ end
 
 function LootDisplayFrameMixin:UpdateRowItemCounts()
 	for row in self.rows:iterate() do
-		if row.id and row.type == "ItemLoot" and not row.unit then
+		---@type RLF_LootDisplayRow
+		local row = row --[[@as RLF_LootDisplayRow]]
+		if row.key and row.type == "ItemLoot" and not row.unit then
 			row:UpdateItemCount(row)
 		end
 	end
