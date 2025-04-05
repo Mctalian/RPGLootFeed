@@ -56,6 +56,7 @@ local G_RLF = ns
 ---@field StaticBottomBorder Texture
 ---@field StaticLeftBorder Texture
 ---@field UnitPortrait RLF_RowTexture
+---@field RLFUser RLF_RowTexture
 ---@field PrimaryText RLF_RowFontString
 ---@field SecondaryText RLF_RowFontString
 ---@field ItemCountText RLF_RowFontString
@@ -100,6 +101,9 @@ function LootDisplayRowMixin:Init()
 	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 
 	self:SetSize(sizingDb.feedWidth, sizingDb.rowHeight)
+	self.RLFUser:SetTexture("Interface/AddOns/RPGLootFeed/Icons/logo.blp")
+	self.RLFUser:SetDrawLayer("OVERLAY")
+	self.RLFUser:Hide()
 	self:StyleBackground()
 	self:StyleRowBorders()
 	self:StyleExitAnimation()
@@ -385,6 +389,9 @@ function LootDisplayRowMixin:StyleUnitPortrait()
 		local portraitSize = iconSize * 0.8
 		self.UnitPortrait:SetSize(portraitSize, portraitSize)
 		self.UnitPortrait:ClearAllPoints()
+		local rlfIconSize = portraitSize * 0.6
+		self.RLFUser:SetSize(rlfIconSize, rlfIconSize)
+		self.RLFUser:ClearAllPoints()
 
 		local anchor, iconAnchor, xOffset = "LEFT", "RIGHT", iconSize / 4
 		if not leftAlign then
@@ -392,6 +399,7 @@ function LootDisplayRowMixin:StyleUnitPortrait()
 		end
 
 		self.UnitPortrait:SetPoint(anchor, self.Icon, iconAnchor, xOffset, 0)
+		self.RLFUser:SetPoint("BOTTOMRIGHT", self.UnitPortrait, "BOTTOMRIGHT", rlfIconSize / 2, 0)
 	end
 
 	if self.unit then
@@ -401,8 +409,12 @@ function LootDisplayRowMixin:StyleUnitPortrait()
 			end
 		end)
 		self.UnitPortrait:Show()
+		if false then -- TODO: Coming soon
+			self.RLFUser:Show()
+		end
 	else
 		self.UnitPortrait:Hide()
+		self.RLFUser:Hide()
 	end
 end
 
