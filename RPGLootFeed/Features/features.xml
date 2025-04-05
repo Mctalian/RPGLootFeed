@@ -2,7 +2,7 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-    <Script file="LootDisplayProperties.lua"/>
+    <Include file="_Internals/internals.xml"/>
     <Include file="ItemLoot/ItemLoot.xml"/>
     <Include file="PartyLoot/PartyLoot.xml"/>
     <Include file="Currency/Currency.xml"/>
@@ -11,5 +11,4 @@
     <Script file="Reputation.lua"/>
     <Script file="Professions.lua"/>
     <Script file="TravelPoints.lua"/>
-    <Script file="RLF_Notifications.lua"/>
 </Ui>

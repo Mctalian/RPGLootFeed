@@ -12,7 +12,7 @@ describe("LootDisplayProperties module", function()
 		-- Define the global G_RLF
 		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 		-- Load the list module before each test
-		LootModule = assert(loadfile("RPGLootFeed/Features/LootDisplayProperties.lua"))("TestAddon", ns)
+		LootModule = assert(loadfile("RPGLootFeed/Features/_Internals/LootDisplayProperties.lua"))("TestAddon", ns)
 	end)
 
 	it("LootModule is not nil", function()
