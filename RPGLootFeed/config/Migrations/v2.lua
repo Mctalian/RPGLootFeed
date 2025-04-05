@@ -18,6 +18,8 @@ function migration:run()
 		"global.styling.disableRowHighlight",
 		"global.animations.update.disableHighlight"
 	)
+
+	G_RLF.db.global.migrationVersion = version
 end
 
 G_RLF.migrations[version] = migration
