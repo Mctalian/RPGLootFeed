@@ -34,7 +34,7 @@ local G_RLF = ns
 ---@field slideIn Translation
 
 ---@class RLF_LootDisplayRow: Frame
----@field id number
+---@field key string
 ---@field frameType G_RLF.Frames
 ---@field amount number
 ---@field icon string
@@ -141,7 +141,7 @@ function LootDisplayRowMixin:Reset()
 	self:ClearAllPoints()
 
 	-- Reset row-specific data
-	self.id = nil
+	self.key = nil
 	self.amount = nil
 	self.icon = nil
 	self.link = nil
@@ -969,7 +969,7 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 		self.unit = unit
 	end
 
-	self.id = key
+	self.key = key
 	self.amount = quantity
 	self.type = element.type
 	self.quality = quality
@@ -1191,9 +1191,12 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 		if not itemDb.itemCountTextEnabled then
 			return
 		end
-
+		if not self.key or not element.key then
+			G_RLF:LogDebug("Item key is nil")
+			return
+		end
 		RunNextFrame(function()
-			local itemCount = C_Item.GetItemCount(self.id or element.key, true, false, true, true)
+			local itemCount = C_Item.GetItemCount(self.key or element.key, true, false, true, true)
 			self:ShowItemCountText(itemCount, {
 				color = G_RLF:RGBAToHexFormat(unpack(itemDb.itemCountTextColor)),
 				wrapChar = itemDb.itemCountTextWrapChar,
