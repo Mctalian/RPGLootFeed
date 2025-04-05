@@ -117,6 +117,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 		addonNamespaceMocks.OpenOptions = stub(ns, "OpenOptions")
 		addonNamespaceMocks.TableToCommaSeparatedString = stub(ns, "TableToCommaSeparatedString")
 		addonNamespaceMocks.FontFlagsToString = stub(ns, "FontFlagsToString")
+		addonNamespaceMocks.GenerateGUID = stub(ns, "GenerateGUID").returns("1234567890")
 	end
 	if loadSection >= addonNamespaceMocks.LoadSections.UtilsAlphaHelpers then
 		addonNamespaceMocks.dump = stub(ns, "dump")

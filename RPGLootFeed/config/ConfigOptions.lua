@@ -22,6 +22,7 @@ G_RLF.defaults = {
 		logger = {},
 		migrationVersion = 0,
 		notifications = {},
+		guid = nil,
 	},
 }
 
