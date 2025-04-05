@@ -925,7 +925,7 @@ function LootDisplayRowMixin:StyleIconHighlight()
 		self.glowAnimationGroup.scaleUp:SetScaleFrom(1 / factor, 1 / factor)
 		self.glowAnimationGroup.scaleUp:SetScaleTo(factor, factor)
 		self.glowAnimationGroup.scaleUp:SetDuration(0.5)
-		self.glowAnimationGroup.scaleUp:SetSmoothing("OUT_IN")
+		self.glowAnimationGroup.scaleUp:SetSmoothing("OUT")
 	end
 end
 
