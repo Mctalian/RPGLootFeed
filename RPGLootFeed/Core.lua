@@ -4,7 +4,7 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
-G_RLF.addonVersion = "@project-version@-@project-abbreviated-hash@"
+G_RLF.addonVersion = "@project-version@"
 
 ---@class RPGLootFeed: AceAddon, AceConsole, AceEvent, AceHook, AceTimer
 ---@field public GetModule fun(self: RPGLootFeed, name: string): RLF_Module
@@ -102,7 +102,7 @@ function RLF:OnInitialize()
 		end)
 	end
 
-	TestMode = self:GetModule("TestMode")
+	TestMode = self:GetModule("TestMode") --[[@as RLF_TestMode]]
 end
 
 function RLF:SlashCommand(msg, editBox)
