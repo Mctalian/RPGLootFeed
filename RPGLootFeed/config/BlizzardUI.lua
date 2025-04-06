@@ -156,5 +156,19 @@ G_RLF.options.args.blizz = {
 			end,
 			order = 11,
 		},
+		disableSkillChatMessages = {
+			type = "execute",
+			name = G_RLF.L["Disable Skill Chat Messages"],
+			desc = G_RLF.L["DisableSkillChatMessagesDesc"],
+			width = "double",
+			func = function()
+				ChatFrameUtil.ForEachChatFrame(function(frame)
+					ChatFrame_RemoveMessageGroup(frame, "SKILL")
+					ChatFrame_RemoveMessageGroup(frame, "TRADESKILLS")
+				end)
+				G_RLF:Print(G_RLF.L["Skill messages Disabled"])
+			end,
+			order = 12,
+		},
 	},
 }

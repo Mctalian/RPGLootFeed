@@ -20,6 +20,7 @@ L["Currency messages Disabled"] = "Currency messages Disabled"
 L["Money messages Disabled"] = "Money messages Disabled"
 L["XP messages Disabled"] = "XP messages Disabled"
 L["Rep messages Disabled"] = "Rep messages Disabled"
+L["Skill messages Disabled"] = "Skill messages Disabled"
 
 L["About"] = "About"
 L["AboutDesc"] = "About the addon and its author"
@@ -407,5 +408,7 @@ L["Disable Experience Chat Messages"] = "Disable Experience Chat Messages"
 L["DisableExperienceChatMessagesDesc"] = "Disables Experience Chat Messages in all chat windows."
 L["Disable Reputation Chat Messages"] = "Disable Reputation Chat Messages"
 L["DisableReputationChatMessagesDesc"] = "Disables Reputation Chat Messages in all chat windows."
+L["Disable Skill Chat Messages"] = "Disable Skill Chat Messages"
+L["DisableSkillChatMessagesDesc"] = "Disables Skill/Trade Skill/Profession Chat Messages in all chat windows."
 
 return L
