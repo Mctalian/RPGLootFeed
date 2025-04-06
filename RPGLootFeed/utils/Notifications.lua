@@ -104,6 +104,8 @@ end
 
 function G_RLF.Notifications:NotifyGlow()
 	if G_RLF.db.global.minimap.hide then
+		local notifModule = G_RLF.RLF:GetModule("Notifications") --[[@as RLF_Notifications]]
+		notifModule:ViewAllNotifications()
 		return
 	end
 

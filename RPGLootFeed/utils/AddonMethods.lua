@@ -247,3 +247,61 @@ function G_RLF:GenerateGUID()
 		return string.format("%x", v)
 	end)
 end
+
+function G_RLF:IsRLFStableRelease()
+	--@alpha@
+	if true then
+		return false
+	end
+	--@end-alpha@
+	--@beta@
+	if true then
+		return false
+	end
+	--@end-beta@
+	return true
+end
+
+function G_RLF:ParseVersion(version)
+	version = version or G_RLF.addonVersion
+	local major, minor, patch = string.match(version, "v(%d+)%.(%d+)%.(%d+)")
+
+	if major and minor and patch then
+		return tonumber(major), tonumber(minor), tonumber(patch)
+	else
+		return nil, nil, nil
+	end
+end
+
+function G_RLF:CompareWithVersion(version)
+	local myVersion = G_RLF.addonVersion
+	local cmpVersion = version
+	local major1, minor1, patch1 = self:ParseVersion(cmpVersion)
+	local major2, minor2, patch2 = self:ParseVersion(myVersion)
+
+	if major1 and major2 then
+		if major1 > major2 then
+			return G_RLF.VersionCompare.NEWER
+		elseif major1 < major2 then
+			return G_RLF.VersionCompare.OLDER
+		end
+
+		if minor1 and minor2 then
+			if minor1 > minor2 then
+				return G_RLF.VersionCompare.NEWER
+			elseif minor1 < minor2 then
+				return G_RLF.VersionCompare.OLDER
+			end
+
+			if patch1 and patch2 then
+				if patch1 > patch2 then
+					return G_RLF.VersionCompare.NEWER
+				elseif patch1 < patch2 then
+					return G_RLF.VersionCompare.OLDER
+				end
+			end
+		end
+	end
+
+	return G_RLF.VersionCompare.SAME -- Versions are equal or invalid
+end

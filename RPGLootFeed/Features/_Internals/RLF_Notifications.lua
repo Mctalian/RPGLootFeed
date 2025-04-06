@@ -49,7 +49,6 @@ end
 function Notifications:ViewNotification(index)
 	G_RLF:LogDebug("ViewNotification " .. index)
 	if G_RLF.db.global.notifications and G_RLF.db.global.notifications[index] then
-		G_RLF:Print("ViewNotification " .. index)
 		local e =
 			self.Element:new(G_RLF.db.global.notifications[index].key, G_RLF.db.global.notifications[index].text, index)
 		e:Show()
@@ -66,4 +65,5 @@ function Notifications:ViewAllNotifications()
 			end
 		end
 	end
+	-- PlaySoundFile(569200)
 end

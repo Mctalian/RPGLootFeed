@@ -147,3 +147,21 @@ G_RLF.TertiaryStats = {
 	Avoid = 3,
 	Indestructible = 4,
 }
+
+G_RLF.NotificationKeys = {
+	VERSION = "RLF_NewVersion",
+}
+
+G_RLF.CommMessagePrefixes = {
+	VERSION = "RLF_Version",
+}
+
+G_RLF.CommsMessages = {
+	VERSION = G_RLF.CommMessagePrefixes.VERSION .. " %s",
+}
+
+G_RLF.VersionCompare = {
+	OLDER = -1,
+	SAME = 0,
+	NEWER = 1,
+}
