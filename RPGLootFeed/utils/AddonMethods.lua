@@ -95,7 +95,7 @@ end
 --- Create info log
 --- @see RLF_Logger.addLogEntry
 --- @param message string
---- @param source string
+--- @param source? string
 --- @param type? string
 --- @param id? string
 --- @param content? string
@@ -108,7 +108,7 @@ end
 --- Create warning log
 --- @see RLF_Logger.addLogEntry
 --- @param message string
---- @param source string
+--- @param source? string
 --- @param type? string
 --- @param id? string
 --- @param content? string
@@ -121,7 +121,7 @@ end
 --- Create error log
 --- @see RLF_Logger.addLogEntry
 --- @param message string
---- @param source string
+--- @param source? string
 --- @param type? string
 --- @param id? string
 --- @param content? string
