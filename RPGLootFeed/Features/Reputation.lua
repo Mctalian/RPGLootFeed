@@ -163,6 +163,9 @@ function Rep.Element:new(...)
 	elseif factionIdIconMap[element.factionId] then
 		element.icon = factionIdIconMap[element.factionId]
 		element.quality = Enum.ItemQuality.Rare
+	elseif element.repType == RepType.DelveCompanion then
+		element.icon = 5315246 -- interface/icons/inv_cape_special_explorer_b_03
+		element.quality = Enum.ItemQuality.Rare
 	else
 		element.icon = G_RLF.DefaultIcons.REPUTATION
 		element.quality = Enum.ItemQuality.Rare
