@@ -93,6 +93,7 @@ local function mockLibStub(lib, silence)
 		stub(libStubReturn[lib], "Register")
 		stub(libStubReturn[lib], "Show")
 		stub(libStubReturn[lib], "Hide")
+		stub(libStubReturn[lib], "AddButtonToCompartment")
 	elseif lib == "LibEasyMenu" then
 		stub(libStubReturn[lib], "EasyMenu")
 	else
