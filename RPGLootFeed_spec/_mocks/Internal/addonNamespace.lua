@@ -31,7 +31,7 @@ addonNamespaceMocks.LoadSections = {
 	ConfigFeaturesAll = 3.99,
 	Config = 4,
 	BlizzOverrides = 5,
-	FeatureLootDisplayProperties = 5.01,
+	FeatureInternals = 5.01,
 	FeatureItemLootAuction = 5.02,
 	FeatureItemLoot = 5.03,
 	FeaturePartyLoot = 5.04,
@@ -55,7 +55,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 	---@class test_G_RLF: G_RLF
 	local ns = {}
 	if loadSection >= addonNamespaceMocks.LoadSections.Core then
-		ns.addonVersion = "1.0.0"
+		ns.addonVersion = "v1.0.0"
 		ns.localeName = "RPGLootFeedLocale"
 		ns.lsm = {
 			MediaType = {
@@ -118,6 +118,9 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 		addonNamespaceMocks.TableToCommaSeparatedString = stub(ns, "TableToCommaSeparatedString")
 		addonNamespaceMocks.FontFlagsToString = stub(ns, "FontFlagsToString")
 		addonNamespaceMocks.GenerateGUID = stub(ns, "GenerateGUID").returns("1234567890")
+		addonNamespaceMocks.IsRLFStableRelease = stub(ns, "IsRLFStableRelease").returns(true)
+		addonNamespaceMocks.ParseVersion = stub(ns, "ParseVersion").returns(1, 0, 0)
+		addonNamespaceMocks.CompareWithVersion = stub(ns, "CompareWithVersion").returns(0)
 	end
 	if loadSection >= addonNamespaceMocks.LoadSections.UtilsAlphaHelpers then
 		addonNamespaceMocks.dump = stub(ns, "dump")
@@ -237,7 +240,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 	if loadSection >= addonNamespaceMocks.LoadSections.BlizzOverrides then
 		addonNamespaceMocks.retryHook = stub(ns, "retryHook")
 	end
-	if loadSection >= addonNamespaceMocks.LoadSections.FeatureLootDisplayProperties then
+	if loadSection >= addonNamespaceMocks.LoadSections.FeatureInternals then
 		addonNamespaceMocks.InitializeLootDisplayProperties = stub(ns, "InitializeLootDisplayProperties")
 	end
 	if loadSection >= addonNamespaceMocks.LoadSections.FeatureItemLootAuction then

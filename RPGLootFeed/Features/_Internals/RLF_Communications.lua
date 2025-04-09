@@ -14,6 +14,7 @@ end
 
 function Communications:OnEnable()
 	G_RLF:LogDebug("Communications:OnEnable")
+	self.lastVersionEncountered = G_RLF.addonVersion
 	self:RegisterComm(addonName)
 	self:RegisterEvent("GROUP_JOINED")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
@@ -22,30 +23,25 @@ end
 function Communications:OnDisable()
 	G_RLF:LogDebug("Communications:OnDisable")
 	self:UnregisterAllComm()
+	self:UnregisterAllEvents()
 end
 
 function Communications:TransmitSay(message)
 	G_RLF:LogDebug("TransmitSay " .. message)
-	self:SendCommMessage(addonName, message, "SAY", "BULK")
+	self:SendCommMessage(addonName, message, "SAY", nil, "BULK")
 end
 
 function Communications:TransmitYell(message)
 	G_RLF:LogDebug("TransmitYell " .. message)
-	self:SendCommMessage(addonName, message, "YELL", "BULK")
+	self:SendCommMessage(addonName, message, "YELL", nil, "BULK")
 end
 
-function Communications:TransmitChannel(message)
+--- Transmit to a specific channel
+--- @param message string The message to transmit
+--- @param channelId? number The channel ID to transmit to, defaults to the general channel
+function Communications:TransmitChannel(message, channelId)
 	G_RLF:LogDebug("TransmitChannel " .. message)
-	local channelId = GetChannelName("rlfcomms")
-	if channelId == 0 then
-		G_RLF:LogDebug("Channel not found, creating it")
-		JoinTemporaryChannel("rlfcomms")
-	end
-	channelId = GetChannelName("rlfcomms")
-	if channelId == 0 then
-		G_RLF:LogError("Channel not found, unable to send message")
-		return
-	end
+	local channelId = channelId or C_ChatInfo.GetGeneralChannelID()
 	self:SendCommMessage(addonName, message, "CHANNEL", tostring(channelId), "BULK")
 end
 
@@ -56,22 +52,22 @@ end
 
 function Communications:TransmitParty(message)
 	G_RLF:LogDebug("TransmitParty " .. message)
-	self:SendCommMessage(addonName, message, "PARTY", "BULK")
+	self:SendCommMessage(addonName, message, "PARTY", nil, "BULK")
 end
 
 function Communications:TransmitRaid(message)
 	G_RLF:LogDebug("TransmitRaid " .. message)
-	self:SendCommMessage(addonName, message, "RAID", "BULK")
+	self:SendCommMessage(addonName, message, "RAID", nil, "BULK")
 end
 
 function Communications:TransmitGuild(message)
 	G_RLF:LogDebug("TransmitGuild " .. message)
-	self:SendCommMessage(addonName, message, "GUILD", "BULK")
+	self:SendCommMessage(addonName, message, "GUILD", nil, "BULK")
 end
 
 function Communications:TransmitInstance(message)
 	G_RLF:LogDebug("TransmitInstance " .. message)
-	self:SendCommMessage(addonName, message, "INSTANCE_CHAT", "BULK")
+	self:SendCommMessage(addonName, message, "INSTANCE_CHAT", nil, "BULK")
 end
 
 local playerName = UnitName("player")
@@ -92,8 +88,9 @@ function Communications:OnCommReceived(prefix, payload, distribution, sender)
 			end
 
 			if distribution ~= "WHISPER" then
-				local versionCompare = G_RLF:CompareWithVersion(versionFromPayload)
+				local versionCompare = G_RLF:CompareWithVersion(self.lastVersionEncountered, versionFromPayload)
 				if versionCompare == G_RLF.VersionCompare.NEWER then
+					self.lastVersionEncountered = versionFromPayload
 					G_RLF.Notifications:AddNotification(
 						G_RLF.NotificationKeys.VERSION,
 						string.format(G_RLF.L["New version available"], versionFromPayload)
@@ -102,8 +99,9 @@ function Communications:OnCommReceived(prefix, payload, distribution, sender)
 					self:TransmitWhisper(string.format(G_RLF.CommsMessages.VERSION, G_RLF.addonVersion), sender)
 				end
 			else
-				local versionCompare = G_RLF:CompareWithVersion(versionFromPayload)
+				local versionCompare = G_RLF:CompareWithVersion(self.lastVersionEncountered, versionFromPayload)
 				if versionCompare == G_RLF.VersionCompare.NEWER then
+					self.lastVersionEncountered = versionFromPayload
 					G_RLF.Notifications:AddNotification(
 						G_RLF.NotificationKeys.VERSION,
 						string.format(G_RLF.L["New version available"], versionFromPayload)
@@ -114,7 +112,7 @@ function Communications:OnCommReceived(prefix, payload, distribution, sender)
 	end
 end
 
-function Communications:QueryGroupVersion()
+function Communications:QueryGroupVersion(versionPayload)
 	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and IsInInstance() then
 		self:TransmitInstance(versionPayload)
 	elseif IsInRaid() then
@@ -127,7 +125,8 @@ end
 function Communications:GROUP_JOINED(eventName, category, partyGUID)
 	G_RLF:LogDebug(eventName, "WOWEVENT", self.moduleName, nil, eventName .. " " .. category .. " " .. partyGUID)
 
-	self:QueryGroupVersion()
+	local versionPayload = string.format(G_RLF.CommsMessages.VERSION, G_RLF.addonVersion)
+	self:QueryGroupVersion(versionPayload)
 end
 
 function Communications:PLAYER_ENTERING_WORLD(eventName, isLogin, isReload)
@@ -139,7 +138,8 @@ function Communications:PLAYER_ENTERING_WORLD(eventName, isLogin, isReload)
 		eventName .. " " .. tostring(isLogin) .. " " .. tostring(isReload)
 	)
 
-	self:QueryGroupVersion()
+	local versionPayload = string.format(G_RLF.CommsMessages.VERSION, G_RLF.addonVersion)
+	self:QueryGroupVersion(versionPayload)
 	if IsInGuild() then
 		self:TransmitGuild(versionPayload)
 	end
@@ -149,3 +149,5 @@ function Communications:PLAYER_ENTERING_WORLD(eventName, isLogin, isReload)
 		self:TransmitChannel(versionPayload)
 	end
 end
+
+return Communications

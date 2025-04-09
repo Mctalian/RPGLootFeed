@@ -18,7 +18,7 @@ describe("AuctionIntegrations module", function()
 
 	describe("load order", function()
 		it("loads the file successfully", function()
-			ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.FeatureLootDisplayProperties)
+			ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.FeatureInternals)
 			local auctionIntegrationsModule =
 				assert(loadfile("RPGLootFeed/Features/ItemLoot/AuctionIntegrations.lua"))("TestAddon", ns)
 			assert.is_not_nil(auctionIntegrationsModule)

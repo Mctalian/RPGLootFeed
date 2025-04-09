@@ -11,10 +11,10 @@ local stub = busted.stub
 
 describe("Money module", function()
 	local _ = match._
-	local MoneyModule, ns
+	local MoneyModule, ns, fnMocks
 
 	before_each(function()
-		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		fnMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
 		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 		-- Load the LootDisplayProperties module to populate `ns`
 		assert(loadfile("RPGLootFeed/Features/_Internals/LootDisplayProperties.lua"))("TestAddon", ns)
@@ -39,7 +39,7 @@ describe("Money module", function()
 
 	it("Money:OnEnable registers events and sets startingMoney", function()
 		stub(MoneyModule, "RegisterEvent")
-		local stubGetMoney = stub(_G, "GetMoney").returns(1000)
+		local stubGetMoney = fnMocks.GetMoney.returns(1000)
 
 		MoneyModule:OnEnable()
 
@@ -48,7 +48,6 @@ describe("Money module", function()
 		assert.equal(MoneyModule.startingMoney, 1000)
 
 		MoneyModule.RegisterEvent:revert()
-		stubGetMoney:revert()
 	end)
 
 	it("Money:OnDisable unregisters events", function()
@@ -63,17 +62,15 @@ describe("Money module", function()
 	end)
 
 	it("Money:PLAYER_ENTERING_WORLD sets startingMoney", function()
-		local stubGetMoney = stub(_G, "GetMoney").returns(2000)
+		fnMocks.GetMoney.returns(2000)
 
 		MoneyModule:PLAYER_ENTERING_WORLD("PLAYER_ENTERING_WORLD")
 
 		assert.equal(MoneyModule.startingMoney, 2000)
-
-		stubGetMoney:revert()
 	end)
 
 	it("Money:PLAYER_MONEY updates startingMoney and creates a new element", function()
-		local stubGetMoney = stub(_G, "GetMoney").returns(3000)
+		fnMocks.GetMoney.returns(3000)
 		local elementMock = mock(MoneyModule.Element, false)
 		local elementShowSpy, elementPlaySoundSpy
 		local stubInitializeLootDisplayProperties = stub(ns, "InitializeLootDisplayProperties", function(e)
@@ -87,7 +84,6 @@ describe("Money module", function()
 		assert.spy(elementMock.new).was.called_with(MoneyModule.Element, 2000)
 		assert.spy(elementShowSpy).was.called(1)
 
-		stubGetMoney:revert()
 		stubInitializeLootDisplayProperties:revert()
 	end)
 end)

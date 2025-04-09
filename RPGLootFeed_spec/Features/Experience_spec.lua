@@ -10,11 +10,11 @@ local stub = busted.stub
 
 describe("Experience module", function()
 	local _ = match._
-	local XpModule, ns
+	local XpModule, ns, fnMocks
 
 	before_each(function()
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
-		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		fnMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
 		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 
 		-- Load the LootDisplayProperties module to populate `ns`
@@ -55,9 +55,9 @@ describe("Experience module", function()
 		-- xp value is still 10
 		-- (50 max for last level - 10 old xp value) + 10 new xp value = 50 xp earned
 		---@diagnostic disable-next-line: undefined-field
-		local stubUnitLevel = stub(_G, "UnitLevel").returns(3)
+		local stubUnitLevel = fnMocks.UnitLevel.returns(3)
 		---@diagnostic disable-next-line: undefined-field
-		local stubUnitXPMax = stub(_G, "UnitXPMax").returns(100)
+		local stubUnitXPMax = fnMocks.UnitXPMax.returns(100)
 
 		local newElement = spy.on(XpModule.Element, "new")
 

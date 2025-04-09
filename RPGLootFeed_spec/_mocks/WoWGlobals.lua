@@ -11,6 +11,11 @@ wowGlobals.BossBanner = {}
 wowGlobals.BossBanner.OnEvent = stub(_G.BossBanner, "OnEvent")
 --#endregion
 
+--#region:C_ChatInfo
+_G.C_ChatInfo = {}
+stub(_G.C_ChatInfo, "GetGeneralChannelID").returns(1)
+--#endregion
+
 --#region:C_CVar
 _G.C_CVar = {}
 stub(_G.C_CVar, "SetCVar")
@@ -339,6 +344,7 @@ _G.FACTION_STANDING_DECREASED_ACCOUNT_WIDE = "AccRep with %s dec by %d."
 
 --#region:Global consts
 _G.MEMBERS_PER_RAID_GROUP = 5
+_G.LE_PARTY_CATEGORY_INSTANCE = 2
 --#endregion
 
 return wowGlobals

@@ -59,7 +59,7 @@ describe("LootDisplayFrameMixin", function()
 	end)
 
 	it("initializes correctly with Load method", function()
-		stub(_G, "CreateFramePool").returns({})
+		mockGlobalFns.CreateFramePool.returns({})
 
 		local testList = {}
 		nsMocks.list.returns(testList)

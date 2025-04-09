@@ -273,9 +273,9 @@ function G_RLF:ParseVersion(version)
 	end
 end
 
-function G_RLF:CompareWithVersion(version)
-	local myVersion = G_RLF.addonVersion
-	local cmpVersion = version
+function G_RLF:CompareWithVersion(myVersion, cmpVersion)
+	local myVersion = myVersion
+	local cmpVersion = cmpVersion
 	local major1, minor1, patch1 = self:ParseVersion(cmpVersion)
 	local major2, minor2, patch2 = self:ParseVersion(myVersion)
 
