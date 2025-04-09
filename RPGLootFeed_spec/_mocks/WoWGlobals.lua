@@ -343,8 +343,10 @@ _G.FACTION_STANDING_DECREASED_ACCOUNT_WIDE = "AccRep with %s dec by %d."
 --#endregion
 
 --#region:Global consts
-_G.MEMBERS_PER_RAID_GROUP = 5
 _G.LE_PARTY_CATEGORY_INSTANCE = 2
+_G.MAX_WOW_CHAT_CHANNELS = 20
+_G.MEMBERS_PER_RAID_GROUP = 5
+_G.GENERAL = "General"
 --#endregion
 
 return wowGlobals

@@ -22,6 +22,7 @@ end)
 
 functions.CreateFrame = stub(_G, "CreateFrame")
 functions.CreateFramePool = stub(_G, "CreateFramePool").returns({})
+functions.GetChannelName = stub(_G, "GetChannelName")
 functions.GetExpansionLevel = stub(_G, "GetExpansionLevel").returns(10)
 functions.GetInventoryItemLink = stub(_G, "GetInventoryItemLink")
 functions.GetFactionInfoByID = stub(_G, "GetFactionInfoByID", function(id)
