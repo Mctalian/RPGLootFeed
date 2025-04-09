@@ -40,8 +40,13 @@ end
 --- @param message string The message to transmit
 --- @param channelId? number The channel ID to transmit to, defaults to the general channel
 function Communications:TransmitChannel(message, channelId)
-	G_RLF:LogDebug("TransmitChannel " .. message)
-	local channelId = channelId or C_ChatInfo.GetGeneralChannelID()
+	if channelId == nil then
+		G_RLF:LogError(
+			"TransmitChannel called with nil channelId, please report this to McTalian via GitHub or Discord"
+		)
+		return
+	end
+	G_RLF:LogDebug("TransmitChannel " .. message .. " to " .. channelId)
 	self:SendCommMessage(addonName, message, "CHANNEL", tostring(channelId), "BULK")
 end
 
@@ -146,7 +151,24 @@ function Communications:PLAYER_ENTERING_WORLD(eventName, isLogin, isReload)
 	if G_RLF:IsClassic() then
 		self:TransmitYell(versionPayload)
 	else
-		self:TransmitChannel(versionPayload)
+		if self.generalChannelId == nil then
+			if GetExpansionLevel() >= G_RLF.Expansion.SL then
+				self.generalChannelId = C_ChatInfo.GetGeneralChannelID()
+			else
+				for i = 1, MAX_WOW_CHAT_CHANNELS do
+					local channelId, channelName = GetChannelName(i)
+					if channelId > 0 and channelName ~= nil then
+						local normalizedName = channelName:gsub("%s%-%s.*", "")
+						if normalizedName == "General" or normalizedName == _G["GENERAL"] then
+							self.generalChannelId = channelId
+							break
+						end
+					end
+				end
+			end
+		end
+
+		self:TransmitChannel(versionPayload, self.generalChannelId)
 	end
 end
 
