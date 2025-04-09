@@ -190,6 +190,24 @@ describe("AddonMethods", function()
 			end)
 		end)
 
+		describe("FontFlagsToString", function()
+			it("converts font flags to a string", function()
+				nsMocks.DbAccessor.Styling.returns({
+					fontFlags = {
+						["OUTLINE"] = true,
+						["THICKOUTLINE"] = true,
+					},
+				})
+				local result = ns:FontFlagsToString()
+				local count = select(2, string.gsub(result, ", ", ""))
+				---@diagnostic disable-next-line: redundant-parameter
+				assert.is_true(string.find(result, "%f[%a]OUTLINE%f[%A]") ~= nil, "Expected OUTLINE flag")
+				---@diagnostic disable-next-line: redundant-parameter
+				assert.is_true(string.find(result, "THICKOUTLINE") ~= nil, "Expected THICKOUTLINE flag")
+				assert.are.equal(1, count, "Expected a single occurrence of ', '")
+			end)
+		end)
+
 		describe("GenerateGUID", function()
 			it("generates a GUID", function()
 				local uid = ns:GenerateGUID()
@@ -205,6 +223,80 @@ describe("AddonMethods", function()
 				assert.are.equal(#uid1, 36)
 				assert.are.equal(#uid2, 36)
 				assert.are_not.equal(uid1, uid2)
+			end)
+		end)
+
+		describe("ParseVersion", function()
+			it("parses a version string into a table", function()
+				local major, minor, patch = ns:ParseVersion("v1.2.3")
+				assert.are.same(major, 1)
+				assert.are.same(minor, 2)
+				assert.are.same(patch, 3)
+			end)
+
+			it("returns nil for invalid version strings", function()
+				local major, minor, patch = ns:ParseVersion("invalid")
+				assert.are.same(major, nil)
+				assert.are.same(minor, nil)
+				assert.are.same(patch, nil)
+			end)
+
+			it("returns nil for empty version strings", function()
+				local major, minor, patch = ns:ParseVersion("")
+				assert.are.same(major, nil)
+				assert.are.same(minor, nil)
+				assert.are.same(patch, nil)
+			end)
+
+			it("returns addonVersion for nil input", function()
+				ns.addonVersion = "v3.2.1"
+				local major, minor, patch = ns:ParseVersion(nil)
+				assert.are.same(major, 3)
+				assert.are.same(minor, 2)
+				assert.are.same(patch, 1)
+			end)
+		end)
+
+		describe("CompareWithVersion", function()
+			describe("major versions", function()
+				it("handles when my major version is older than the compared version", function()
+					local result = ns:CompareWithVersion("v1.2.3", "v2.0.0")
+					assert.are.equal(result, ns.VersionCompare.NEWER)
+				end)
+
+				it("handles when my major version is newer than the compared version", function()
+					local result = ns:CompareWithVersion("v2.0.0", "v1.2.3")
+					assert.are.equal(result, ns.VersionCompare.OLDER)
+				end)
+			end)
+
+			describe("minor versions", function()
+				it("handles when my minor version is older than the compared version", function()
+					local result = ns:CompareWithVersion("v1.2.3", "v1.3.0")
+					assert.are.equal(result, ns.VersionCompare.NEWER)
+				end)
+
+				it("handles when my minor version is newer than the compared version", function()
+					local result = ns:CompareWithVersion("v1.3.0", "v1.2.3")
+					assert.are.equal(result, ns.VersionCompare.OLDER)
+				end)
+			end)
+
+			describe("patch versions", function()
+				it("handles when my patch version is older than the compared version", function()
+					local result = ns:CompareWithVersion("v1.2.3", "v1.2.4")
+					assert.are.equal(result, ns.VersionCompare.NEWER)
+				end)
+
+				it("handles when my patch version is newer than the compared version", function()
+					local result = ns:CompareWithVersion("v1.2.4", "v1.2.3")
+					assert.are.equal(result, ns.VersionCompare.OLDER)
+				end)
+			end)
+
+			it("properly determines when versions are the same", function()
+				local result = ns:CompareWithVersion("v1.2.3", "v1.2.3")
+				assert.are.equal(result, ns.VersionCompare.SAME)
 			end)
 		end)
 	end)

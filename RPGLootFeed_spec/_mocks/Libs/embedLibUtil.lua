@@ -48,6 +48,12 @@ local function embedLibs(addonOrModule, ...)
 			stub(addonOrModule, "RegisterChatCommand")
 			stub(addonOrModule, "UnregisterChatCommand")
 		end
+		if lib == "AceComm-3.0" then
+			stub(addonOrModule, "RegisterComm")
+			stub(addonOrModule, "UnregisterComm")
+			stub(addonOrModule, "UnregisterAllComm")
+			stub(addonOrModule, "SendCommMessage")
+		end
 		if lib == "AceEvent-3.0" then
 			stub(addonOrModule, "RegisterEvent")
 			stub(addonOrModule, "UnregisterEvent")
