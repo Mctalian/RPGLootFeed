@@ -217,7 +217,6 @@ function G_RLF:OpenOptions(button)
 		LibEasyMenu:EasyMenu(tmpMenu, menuFrame, "cursor", 0, 0, "MENU")
 	end
 end
-RLFOpenOptions = G_RLF.OpenOptions
 
 function G_RLF:TableToCommaSeparatedString(tbl)
 	local result = {}

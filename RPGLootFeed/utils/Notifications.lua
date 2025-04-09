@@ -102,15 +102,31 @@ function G_RLF.Notifications:RemoveSeenNotifications()
 	end
 end
 
-function G_RLF.Notifications:NotifyGlow()
+function G_RLF.Notifications.GetButton()
+	---@class RLF_MinimapButton: LibDBIcon.button, nil
+	local button = nil
+
 	if G_RLF.db.global.minimap.hide then
+		if G_RLF.DBIcon:IsButtonCompartmentAvailable() and G_RLF.DBIcon:IsButtonInCompartment(addonName) then
+			-- TODO: Figure out how to show notifications in an non-intrusive way when minimap button is hidden
+		end
+		G_RLF.DBIcon:Show(addonName)
+	end
+
+	button = G_RLF.DBIcon:GetMinimapButton(addonName) --[[@as RLF_MinimapButton]]
+
+	return button
+end
+
+function G_RLF.Notifications:NotifyGlow()
+	---@class RLF_MinimapButton
+	local button = self:GetButton()
+
+	if button == nil then
 		local notifModule = G_RLF.RLF:GetModule("Notifications") --[[@as RLF_Notifications]]
 		notifModule:ViewAllNotifications()
 		return
 	end
-
-	---@class RLF_MinimapButton: LibDBIcon.button
-	local button = G_RLF.DBIcon:GetMinimapButton(addonName)
 
 	if button and button.customGlow and button.customGlow.animGroup and button.customGlow.animGroup:IsPlaying() then
 		-- If the glow animation is already playing, do nothing.
@@ -148,10 +164,13 @@ function G_RLF.Notifications:NotifyGlow()
 end
 
 function G_RLF.Notifications:StopNotifyGlow()
-	---@class RLF_MinimapButton: LibDBIcon.button
-	local button = G_RLF.DBIcon:GetMinimapButton(addonName)
+	---@class RLF_MinimapButton
+	local button = self:GetButton()
 	if button and button.customGlow then
 		button.customGlow:Hide()
 		button.customGlow.animGroup:Stop()
+	end
+	if G_RLF.db.global.minimap.hide then
+		G_RLF.DBIcon:Hide(addonName)
 	end
 end

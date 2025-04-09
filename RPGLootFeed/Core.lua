@@ -72,7 +72,7 @@ function RLF:OnInitialize()
 				tooltip:AddLine(" ")
 			end
 			tooltip:AddLine(G_RLF.L["LauncherLeftClick"], 1, 1, 1, 1)
-			if G_RLF.db.global.lootHistory.enabled then
+			if G_RLF.db.global.lootHistory.enabled or unseenNotifications > 0 then
 				tooltip:AddLine(G_RLF.L["LauncherRightClick"], 1, 1, 1, 1)
 			end
 		end,
@@ -86,6 +86,7 @@ function RLF:OnInitialize()
 		"Interface\\AddOns\\RPGLootFeed\\Sounds\\Pickup_Gold_04.ogg"
 	)
 	G_RLF.DBIcon:Register(addonName, rlfLDB, G_RLF.db.global.minimap)
+	G_RLF.DBIcon:AddButtonToCompartment(addonName)
 	self:Hook(G_RLF.acd, "Open", "OnOptionsOpen")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterChatCommand("rlf", "SlashCommand")
@@ -120,6 +121,8 @@ function RLF:SlashCommand(msg, editBox)
 			itemModule:CHAT_MSG_LOOT("CHAT_MSG_LOOT", itemLink, "", "", "", "", "", "", "", "", "", "", GetPlayerGuid())
 		elseif msg == "i" then
 			TestMode:IntegrationTest()
+		elseif msg == "notif" then
+			G_RLF.Notifications:AddNotification("TEST_NOTIF", "Test Notification")
 		--@end-alpha@
 		elseif msg == "clear" then
 			G_RLF.LootDisplay:HideLoot()
