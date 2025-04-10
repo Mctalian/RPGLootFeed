@@ -10,12 +10,14 @@ local G_RLF = ns
 ---@field IconOverlay Alpha
 ---@field Stock Alpha
 ---@field Count Alpha
-
----@class RLF_RowItemButton: g_ItemButton
----@field elementFadeIn RLF_RowItemButtonElementFadeIn
+---@field TopLeftText Alpha
 
 ---@class RLF_RowFontString: FontString
 ---@field elementFadeIn Alpha
+
+---@class RLF_RowItemButton: g_ItemButton
+---@field elementFadeIn RLF_RowItemButtonElementFadeIn
+---@field topLeftText RLF_RowFontString
 
 ---@class RLF_RowTexture: Texture
 ---@field elementFadeIn Alpha
@@ -104,6 +106,8 @@ function LootDisplayRowMixin:Init()
 	self.RLFUser:SetTexture("Interface/AddOns/RPGLootFeed/Icons/logo.blp")
 	self.RLFUser:SetDrawLayer("OVERLAY")
 	self.RLFUser:Hide()
+	self:CreateTopLeftText()
+	self.Icon.topLeftText:Hide()
 	self:StyleBackground()
 	self:StyleRowBorders()
 	self:StyleExitAnimation()
@@ -164,10 +168,12 @@ function LootDisplayRowMixin:Reset()
 	self.BottomBorder:SetAlpha(0)
 	self.LeftBorder:SetAlpha(0)
 
+	self:CreateTopLeftText()
 	self.Icon:Reset()
 	self.Icon.NormalTexture:SetTexture(nil)
 	self.Icon.HighlightTexture:SetTexture(nil)
 	self.Icon.PushedTexture:SetTexture(nil)
+	self.Icon.topLeftText:Hide()
 	self.Icon:SetScript("OnEnter", nil)
 	self.Icon:SetScript("OnLeave", nil)
 	self.Icon:SetScript("OnMouseUp", nil)
@@ -233,6 +239,7 @@ function LootDisplayRowMixin:StyleElementFadeIn()
 			IconOverlay = self.ElementFadeInAnimation:CreateAnimation("Alpha"),
 			Stock = self.ElementFadeInAnimation:CreateAnimation("Alpha"),
 			Count = self.ElementFadeInAnimation:CreateAnimation("Alpha"),
+			TopLeftText = self.ElementFadeInAnimation:CreateAnimation("Alpha"),
 		}
 		self.Icon.elementFadeIn.icon:SetTarget(self.Icon.icon)
 		self.Icon.elementFadeIn.icon:SetFromAlpha(0)
@@ -254,12 +261,17 @@ function LootDisplayRowMixin:StyleElementFadeIn()
 		self.Icon.elementFadeIn.Count:SetFromAlpha(0)
 		self.Icon.elementFadeIn.Count:SetToAlpha(1)
 		self.Icon.elementFadeIn.Count:SetSmoothing(fadeInSmoothing)
+		self.Icon.elementFadeIn.TopLeftText:SetTarget(self.Icon.topLeftText)
+		self.Icon.elementFadeIn.TopLeftText:SetFromAlpha(0)
+		self.Icon.elementFadeIn.TopLeftText:SetToAlpha(1)
+		self.Icon.elementFadeIn.TopLeftText:SetSmoothing(fadeInSmoothing)
 	end
 	self.Icon.elementFadeIn.icon:SetDuration(fadeInDuration)
 	self.Icon.elementFadeIn.IconBorder:SetDuration(fadeInDuration)
 	self.Icon.elementFadeIn.IconOverlay:SetDuration(fadeInDuration)
 	self.Icon.elementFadeIn.Stock:SetDuration(fadeInDuration)
 	self.Icon.elementFadeIn.Count:SetDuration(fadeInDuration)
+	self.Icon.elementFadeIn.TopLeftText:SetDuration(fadeInDuration)
 
 	-- PrimaryText
 	if not self.PrimaryText.elementFadeIn then
@@ -447,11 +459,13 @@ function LootDisplayRowMixin:StyleText()
 	local fontShadowOffsetX = stylingDb.fontShadowOffsetX
 	local fontShadowOffsetY = stylingDb.fontShadowOffsetY
 	local secondaryFontSize = stylingDb.secondaryFontSize
+	local topLeftIconFontSize = stylingDb.topLeftIconFontSize
 
 	if
 		self.cachedFontFace ~= fontFace
 		or self.cachedFontSize ~= fontSize
 		or self.cachedSecondaryFontSize ~= secondaryFontSize
+		or self.cachedTopLeftIconFontSize ~= topLeftIconFontSize
 		or self.cachedFontFlags ~= fontFlagsString
 		or self.cachedUseFontObject ~= useFontObjects
 		or self.cachedFontShadowColor ~= fontShadowColor
@@ -462,6 +476,7 @@ function LootDisplayRowMixin:StyleText()
 		self.cachedFontFace = fontFace
 		self.cachedFontSize = fontSize
 		self.cachedSecondaryFontSize = secondaryFontSize
+		self.cachedTopLeftIconFontSize = topLeftIconFontSize
 		self.cachedFontFlags = fontFlagsString
 		self.cachedFontShadowColor = fontShadowColor
 		self.cachedFontShadowOffsetX = fontShadowOffsetX
@@ -498,6 +513,16 @@ function LootDisplayRowMixin:StyleText()
 				self.SecondaryText,
 				fontPath,
 				secondaryFontSize,
+				fontFlagsString,
+				fontShadowColor,
+				fontShadowOffsetX,
+				fontShadowOffsetY
+			)
+			self:CreateTopLeftText()
+			ApplyFontStyle(
+				self.Icon.topLeftText,
+				fontPath,
+				topLeftIconFontSize,
 				fontFlagsString,
 				fontShadowColor,
 				fontShadowOffsetX,
@@ -576,6 +601,14 @@ function LootDisplayRowMixin:StyleText()
 
 		self.ItemCountText:SetPoint(anchor, self.PrimaryText, iconAnchor, xOffset, 0)
 	end
+end
+
+function LootDisplayRowMixin:CreateTopLeftText()
+	if not self.Icon.topLeftText then
+		self.Icon.topLeftText = self.Icon:CreateFontString(nil, "OVERLAY") --[[@as RLF_RowFontString]]
+		self.Icon.topLeftText:SetPoint("TOPLEFT", self.Icon, "TOPLEFT", 2, -2)
+	end
+	self.Icon.topLeftText:Hide()
 end
 
 function LootDisplayRowMixin:StyleRowBorders()
@@ -985,6 +1018,8 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	self.amount = quantity
 	self.type = element.type
 	self.quality = quality
+	self.topLeftText = element.topLeftText
+	self.topLeftColor = element.topLeftColor
 
 	if isLink then
 		local extraWidthStr = " x" .. self.amount
@@ -1567,6 +1602,7 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 	RunNextFrame(function()
 		---@type RLF_ConfigSizing
 		local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
+		local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
 		local iconSize = sizingDb.iconSize
 
 		if not quality then
@@ -1581,6 +1617,18 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 		end
 		if self.Icon.ProfessionQualityOverlay then
 			self.Icon.ProfessionQualityOverlay:SetSize(iconSize, iconSize)
+		end
+
+		if stylingDb.enableTopLeftIconText and self.topLeftText and self.topLeftColor then
+			self.Icon.topLeftText:SetText(self.topLeftText)
+			if stylingDb.topLeftIconTextUseQualityColor then
+				self.Icon.topLeftText:SetTextColor(unpack(self.topLeftColor))
+			else
+				self.Icon.topLeftText:SetTextColor(unpack(stylingDb.topLeftIconTextColor))
+			end
+			self.Icon.topLeftText:Show()
+		else
+			self.Icon.topLeftText:Hide()
 		end
 
 		self.Icon:ClearDisabledTexture()
