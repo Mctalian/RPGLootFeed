@@ -16,7 +16,7 @@ As featured in SoulSoBreezy's _11 Useful Addons for Patch 11.0.7_
 
 - **Declutter Your Chat**: Keep your chat window free from loot spam. RPGLootFeed displays all your looted items, currencies, reputation gains, and even profession skill-ups in a sleek, scrolling feed.
 - **Contextual Information**: Get detailed information about looted items, currencies, and faction reputation gains. See the item count available to your character, currency cap information, reputation progress, and more at a glance.
-- **Integrations**: Seamlessly integrates with popular addons like Auctionator, TradeSkillMaster (TSM) to provide additional contextual information and enhance your looting experience. Or apply your favorite Masque themes to RPGLootFeed so it fits in nicely with your custom UI experience.
+- **Integrations**: Seamlessly integrates with popular addons like ElvUI, Auctionator, TradeSkillMaster (TSM) to provide additional contextual information and enhance your looting experience. Or apply your favorite Masque themes to RPGLootFeed so it fits in nicely with your custom UI experience.
 - **Customizable**: Tailor the loot feed to your preferences. Choose what information to display and how it should be presented.
 
 ## Recommended Addons

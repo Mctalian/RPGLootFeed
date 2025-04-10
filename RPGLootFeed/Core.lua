@@ -29,6 +29,16 @@ end
 G_RLF.localeName = addonName .. "Locale"
 G_RLF.lsm = LibStub("LibSharedMedia-3.0")
 G_RLF.Masque = LibStub and LibStub("Masque", true)
+G_RLF.ElvUI = nil
+G_RLF.ElvSkins = nil
+if ElvUI then
+	G_RLF.ElvUI = ElvUI
+	local E, L, V, P, G = unpack(ElvUI)
+	local S = E:GetModule("Skins")
+	if S then
+		G_RLF.ElvSkins = S
+	end
+end
 G_RLF.iconGroup = G_RLF.Masque and G_RLF.Masque:Group(addonName)
 local dbName = addonName .. "DB"
 G_RLF.acd = LibStub("AceConfigDialog-3.0") --[[@as AceConfigDialog]]
