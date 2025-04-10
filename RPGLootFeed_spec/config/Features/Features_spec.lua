@@ -6,6 +6,7 @@ local before_each = busted.before_each
 local describe = busted.describe
 local it = busted.it
 local setup = busted.setup
+local stub = busted.stub
 local _ = require("luassert.match")._
 
 describe("Features module", function()
