@@ -486,7 +486,7 @@ function LootDisplayFrameMixin:ToggleHistoryFrame()
 	if not self.historyFrame or not self.historyFrame:IsVisible() then
 		self:ShowHistoryFrame()
 	else
-		self:HideHistoryFrame()
+		self:HideHistoryFrame(true)
 	end
 end
 
