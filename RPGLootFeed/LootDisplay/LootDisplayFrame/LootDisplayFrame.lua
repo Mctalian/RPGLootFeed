@@ -212,7 +212,7 @@ function LootDisplayFrameMixin:UpdateQueueLabel(count)
 end
 
 function LootDisplayFrameMixin:ClearFeed()
-	local row = self.rows.last
+	local row = self.rows.last --[[@as RLF_LootDisplayRow]]
 
 	while row do
 		local oldRow = row
@@ -228,13 +228,13 @@ function LootDisplayFrameMixin:UpdateSize()
 	self:SetSize(sizingDb.feedWidth, self:getFrameHeight())
 
 	for row in self.rows:iterate() do
+		local row = row --[[@as RLF_LootDisplayRow]]
 		row:UpdateStyles()
 	end
 end
 
 function LootDisplayFrameMixin:UpdateFadeDelay()
 	for row in self.rows:iterate() do
-		---@type RLF_LootDisplayRow
 		local row = row --[[@as RLF_LootDisplayRow]]
 		row:UpdateFadeoutDelay()
 	end
@@ -242,6 +242,7 @@ end
 
 function LootDisplayFrameMixin:UpdateEnterAnimationType()
 	for row in self.rows:iterate() do
+		local row = row --[[@as RLF_LootDisplayRow]]
 		row:UpdateEnterAnimation()
 	end
 end
