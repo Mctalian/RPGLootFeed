@@ -1592,6 +1592,10 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 		if G_RLF.Masque and G_RLF.iconGroup then
 			G_RLF.iconGroup:ReSkin(self.Icon)
 		end
+		if G_RLF.ElvSkins then
+			G_RLF.ElvSkins:HandleItemButton(self.Icon, true)
+			G_RLF.ElvSkins:HandleIconBorder(self.Icon.IconBorder)
+		end
 	end)
 end
 
