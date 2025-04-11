@@ -140,6 +140,7 @@ function G_RLF:CreatePatternSegmentsForStringNumber(localeString)
 	return { prePattern, midPattern, postPattern }
 end
 
+--- @return string?, number?
 function G_RLF:ExtractDynamicsFromPattern(localeString, segments)
 	local prePattern, midPattern, postPattern = unpack(segments)
 	local preMatchStart, preMatchEnd = string.find(localeString, prePattern, 1, true)

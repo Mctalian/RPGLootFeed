@@ -12,13 +12,14 @@ local spy = busted.spy
 describe("Reputation module", function()
 	local _ = match._
 	local RepModule, ns
-	local reputationMocks, gossipInfoMocks, delvesUIMocks
+	local reputationMocks, gossipInfoMocks, delvesUIMocks, majorFactionMocks
 
 	setup(function()
 		require("RPGLootFeed_spec._mocks.WoWGlobals")
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
 		reputationMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_Reputation")
+		majorFactionMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_MajorFactions")
 		gossipInfoMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_GossipInfo")
 		delvesUIMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_DelvesUI")
 	end)
