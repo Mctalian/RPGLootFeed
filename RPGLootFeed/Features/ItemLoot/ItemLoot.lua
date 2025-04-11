@@ -238,6 +238,14 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 
 	local stats = getItemStats(info)
 
+	element.topLeftText = nil
+	element.topLeftColor = nil
+	if info:IsEligibleEquipment() and info.itemQuality > Enum.ItemQuality.Poor then
+		element.topLeftText = info.itemLevel
+		local r, g, b = C_Item.GetItemQualityColor(info.itemQuality)
+		element.topLeftColor = { r, g, b }
+	end
+
 	function element:isPassingFilter(itemName, itemQuality)
 		if not G_RLF.db.global.item.itemQualitySettings[itemQuality].enabled then
 			G_RLF:LogDebug(
@@ -303,7 +311,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 		end
 
 		if info:IsEligibleEquipment() then
-			local secondaryText = _G["ITEM_LEVEL_ABBR"] .. " " .. info.itemLevel .. " "
+			local secondaryText = ""
 			if HasItemRollBonus(stats) then
 				if stats.isSocketed then
 					secondaryText = string.format(

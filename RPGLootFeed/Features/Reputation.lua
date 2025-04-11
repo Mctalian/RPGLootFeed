@@ -5,8 +5,8 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
----@class RLF_Reputation: RLF_Module, AceEvent, AceTimer
-local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0")
+---@class RLF_Reputation: RLF_Module, AceEvent-3.0, AceTimer-3.0, AceBucket-3.0
+local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0", "AceBucket-3.0")
 
 Rep.Element = {}
 
@@ -18,6 +18,11 @@ local RepType = {
 	DelveCompanion = 4,
 	Friendship = 5,
 }
+
+--- Season 1
+-- local CURRENT_SEASON_DELVE_JOURNEY = 2644
+--- Season 2
+local CURRENT_SEASON_DELVE_JOURNEY = 2683
 
 -- Precompute pattern segments to optimize runtime message parsing
 local function precomputePatternSegments(patterns)
@@ -124,6 +129,7 @@ local factionIdIconMap = {
 	[2673] = 6439627, -- Bilgewater Cartel
 	[2675] = 6439628, -- Blackwater Cartel
 	[2677] = 6439630, -- Steamwheedle Cartel
+	[CURRENT_SEASON_DELVE_JOURNEY] = 4635200, -- Delver's Journey
 }
 
 function Rep.Element:new(...)
@@ -299,6 +305,7 @@ local function extractFactionAndRep(message, patterns)
 	return nil, nil
 end
 
+--- @return string?, number?
 local function extractFactionAndRepForDelves(message, companionFactionName)
 	if not companionFactionName then
 		return nil, nil
@@ -319,11 +326,23 @@ end
 function Rep:OnDisable()
 	self:UnregisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
+	if GetExpansionLevel() >= G_RLF.Expansion.TWW then
+		self:UnregisterAllBuckets()
+	end
 end
 
 function Rep:OnEnable()
 	self:RegisterEvent("CHAT_MSG_COMBAT_FACTION_CHANGE")
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
+	if GetExpansionLevel() >= G_RLF.Expansion.TWW then
+		--- @type FrameEvent[]
+		local events = {
+			"UPDATE_FACTION",
+			"MAJOR_FACTION_RENOWN_LEVEL_CHANGED",
+		}
+		---@diagnostic disable-next-line: param-type-mismatch
+		self:RegisterBucketEvent(events, 0.5, "CheckForHiddenRenownFactions")
+	end
 	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 end
 
@@ -361,6 +380,9 @@ function Rep:PLAYER_ENTERING_WORLD(eventName, isLogin, isReload)
 			end
 		end
 	end
+	if GetExpansionLevel() >= G_RLF.Expansion.TWW then
+		self.delversJourney = C_MajorFactions.GetMajorFactionRenownInfo(CURRENT_SEASON_DELVE_JOURNEY)
+	end
 end
 
 function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
@@ -380,12 +402,14 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 			return
 		end
 
+		--- @type number, number, number, ColorMixin
 		local r, g, b, color
 		local factionMapEntry = G_RLF.db.locale.factionMap[faction]
 		if factionMapEntry == nil then
 			-- attempt to find the missing faction's ID
 			G_RLF:LogDebug(faction .. " not cached for " .. locale, addonName, self.moduleName)
 			buildFactionLocaleMap(faction)
+			factionMapEntry = G_RLF.db.locale.factionMap[faction]
 		end
 
 		local repType, fId, factionData
@@ -473,6 +497,67 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 		local e = self.Element:new(repChange, faction, r, g, b, fId, factionData, repType)
 		e:Show()
 	end)
+end
+
+--- @class UpdateFactionEventPayload
+--- @field eventName string
+
+--- @class MajorFactionRenownLevelChangedEventPayload
+--- @field eventName string
+--- @field majorFactionID number
+--- @field newRenownLevel number
+--- @field oldRenownLevel number
+
+--- Checks for updates to known hidden renown factions
+---@param events table<UpdateFactionEventPayload | MajorFactionRenownLevelChangedEventPayload, number>
+function Rep:CheckForHiddenRenownFactions(events)
+	local updated = C_MajorFactions.GetMajorFactionRenownInfo(CURRENT_SEASON_DELVE_JOURNEY)
+
+	if not updated then
+		G_RLF:LogDebug("No updated DJ info", addonName, self.moduleName)
+		return
+	end
+
+	if not self.delversJourney then
+		G_RLF:LogDebug("No cached DJ info, updating", addonName, self.moduleName)
+		self.delversJourney = updated
+		return
+	end
+	--- @type number
+	local repChange
+
+	if updated.renownLevel > self.delversJourney.renownLevel then
+		G_RLF:LogDebug("DJ level up", addonName, self.moduleName)
+		local knownRemainingToNextLevel = self.delversJourney.renownLevelThreshold
+			- self.delversJourney.renownReputationEarned
+		local currentLevelEarned = updated.renownReputationEarned
+		repChange = currentLevelEarned + knownRemainingToNextLevel
+	elseif updated.renownReputationEarned > self.delversJourney.renownReputationEarned then
+		G_RLF:LogDebug("DJ rep change", addonName, self.moduleName)
+		repChange = updated.renownReputationEarned - self.delversJourney.renownReputationEarned
+	else
+		G_RLF:LogDebug("DJ no change", addonName, self.moduleName)
+		return
+	end
+
+	self.delversJourney = updated
+	---@type string
+	local localeGlobalString = _G["DELVES_REPUTATION_BAR_TITLE_NO_SEASON"]
+	local trimIndex = localeGlobalString:find("%(")
+	if not trimIndex then
+		G_RLF:LogDebug("No trim index found for DJ locale string", addonName, self.moduleName)
+		return
+	end
+
+	local faction = strtrim(localeGlobalString:sub(1, trimIndex - 1))
+	local color = ACCOUNT_WIDE_FONT_COLOR
+	local r, g, b = color.r, color.g, color.b
+
+	if repChange and repChange > 0 then
+		local e =
+			self.Element:new(repChange, faction, r, g, b, CURRENT_SEASON_DELVE_JOURNEY, updated, RepType.MajorFaction)
+		e:Show()
+	end
 end
 
 return Rep
