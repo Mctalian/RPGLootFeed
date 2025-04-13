@@ -4,7 +4,7 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
----@class RLF_Money: RLF_Module, AceEvent
+---@class RLF_Money: RLF_Module, AceEvent-3.0
 local Money = G_RLF.RLF:NewModule("Money", "AceEvent-3.0")
 
 Money.Element = {}

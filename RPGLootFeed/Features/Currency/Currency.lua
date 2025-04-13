@@ -6,7 +6,7 @@ local G_RLF = ns
 
 local C = LibStub("C_Everywhere")
 
----@class RLF_Currency: RLF_Module, AceEvent
+---@class RLF_Currency: RLF_Module, AceEvent-3.0
 local Currency = G_RLF.RLF:NewModule("Currency", "AceEvent-3.0")
 
 Currency.Element = {}

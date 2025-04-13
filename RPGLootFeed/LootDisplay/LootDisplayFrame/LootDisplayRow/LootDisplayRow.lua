@@ -15,7 +15,7 @@ local G_RLF = ns
 ---@class RLF_RowFontString: FontString
 ---@field elementFadeIn Alpha
 
----@class RLF_RowItemButton: g_ItemButton
+---@class RLF_RowItemButton: ItemButton
 ---@field elementFadeIn RLF_RowItemButtonElementFadeIn
 ---@field topLeftText RLF_RowFontString
 

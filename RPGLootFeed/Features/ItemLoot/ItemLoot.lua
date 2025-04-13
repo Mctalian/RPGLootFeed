@@ -4,7 +4,7 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
----@class RLF_ItemLoot: RLF_Module, AceEvent
+---@class RLF_ItemLoot: RLF_Module, AceEvent-3.0
 local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
 
 local C = LibStub("C_Everywhere")
