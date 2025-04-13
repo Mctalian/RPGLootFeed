@@ -4,7 +4,7 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
----@class RLF_TravelPoints: RLF_Module, AceEvent
+---@class RLF_TravelPoints: RLF_Module, AceEvent-3.0
 local TravelPoints = G_RLF.RLF:NewModule("TravelPoints", "AceEvent-3.0")
 local currentTravelersJourney, maxTravelersJourney
 

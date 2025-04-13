@@ -6,7 +6,7 @@ local G_RLF = ns
 
 G_RLF.addonVersion = "@project-version@"
 
----@class RPGLootFeed: AceAddon, AceConsole, AceEvent, AceHook, AceTimer
+---@class RPGLootFeed: AceAddon, AceConsole-3.0, AceEvent-3.0, AceHook-3.0, AceTimer-3.0
 ---@field public GetModule fun(self: RPGLootFeed, name: string): RLF_Module
 ---@field public NewModule fun(self: RPGLootFeed, name: string, ...: string): RLF_Module
 local RLF = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
@@ -33,15 +33,16 @@ G_RLF.ElvUI = nil
 G_RLF.ElvSkins = nil
 if ElvUI then
 	G_RLF.ElvUI = ElvUI
-	local E, L, V, P, G = unpack(ElvUI)
-	local S = E:GetModule("Skins")
+	---@type ElvUIApp, ElvUILocale, ElvUIPrivateDb, ElvUIProfileDb, ElvUIGlobalDb
+	local E, _, _, _, _ = unpack(ElvUI)
+	local S = E:GetModule("Skins") --[[@as ElvUISkinsModule]]
 	if S then
 		G_RLF.ElvSkins = S
 	end
 end
 G_RLF.iconGroup = G_RLF.Masque and G_RLF.Masque:Group(addonName)
 local dbName = addonName .. "DB"
-G_RLF.acd = LibStub("AceConfigDialog-3.0") --[[@as AceConfigDialog]]
+G_RLF.acd = LibStub("AceConfigDialog-3.0") --[[@as AceConfigDialog-3.0]]
 G_RLF.DBIcon = LibStub("LibDBIcon-1.0")
 
 local TestMode

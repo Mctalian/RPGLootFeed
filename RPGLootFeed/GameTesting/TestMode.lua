@@ -6,7 +6,7 @@ local G_RLF = ns
 
 local C = LibStub("C_Everywhere")
 
----@class RLF_TestMode: RLF_Module, AceEvent
+---@class RLF_TestMode: RLF_Module, AceEvent-3.0
 ---@field public SmokeTest fun(s: RLF_TestMode)
 ---@field public IntegrationTest fun(s: RLF_TestMode)
 local TestMode = G_RLF.RLF:NewModule("TestMode", "AceEvent-3.0")

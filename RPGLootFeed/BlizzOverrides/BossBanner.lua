@@ -4,7 +4,7 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
----@class BossBannerOverride: RLF_Module, AceEvent, AceHook, AceTimer
+---@class BossBannerOverride: RLF_Module, AceEvent-3.0, AceHook-3.0, AceTimer-3.0
 local BossBannerOverride = G_RLF.RLF:NewModule("BossBanner", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 
 function BossBannerOverride:OnInitialize()

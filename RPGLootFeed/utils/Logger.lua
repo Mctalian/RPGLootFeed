@@ -4,11 +4,10 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
----@class RLF_Logger: RLF_Module, AceBucket, AceEvent
+---@class RLF_Logger: RLF_Module, AceBucket-3.0, AceEvent-3.0
 local Logger = G_RLF.RLF:NewModule("Logger", "AceBucket-3.0", "AceEvent-3.0")
 
----@type AceGUI
-local gui = LibStub("AceGUI-3.0") --[[@as AceGUI]]
+local gui = LibStub("AceGUI-3.0") --[[@as AceGUI-3.0]]
 
 local updateContent
 local logger = nil
@@ -85,10 +84,10 @@ local createFilterBarComponents
 
 function Logger:createLoggerFrames()
 	if not self.frame then
-		---@class LoggerFrame: AceGUIFrameContainer
+		---@class LoggerFrame: AceGUIFrame
 		---@field contentBox LoggerContentBox
 		---@field filterBar LoggerFilterBox
-		self.frame = gui:Create("Frame") --[[@as AceGUIFrameContainer]]
+		self.frame = gui:Create("Frame") --[[@as AceGUIFrame]]
 		self.frame:Hide()
 		self.frame:SetLayout("Flow")
 		self.frame:SetTitle("Loot Log")
@@ -105,8 +104,8 @@ end
 function Logger:createContentBox()
 	local f = self.frame
 	if not f.contentBox then
-		---@class LoggerContentBox: AceGUIMultiLineEditBoxWidget
-		f.contentBox = gui:Create("MultiLineEditBox") --[[@as AceGUIMultiLineEditBoxWidget]]
+		---@class LoggerContentBox: AceGUIMultiLineEditBox
+		f.contentBox = gui:Create("MultiLineEditBox") --[[@as AceGUIMultiLineEditBox]]
 		f:AddChild(f.contentBox)
 		f.contentBox:SetLabel("Logs")
 		f.contentBox:DisableButton(true)
@@ -119,12 +118,12 @@ end
 function Logger:createFilterBar()
 	local f = self.frame
 	if not f.filterBar then
-		---@class LoggerFilterBox: AceGUISimpleGroupContainer
-		---@field logSources AceGUIDropdownWidget
-		---@field logLevels AceGUIDropdownWidget
-		---@field logTypes AceGUIDropdownWidget
-		---@field clearButton AceGUIButtonWidget
-		f.filterBar = gui:Create("SimpleGroup") --[[@as AceGUISimpleGroupContainer]]
+		---@class LoggerFilterBox: AceGUISimpleGroup
+		---@field logSources AceGUIDropdown
+		---@field logLevels AceGUIDropdown
+		---@field logTypes AceGUIDropdown
+		---@field clearButton AceGUIButton
+		f.filterBar = gui:Create("SimpleGroup") --[[@as AceGUISimpleGroup]]
 		f:AddChild(f.filterBar)
 		f.filterBar:SetFullWidth(true)
 		f.filterBar:SetLayout("Flow")
@@ -137,7 +136,7 @@ end
 function Logger:createFilterBarComponents()
 	local fB = self.frame.filterBar
 	if not fB.logSources then
-		fB.logSources = gui:Create("Dropdown") --[[@as AceGUIDropdownWidget]]
+		fB.logSources = gui:Create("Dropdown") --[[@as AceGUIDropdown]]
 		fB:AddChild(fB.logSources)
 		RunNextFrame(function()
 			fB.logSources:SetLabel("Log Sources")
@@ -151,13 +150,14 @@ function Logger:createFilterBarComponents()
 			})
 			fB.logSources:SetCallback("OnValueChanged", OnEventSourceChange)
 			for k, v in pairs(eventSource) do
+				---@diagnostic disable-next-line: param-type-mismatch
 				fB.logSources:SetItemValue(k, v)
 			end
 		end)
 	end
 
 	if not fB.logLevels then
-		fB.logLevels = gui:Create("Dropdown") --[[@as AceGUIDropdownWidget]]
+		fB.logLevels = gui:Create("Dropdown") --[[@as AceGUIDropdown]]
 		fB:AddChild(fB.logLevels)
 		RunNextFrame(function()
 			fB.logLevels:SetLabel("Log Levels")
@@ -170,13 +170,14 @@ function Logger:createFilterBarComponents()
 			})
 			fB.logLevels:SetCallback("OnValueChanged", OnEventLevelChange)
 			for k, v in pairs(eventLevel) do
+				---@diagnostic disable-next-line: param-type-mismatch
 				fB.logLevels:SetItemValue(k, v)
 			end
 		end)
 	end
 
 	if not fB.logTypes then
-		fB.logTypes = gui:Create("Dropdown") --[[@as AceGUIDropdownWidget]]
+		fB.logTypes = gui:Create("Dropdown") --[[@as AceGUIDropdown]]
 		fB:AddChild(fB.logTypes)
 		RunNextFrame(function()
 			fB.logTypes:SetLabel("Log Types")
@@ -193,13 +194,14 @@ function Logger:createFilterBarComponents()
 			})
 			fB.logTypes:SetCallback("OnValueChanged", OnEventTypeChange)
 			for k, v in pairs(eventType) do
+				---@diagnostic disable-next-line: param-type-mismatch
 				fB.logTypes:SetItemValue(k, v)
 			end
 		end)
 	end
 
 	if not fB.clearButton then
-		fB.clearButton = gui:Create("Button") --[[@as AceGUIButtonWidget]]
+		fB.clearButton = gui:Create("Button") --[[@as AceGUIButton]]
 		fB:AddChild(fB.clearButton)
 		RunNextFrame(function()
 			fB.clearButton:SetText("Clear Current Log")

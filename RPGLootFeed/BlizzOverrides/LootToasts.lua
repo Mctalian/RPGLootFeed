@@ -4,7 +4,7 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
----@class LootToastOverride: RLF_Module, AceEvent, AceHook, AceTimer
+---@class LootToastOverride: RLF_Module, AceEvent-3.0, AceHook-3.0, AceTimer-3.0
 local LootToastOverride = G_RLF.RLF:NewModule("LootToasts", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 
 function LootToastOverride:OnInitialize()
