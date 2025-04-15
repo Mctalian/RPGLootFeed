@@ -1041,6 +1041,7 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	end
 
 	if icon then
+		self:StyleText()
 		self:UpdateIcon(key, icon, quality)
 	end
 
@@ -1775,6 +1776,7 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 	self.link = data.link
 	self.quality = data.quality
 	self.unit = data.unit
+	self:UpdateStyles()
 	self.PrimaryText:SetText(data.rowText)
 	self.PrimaryText:SetTextColor(unpack(data.textColor))
 
@@ -1791,5 +1793,4 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 	else
 		self.icon = nil
 	end
-	self:UpdateStyles()
 end
