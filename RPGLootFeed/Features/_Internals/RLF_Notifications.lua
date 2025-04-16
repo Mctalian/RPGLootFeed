@@ -10,7 +10,7 @@ local Notifications = G_RLF.RLF:NewModule("Notifications", "AceEvent-3.0")
 Notifications.Element = {}
 
 function Notifications.Element:new(...)
-	---@class Notifications.Element: RLF_LootElement
+	---@class Notifications.Element: RLF_BaseLootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 

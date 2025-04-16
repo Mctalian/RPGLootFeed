@@ -11,7 +11,7 @@ local currentXP, currentMaxXP, currentLevel
 Xp.Element = {}
 
 function Xp.Element:new(...)
-	---@class Xp.Element: RLF_LootElement
+	---@class Xp.Element: RLF_BaseLootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 
@@ -26,7 +26,7 @@ function Xp.Element:new(...)
 	element.textFn = function(existingXP)
 		return "+" .. ((existingXP or 0) + element.quantity) .. " " .. G_RLF.L["XP"]
 	end
-	element.currentLevel = currentLevel
+	element.itemCount = currentLevel
 	element.icon = G_RLF.DefaultIcons.XP
 	element.quality = Enum.ItemQuality.Epic
 

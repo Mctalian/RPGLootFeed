@@ -15,7 +15,7 @@ local onlyEpicPartyLoot = false
 PartyLoot.Element = {}
 
 function PartyLoot.Element:new(...)
-	---@class PartyLoot.Element: RLF_LootElement
+	---@class PartyLoot.Element: RLF_BaseLootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 

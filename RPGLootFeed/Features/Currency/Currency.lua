@@ -12,7 +12,7 @@ local Currency = G_RLF.RLF:NewModule("Currency", "AceEvent-3.0")
 Currency.Element = {}
 
 function Currency.Element:new(...)
-	---@class Currency.Element: RLF_LootElement
+	---@class Currency.Element: RLF_BaseLootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 
@@ -32,13 +32,13 @@ function Currency.Element:new(...)
 	element.key = currencyInfo.currencyID
 	element.icon = currencyInfo.iconFileID
 	element.quantity = basicInfo.displayAmount
-	element.totalCount = currencyInfo.quantity
+	element.itemCount = currencyInfo.quantity
 	element.quality = currencyInfo.quality
 	element.totalEarned = currencyInfo.totalEarned
 	element.cappedQuantity = currencyInfo.maxQuantity
 
 	if element.key == Constants.CurrencyConsts.ACCOUNT_WIDE_HONOR_CURRENCY_ID then
-		element.totalCount = UnitHonorLevel("player")
+		element.itemCount = UnitHonorLevel("player")
 		element.cappedQuantity = UnitHonorMax("player")
 		element.totalEarned = UnitHonor("player")
 		---@diagnostic disable-next-line: undefined-field
@@ -59,8 +59,8 @@ function Currency.Element:new(...)
 				numerator = element.totalEarned
 				percentage = element.totalEarned / element.cappedQuantity
 			else
-				numerator = element.totalCount
-				percentage = element.totalCount / element.cappedQuantity
+				numerator = element.itemCount
+				percentage = element.itemCount / element.cappedQuantity
 			end
 			local currencyDb = G_RLF.db.global.currency
 			local lowThreshold = currencyDb.lowerThreshold

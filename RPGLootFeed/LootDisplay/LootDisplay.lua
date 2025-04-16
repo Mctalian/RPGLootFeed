@@ -240,17 +240,11 @@ function LootDisplay:UpdateFadeDelay(frame)
 	lootFrames[frame]:UpdateFadeDelay()
 end
 
---- Handle the BAG_UPDATE_DELAYED event for the frame
---- @param frame? G_RLF.Frames
-function LootDisplay:BAG_UPDATE_DELAYED(frame)
-	frame = frame or G_RLF.Frames.MAIN
-	if lootFrames[frame] == nil then
-		return
-	end
+--- Handle the BAG_UPDATE_DELAYED event
+function LootDisplay:BAG_UPDATE_DELAYED()
+	G_RLF:LogInfo("BAG_UPDATE_DELAYED", "WOWEVENT", self.moduleName, nil, "BAG_UPDATE_DELAYED")
 
-	G_RLF:LogInfo(frame .. " BAG_UPDATE_DELAYED", "WOWEVENT", self.moduleName, nil, "BAG_UPDATE_DELAYED")
-
-	lootFrames[frame]:UpdateRowItemCounts()
+	lootFrames[G_RLF.Frames.MAIN]:UpdateRowItemCounts()
 end
 
 --- process the row for the proper frame

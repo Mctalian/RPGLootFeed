@@ -133,7 +133,7 @@ local factionIdIconMap = {
 }
 
 function Rep.Element:new(...)
-	---@class Rep.Element: RLF_LootElement
+	---@class Rep.Element: RLF_BaseLootElement
 	---@field public repType RepType
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
@@ -177,12 +177,12 @@ function Rep.Element:new(...)
 		element.quality = Enum.ItemQuality.Rare
 	end
 
-	element.repLevel = nil
+	element.itemCount = nil
 	if factionData then
 		if factionData.renownLevel then
-			element.repLevel = factionData.renownLevel
+			element.itemCount = factionData.renownLevel
 		elseif element.repType == RepType.DelveCompanion then
-			element.repLevel = factionData.currentLevel
+			element.itemCount = factionData.currentLevel
 		end
 	end
 

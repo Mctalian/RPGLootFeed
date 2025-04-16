@@ -16,6 +16,7 @@ local lootDisplayProperties = {
 	"quantity",
 	"quality",
 	"totalCount",
+	"itemCount",
 	"r",
 	"g",
 	"b",
@@ -24,7 +25,7 @@ local lootDisplayProperties = {
 	"eventChannel",
 }
 
----@class RLF_LootElement
+---@class RLF_BaseLootElement
 ---@field public key string
 ---@field public textFn fun(existingQuantity: number, truncatedLink: string): string
 ---@field public secondaryTextFn fun(...: any): string
@@ -36,16 +37,19 @@ local lootDisplayProperties = {
 ---@field public quantity number
 ---@field public quality number
 ---@field public totalCount number
+---@field public itemCount number
 ---@field public showForSeconds number
 ---@field public r number
 ---@field public g number
 ---@field public b number
 ---@field public a number
 ---@field public logFn fun(text: string, amount: number, new: boolean): nil
----@field public Show fun(s: RLF_LootElement, itemName?: string, itemQuality?: number): nil
----@field public isPassingFilter fun(s: RLF_LootElement, itemName: string, itemQuality: number): boolean
----@field public IsEnabled fun(s: RLF_LootElement): boolean
+---@field public Show fun(s: RLF_BaseLootElement, itemName?: string, itemQuality?: number): nil
+---@field public isPassingFilter fun(s: RLF_BaseLootElement, itemName: string, itemQuality: number): boolean
+---@field public IsEnabled fun(s: RLF_BaseLootElement): boolean
 ---@field public type string
+
+--- @alias RLF_LootElement RLF_BaseLootElement | ItemLoot.Element | Currency.Element | Money.Element | Xp.Element | Rep.Element | Professions.Element | TravelPoints.Element | PartyLoot.Element
 
 function G_RLF.InitializeLootDisplayProperties(element)
 	for _, prop in ipairs(lootDisplayProperties) do

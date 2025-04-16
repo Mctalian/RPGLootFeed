@@ -201,7 +201,7 @@ end
 ---@param quantity number
 ---@param fromLink? string
 function ItemLoot.Element:new(info, quantity, fromLink)
-	---@class ItemLoot.Element: RLF_LootElement
+	---@class ItemLoot.Element: RLF_BaseLootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 
@@ -236,12 +236,14 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 		end
 	end
 
+	element.itemCount = C.Item.GetItemCount(info.itemLink, true, false, true, true)
+
 	local stats = getItemStats(info)
 
 	element.topLeftText = nil
 	element.topLeftColor = nil
 	if info:IsEquippableItem() and info.itemQuality > Enum.ItemQuality.Poor then
-		element.topLeftText = info.itemLevel
+		element.topLeftText = tostring(info.itemLevel)
 		local r, g, b = C_Item.GetItemQualityColor(info.itemQuality)
 		element.topLeftColor = { r, g, b }
 	end

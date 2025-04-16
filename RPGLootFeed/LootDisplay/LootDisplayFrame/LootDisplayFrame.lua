@@ -529,7 +529,7 @@ function LootDisplayFrameMixin:UpdateRowItemCounts()
 		---@type RLF_LootDisplayRow
 		local row = row --[[@as RLF_LootDisplayRow]]
 		if row.key and row.type == "ItemLoot" and not row.unit then
-			row:UpdateItemCount(row)
+			row:UpdateItemCount()
 		end
 	end
 end

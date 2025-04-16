@@ -11,7 +11,7 @@ local currentTravelersJourney, maxTravelersJourney
 TravelPoints.Element = {}
 
 function TravelPoints.Element:new(...)
-	---@class TravelPoints.Element: RLF_LootElement
+	---@class TravelPoints.Element: RLF_BaseLootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 
