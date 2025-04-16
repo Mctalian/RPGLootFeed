@@ -10,7 +10,7 @@ local Money = G_RLF.RLF:NewModule("Money", "AceEvent-3.0")
 Money.Element = {}
 
 function Money.Element:new(...)
-	---@class Money.Element: RLF_LootElement
+	---@class Money.Element: RLF_BaseLootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 

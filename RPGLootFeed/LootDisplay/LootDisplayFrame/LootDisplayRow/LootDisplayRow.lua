@@ -1008,6 +1008,8 @@ function LootDisplayRowMixin:Styles()
 	self:HandlerOnRightClick()
 end
 
+--- Bootstrap a row from an RLF_LootElement
+--- @param element RLF_LootElement
 function LootDisplayRowMixin:BootstrapFromElement(element)
 	local key = element.key
 	local textFn = element.textFn
@@ -1021,8 +1023,8 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	self.logFn = element.logFn
 	local isLink = element.isLink
 	local unit = element.unit
-	local itemCount = element.itemCount
 	local highlight = element.highlight
+	self.itemCount = element.itemCount
 	self.elementSecondaryText = element.secondaryText or nil
 	---@type ColorMixin|ColorMixin_RCC|nil
 	self.elementSecondaryTextColor = element.secondaryTextColor or nil
@@ -1046,8 +1048,8 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 
 	if isLink then
 		local extraWidthStr = " x" .. self.amount
-		if itemCount then
-			extraWidthStr = extraWidthStr .. " (" .. itemCount .. ")"
+		if type(self.itemCount) == "number" and self.itemCount > 0 then
+			extraWidthStr = extraWidthStr .. " (" .. self.itemCount .. ")"
 		end
 
 		local extraWidth = G_RLF:CalculateTextWidth(extraWidthStr, self.frameType)
@@ -1074,7 +1076,7 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	self.highlight = highlight
 	RunNextFrame(function()
 		self:Enter()
-		self:UpdateItemCount(element)
+		self:UpdateItemCount()
 	end)
 	self:LogRow(self.logFn, text, true)
 end
@@ -1240,7 +1242,7 @@ function LootDisplayRowMixin:UpdateQuantity(element)
 	local r, g, b, a = element.r, element.g, element.b, element.a
 
 	self:UpdateSecondaryText(element.secondaryTextFn)
-	self:UpdateItemCount(element)
+	self:UpdateItemCount()
 	self:ShowText(text, r, g, b, a)
 
 	if not G_RLF.db.global.animations.update.disableHighlight then
@@ -1255,19 +1257,24 @@ function LootDisplayRowMixin:UpdateQuantity(element)
 	self:LogRow(self.logFn, text, false)
 end
 
-function LootDisplayRowMixin:UpdateItemCount(element)
-	if element.type == "ItemLoot" and not element.unit then
+--- Update the total item count for the row
+function LootDisplayRowMixin:UpdateItemCount()
+	if self.itemCount == nil then
+		return
+	end
+
+	if self.type == "ItemLoot" and not self.unit then
 		---@type RLF_ConfigItemLoot
 		local itemDb = G_RLF.db.global.item
 		if not itemDb.itemCountTextEnabled then
 			return
 		end
-		if not self.key or not element.key then
+		if not self.key then
 			G_RLF:LogDebug("Item key is nil")
 			return
 		end
 		RunNextFrame(function()
-			local itemCount = C_Item.GetItemCount(self.key or element.key, true, false, true, true)
+			local itemCount = C_Item.GetItemCount(self.key, true, false, true, true)
 			self:ShowItemCountText(itemCount, {
 				color = G_RLF:RGBAToHexFormat(unpack(itemDb.itemCountTextColor)),
 				wrapChar = itemDb.itemCountTextWrapChar,
@@ -1276,14 +1283,14 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 		return
 	end
 
-	if element.type == "Currency" then
+	if self.type == "Currency" then
 		---@type RLF_ConfigCurrency
 		local currencyDb = G_RLF.db.global.currency
 		if not currencyDb.currencyTotalTextEnabled then
 			return
 		end
 		RunNextFrame(function()
-			self:ShowItemCountText(element.totalCount, {
+			self:ShowItemCountText(self.itemCount, {
 				color = G_RLF:RGBAToHexFormat(unpack(currencyDb.currencyTotalTextColor)),
 				wrapChar = currencyDb.currencyTotalTextWrapChar,
 			})
@@ -1291,14 +1298,14 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 		return
 	end
 
-	if element.type == "Reputation" and element.repLevel then
+	if self.type == "Reputation" and self.itemCount then
 		---@type RLF_ConfigReputation
 		local repDb = G_RLF.db.global.rep
 		if not repDb.enableRepLevel then
 			return
 		end
 		RunNextFrame(function()
-			self:ShowItemCountText(element.repLevel, {
+			self:ShowItemCountText(self.itemCount, {
 				color = G_RLF:RGBAToHexFormat(unpack(repDb.repLevelColor)),
 				wrapChar = repDb.repLevelTextWrapChar,
 			})
@@ -1306,14 +1313,14 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 		return
 	end
 
-	if element.type == "Experience" and element.currentLevel then
+	if self.type == "Experience" and self.itemCount then
 		---@type RLF_ConfigExperience
 		local xpDb = G_RLF.db.global.xp
 		if not xpDb.showCurrentLevel then
 			return
 		end
 		RunNextFrame(function()
-			self:ShowItemCountText(element.currentLevel, {
+			self:ShowItemCountText(self.itemCount, {
 				color = G_RLF:RGBAToHexFormat(unpack(xpDb.currentLevelColor)),
 				wrapChar = xpDb.currentLevelTextWrapChar,
 			})
@@ -1321,7 +1328,7 @@ function LootDisplayRowMixin:UpdateItemCount(element)
 		return
 	end
 
-	if element.type == "Professions" then
+	if self.type == "Professions" then
 		---@type RLF_ConfigProfession
 		local profDb = G_RLF.db.global.prof
 		if not profDb.showSkillChange then
