@@ -250,6 +250,10 @@ local function GetHighestArmorClass()
 	return G_RLF.cachedArmorClass
 end
 
+function ItemInfo:IsEquippableItem()
+	return C_Item.IsEquippableItem(self.itemLink)
+end
+
 function ItemInfo:IsEligibleEquipment()
 	if self.classID ~= Enum.ItemClass.Armor then
 		return false

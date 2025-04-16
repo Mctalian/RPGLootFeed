@@ -444,6 +444,36 @@ local function ApplyFontStyle(
 	fontString:SetShadowOffset(fontShadowOffsetX or 1, fontShadowOffsetY or -1)
 end
 
+--- Setup font styling for top left text
+--- @param stylingDb? RLF_ConfigStyling
+function LootDisplayRowMixin:StyleTopLeftText(stylingDb)
+	---@type RLF_ConfigStyling
+	local stylingDb = stylingDb or G_RLF.DbAccessor:Styling(self.frameType)
+	local fontFace = stylingDb.fontFace
+	local useFontObjects = stylingDb.useFontObjects
+	local font = stylingDb.font
+	local fontFlagsString = G_RLF:FontFlagsToString()
+	local fontShadowColor = stylingDb.fontShadowColor
+	local fontShadowOffsetX = stylingDb.fontShadowOffsetX
+	local fontShadowOffsetY = stylingDb.fontShadowOffsetY
+	local topLeftIconFontSize = stylingDb.topLeftIconFontSize
+
+	if useFontObjects then
+		self.Icon.topLeftText:SetFontObject(font)
+	else
+		local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, fontFace)
+		ApplyFontStyle(
+			self.Icon.topLeftText,
+			fontPath,
+			topLeftIconFontSize,
+			fontFlagsString,
+			fontShadowColor,
+			fontShadowOffsetX,
+			fontShadowOffsetY
+		)
+	end
+end
+
 function LootDisplayRowMixin:StyleText()
 	local fontChanged = false
 
@@ -489,6 +519,7 @@ function LootDisplayRowMixin:StyleText()
 			self.PrimaryText:SetFontObject(font)
 			self.ItemCountText:SetFontObject(font)
 			self.SecondaryText:SetFontObject(font)
+			self.Icon.topLeftText:SetFontObject(font)
 		else
 			local fontPath = G_RLF.lsm:Fetch(G_RLF.lsm.MediaType.FONT, fontFace)
 			ApplyFontStyle(
@@ -519,15 +550,6 @@ function LootDisplayRowMixin:StyleText()
 				fontShadowOffsetY
 			)
 			self:CreateTopLeftText()
-			ApplyFontStyle(
-				self.Icon.topLeftText,
-				fontPath,
-				topLeftIconFontSize,
-				fontFlagsString,
-				fontShadowColor,
-				fontShadowOffsetX,
-				fontShadowOffsetY
-			)
 		end
 	end
 
@@ -608,6 +630,7 @@ function LootDisplayRowMixin:CreateTopLeftText()
 		self.Icon.topLeftText = self.Icon:CreateFontString(nil, "OVERLAY") --[[@as RLF_RowFontString]]
 		self.Icon.topLeftText:SetPoint("TOPLEFT", self.Icon, "TOPLEFT", 2, -2)
 	end
+	self:StyleTopLeftText()
 	self.Icon.topLeftText:Hide()
 end
 
