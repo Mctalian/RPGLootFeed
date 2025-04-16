@@ -129,7 +129,21 @@ function RLF:SlashCommand(msg, editBox)
 		elseif start then
 			local itemLink = msg:sub(stop + 1)
 			local itemModule = G_RLF.RLF:GetModule("ItemLoot") --[[@as RLF_ItemLoot]]
-			itemModule:CHAT_MSG_LOOT("CHAT_MSG_LOOT", itemLink, "", "", "", "", "", "", "", "", "", "", GetPlayerGuid())
+			itemModule:CHAT_MSG_LOOT(
+				"CHAT_MSG_LOOT",
+				itemLink,
+				"",
+				"",
+				"",
+				UnitName("player"),
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				GetPlayerGuid()
+			)
 		elseif msg == "i" then
 			TestMode:IntegrationTest()
 		elseif msg == "notif" then

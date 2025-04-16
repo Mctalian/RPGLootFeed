@@ -60,6 +60,9 @@ describe("ItemLoot module", function()
 		local spyIsEligibleEquipment = spy.new(function()
 			return false
 		end)
+		local spyIsEquippableItem = spy.new(function()
+			return false
+		end)
 		local guid = UnitGUID("player")
 		nsMocks.ItemInfo.new.returns({
 			itemId = 18803,
@@ -71,6 +74,7 @@ describe("ItemLoot module", function()
 			IsMount = spyIsMount,
 			IsLegendary = spyIsLegendary,
 			IsEligibleEquipment = spyIsEligibleEquipment,
+			IsEquippableItem = spyIsEquippableItem,
 		})
 		local elementMock = mock(LootModule.Element, false)
 		local elementShowSpy
@@ -102,6 +106,9 @@ describe("ItemLoot module", function()
 		local spyIsEligibleEquipment = spy.new(function()
 			return false
 		end)
+		local spyIsEquippableItem = spy.new(function()
+			return false
+		end)
 		nsMocks.ItemInfo.new.returns({
 			itemId = 18803,
 			itemName = "Finkle's Lava Dredger",
@@ -112,6 +119,7 @@ describe("ItemLoot module", function()
 			IsMount = spyIsMount,
 			IsLegendary = spyIsLegendary,
 			IsEligibleEquipment = spyIsEligibleEquipment,
+			IsEquippableItem = spyIsEquippableItem,
 		})
 
 		LootModule.pendingItemRequests[itemID] = { itemLink, amount }

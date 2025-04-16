@@ -207,6 +207,83 @@ G_RLF.options.args.styles = {
 			end,
 			order = 6,
 		},
+		topLeftIconTextOptions = {
+			name = G_RLF.L["Top Left Icon Text Options"],
+			type = "group",
+			inline = true,
+			order = 6.1,
+			args = {
+				enableTopLeftIconText = {
+					type = "toggle",
+					name = G_RLF.L["Enable Top Left Icon Text"],
+					desc = G_RLF.L["EnableTopLeftIconTextDesc"],
+					get = function(info, value)
+						return G_RLF.db.global.styling.enableTopLeftIconText
+					end,
+					set = function(info, value)
+						G_RLF.db.global.styling.enableTopLeftIconText = value
+						G_RLF.LootDisplay:UpdateRowStyles()
+					end,
+					order = 0.1,
+				},
+				topLeftIconFontSize = {
+					type = "range",
+					name = G_RLF.L["Top Left Icon Font Size"],
+					desc = G_RLF.L["TopLeftIconFontSizeDesc"],
+					softMin = 6,
+					softMax = 24,
+					min = 1,
+					max = 72,
+					bigStep = 1,
+					disabled = function()
+						return not G_RLF.db.global.styling.enableTopLeftIconText
+					end,
+					get = function(info, value)
+						return G_RLF.db.global.styling.topLeftIconFontSize
+					end,
+					set = function(info, value)
+						G_RLF.db.global.styling.topLeftIconFontSize = value
+						G_RLF.LootDisplay:UpdateRowStyles()
+					end,
+					order = 1,
+				},
+				topLeftIconTextUseQualityColor = {
+					type = "toggle",
+					name = G_RLF.L["Use Quality Color"],
+					desc = G_RLF.L["UseQualityColorDesc"],
+					disabled = function()
+						return not G_RLF.db.global.styling.enableTopLeftIconText
+					end,
+					get = function(info, value)
+						return G_RLF.db.global.styling.topLeftIconTextUseQualityColor
+					end,
+					set = function(info, value)
+						G_RLF.db.global.styling.topLeftIconTextUseQualityColor = value
+						G_RLF.LootDisplay:UpdateRowStyles()
+					end,
+					order = 2,
+				},
+				topLeftIconTextColor = {
+					type = "color",
+					name = G_RLF.L["Top Left Icon Text Color"],
+					desc = G_RLF.L["TopLeftIconTextColorDesc"],
+					hasAlpha = true,
+					disabled = function()
+						return G_RLF.db.global.styling.topLeftIconTextUseQualityColor
+							or not G_RLF.db.global.styling.enableTopLeftIconText
+					end,
+					get = function(info, value)
+						local r, g, b, a = unpack(G_RLF.db.global.styling.topLeftIconTextColor)
+						return r, g, b, a
+					end,
+					set = function(info, r, g, b, a)
+						G_RLF.db.global.styling.topLeftIconTextColor = { r, g, b, a }
+						G_RLF.LootDisplay:UpdateRowStyles()
+					end,
+					order = 3,
+				},
+			},
+		},
 		useFontObjects = {
 			type = "toggle",
 			name = G_RLF.L["Use Font Objects"],
@@ -301,6 +378,7 @@ G_RLF.options.args.styles = {
 					desc = G_RLF.L["SecondaryFontSizeDesc"],
 					disabled = function()
 						return not G_RLF.db.global.styling.enabledSecondaryRowText
+							or (G_RLF.db.global.styling.useFontObjects == true)
 					end,
 					softMin = 6,
 					softMax = 24,
@@ -315,83 +393,6 @@ G_RLF.options.args.styles = {
 						G_RLF.LootDisplay:UpdateRowStyles()
 					end,
 					order = 3,
-				},
-				topLeftIconTextOptions = {
-					name = G_RLF.L["Top Left Icon Text Options"],
-					type = "group",
-					inline = true,
-					order = 3.1,
-					args = {
-						enableTopLeftIconText = {
-							type = "toggle",
-							name = G_RLF.L["Enable Top Left Icon Text"],
-							desc = G_RLF.L["EnableTopLeftIconTextDesc"],
-							get = function(info, value)
-								return G_RLF.db.global.styling.enableTopLeftIconText
-							end,
-							set = function(info, value)
-								G_RLF.db.global.styling.enableTopLeftIconText = value
-								G_RLF.LootDisplay:UpdateRowStyles()
-							end,
-							order = 0.1,
-						},
-						topLeftIconFontSize = {
-							type = "range",
-							name = G_RLF.L["Top Left Icon Font Size"],
-							desc = G_RLF.L["TopLeftIconFontSizeDesc"],
-							softMin = 6,
-							softMax = 24,
-							min = 1,
-							max = 72,
-							bigStep = 1,
-							disabled = function()
-								return not G_RLF.db.global.styling.enableTopLeftIconText
-							end,
-							get = function(info, value)
-								return G_RLF.db.global.styling.topLeftIconFontSize
-							end,
-							set = function(info, value)
-								G_RLF.db.global.styling.topLeftIconFontSize = value
-								G_RLF.LootDisplay:UpdateRowStyles()
-							end,
-							order = 1,
-						},
-						topLeftIconTextUseQualityColor = {
-							type = "toggle",
-							name = G_RLF.L["Use Quality Color"],
-							desc = G_RLF.L["UseQualityColorDesc"],
-							disabled = function()
-								return not G_RLF.db.global.styling.enableTopLeftIconText
-							end,
-							get = function(info, value)
-								return G_RLF.db.global.styling.topLeftIconTextUseQualityColor
-							end,
-							set = function(info, value)
-								G_RLF.db.global.styling.topLeftIconTextUseQualityColor = value
-								G_RLF.LootDisplay:UpdateRowStyles()
-							end,
-							order = 2,
-						},
-						topLeftIconTextColor = {
-							type = "color",
-							name = G_RLF.L["Top Left Icon Text Color"],
-							desc = G_RLF.L["TopLeftIconTextColorDesc"],
-							hasAlpha = true,
-							disabled = function()
-								return G_RLF.db.global.styling.topLeftIconTextUseQualityColor
-									or not G_RLF.db.global.styling.enableTopLeftIconText
-							end,
-							get = function(info, value)
-								local r, g, b, a = unpack(G_RLF.db.global.styling.topLeftIconTextColor)
-								return r, g, b, a
-							end,
-							set = function(info, r, g, b, a)
-								G_RLF.db.global.styling.topLeftIconTextColor = { r, g, b, a }
-								G_RLF.LootDisplay:UpdateRowStyles()
-							end,
-							order = 3,
-						},
-					},
 				},
 				fontFlags = {
 					type = "multiselect",

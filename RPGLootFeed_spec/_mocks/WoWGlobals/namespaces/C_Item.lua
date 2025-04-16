@@ -19,5 +19,6 @@ itemMocks.GetItemStatDelta = stub(_G.C_Item, "GetItemStatDelta").returns({
 	["ITEM_MOD_INTELLECT_SHORT"] = 8,
 	["ITEM_MOD_STAMINA_SHORT"] = 12,
 })
+itemMocks.IsEquippableItem = stub(_G.C_Item, "IsEquippableItem").returns(true)
 
 return itemMocks

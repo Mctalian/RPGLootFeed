@@ -240,7 +240,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 
 	element.topLeftText = nil
 	element.topLeftColor = nil
-	if info:IsEligibleEquipment() and info.itemQuality > Enum.ItemQuality.Poor then
+	if info:IsEquippableItem() and info.itemQuality > Enum.ItemQuality.Poor then
 		element.topLeftText = info.itemLevel
 		local r, g, b = C_Item.GetItemQualityColor(info.itemQuality)
 		element.topLeftColor = { r, g, b }
