@@ -4,8 +4,8 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
----@class RLF_ItemLoot: RLF_Module, AceEvent-3.0
-local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0")
+---@class RLF_ItemLoot: RLF_Module, AceEvent-3.0, AceBucket-3.0
+local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0", "AceBucket-3.0")
 
 local C = LibStub("C_Everywhere")
 
@@ -463,6 +463,39 @@ function ItemLoot:OnEnable()
 	self:RegisterEvent("CHAT_MSG_LOOT")
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
+	if GetExpansionLevel() == G_RLF.Expansion.CATA then
+		self:SetEquippableArmorClass()
+	end
+end
+
+function ItemLoot:SetEquippableArmorClass()
+	local _, playerClass = UnitClass("player")
+
+	if
+		playerClass == "ROGUE"
+		or playerClass == "DRUID"
+		or playerClass == "PRIEST"
+		or playerClass == "MAGE"
+		or playerClass == "WARLOCK"
+	then
+		return
+	end
+
+	local playerLevel = UnitLevel("player")
+	if playerLevel < 40 then
+		if not self.armorLevelListener then
+			self.armorLevelListener = self:RegisterBucketEvent("PLAYER_LEVEL_UP", 1, "SetEquippableArmorClass")
+		end
+		G_RLF.armorClassMapping = G_RLF.cataArmorClassMappingLowLevel
+		return
+	end
+
+	if self.armorLevelListener then
+		self:UnregisterBucket(self.armorLevelListener)
+		self.armorLevelListener = nil
+	end
+
+	G_RLF.armorClassMapping = G_RLF.standardArmorClassMapping
 end
 
 ---@param info RLF_ItemInfo
