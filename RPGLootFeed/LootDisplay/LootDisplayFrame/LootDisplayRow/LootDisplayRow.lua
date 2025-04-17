@@ -1285,12 +1285,17 @@ function LootDisplayRowMixin:UpdateItemCount()
 		if not itemDb.itemCountTextEnabled then
 			return
 		end
-		if not self.key then
-			G_RLF:LogDebug("Item key is nil")
+		if not self.link then
+			G_RLF:LogDebug("Item link is nil")
 			return
 		end
 		RunNextFrame(function()
-			local itemCount = C_Item.GetItemCount(self.key, true, false, true, true)
+			local itemInfo = self.link
+			local name = C_Item.GetItemInfo(itemInfo)
+			if not name then
+				return
+			end
+			local itemCount = C_Item.GetItemCount(itemInfo, true, false, true, true)
 			self:ShowItemCountText(itemCount, {
 				color = G_RLF:RGBAToHexFormat(unpack(itemDb.itemCountTextColor)),
 				wrapChar = itemDb.itemCountTextWrapChar,
