@@ -1259,6 +1259,22 @@ end
 
 --- Update the total item count for the row
 function LootDisplayRowMixin:UpdateItemCount()
+	if self.type == "Professions" then
+		---@type RLF_ConfigProfession
+		local profDb = G_RLF.db.global.prof
+		if not profDb.showSkillChange then
+			return
+		end
+		RunNextFrame(function()
+			self:ShowItemCountText(self.amount, {
+				color = G_RLF:RGBAToHexFormat(unpack(profDb.skillColor)),
+				wrapChar = profDb.skillTextWrapChar,
+				showSign = true,
+			})
+		end)
+		return
+	end
+
 	if self.itemCount == nil then
 		return
 	end
@@ -1323,22 +1339,6 @@ function LootDisplayRowMixin:UpdateItemCount()
 			self:ShowItemCountText(self.itemCount, {
 				color = G_RLF:RGBAToHexFormat(unpack(xpDb.currentLevelColor)),
 				wrapChar = xpDb.currentLevelTextWrapChar,
-			})
-		end)
-		return
-	end
-
-	if self.type == "Professions" then
-		---@type RLF_ConfigProfession
-		local profDb = G_RLF.db.global.prof
-		if not profDb.showSkillChange then
-			return
-		end
-		RunNextFrame(function()
-			self:ShowItemCountText(self.amount, {
-				color = G_RLF:RGBAToHexFormat(unpack(profDb.skillColor)),
-				wrapChar = profDb.skillTextWrapChar,
-				showSign = true,
 			})
 		end)
 		return
