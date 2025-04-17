@@ -4,12 +4,31 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
-G_RLF.armorClassMapping = {
+G_RLF.standardArmorClassMapping = {
 	WARRIOR = Enum.ItemArmorSubclass.Plate,
 	PALADIN = Enum.ItemArmorSubclass.Plate,
 	DEATHKNIGHT = Enum.ItemArmorSubclass.Plate,
 	HUNTER = Enum.ItemArmorSubclass.Mail,
 	SHAMAN = Enum.ItemArmorSubclass.Mail,
+	EVOKER = Enum.ItemArmorSubclass.Mail,
+	ROGUE = Enum.ItemArmorSubclass.Leather,
+	DRUID = Enum.ItemArmorSubclass.Leather,
+	DEMONHUNTER = Enum.ItemArmorSubclass.Leather,
+	MONK = Enum.ItemArmorSubclass.Leather,
+	PRIEST = Enum.ItemArmorSubclass.Cloth,
+	MAGE = Enum.ItemArmorSubclass.Cloth,
+	WARLOCK = Enum.ItemArmorSubclass.Cloth,
+}
+
+G_RLF.armorClassMapping = G_RLF.standardArmorClassMapping
+
+G_RLF.cataArmorClassMappingLowLevel = {
+	WARRIOR = Enum.ItemArmorSubclass.Mail,
+	PALADIN = Enum.ItemArmorSubclass.Mail,
+	DEATHKNIGHT = Enum.ItemArmorSubclass.Mail,
+	HUNTER = Enum.ItemArmorSubclass.Leather,
+	SHAMAN = Enum.ItemArmorSubclass.Leather,
+	-- It's really just the ones above
 	EVOKER = Enum.ItemArmorSubclass.Mail,
 	ROGUE = Enum.ItemArmorSubclass.Leather,
 	DRUID = Enum.ItemArmorSubclass.Leather,
