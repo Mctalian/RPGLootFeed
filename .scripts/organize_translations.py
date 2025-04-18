@@ -74,9 +74,30 @@ def parse_locale_file_with_regions(file_path):
 
 
 def sort_regions_by_keys(regions):
-    """Sort translations within each region alphabetically by key"""
+    """
+    Sort translations within each region:
+    1. Untranslated (commented) entries first, sorted alphabetically by key
+    2. Translated entries next, sorted alphabetically by key
+    """
     for region_name, translations in regions.items():
-        regions[region_name] = sorted(translations, key=lambda x: x[0].lower())
+        # Split into translated and untranslated entries
+        untranslated = []
+        translated = []
+
+        for entry in translations:
+            key, value, line = entry
+            if line.strip().startswith("--"):
+                untranslated.append(entry)
+            else:
+                translated.append(entry)
+
+        # Sort each group alphabetically
+        untranslated.sort(key=lambda x: x[0].lower())
+        translated.sort(key=lambda x: x[0].lower())
+
+        # Combine: untranslated first, then translated
+        regions[region_name] = untranslated + translated
+
     return regions
 
 

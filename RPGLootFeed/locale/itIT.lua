@@ -1,3 +1,4 @@
+--@strip-comments@
 ---@type string, table
 local _, ns = ...
 

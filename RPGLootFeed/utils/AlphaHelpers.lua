@@ -38,7 +38,12 @@ function G_RLF:ProfileFunction(func, funcName)
 		local result = { func(...) }
 		local endTime = debugprofilestop()
 		local duration = endTime - startTime
-		if duration > 0.8 then
+		local durationThreshold = 0.8 -- in milliseconds
+		if G_RLF:IsCataClassic() then
+			--- Cata seems to be slower to process than Retail
+			durationThreshold = 10 -- in milliseconds
+		end
+		if duration > durationThreshold then
 			G_RLF:Print(string.format("%s took %.2f ms", funcName, endTime - startTime))
 		end
 
