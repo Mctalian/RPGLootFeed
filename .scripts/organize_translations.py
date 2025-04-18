@@ -1,9 +1,13 @@
 import os
 import re
-import sys
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 
 import defusedxml.ElementTree as ET
+
+base_dir = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "RPGLootFeed"
+)
+locale_dir = os.path.join(base_dir, "locale")
 
 
 def parse_locales_xml(xml_file):
@@ -45,7 +49,7 @@ def parse_locale_file_with_regions(file_path):
         for line in region_content.splitlines():
             # Skip empty lines and comments
             if not line.strip() or (
-                line.strip().startswith("--") and not "--[[" in line
+                line.strip().startswith("--") and "--[[" not in line
             ):
                 continue
 
@@ -82,7 +86,7 @@ def generate_updated_locale_file(header_lines, regions, footer_lines):
 
     for region_name, translations in regions.items():
         lines.append(f"--#region {region_name}")
-        for key, value, original_line in translations:
+        for _key, _value, original_line in translations:
             lines.append(original_line)
         lines.append("--#endregion")
 
@@ -149,11 +153,10 @@ def process_locale_file(reference_regions, locale_file_path):
     with open(locale_file_path, "w", encoding="utf-8") as f:
         f.write(updated_content)
 
-    print(f"Updated {locale_file_path}")
+    # print(f"Updated {locale_file_path}")
 
 
 def main():
-    locale_dir = "RPGLootFeed/locale"
     locales_xml = f"{locale_dir}/locales.xml"
     locale_files = parse_locales_xml(locales_xml)
 
@@ -173,7 +176,7 @@ def main():
     )
     with open(reference_path, "w", encoding="utf-8") as f:
         f.write(updated_reference_content)
-    print(f"Updated reference locale file: {reference_path}")
+    # print(f"Updated reference locale file: {reference_path}")
 
     # Now process each other locale file
     for locale_file in locale_files:
