@@ -1,3 +1,4 @@
+--@strip-comments@
 ---Translator ZamestoTV v1.22.3
 ---@type string, G_RLF
 local _, G_RLF = ...
