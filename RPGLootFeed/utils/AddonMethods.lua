@@ -133,8 +133,16 @@ end
 
 function G_RLF:CreatePatternSegmentsForStringNumber(localeString)
 	local preStart, preEnd = string.find(localeString, "%%s")
+	if preStart == nil then
+		-- Mainly for deDE which uses a slightly different format token
+		preStart, preEnd = string.find(localeString, "%%1$s")
+	end
 	local prePattern = string.sub(localeString, 1, preStart - 1)
 	local midStart, midEnd = string.find(localeString, "%%d", preEnd + 1)
+	if midStart == nil then
+		-- Mainly for deDE which uses a slightly different format token
+		midStart, midEnd = string.find(localeString, "%%2$d", preEnd + 1)
+	end
 	local midPattern = string.sub(localeString, preEnd + 1, midStart - 1)
 	local postPattern = string.sub(localeString, midEnd + 1)
 	return { prePattern, midPattern, postPattern }

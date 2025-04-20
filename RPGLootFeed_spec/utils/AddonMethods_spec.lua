@@ -165,6 +165,11 @@ describe("AddonMethods", function()
 				local segments = ns:CreatePatternSegmentsForStringNumber("Hello %s, you have %d messages")
 				assert.are.same(segments, { "Hello ", ", you have ", " messages" })
 			end)
+
+			it("creates pattern segments for a string that uses a different format", function()
+				local segments = ns:CreatePatternSegmentsForStringNumber("Hello %1$s, you have %2$d messages")
+				assert.are.same(segments, { "Hello ", ", you have ", " messages" })
+			end)
 		end)
 
 		describe("ExtractDynamicsFromPattern", function()
