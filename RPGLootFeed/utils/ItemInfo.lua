@@ -171,7 +171,7 @@ function ItemInfo:populateKeystoneInfo()
 	end
 	self.keystoneInfo = keystoneInfo
 	local linkPrefix = string.format(
-		"|cffa335ee|Hkeystone:%d:%d:%d:%d:%d:%d:%d|h[",
+		"|cnIQ4:|Hkeystone:%d:%d:%d:%d:%d:%d:%d|h[",
 		self.keystoneInfo.itemId,
 		self.keystoneInfo.dungeonId,
 		self.keystoneInfo.level,
