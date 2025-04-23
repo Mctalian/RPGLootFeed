@@ -12,6 +12,21 @@ body:
       value: |
         Thank you for suggesting a new feature or enhancement for RPGLootFeed. Please provide the following information to help us understand and evaluate your request.
 
+  - type: checkboxes
+    id: flavor
+    attributes:
+      label: Game Flavor
+      description: Which game flavor(s) do you want to see this feature? (Check all that apply)
+      options:
+        - label: Retail
+        - label: Cataclysm Classic
+        - label: Classic Era (Vanilla)
+        - label: Classic Era, Season of Discovery
+        - label: Classic Era 20th Anniversary (Vanilla)
+        - label: Other (please specify in additional information section)
+    validations:
+      required: true
+
   - type: textarea
     id: feature_description
     attributes:

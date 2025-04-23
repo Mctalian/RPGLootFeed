@@ -11,14 +11,53 @@ body:
     attributes:
       value: |
         Thanks for reporting a lua error! Please fill out the details below so we can investigate the issue.
-  - type: input
-    id: summary
+
+  - type: checkboxes
+    id: flavor
     attributes:
-      label: Summary
-      description: A short summary of the bug.
-      placeholder: e.g. Looting an epic item causes a lua error
+      label: Game Flavor
+      description: Which game flavor(s) does this error occur in? (Check all that you are aware of)
+      options:
+        - label: Retail
+        - label: Cataclysm Classic
+        - label: Classic Era (Vanilla)
+        - label: Classic Era, Season of Discovery
+        - label: Classic Era 20th Anniversary (Vanilla)
+        - label: Other (please specify in additional information section)
     validations:
       required: true
+
+  - type: checkboxes
+    id: locale
+    attributes:
+      label: Game Locale
+      description: Which game locale(s) does this error occur in? (Check all that you are aware of)
+      options:
+        - label: enUS
+        - label: enGB
+        - label: deDE
+        - label: frFR
+        - label: esES
+        - label: esMX
+        - label: ptBR
+        - label: ruRU
+        - label: koKR
+        - label: zhCN
+        - label: zhTW
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: rlf-version
+    attributes:
+      label: RLF Version
+      description: Which version of RPGLootFeed did you encounter this error?
+      options:
+        - label: I am using the latest version from CurseForge, Wago, WoWInterface, or GitHub.
+        - label: I am using an older version (please specify in additional information section)
+    validations:
+      required: true
+
   - type: textarea
     id: steps-to-reproduce
     attributes:
@@ -31,6 +70,7 @@ body:
         4. Lua error is raised
     validations:
       required: true
+
   - type: textarea
     id: lua-error
     attributes:
@@ -38,9 +78,10 @@ body:
       description: Please paste the lua error that was raised.
     validations:
       required: true
+
   - type: textarea
     id: additional-information
     attributes:
       label: Additional Information
-      description: Any additional context, screenshots, or logs (`/rlf log` in game).
+      description: Any additional context, game flavors, RPGLootFeed version(s), screenshots, or logs (`/rlf log` in game).
       placeholder: Add any other context about the problem here.
