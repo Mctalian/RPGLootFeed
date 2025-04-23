@@ -1239,6 +1239,7 @@ function LootDisplayRowMixin:UpdateQuantity(element)
 	-- Update existing entry
 	local text = element.textFn(self.amount, self.link)
 	self.amount = self.amount + element.quantity
+	self.itemCount = element.itemCount
 	local r, g, b, a = element.r, element.g, element.b, element.a
 
 	self:UpdateSecondaryText(element.secondaryTextFn)
@@ -1295,6 +1296,7 @@ function LootDisplayRowMixin:UpdateItemCount()
 				return C_Item.GetItemInfo(itemInfo)
 			end)
 			if not success or not name then
+				G_RLF:LogDebug("Failed to get item info for link: %s", itemInfo)
 				return
 			end
 			local itemCount = C_Item.GetItemCount(itemInfo, true, false, true, true)

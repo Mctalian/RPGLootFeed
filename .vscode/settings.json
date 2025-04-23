@@ -86,7 +86,8 @@
     "${addons}/busted/module/library",
     "${3rd}/luassert/library",
     "${addons}/luassert/module/library",
-    "~/.vscode-server/extensions/ketho.wow-api-0.20.6/Annotations"
+    "~/.vscode-server/extensions/ketho.wow-api-0.20.6/Annotations/Core",
+    "~/.vscode-server/extensions/ketho.wow-api-0.20.6/Annotations/FrameXML"
   ],
   "Lua.workspace.checkThirdParty": false,
   "Lua.runtime.version": "Lua 5.1",
