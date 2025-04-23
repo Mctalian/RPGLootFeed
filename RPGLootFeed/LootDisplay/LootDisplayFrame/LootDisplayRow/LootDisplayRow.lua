@@ -1291,8 +1291,10 @@ function LootDisplayRowMixin:UpdateItemCount()
 		end
 		RunNextFrame(function()
 			local itemInfo = self.link
-			local name = C_Item.GetItemInfo(itemInfo)
-			if not name then
+			local success, name = pcall(function()
+				return C_Item.GetItemInfo(itemInfo)
+			end)
+			if not success or not name then
 				return
 			end
 			local itemCount = C_Item.GetItemCount(itemInfo, true, false, true, true)
