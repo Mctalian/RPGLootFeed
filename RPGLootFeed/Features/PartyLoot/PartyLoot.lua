@@ -220,7 +220,7 @@ end
 -- Function to extract item links from the message
 local function extractItemLinks(message)
 	local itemLinks = {}
-	for itemLink in message:gmatch("|c%x+|Hitem:.-|h%[.-%]|h|r") do
+	for itemLink in message:gmatch("|c.-|Hitem:.-|h%[.-%]|h|r") do
 		table.insert(itemLinks, itemLink)
 	end
 	return itemLinks
