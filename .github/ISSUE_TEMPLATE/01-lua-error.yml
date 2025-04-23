@@ -40,6 +40,7 @@ body:
         - label: esES
         - label: esMX
         - label: ptBR
+        - label: ptPT
         - label: ruRU
         - label: koKR
         - label: zhCN
