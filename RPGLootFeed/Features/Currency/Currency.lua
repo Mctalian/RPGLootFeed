@@ -11,7 +11,10 @@ local Currency = G_RLF.RLF:NewModule("Currency", "AceEvent-3.0")
 
 Currency.Element = {}
 
-function Currency.Element:new(...)
+--- @param currencyLink string
+--- @param currencyInfo CurrencyInfo
+--- @param basicInfo CurrencyDisplayInfo
+function Currency.Element:new(currencyLink, currencyInfo, basicInfo)
 	---@class Currency.Element: RLF_BaseLootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
@@ -23,13 +26,11 @@ function Currency.Element:new(...)
 
 	element.isLink = true
 
-	local currencyLink, currencyInfo, basicInfo = ...
-
 	if not currencyLink or not currencyInfo or not basicInfo then
 		return
 	end
 
-	element.key = currencyInfo.currencyID
+	element.key = "CURRENCY_" .. currencyInfo.currencyID
 	element.icon = currencyInfo.iconFileID
 	element.quantity = basicInfo.displayAmount
 	element.itemCount = currencyInfo.quantity
@@ -149,6 +150,7 @@ function Currency:Process(eventName, currencyType, quantityChange)
 		return
 	end
 
+	---@type CurrencyInfo
 	local info = C.CurrencyInfo.GetCurrencyInfo(currencyType)
 	if info == nil or info.description == "" or info.iconFileID == nil then
 		G_RLF:LogDebug(
@@ -163,6 +165,7 @@ function Currency:Process(eventName, currencyType, quantityChange)
 	end
 
 	self:fn(function()
+		---@type CurrencyDisplayInfo
 		local basicInfo = C.CurrencyInfo.GetBasicCurrencyInfo(currencyType, quantityChange)
 		local e = self.Element:new(C.CurrencyInfo.GetCurrencyLink(currencyType), info, basicInfo)
 		if e then

@@ -20,5 +20,6 @@ itemMocks.GetItemStatDelta = stub(_G.C_Item, "GetItemStatDelta").returns({
 	["ITEM_MOD_STAMINA_SHORT"] = 12,
 })
 itemMocks.IsEquippableItem = stub(_G.C_Item, "IsEquippableItem").returns(true)
+itemMocks.GetItemQualityColor = stub(_G.C_Item, "GetItemQualityColor").returns(1, 0.5, 0, 1)
 
 return itemMocks

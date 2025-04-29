@@ -58,6 +58,8 @@ function RLF:OnInitialize()
 		-- identify a specific character or account.
 		G_RLF.db.global.guid = G_RLF:GenerateGUID()
 	end
+	G_RLF.noQualColor = {}
+	G_RLF.noQualColor.r, G_RLF.noQualColor.g, G_RLF.noQualColor.b = C_Item.GetItemQualityColor(G_RLF.ItemQualEnum.Poor)
 	DbMigrations()
 	LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, G_RLF.options)
 	local rlfLDB = LibStub("LibDataBroker-1.1"):NewDataObject(addonName, {

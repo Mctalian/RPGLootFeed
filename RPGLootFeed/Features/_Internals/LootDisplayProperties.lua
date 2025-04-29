@@ -11,6 +11,7 @@ local lootDisplayProperties = {
 	"secondaryText",
 	"unit",
 	"sellPrice",
+	"highlight",
 	"isLink",
 	"icon",
 	"quantity",
@@ -31,6 +32,7 @@ local lootDisplayProperties = {
 ---@field public secondaryTextFn fun(...: any): string
 ---@field public unit string
 ---@field public sellPrice number
+---@field public highlight boolean
 ---@field public isLink boolean
 ---@field public icon number
 ---@field public eventChannel string
