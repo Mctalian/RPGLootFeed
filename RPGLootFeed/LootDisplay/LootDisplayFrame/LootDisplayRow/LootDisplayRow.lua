@@ -81,6 +81,7 @@ function LootDisplayRowMixin:Init()
 	end
 	self.updatePending = false
 	self.pendingElement = nil
+	self.quality = nil
 
 	self.ClickableButton:Hide()
 	---@type ScriptRegion[]
@@ -151,6 +152,7 @@ function LootDisplayRowMixin:Reset()
 	-- Reset row-specific data
 	self.key = nil
 	self.amount = nil
+	self.quality = nil
 	self.icon = nil
 	self.link = nil
 	self.secondaryText = nil
