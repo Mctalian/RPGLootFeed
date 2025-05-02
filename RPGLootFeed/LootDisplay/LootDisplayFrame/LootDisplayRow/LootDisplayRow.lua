@@ -173,7 +173,6 @@ function LootDisplayRowMixin:Reset()
 
 	self:CreateTopLeftText()
 	self.Icon:Reset()
-	self.Icon.IconBorder:SetTexture(nil)
 	self.Icon.IconBorder:SetVertexColor(G_RLF.noQualColor.r, G_RLF.noQualColor.g, G_RLF.noQualColor.b, 1)
 	self.Icon.NormalTexture:SetTexture(nil)
 	self.Icon.HighlightTexture:SetTexture(nil)
