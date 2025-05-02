@@ -1820,7 +1820,6 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 	self.link = data.link
 	self.quality = data.quality
 	self.unit = data.unit
-	self:UpdateStyles()
 	self.PrimaryText:SetText(data.rowText)
 	self.PrimaryText:SetTextColor(unpack(data.textColor))
 
@@ -1831,10 +1830,12 @@ function LootDisplayRowMixin:UpdateWithHistoryData(data)
 		self.SecondaryText:SetText(data.secondaryText)
 		self.SecondaryText:SetTextColor(unpack(data.secondaryTextColor))
 	end
+	self:StyleText()
 	if data.icon then
-		self:UpdateIcon(self.key, data.icon, self.quality)
 		self:SetupTooltip(true)
+		self:UpdateIcon(self.key, data.icon, self.quality)
 	else
 		self.icon = nil
 	end
+	self:UpdateStyles()
 end
