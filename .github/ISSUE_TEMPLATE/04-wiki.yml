@@ -1,0 +1,22 @@
+name: Wiki Content
+description: Find a typo in the wiki? Is a feature or configuration option missing? Let me know!
+title: "[Wiki]: "
+labels:
+  - wiki
+assignees:
+  - McTalian
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for your interest in improving the RPGLootFeed wiki! Please provide the following information to help us understand and evaluate your request.
+
+  - type: textarea
+    id: wiki_content
+    attributes:
+      label: Wiki Content
+      description: Describe what you would like to see changed or added to the wiki.
+      placeholder: Provide a detailed description of the wiki change...
+    validations:
+      required: true
