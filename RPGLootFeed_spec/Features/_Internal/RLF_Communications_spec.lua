@@ -11,7 +11,7 @@ local after_each = busted.after_each
 local describe = busted.describe
 local it = busted.it
 
-describe("Communications module #only", function()
+describe("Communications module", function()
 	local _ = match._
 
 	describe("load order", function()
