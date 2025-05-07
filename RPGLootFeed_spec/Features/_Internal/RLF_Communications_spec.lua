@@ -52,7 +52,6 @@ describe("Communications module", function()
 			globalMocks.IsInGuild:clear()
 			globalMocks.IsInGroup:clear()
 			globalMocks.IsInRaid:clear()
-			globalMocks.IsInInstance:clear()
 			nsMocks.LogDebug:clear()
 		end)
 
@@ -104,7 +103,6 @@ describe("Communications module", function()
 			local spyQueryGroupVersion = spy.on(module, "QueryGroupVersion")
 			local spyIsInGroup = globalMocks.IsInGroup.returns(false)
 			local spyIsInRaid = globalMocks.IsInRaid.returns(false)
-			local spyIsInInstance = globalMocks.IsInInstance.returns(false)
 
 			module:GROUP_JOINED("GROUP_JOINED", "party", "12345abcde")
 
@@ -117,15 +115,13 @@ describe("Communications module", function()
 				.spy(spyQueryGroupVersion).was
 				.called_with(module, string.format(ns.CommsMessages.VERSION, ns.addonVersion))
 			assert.spy(spyIsInGroup).was.called(2)
-			assert.spy(spyIsInRaid).was.called(1)
-			assert.spy(spyIsInInstance).was.called(0)
+			assert.spy(spyIsInRaid).was.called(2)
 		end)
 
 		describe("QueryGroupVersion", function()
 			after_each(function()
 				globalMocks.IsInGroup:clear()
 				globalMocks.IsInRaid:clear()
-				globalMocks.IsInInstance:clear()
 				globalMocks.IsInGuild:clear()
 			end)
 
@@ -141,7 +137,6 @@ describe("Communications module", function()
 					end
 				end)
 				local spyIsInRaid = globalMocks.IsInRaid.returns(false)
-				local spyIsInInstance = globalMocks.IsInInstance.returns(true)
 
 				module:QueryGroupVersion(string.format(ns.CommsMessages.VERSION, ns.addonVersion))
 
@@ -153,7 +148,6 @@ describe("Communications module", function()
 				assert.spy(spyTransmitParty).was.called(0)
 				assert.spy(spyIsInGroup).was.called(1)
 				assert.spy(spyIsInRaid).was.called(0)
-				assert.spy(spyIsInInstance).was.called(1)
 			end)
 
 			it("transmits to raid", function()
@@ -167,8 +161,13 @@ describe("Communications module", function()
 						return true
 					end
 				end)
-				local spyIsInRaid = globalMocks.IsInRaid.returns(true)
-				local spyIsInInstance = globalMocks.IsInInstance.returns(true)
+				local spyIsInRaid = globalMocks.IsInRaid.invokes(function(t)
+					if t == LE_PARTY_CATEGORY_INSTANCE then
+						return false
+					else
+						return true
+					end
+				end)
 
 				module:QueryGroupVersion(string.format(ns.CommsMessages.VERSION, ns.addonVersion))
 
@@ -179,8 +178,7 @@ describe("Communications module", function()
 					.called_with(module, string.format(ns.CommsMessages.VERSION, ns.addonVersion))
 				assert.spy(spyTransmitParty).was.called(0)
 				assert.spy(spyIsInGroup).was.called(1)
-				assert.spy(spyIsInRaid).was.called(1)
-				assert.spy(spyIsInInstance).was.called(0)
+				assert.spy(spyIsInRaid).was.called(2)
 			end)
 
 			it("transmits to party", function()
@@ -195,7 +193,6 @@ describe("Communications module", function()
 					end
 				end)
 				local spyIsInRaid = globalMocks.IsInRaid.returns(false)
-				local spyIsInInstance = globalMocks.IsInInstance.returns(true)
 
 				module:QueryGroupVersion(string.format(ns.CommsMessages.VERSION, ns.addonVersion))
 
@@ -206,8 +203,7 @@ describe("Communications module", function()
 					.spy(spyTransmitParty).was
 					.called_with(module, string.format(ns.CommsMessages.VERSION, ns.addonVersion))
 				assert.spy(spyIsInGroup).was.called(2)
-				assert.spy(spyIsInRaid).was.called(1)
-				assert.spy(spyIsInInstance).was.called(0)
+				assert.spy(spyIsInRaid).was.called(2)
 			end)
 		end)
 
@@ -220,18 +216,16 @@ describe("Communications module", function()
 			globalMocks.IsInGuild.returns(true)
 			globalMocks.IsInGroup.returns(false)
 			globalMocks.IsInRaid.returns(false)
-			globalMocks.IsInInstance.returns(false)
 			nsMocks.IsClassic.returns(false)
 			local expectedMessage = string.format(ns.CommsMessages.VERSION, ns.addonVersion)
 
 			module:PLAYER_ENTERING_WORLD("PLAYER_ENTERING_WORLD", true, false)
 
-			assert.spy(spyLogDebug).was.called(3)
+			assert.spy(spyLogDebug).was.called(2)
 			assert
 				.spy(spyLogDebug).was
 				.called_with(ns, "PLAYER_ENTERING_WORLD", "WOWEVENT", module.moduleName, nil, "PLAYER_ENTERING_WORLD true false")
 			assert.spy(spyLogDebug).was.called_with(ns, "TransmitGuild " .. expectedMessage)
-			assert.spy(spyLogDebug).was.called_with(ns, "TransmitChannel " .. expectedMessage .. " to " .. 1)
 			assert.spy(spyQueryGroupVersion).was.called(1)
 			assert
 				.spy(spyQueryGroupVersion).was
@@ -240,40 +234,29 @@ describe("Communications module", function()
 			assert.spy(spyTransmitGuild).was.called(1)
 			assert.spy(spyTransmitGuild).was.called_with(_, string.format(ns.CommsMessages.VERSION, ns.addonVersion))
 			assert.spy(spyTransmitYell).was.called(0)
-			assert.spy(spyTransmitChannel).was.called(1)
-			assert
-				.spy(spyTransmitChannel).was
-				.called_with(_, string.format(ns.CommsMessages.VERSION, ns.addonVersion), 1)
+			assert.spy(spyTransmitChannel).was.called(0)
 		end)
 
-		it("queries for new versions on enter world pre-Shadowlands #only", function()
+		it("queries for new versions on enter world pre-Shadowlands", function()
 			local spyLogDebug = nsMocks.LogDebug
 			local spyQueryGroupVersion = spy.on(module, "QueryGroupVersion")
 			local spyTransmitGuild = spy.on(module, "TransmitGuild")
 			local spyTransmitYell = spy.on(module, "TransmitYell")
 			local spyTransmitChannel = spy.on(module, "TransmitChannel")
 			globalMocks.GetExpansionLevel.returns(3)
-			globalMocks.GetChannelName.invokes(function(t)
-				if t == 3 then
-					return 3, "General"
-				end
-				return t, "Channel" .. t
-			end)
 			globalMocks.IsInGuild.returns(true)
 			globalMocks.IsInGroup.returns(false)
 			globalMocks.IsInRaid.returns(false)
-			globalMocks.IsInInstance.returns(false)
 			nsMocks.IsClassic.returns(false)
 			local expectedMessage = string.format(ns.CommsMessages.VERSION, ns.addonVersion)
 
 			module:PLAYER_ENTERING_WORLD("PLAYER_ENTERING_WORLD", true, false)
 
-			assert.spy(spyLogDebug).was.called(3)
+			assert.spy(spyLogDebug).was.called(2)
 			assert
 				.spy(spyLogDebug).was
 				.called_with(ns, "PLAYER_ENTERING_WORLD", "WOWEVENT", module.moduleName, nil, "PLAYER_ENTERING_WORLD true false")
 			assert.spy(spyLogDebug).was.called_with(ns, "TransmitGuild " .. expectedMessage)
-			assert.spy(spyLogDebug).was.called_with(ns, "TransmitChannel " .. expectedMessage .. " to " .. 3)
 			assert.spy(spyQueryGroupVersion).was.called(1)
 			assert
 				.spy(spyQueryGroupVersion).was
@@ -282,10 +265,7 @@ describe("Communications module", function()
 			assert.spy(spyTransmitGuild).was.called(1)
 			assert.spy(spyTransmitGuild).was.called_with(_, string.format(ns.CommsMessages.VERSION, ns.addonVersion))
 			assert.spy(spyTransmitYell).was.called(0)
-			assert.spy(spyTransmitChannel).was.called(1)
-			assert
-				.spy(spyTransmitChannel).was
-				.called_with(_, string.format(ns.CommsMessages.VERSION, ns.addonVersion), 3)
+			assert.spy(spyTransmitChannel).was.called(0)
 		end)
 
 		it("queries for new versions on enter world via yell for Classic", function()
@@ -297,7 +277,6 @@ describe("Communications module", function()
 			globalMocks.IsInGuild.returns(false)
 			globalMocks.IsInGroup.returns(false)
 			globalMocks.IsInRaid.returns(false)
-			globalMocks.IsInInstance.returns(false)
 			nsMocks.IsClassic.returns(true)
 			local expectedMessage = string.format(ns.CommsMessages.VERSION, ns.addonVersion)
 
