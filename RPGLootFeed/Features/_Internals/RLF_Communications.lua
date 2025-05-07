@@ -118,7 +118,9 @@ function Communications:OnCommReceived(prefix, payload, distribution, sender)
 end
 
 function Communications:QueryGroupVersion(versionPayload)
-	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) or IsInRaid(LE_PARTY_CATEGORY_INSTANCE) then
+	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+		self:TransmitInstance(versionPayload)
+	elseif IsInRaid(LE_PARTY_CATEGORY_INSTANCE) then
 		self:TransmitInstance(versionPayload)
 	elseif IsInRaid() then
 		self:TransmitRaid(versionPayload)
