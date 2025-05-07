@@ -118,7 +118,7 @@ function Communications:OnCommReceived(prefix, payload, distribution, sender)
 end
 
 function Communications:QueryGroupVersion(versionPayload)
-	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) and IsInInstance() then
+	if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) or IsInRaid(LE_PARTY_CATEGORY_INSTANCE) then
 		self:TransmitInstance(versionPayload)
 	elseif IsInRaid() then
 		self:TransmitRaid(versionPayload)
@@ -150,25 +150,6 @@ function Communications:PLAYER_ENTERING_WORLD(eventName, isLogin, isReload)
 	end
 	if G_RLF:IsClassic() then
 		self:TransmitYell(versionPayload)
-	else
-		if self.generalChannelId == nil then
-			if GetExpansionLevel() >= G_RLF.Expansion.SL then
-				self.generalChannelId = C_ChatInfo.GetGeneralChannelID()
-			else
-				for i = 1, MAX_WOW_CHAT_CHANNELS do
-					local channelId, channelName = GetChannelName(i)
-					if channelId > 0 and channelName ~= nil then
-						local normalizedName = channelName:gsub("%s%-%s.*", "")
-						if normalizedName == "General" or normalizedName == _G["GENERAL"] then
-							self.generalChannelId = channelId
-							break
-						end
-					end
-				end
-			end
-		end
-
-		self:TransmitChannel(versionPayload, self.generalChannelId)
 	end
 end
 
