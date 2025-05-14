@@ -45,7 +45,9 @@ function TravelPoints.Element:new(...)
 	return element
 end
 
-local function initTravelersJourneyValues()
+--- Calculate the current and max values for the Travelers Journey
+--- @param activityID? number
+local function calcTravelersJourneyVal(activityID)
 	local allInfo = C_PerksActivities.GetPerksActivitiesInfo()
 	if allInfo == nil then
 		G_RLF:LogWarn("Could not get all activity info", addonName, TravelPoints.moduleName)
@@ -55,6 +57,8 @@ local function initTravelersJourneyValues()
 	local progress = 0
 	for i, v in ipairs(allInfo.activities) do
 		if v.completed then
+			progress = progress + v.thresholdContributionAmount
+		elseif v.ID == activityID then
 			progress = progress + v.thresholdContributionAmount
 		end
 	end
@@ -66,6 +70,11 @@ local function initTravelersJourneyValues()
 
 	currentTravelersJourney = progress
 	maxTravelersJourney = max
+	G_RLF:LogDebug(
+		"Current Travelers Journey " .. tostring(currentTravelersJourney) .. " / " .. tostring(maxTravelersJourney),
+		addonName,
+		TravelPoints.moduleName
+	)
 end
 
 function TravelPoints:OnInitialize()
@@ -80,7 +89,6 @@ function TravelPoints:OnDisable()
 	if not G_RLF:IsRetail() then
 		return
 	end
-	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PERKS_ACTIVITY_COMPLETED")
 end
 
@@ -90,16 +98,7 @@ function TravelPoints:OnEnable()
 	end
 
 	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
-	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PERKS_ACTIVITY_COMPLETED")
-	if currentTravelersJourney == nil then
-		self:fn(initTravelersJourneyValues)
-	end
-end
-
-function TravelPoints:PLAYER_ENTERING_WORLD(eventName)
-	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName)
-	self:fn(initTravelersJourneyValues)
 end
 
 function TravelPoints:PERKS_ACTIVITY_COMPLETED(eventName, activityID)
@@ -111,8 +110,7 @@ function TravelPoints:PERKS_ACTIVITY_COMPLETED(eventName, activityID)
 		return
 	end
 	local amount = info.thresholdContributionAmount
-
-	currentTravelersJourney = (currentTravelersJourney or 0) + amount
+	self:fn(calcTravelersJourneyVal, activityID)
 
 	if amount > 0 then
 		local e = self.Element:new(amount)
