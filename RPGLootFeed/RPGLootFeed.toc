@@ -1,4 +1,4 @@
-## Interface: 11507, 40402, 110105
+## Interface: 11507, 40402, 110105, 110107
 ## Title: |cFFFF8000RPGLootFeed|r
 ## Author: McTalian
 ## Version: @project-version@
