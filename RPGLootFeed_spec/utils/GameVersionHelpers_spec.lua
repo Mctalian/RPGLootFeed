@@ -11,17 +11,19 @@ local stub = busted.stub
 
 describe("GameVersionHelpers", function()
 	describe("load order", function()
-		local stubClearIBO, ns, stubIsClassic, stubIsCataClassic, stubIsRetail
+		local stubClearIBO, ns, stubIsClassic, stubIsCataClassic, stubIsMopClassic, stubIsRetail
 		before_each(function()
 			ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.UtilsEnums)
 			stubIsClassic = nsMocks.IsClassic.returns(false)
 			stubIsCataClassic = nsMocks.IsCataClassic.returns(false)
+			stubIsMopClassic = nsMocks.IsMoPClassic.returns(false)
 			stubIsRetail = nsMocks.IsRetail.returns(true)
 		end)
 
 		after_each(function()
 			stubIsClassic:revert()
 			stubIsCataClassic:revert()
+			stubIsMopClassic:revert()
 			stubIsRetail:revert()
 			_G.ClearItemButtonOverlay = nil
 		end)

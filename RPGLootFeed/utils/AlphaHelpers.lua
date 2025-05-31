@@ -43,6 +43,10 @@ function G_RLF:ProfileFunction(func, funcName)
 			--- Cata seems to be slower to process than Retail
 			durationThreshold = 10 -- in milliseconds
 		end
+		if G_RLF:IsMoPClassic() then
+			--- MoP seems to be slightly slower to process than Retail
+			durationThreshold = 5 -- in milliseconds
+		end
 		if duration > durationThreshold then
 			G_RLF:Print(string.format("%s took %.2f ms", funcName, endTime - startTime))
 		end

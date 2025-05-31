@@ -52,7 +52,8 @@ local function buildFactionLocaleMap(findName)
 	local hasMoreFactions = false
 	if G_RLF:IsRetail() then
 		hasMoreFactions = C_Reputation.GetFactionDataByIndex(mappedFactions + 1) ~= nil
-	elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+	-- So far up through MoP Classic, there is no C_Reputation.GetFactionDataByIndex
+	else
 		hasMoreFactions = GetFactionInfo(mappedFactions + 1) ~= nil
 	end
 	if not hasMoreFactions and not findName then
@@ -70,7 +71,8 @@ local function buildFactionLocaleMap(findName)
 					local factionData
 					if G_RLF:IsRetail() then
 						factionData = C_Reputation.GetFactionDataByIndex(i)
-					elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+					-- So far up through MoP Classic, there is no C_Reputation.GetFactionDataByIndex
+					else
 						factionData = G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(i)
 					end
 					if factionData and factionData.name then
@@ -89,7 +91,8 @@ local function buildFactionLocaleMap(findName)
 		local factionData
 		if G_RLF:IsRetail() then
 			factionData = C_Reputation.GetFactionDataByIndex(i)
-		elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+		-- So far up through MoP Classic, there is no C_Reputation.GetFactionDataByIndex
+		else
 			factionData = G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(i)
 		end
 
@@ -451,7 +454,8 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 				local friendInfo = C_GossipInfo.GetFriendshipReputation(fId)
 				if G_RLF:IsRetail() then
 					factionData = C_Reputation.GetFactionDataByID(fId)
-				elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+				-- So far up through MoP Classic, there is no C_Reputation.GetFactionDataByID
+				else
 					factionData = G_RLF.ClassicToRetail:ConvertFactionInfoByID(fId)
 				end
 				if not factionData then

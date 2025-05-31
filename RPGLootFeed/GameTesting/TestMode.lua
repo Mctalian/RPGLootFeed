@@ -83,6 +83,9 @@ elseif G_RLF:IsClassic() then
 	tconcat(testItemIds, { 233620 })
 elseif G_RLF:IsCataClassic() then
 	tconcat(testItemIds, { 71086 })
+	-- TODO: Add MoP Classic test items
+	--elseif G_RLF:IsMoPClassic() then
+	--	tconcat(testItemIds, { 123456 })
 end
 local function initializeTestItems()
 	for _, id in pairs(testItemIds) do
@@ -128,7 +131,8 @@ local function initializeTestFactions()
 		local factionInfo
 		if G_RLF:IsRetail() then
 			factionInfo = C.Reputation.GetFactionDataByIndex(i)
-		elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+		-- So far up through MoP Classic, there is no C_Reputation.GetFactionDataByIndex
+		else
 			factionInfo = G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(i)
 		end
 		if factionInfo and factionInfo.name then

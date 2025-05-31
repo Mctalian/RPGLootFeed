@@ -55,6 +55,10 @@ function G_RLF:IsCataClassic()
 	return WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC
 end
 
+function G_RLF:IsMoPClassic()
+	return WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC
+end
+
 function G_RLF:SendMessage(...)
 	local args = { ... }
 	RunNextFrame(function()

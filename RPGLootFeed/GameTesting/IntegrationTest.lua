@@ -144,7 +144,8 @@ end
 local function runProfessionIntegrationTest()
 	local module = G_RLF.RLF:GetModule("Professions") --[[@as RLF_Professions]]
 	local icon = "4620671"
-	if G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+	-- So far, MoP Classic and below doesn't have this icon
+	if not G_RLF:IsRetail() then
 		icon = G_RLF.DefaultIcons.PROFESSION
 	end
 	local e = module.Element:new("Cooking", "Cooking", icon, 3, nil, 1)

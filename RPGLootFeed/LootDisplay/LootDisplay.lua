@@ -77,7 +77,8 @@ function LootDisplay:OnEnable()
 		TestModeModule:OnLootDisplayReady()
 	end)
 
-	if G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+	-- So far up through MoP Classic, some/all of these methods are not defined
+	if not G_RLF:IsRetail() then
 		if not ItemButtonMixin.SetItemButtonTexture then
 			ItemButtonMixin.SetItemButtonTexture = function(self, texture) end
 		end

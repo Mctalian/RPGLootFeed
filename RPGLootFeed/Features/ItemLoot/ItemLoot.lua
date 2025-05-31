@@ -354,7 +354,8 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 			end
 			if G_RLF:IsRetail() then
 				atlasIcon = "spellicon-256x256-selljunk"
-			elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+			-- So far, MoP Classic and below don't have the retail icon available
+			else
 				atlasIcon = "bags-junkcoin"
 			end
 			unitPrice = element.sellPrice
@@ -366,7 +367,8 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 			unitPrice = marketPrice
 			if G_RLF:IsRetail() then
 				atlasIcon = "auctioneer"
-			elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+			-- So far, MoP Classic and below don't have the retail icon available
+			else
 				atlasIcon = "Auctioneer"
 			end
 		end
@@ -559,7 +561,8 @@ function ItemLoot:CHAT_MSG_LOOT(eventName, ...)
 	local me = false
 	if G_RLF:IsRetail() then
 		me = guid == GetPlayerGuid()
-	elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+	-- So far, MoP Classic and below doesn't work with GetPlayerGuid()
+	else
 		me = playerName2 == UnitName("player")
 	end
 
