@@ -19,12 +19,15 @@ function Notifications.Element:new(...)
 		return Notifications:IsEnabled()
 	end
 
-	local key, text, index = ...
+	local key, text, secondaryText, index = ...
 
 	element.key = key
 	element.quantity = 0
-	element.textFn = function(existingAmount)
+	element.textFn = function()
 		return text
+	end
+	element.secondaryTextFn = function()
+		return secondaryText
 	end
 	element.icon = "Interface/Addons/RPGLootFeed/Icons/logo.blp"
 	element.quality = Enum.ItemQuality.Legendary
@@ -49,8 +52,12 @@ end
 function Notifications:ViewNotification(index)
 	G_RLF:LogDebug("ViewNotification " .. index)
 	if G_RLF.db.global.notifications and G_RLF.db.global.notifications[index] then
-		local e =
-			self.Element:new(G_RLF.db.global.notifications[index].key, G_RLF.db.global.notifications[index].text, index)
+		local e = self.Element:new(
+			G_RLF.db.global.notifications[index].key,
+			G_RLF.db.global.notifications[index].text,
+			G_RLF.db.global.notifications[index].secondaryText,
+			index
+		)
 		e:Show()
 		G_RLF.Notifications:AckNotification(index)
 	end
