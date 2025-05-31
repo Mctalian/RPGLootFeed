@@ -22,6 +22,7 @@ G_RLF.defaults.global.money = {
 	onlyIncome = false,
 	overrideMoneyLootSound = false,
 	moneyLootSound = "",
+	enableIcon = true,
 }
 
 G_RLF.options.args.features.args.moneyConfig = {
@@ -155,6 +156,19 @@ G_RLF.options.args.features.args.moneyConfig = {
 					end,
 					order = 3,
 				},
+				showIcon = {
+					type = "toggle",
+					name = G_RLF.L["Show Money Icon"],
+					desc = G_RLF.L["ShowMoneyIconDesc"],
+					width = "double",
+					get = function()
+						return G_RLF.db.global.money.enableIcon
+					end,
+					set = function(_, value)
+						G_RLF.db.global.money.enableIcon = value
+					end,
+					order = 4,
+				},
 				overrideMoneyLootSound = {
 					type = "toggle",
 					name = G_RLF.L["Override Money Loot Sound"],
@@ -167,7 +181,7 @@ G_RLF.options.args.features.args.moneyConfig = {
 						MoneyConfig:OverrideSound()
 					end,
 					width = "double",
-					order = 4,
+					order = 5,
 				},
 				moneyLootSound = {
 					type = "select",
@@ -191,7 +205,7 @@ G_RLF.options.args.features.args.moneyConfig = {
 						return not G_RLF.db.global.money.overrideMoneyLootSound
 					end,
 					width = "full",
-					order = 5,
+					order = 6,
 				},
 			},
 		},
