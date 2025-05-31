@@ -67,6 +67,9 @@ def parse_locale_file_with_regions(file_path):
     if len(parts) > 1:
         # The last part will be what comes after the last --#endregion
         footer_lines = parts[-1].splitlines()
+        # Remove leading empty lines to prevent accumulation
+        while footer_lines and not footer_lines[0].strip():
+            footer_lines.pop(0)
     else:
         footer_lines = []
 
@@ -110,8 +113,14 @@ def generate_updated_locale_file(header_lines, regions, footer_lines):
         for _key, _value, original_line in translations:
             lines.append(original_line)
         lines.append("--#endregion")
+        lines.append("")  # Add empty line after each endregion
 
     lines.extend(footer_lines)
+
+    # Remove trailing empty lines and ensure exactly one newline at the end
+    while lines and not lines[-1].strip():
+        lines.pop()
+
     return "\n".join(lines) + "\n"
 
 
