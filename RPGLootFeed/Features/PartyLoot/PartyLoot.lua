@@ -242,7 +242,8 @@ function PartyLoot:CHAT_MSG_LOOT(eventName, ...)
 	local me = false
 	if G_RLF:IsRetail() then
 		me = guid == GetPlayerGuid()
-	elseif G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+	-- So far, MoP Classic and below doesn't work with GetPlayerGuid()
+	else
 		me = playerName2 == UnitName("player")
 	end
 

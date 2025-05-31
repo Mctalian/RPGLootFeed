@@ -47,7 +47,8 @@ function G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(index)
 	return convertFactionInfo(legacyFactionData)
 end
 
-if G_RLF:IsClassic() or G_RLF:IsCataClassic() then
+-- So far up through MoP Classic, ClearItemButtonOverlay is not defined (but is called by Blizzard code)
+if not G_RLF:IsRetail() then
 	if not ClearItemButtonOverlay then
 		function ClearItemButtonOverlay(button)
 			-- Dummy function to avoid errors
