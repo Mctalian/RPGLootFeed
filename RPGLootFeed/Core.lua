@@ -180,7 +180,15 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 	local isNewVersion = currentVersion ~= G_RLF.db.global.lastVersionLoaded
 	if isLogin and isReload == false and isNewVersion then
 		G_RLF.db.global.lastVersionLoaded = currentVersion
-		self:Print(G_RLF.L["Welcome"] .. " (" .. currentVersion .. ")")
+		G_RLF.Notifications:AddNotification(
+			G_RLF.NotificationKeys.WELCOME,
+			G_RLF:RGBAToHexFormat(1, 0.5, 0, 1) .. G_RLF.L["Welcome"] .. "|r",
+			G_RLF:RGBAToHexFormat(0.2, 0.5, 0.4, 1) .. currentVersion .. "|r"
+		)
+		local notifModule = G_RLF.RLF:GetModule("Notifications") --[[@as RLF_Notifications]]
+		if notifModule then
+			notifModule:ViewAllNotifications()
+		end
 		if G_RLF.db.global.blizzOverrides.enableAutoLoot then
 			C_CVar.SetCVar("autoLootDefault", "1")
 		end

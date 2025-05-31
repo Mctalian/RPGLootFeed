@@ -27,10 +27,11 @@ function G_RLF.Notifications:CheckForNotifications()
 	end
 end
 
-function G_RLF.Notifications:AddNotification(key, text)
+function G_RLF.Notifications:AddNotification(key, text, secondaryText)
 	local notification = {
 		key = key,
 		text = text,
+		secondaryText = secondaryText or "",
 		time = GetTime(),
 		seen = false,
 	}

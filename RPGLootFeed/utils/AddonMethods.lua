@@ -174,12 +174,13 @@ function G_RLF:ExtractDynamicsFromPattern(localeString, segments)
 end
 
 local menu = {
-	{ text = addonName, isTitle = true },
+	{ text = addonName, isTitle = true, notCheckable = true },
 	{
 		text = G_RLF.L["Clear rows"],
 		func = function()
 			G_RLF.LootDisplay:HideLoot()
 		end,
+		notCheckable = true,
 	},
 }
 local menuFrame = CreateFrame("Frame", addonName .. "MenuFrame", UIParent, "UIDropDownMenuTemplate")
@@ -203,6 +204,7 @@ function G_RLF:OpenOptions(button)
 						notifModule:ViewAllNotifications()
 					end
 				end,
+				notCheckable = true,
 			})
 		end
 		if G_RLF.db.global.lootHistory.enabled then
@@ -215,6 +217,7 @@ function G_RLF:OpenOptions(button)
 						partyFrame:ToggleHistoryFrame()
 					end
 				end,
+				notCheckable = true,
 			})
 		end
 		table.insert(tmpMenu, {
@@ -222,6 +225,7 @@ function G_RLF:OpenOptions(button)
 			func = function()
 				CloseDropDownMenus()
 			end,
+			notCheckable = true,
 		})
 		LibEasyMenu:EasyMenu(tmpMenu, menuFrame, "cursor", 0, 0, "MENU")
 	end

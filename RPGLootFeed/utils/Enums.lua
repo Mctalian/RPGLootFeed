@@ -150,6 +150,7 @@ G_RLF.TertiaryStats = {
 
 G_RLF.NotificationKeys = {
 	VERSION = "RLF_NewVersion",
+	WELCOME = "RLF_Welcome",
 }
 
 G_RLF.CommMessagePrefixes = {

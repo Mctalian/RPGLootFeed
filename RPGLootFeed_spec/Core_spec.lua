@@ -75,9 +75,19 @@ describe("Core module", function()
 		describe("PLAYER_ENTERING_WORLD", function()
 			it("should handle PLAYER_ENTERING_WORLD event correctly", function()
 				ns.db.global.blizzOverrides.enableAutoLoot = true
+				nsMocks.RGBAToHexFormat.returns("|cFFFFFFFF")
+				local fakeNotifModule = {
+					ViewAllNotifications = spy.new(function() end),
+				}
+				local stubGetModule = stub(RLF, "GetModule", function(_, moduleName)
+					if moduleName == "Notifications" then
+						return fakeNotifModule
+					end
+				end)
 				spy.on(RLF, "PLAYER_ENTERING_WORLD")
 				RLF:PLAYER_ENTERING_WORLD("PLAYER_ENTERING_WORLD", true, false)
 				assert.spy(RLF.PLAYER_ENTERING_WORLD).was.called(1)
+				assert.spy(fakeNotifModule.ViewAllNotifications).was.called(1)
 			end)
 		end)
 
