@@ -19,6 +19,7 @@ G_RLF.defaults.global.money = {
 	moneyTextWrapChar = G_RLF.WrapCharEnum.BAR,
 	abbreviateTotal = true,
 	accountantMode = false,
+	onlyIncome = false,
 	overrideMoneyLootSound = false,
 	moneyLootSound = "",
 }
@@ -125,18 +126,34 @@ G_RLF.options.args.features.args.moneyConfig = {
 						},
 					},
 				},
+				onlyIncome = {
+					type = "toggle",
+					name = G_RLF.L["Only Income"],
+					desc = G_RLF.L["OnlyIncomeDesc"],
+					width = "double",
+					get = function()
+						return G_RLF.db.global.money.onlyIncome
+					end,
+					set = function(_, value)
+						G_RLF.db.global.money.onlyIncome = value
+					end,
+					order = 2,
+				},
 				accountantMode = {
 					type = "toggle",
 					name = G_RLF.L["Accountant Mode"],
 					desc = G_RLF.L["AccountantModeDesc"],
 					width = "double",
+					disabled = function()
+						return G_RLF.db.global.money.onlyIncome
+					end,
 					get = function()
 						return G_RLF.db.global.money.accountantMode
 					end,
 					set = function(_, value)
 						G_RLF.db.global.money.accountantMode = value
 					end,
-					order = 2,
+					order = 3,
 				},
 				overrideMoneyLootSound = {
 					type = "toggle",
@@ -150,7 +167,7 @@ G_RLF.options.args.features.args.moneyConfig = {
 						MoneyConfig:OverrideSound()
 					end,
 					width = "double",
-					order = 3,
+					order = 4,
 				},
 				moneyLootSound = {
 					type = "select",
@@ -174,7 +191,7 @@ G_RLF.options.args.features.args.moneyConfig = {
 						return not G_RLF.db.global.money.overrideMoneyLootSound
 					end,
 					width = "full",
-					order = 4,
+					order = 5,
 				},
 			},
 		},

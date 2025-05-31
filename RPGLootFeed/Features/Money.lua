@@ -121,6 +121,11 @@ function Money:PLAYER_MONEY(eventName)
 		local newMoney = GetMoney()
 		local amountInCopper = newMoney - self.startingMoney
 		self.startingMoney = newMoney
+		if G_RLF.db.global.money.onlyIncome and amountInCopper < 0 then
+			G_RLF:LogDebug("Ignoring money loss in 'only income' mode", addonName, self.moduleName)
+			return
+		end
+
 		local e = self.Element:new(amountInCopper)
 		if not e then
 			G_RLF:LogDebug("No money to display", addonName, self.moduleName)

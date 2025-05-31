@@ -14,6 +14,11 @@ end
 --- You may translate these comments, but do not translate "region" or "endregion" as they are used by the localization tool to determine where to place the translations.
 --- To add translations, simply uncomment the line(s) and replace the English text after the equal sign (=) with the translated value.
 
+--#region 1.23.0
+-- L["Only Income"] = "Only Income Mode"
+-- L["OnlyIncomeDesc"] = "If checked, only show income money amounts (i.e. positive money) in the Loot Feed. Money spent, such as repairs, buying items, etc. will not be processed."
+--#endregion
+
 --#region 1.0.0 - 1.22.0
 L["Abbreviate Total"] = "缩写总计"
 L["AbbreviateTotalDesc"] = "缩写拾取通报中的金币总额 (金币超过1000时)"
