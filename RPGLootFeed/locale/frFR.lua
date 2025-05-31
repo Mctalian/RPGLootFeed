@@ -16,6 +16,8 @@ end
 --#region 1.23.0
 -- L["Only Income"] = "Only Income Mode"
 -- L["OnlyIncomeDesc"] = "If checked, only show income money amounts (i.e. positive money) in the Loot Feed. Money spent, such as repairs, buying items, etc. will not be processed."
+-- L["Show Money Icon"] = "Show Money Icon"
+-- L["ShowMoneyIconDesc"] = "If checked, show the money icon in the Loot Feed next to the money amount."
 --#endregion
 
 --#region 1.0.0 - 1.22.0
