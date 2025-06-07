@@ -80,15 +80,20 @@
     "ElvUI",
     "SetItemButtonCount",
     "GetItemButtonCount",
-    "ItemButtonConstants"
+    "ItemButtonConstants",
+    "WOW_PROJECT_MISTS_CLASSIC"
   ],
+  "wowAPI.luals.frameXML": true,
   "Lua.workspace.library": [
     "${addons}/busted/module/library",
     "${3rd}/luassert/library",
     "${addons}/luassert/module/library",
-    "~/.vscode-server/extensions/ketho.wow-api-0.20.7/Annotations"
+    "~/.vscode-server/extensions/ketho.wow-api-0.20.7/Annotations/Core",
+    "~/.vscode-server/extensions/ketho.wow-api-0.20.7/Annotations/FrameXML"
   ],
+  "Lua.workspace.userThirdParty": [],
   "Lua.workspace.checkThirdParty": false,
+  "Lua.workspace.ignoreSubmodules": true,
   "Lua.runtime.version": "Lua 5.1",
   "Lua.runtime.builtin": {
     "basic": "disable",
