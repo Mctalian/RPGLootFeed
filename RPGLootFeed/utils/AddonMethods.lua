@@ -321,3 +321,25 @@ function G_RLF:CompareWithVersion(myVersion, cmpVersion)
 
 	return G_RLF.VersionCompare.SAME -- Versions are equal or invalid
 end
+
+function G_RLF:ExtractItemLinks(message)
+	local itemLinks = {}
+	for itemLink in message:gmatch("|c.-|Hitem:.-|h%[.-%]|h|r") do
+		table.insert(itemLinks, itemLink)
+	end
+	return itemLinks
+end
+
+function G_RLF:ExtractCurrencyLinks(message)
+	local currencyLinks = {}
+	for currencyLink in message:gmatch("|c.-|Hcurrency:.-|h%[.-%]|h|r") do
+		table.insert(currencyLinks, currencyLink)
+	end
+	return currencyLinks
+end
+
+function G_RLF:ExtractCurrencyID(currencyLink)
+	-- Currency links have the format: |cffffffff|Hcurrency:currencyID:amount|h[Name]|h|r
+	local currencyID = currencyLink:match("|Hcurrency:(%d+):")
+	return currencyID and tonumber(currencyID) or nil
+end

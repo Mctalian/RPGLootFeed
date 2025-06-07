@@ -28,7 +28,7 @@ G_RLF.options.args.features.args.currencyConfig = {
 	name = G_RLF.L["Currency Config"],
 	order = G_RLF.mainFeatureOrder.Currency,
 	disabled = function()
-		return GetExpansionLevel() < G_RLF.Expansion.SL
+		return GetExpansionLevel() < G_RLF.Expansion.WOTLK
 	end,
 	args = {
 		enableCurrency = {
@@ -48,7 +48,7 @@ G_RLF.options.args.features.args.currencyConfig = {
 				end
 			end,
 			disabled = function()
-				return GetExpansionLevel() < G_RLF.Expansion.SL
+				return GetExpansionLevel() < G_RLF.Expansion.WOTLK
 			end,
 			order = 1,
 		},

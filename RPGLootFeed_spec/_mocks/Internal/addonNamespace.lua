@@ -122,6 +122,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 		addonNamespaceMocks.IsRLFStableRelease = stub(ns, "IsRLFStableRelease").returns(true)
 		addonNamespaceMocks.ParseVersion = stub(ns, "ParseVersion").returns(1, 0, 0)
 		addonNamespaceMocks.CompareWithVersion = stub(ns, "CompareWithVersion").returns(0)
+		addonNamespaceMocks.ExtractItemLinks = stub(ns, "ExtractItemLinks").returns({})
 	end
 	if loadSection >= addonNamespaceMocks.LoadSections.UtilsAlphaHelpers then
 		addonNamespaceMocks.dump = stub(ns, "dump")

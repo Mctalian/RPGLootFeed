@@ -109,7 +109,7 @@ G_RLF.options.args.features = {
 				end
 			end,
 			disabled = function()
-				return GetExpansionLevel() < G_RLF.Expansion.SL
+				return GetExpansionLevel() < G_RLF.Expansion.WOTLK
 			end,
 			order = G_RLF.mainFeatureOrder.Currency,
 		},

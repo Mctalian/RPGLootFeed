@@ -61,7 +61,7 @@ describe("Currency module", function()
 			ns.db.global.currency.enabled = true
 			local spyEnable = spy.on(CurrencyModule, "Enable")
 			local spyDisable = spy.on(CurrencyModule, "Disable")
-			functionMocks.GetExpansionLevel.returns(ns.Expansion.SL)
+			functionMocks.GetExpansionLevel.returns(ns.Expansion.WOTLK)
 			CurrencyModule:OnInitialize()
 
 			assert.spy(spyEnable).was.called(1)
@@ -72,26 +72,26 @@ describe("Currency module", function()
 			ns.db.global.currency.enabled = false
 			local spyEnable = spy.on(CurrencyModule, "Enable")
 			local spyDisable = spy.on(CurrencyModule, "Disable")
-			functionMocks.GetExpansionLevel.returns(ns.Expansion.SL)
+			functionMocks.GetExpansionLevel.returns(ns.Expansion.WOTLK)
 			CurrencyModule:OnInitialize()
 
 			assert.spy(spyEnable).was.not_called()
 			assert.spy(spyDisable).was.called(1)
 		end)
 
-		it("OnInitialize does not set up the module if the expansion level is lower than SL", function()
+		it("OnInitialize does not set up the module if the expansion level is lower than WOTLK", function()
 			ns.db.global.currency.enabled = true
 			local spyEnable = spy.on(CurrencyModule, "Enable")
 			local spyDisable = spy.on(CurrencyModule, "Disable")
-			functionMocks.GetExpansionLevel.returns(ns.Expansion.BFA)
+			functionMocks.GetExpansionLevel.returns(ns.Expansion.TBC)
 			CurrencyModule:OnInitialize()
 
 			assert.spy(spyEnable).was.not_called()
 			assert.spy(spyDisable).was.called(1)
 		end)
 
-		it("OnEnable registers events correctly for Retail expansions gte SL", function()
-			functionMocks.GetExpansionLevel.returns(ns.Expansion.SL)
+		it("OnEnable registers events correctly for Retail expansions gte BFA", function()
+			functionMocks.GetExpansionLevel.returns(ns.Expansion.BFA)
 			nsMocks.IsRetail.returns(true)
 			local spyRegisterEvent = spy.on(CurrencyModule, "RegisterEvent")
 
@@ -102,19 +102,19 @@ describe("Currency module", function()
 			assert.stub(spyRegisterEvent).was.called_with(CurrencyModule, "PERKS_PROGRAM_CURRENCY_AWARDED")
 		end)
 
-		it("OnEnable registers events correctly for Classic expansions gte SL", function()
-			functionMocks.GetExpansionLevel.returns(ns.Expansion.SL)
+		it("OnEnable registers events correctly for Classic expansions gte WOTLK", function()
+			functionMocks.GetExpansionLevel.returns(ns.Expansion.WOTLK)
 			nsMocks.IsRetail.returns(false)
 			local spyRegisterEvent = spy.on(CurrencyModule, "RegisterEvent")
 
 			CurrencyModule:OnEnable()
 
 			assert.stub(spyRegisterEvent).was.called(1)
-			assert.stub(spyRegisterEvent).was.called_with(CurrencyModule, "CURRENCY_DISPLAY_UPDATE")
+			assert.stub(spyRegisterEvent).was.called_with(CurrencyModule, "CHAT_MSG_CURRENCY")
 		end)
 
-		it("OnEnable does not register events for expansions lower than SL", function()
-			functionMocks.GetExpansionLevel.returns(ns.Expansion.BFA)
+		it("OnEnable does not register events for expansions lower than WOTLK", function()
+			functionMocks.GetExpansionLevel.returns(ns.Expansion.TBC)
 			local spyRegisterEvent = spy.on(CurrencyModule, "RegisterEvent")
 
 			CurrencyModule:OnEnable()
@@ -122,8 +122,8 @@ describe("Currency module", function()
 			assert.stub(spyRegisterEvent).was.not_called()
 		end)
 
-		it("OnDisable unregisters events correctly for Retail expansions gte SL", function()
-			functionMocks.GetExpansionLevel.returns(ns.Expansion.SL)
+		it("OnDisable unregisters events correctly for Retail expansions gte BFA", function()
+			functionMocks.GetExpansionLevel.returns(ns.Expansion.BFA)
 			nsMocks.IsRetail.returns(true)
 			local spyUnregisterEvent = spy.on(CurrencyModule, "UnregisterEvent")
 
@@ -135,19 +135,19 @@ describe("Currency module", function()
 			assert.stub(spyUnregisterEvent).was.called_with(CurrencyModule, "PERKS_PROGRAM_CURRENCY_REFRESH")
 		end)
 
-		it("OnDisable unregisters events correctly for Classic expansions gte SL", function()
-			functionMocks.GetExpansionLevel.returns(ns.Expansion.SL)
+		it("OnDisable unregisters events correctly for Classic expansions gte WOTLK", function()
+			functionMocks.GetExpansionLevel.returns(ns.Expansion.WOTLK)
 			nsMocks.IsRetail.returns(false)
 			local spyUnregisterEvent = spy.on(CurrencyModule, "UnregisterEvent")
 
 			CurrencyModule:OnDisable()
 
 			assert.stub(spyUnregisterEvent).was.called(1)
-			assert.stub(spyUnregisterEvent).was.called_with(CurrencyModule, "CURRENCY_DISPLAY_UPDATE")
+			assert.stub(spyUnregisterEvent).was.called_with(CurrencyModule, "CHAT_MSG_CURRENCY")
 		end)
 
-		it("OnDisable does not unregister events for expansions lower than SL", function()
-			functionMocks.GetExpansionLevel.returns(ns.Expansion.BFA)
+		it("OnDisable does not unregister events for expansions lower than WOTLK", function()
+			functionMocks.GetExpansionLevel.returns(ns.Expansion.TBC)
 			local spyUnregisterEvent = spy.on(CurrencyModule, "UnregisterEvent")
 
 			CurrencyModule:OnDisable()
