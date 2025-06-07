@@ -50,7 +50,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - uses: leafo/gh-actions-lua@v10
+      - uses: lewis6991/gh-actions-lua@01aab24c4de9555717b685f9b142a2abbe12ef14
         with:
           luaVersion: 5.3.5
 
