@@ -48,6 +48,17 @@ local IndestructibleMap = {
 	["ITEM_MOD_CR_STURDINESS_SHORT"] = TertiaryStats.Indestructible,
 }
 
+local function getPriceString(icon, fontSize, price)
+	if not icon or not fontSize or not price then
+		return ""
+	end
+	local sizeCoeff = G_RLF.AtlastIconCoefficients[icon]
+	local atlasIconSize = fontSize * sizeCoeff
+	return CreateAtlasMarkup(icon, atlasIconSize, atlasIconSize, 0, 0)
+		.. " "
+		.. C_CurrencyInfo.GetCoinTextureString(price)
+end
+
 function ItemLoot:ItemQualityName(enumValue)
 	for k, v in pairs(Enum.ItemQuality) do
 		if v == enumValue then
@@ -345,45 +356,48 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 		end
 
 		local quantity = ...
-		local atlasIcon
-		local unitPrice
-		local pricesForSellableItems = G_RLF.db.global.item.pricesForSellableItems
-		if pricesForSellableItems == G_RLF.PricesEnum.Vendor then
-			if not element.sellPrice or element.sellPrice == 0 then
-				return ""
-			end
-			if G_RLF:IsRetail() then
-				atlasIcon = "spellicon-256x256-selljunk"
-			-- So far, MoP Classic and below don't have the retail icon available
-			else
-				atlasIcon = "bags-junkcoin"
-			end
-			unitPrice = element.sellPrice
-		elseif pricesForSellableItems == G_RLF.PricesEnum.AH then
-			local marketPrice = G_RLF.AuctionIntegrations.activeIntegration:GetAHPrice(itemLink)
-			if not marketPrice or marketPrice == 0 then
-				return ""
-			end
-			unitPrice = marketPrice
-			if G_RLF:IsRetail() then
-				atlasIcon = "auctioneer"
-			-- So far, MoP Classic and below don't have the retail icon available
-			else
-				atlasIcon = "Auctioneer"
-			end
+		local vendorIcon, auctionIcon
+		if G_RLF:IsRetail() then
+			vendorIcon = "spellicon-256x256-selljunk"
+		-- So far, MoP Classic and below don't have the retail icon available
+		else
+			vendorIcon = "bags-junkcoin"
 		end
-		if unitPrice then
-			local str = "    "
-			if atlasIcon then
-				local sizeCoeff = G_RLF.AtlastIconCoefficients[atlasIcon]
-				local atlasIconSize = secondaryFontSize * sizeCoeff
-				str = str .. CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0) .. "  "
+		if G_RLF:IsRetail() then
+			auctionIcon = "auctioneer"
+		-- So far, MoP Classic and below don't have the retail icon available
+		else
+			auctionIcon = "Auctioneer"
+		end
+		local vendorPrice, auctionPrice = 0, 0
+		local pricesForSellableItems = G_RLF.db.global.item.pricesForSellableItems
+		if element.sellPrice and element.sellPrice > 0 then
+			vendorPrice = element.sellPrice
+		end
+		local marketPrice = G_RLF.AuctionIntegrations.activeIntegration:GetAHPrice(itemLink)
+		if marketPrice and marketPrice > 0 then
+			auctionPrice = marketPrice
+		end
+		local str = ""
+		if pricesForSellableItems == G_RLF.PricesEnum.Vendor then
+			str = str .. getPriceString(vendorIcon, secondaryFontSize, vendorPrice * (quantity or 1))
+		elseif pricesForSellableItems == G_RLF.PricesEnum.AH then
+			str = str .. getPriceString(auctionIcon, secondaryFontSize, auctionPrice * (quantity or 1))
+		elseif pricesForSellableItems == G_RLF.PricesEnum.VendorAH then
+			str = str .. getPriceString(vendorIcon, secondaryFontSize, vendorPrice * (quantity or 1)) .. "    "
+			str = str .. getPriceString(auctionIcon, secondaryFontSize, auctionPrice * (quantity or 1))
+		elseif pricesForSellableItems == G_RLF.PricesEnum.AHVendor then
+			str = str .. getPriceString(auctionIcon, secondaryFontSize, auctionPrice * (quantity or 1)) .. "    "
+			str = str .. getPriceString(vendorIcon, secondaryFontSize, vendorPrice * (quantity or 1))
+		elseif pricesForSellableItems == G_RLF.PricesEnum.Highest then
+			if auctionPrice > vendorPrice then
+				str = str .. getPriceString(auctionIcon, secondaryFontSize, auctionPrice * (quantity or 1))
+			else
+				str = str .. getPriceString(vendorIcon, secondaryFontSize, vendorPrice * (quantity or 1))
 			end
-			str = str .. C_CurrencyInfo.GetCoinTextureString(unitPrice * (quantity or 1))
-			return str
 		end
 
-		return ""
+		return str
 	end
 
 	element.isMount = IsMount(info)

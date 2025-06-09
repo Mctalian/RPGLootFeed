@@ -187,18 +187,34 @@ G_RLF.options.args.features.args.itemLootConfig = {
 								}
 								if G_RLF.AuctionIntegrations.numActiveIntegrations > 0 then
 									values[PricesEnum.AH] = G_RLF.L["Auction Price"]
+									values[PricesEnum.VendorAH] = G_RLF.L["Vendor Price then Auction Price"]
+									values[PricesEnum.AHVendor] = G_RLF.L["Auction Price then Vendor Price"]
+									values[PricesEnum.Highest] = G_RLF.L["Highest Price"]
 								end
 								return values
 							end,
-							sorting = {
-								PricesEnum.None,
-								PricesEnum.Vendor,
-								PricesEnum.AH,
-							},
+							sorting = function()
+								local order = {
+									PricesEnum.None,
+									PricesEnum.Vendor,
+								}
+								if G_RLF.AuctionIntegrations.numActiveIntegrations > 0 then
+									table.insert(order, PricesEnum.AH)
+									table.insert(order, PricesEnum.VendorAH)
+									table.insert(order, PricesEnum.AHVendor)
+									table.insert(order, PricesEnum.Highest)
+								end
+
+								return order
+							end,
 							get = function(info)
 								if
-									G_RLF.db.global.item.pricesForSellableItems == PricesEnum.AH
-									and G_RLF.AuctionIntegrations.numActiveIntegrations == 0
+									(
+										G_RLF.db.global.item.pricesForSellableItems == PricesEnum.AH
+										or G_RLF.db.global.item.pricesForSellableItems == PricesEnum.VendorAH
+										or G_RLF.db.global.item.pricesForSellableItems == PricesEnum.AHVendor
+										or G_RLF.db.global.item.pricesForSellableItems == PricesEnum.Highest
+									) and G_RLF.AuctionIntegrations.numActiveIntegrations == 0
 								then
 									G_RLF.db.global.item.pricesForSellableItems = PricesEnum.Vendor
 								end
@@ -243,7 +259,8 @@ G_RLF.options.args.features.args.itemLootConfig = {
 								return values
 							end,
 							disabled = function()
-								return G_RLF.db.global.item.pricesForSellableItems ~= PricesEnum.AH
+								return G_RLF.db.global.item.pricesForSellableItems == PricesEnum.Vendor
+									or G_RLF.db.global.item.pricesForSellableItems == PricesEnum.None
 							end,
 							hidden = function()
 								local activeIntegrations = G_RLF.AuctionIntegrations.activeIntegrations
