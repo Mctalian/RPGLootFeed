@@ -88,13 +88,15 @@ local function testWoWGlobals()
 
 	assertEqual(type(LootAlertSystem.AddAlert), "function", "Global: LootAlertSystem.AddAlert")
 
-	if GetExpansionLevel() >= G_RLF.Expansion.SL then
+	if GetExpansionLevel() >= G_RLF.Expansion.WOTLK then
 		assertEqual(type(C.CurrencyInfo.GetCurrencyInfo), "function", "Global: C.CurrencyInfo.GetCurrencyInfo")
-		local info = C.CurrencyInfo.GetCurrencyInfo(1813)
-		assertEqual(info ~= nil, true, "Global: C.CurrencyInfo.GetCurrencyInfo(1813)")
-		assertEqual(info.description ~= nil, true, "Global: C.CurrencyInfo.GetCurrencyInfo(1813).description")
-		assertEqual(info.iconFileID ~= nil, true, "Global: C.CurrencyInfo.GetCurrencyInfo(1813).iconFileID")
-		assertEqual(info.currencyID ~= nil, true, "Global: C.CurrencyInfo.GetCurrencyInfo(1813).currencyID")
+		local info = C.CurrencyInfo.GetCurrencyInfo(241)
+		assertEqual(info ~= nil, true, "Global: C.CurrencyInfo.GetCurrencyInfo(241)")
+		assertEqual(info.description ~= nil, true, "Global: C.CurrencyInfo.GetCurrencyInfo(241).description")
+		assertEqual(info.iconFileID ~= nil, true, "Global: C.CurrencyInfo.GetCurrencyInfo(241).iconFileID")
+		assertEqual(info.currencyID ~= nil, true, "Global: C.CurrencyInfo.GetCurrencyInfo(241).currencyID")
+	end
+	if GetExpansionLevel() >= G_RLF.Expansion.SL then
 		assertEqual(C.CurrencyInfo.GetCurrencyLink(1813) ~= nil, true, "Global: C.CurrencyInfo.GetCurrencyLink")
 	end
 

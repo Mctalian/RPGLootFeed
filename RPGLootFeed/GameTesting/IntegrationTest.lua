@@ -185,7 +185,7 @@ function TestMode:IntegrationTest()
 	newRowsExpected = newRowsExpected + runExperienceIntegrationTest()
 	newRowsExpected = newRowsExpected + runMoneyIntegrationTest()
 	newRowsExpected = newRowsExpected + runItemLootIntegrationTest()
-	if GetExpansionLevel() >= G_RLF.Expansion.SL then
+	if GetExpansionLevel() >= G_RLF.Expansion.WOTLK then
 		newRowsExpected = newRowsExpected + runCurrencyIntegrationTest()
 	end
 	if G_RLF.db.global.partyLoot.enabled then

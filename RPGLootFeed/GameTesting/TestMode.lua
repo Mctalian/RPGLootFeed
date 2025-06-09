@@ -99,7 +99,16 @@ local function initializeTestItems()
 	end
 end
 
-local testCurrencyIds = { 2245, 1191, 1828, 1792, 1755, 1580, 1273, 1166, 515, 241, 1813, 2778, 3089, 1101, 1704 }
+local testCurrencyIds = {}
+if G_RLF:IsRetail() then
+	tconcat(testCurrencyIds, { 2245, 1191, 1828, 1792, 1755, 1580, 1273, 1166, 515, 241, 1813, 2778, 3089, 1101, 1704 })
+elseif GetExpansionLevel() == G_RLF.Expansion.WOTLK then
+	tconcat(testCurrencyIds, { 221, 241, 126, 81 })
+elseif GetExpansionLevel() == G_RLF.Expansion.CATA then
+	tconcat(testCurrencyIds, { 391, 416, 401, 402 })
+elseif GetExpansionLevel() == G_RLF.Expansion.MOP then
+	tconcat(testCurrencyIds, { 777, 738, 697, 677, 789 })
+end
 local function initializeTestCurrencies()
 	for _, id in pairs(testCurrencyIds) do
 		if not idExistsInTable(id, TestMode.testCurrencies) then
@@ -252,7 +261,7 @@ local function generateRandomLoot()
 
 			-- 15% chance to show currency
 		elseif rng > 0.7 and rng <= 0.85 then
-			if GetExpansionLevel() >= G_RLF.Expansion.SL then
+			if GetExpansionLevel() >= G_RLF.Expansion.WOTLK then
 				local currency = TestMode.testCurrencies[math.random(#TestMode.testCurrencies)]
 				local amountLooted = math.random(1, 500)
 				local module = G_RLF.RLF:GetModule("Currency") --[[@as RLF_Currency]]
