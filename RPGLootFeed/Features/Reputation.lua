@@ -219,7 +219,7 @@ function Rep.Element:new(...)
 			if factionData.hasRewardPending then
 				local stylingDb = G_RLF.DbAccessor:Styling(G_RLF.Frames.MAIN)
 				local atlasIcon = "ParagonReputation_Bag"
-				local sizeCoeff = G_RLF.AtlastIconCoefficients[atlasIcon]
+				local sizeCoeff = G_RLF.AtlasIconCoefficients[atlasIcon] or 1
 				local atlasIconSize = stylingDb.fontSize * sizeCoeff
 				str = str .. CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0) .. "    "
 			end

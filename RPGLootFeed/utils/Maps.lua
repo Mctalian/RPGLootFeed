@@ -81,7 +81,7 @@ G_RLF.WrapCharOptions = {
 	[G_RLF.WrapCharEnum.BAR] = G_RLF.L["Bars"],
 }
 
-G_RLF.AtlastIconCoefficients = {
+G_RLF.AtlasIconCoefficients = {
 	["ParagonReputation_Bag"] = 1,
 	["npe_arrowrightglow"] = 1.2,
 	["spellicon-256x256-selljunk"] = 1.5,
