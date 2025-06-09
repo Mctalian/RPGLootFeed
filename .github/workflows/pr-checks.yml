@@ -156,6 +156,23 @@ jobs:
               testPkgNoLibSize: ${{ steps.capture-filenames.outputs.TEST_NOLIB_SIZE }},
             });
 
+  trunk-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Trunk Cache
+        uses: actions/cache@v4
+        with:
+          key: trunk-cache-${{ hashFiles('**/trunk.yaml') }}
+          path: ~/.cache/trunk
+
+      - name: Trunk Code Quality
+        uses: trunk-io/trunk-action@v1
+
   commitlint:
     runs-on: ubuntu-latest
     permissions:
@@ -189,7 +206,8 @@ jobs:
     name: Passing PR Checks
     runs-on: ubuntu-latest
     if: always()
-    needs: [check_translations, run_tests, test_package, commitlint]
+    needs:
+      [check_translations, run_tests, test_package, trunk-check, commitlint]
     steps:
       - name: Export needs results as JSON
         id: export-needs
