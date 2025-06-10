@@ -390,6 +390,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 	element.isLegendary = IsLegendary(info)
 	element.isBetterThanEquipped = IsBetterThanEquipped(info)
 	element.hasTertiaryOrSocket = HasItemRollBonus(stats)
+	element.isQuestItem = info:IsQuestItem()
 	function element:PlaySoundIfEnabled()
 		local soundsConfig = G_RLF.db.global.item.sounds
 		if self.isMount and soundsConfig.mounts.enabled and soundsConfig.mounts.sound ~= "" then
@@ -441,6 +442,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 		self.highlight = (self.isMount and itemHighlights.mounts)
 			or (self.isLegendary and itemHighlights.legendary)
 			or (self.isBetterThanEquipped and itemHighlights.betterThanEquipped)
+			or (self.isQuestItem and itemHighlights.quest)
 			or (self.hasTertiaryOrSocket and itemHighlights.tertiaryOrSocket)
 	end
 

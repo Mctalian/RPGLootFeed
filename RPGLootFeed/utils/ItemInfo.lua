@@ -201,6 +201,16 @@ function ItemInfo:IsMount()
 	return false
 end
 
+---Determine if the item is a quest item
+---@return boolean
+function ItemInfo:IsQuestItem()
+	if self.classID == Enum.ItemClass.Questitem then
+		return true
+	end
+
+	return false
+end
+
 ---Determine if the item is Legendary
 ---@return boolean
 function ItemInfo:IsLegendary()
