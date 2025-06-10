@@ -194,6 +194,14 @@ describe("AddonMethods", function()
 				assert.is_nil(str)
 				assert.is_nil(num)
 			end)
+
+			it("extracts a single dynamic part from a pattern", function()
+				local segments = { "Вы получаете валюту – ", ".", "" }
+				local msg = "Вы получаете валюту – [Currency]."
+				local str, num = ns:ExtractDynamicsFromPattern(msg, segments)
+				assert.are.equal(str, "[Currency]")
+				assert.is_nil(num)
+			end)
 		end)
 
 		describe("FontFlagsToString", function()

@@ -26,5 +26,11 @@ currencyInfoMocks.GetBasicCurrencyInfo = stub(
 		}
 	end
 )
+currencyInfoMocks.GetCurrencyInfoFromLink = stub(_G.C_CurrencyInfo, "GetCurrencyInfoFromLink").returns({
+	currencyID = 241,
+	quantity = 1,
+	iconFileID = 133784,
+	quality = 1,
+})
 
 return currencyInfoMocks

@@ -93,11 +93,41 @@ local function isHiddenCurrency(id)
 	return G_RLF.hiddenCurrencies[id] == true
 end
 
+local function extractCurrencyAndAmount(message, patterns)
+	for _, segments in ipairs(patterns) do
+		local currencyLink, amount = G_RLF:ExtractDynamicsFromPattern(message, segments)
+		if currencyLink then
+			return currencyLink, amount
+		end
+	end
+	return nil, nil
+end
+
+-- Precompute pattern segments to optimize runtime message parsing
+local function precomputePatternSegments(patterns)
+	local computedPatterns = {}
+	for _, pattern in ipairs(patterns) do
+		local segments = G_RLF:CreatePatternSegmentsForStringNumber(pattern)
+		table.insert(computedPatterns, segments)
+	end
+	return computedPatterns
+end
+
+local classicCurrencyPatterns
 function Currency:OnInitialize()
 	if G_RLF.db.global.currency.enabled and GetExpansionLevel() >= G_RLF.Expansion.WOTLK then
 		self:Enable()
 	else
 		self:Disable()
+	end
+
+	if GetExpansionLevel() < G_RLF.Expansion.BFA then
+		local currencyConsts = {
+			CURRENCY_GAINED,
+			CURRENCY_GAINED_MULTIPLE,
+			CURRENCY_GAINED_MULTIPLE_BONUS,
+		}
+		classicCurrencyPatterns = precomputePatternSegments(currencyConsts)
 	end
 end
 
@@ -206,153 +236,104 @@ function Currency:CURRENCY_DISPLAY_UPDATE(eventName, ...)
 	self:Process(eventName, currencyType, quantityChange)
 end
 
-function Currency:CHAT_MSG_CURRENCY(eventName, ...)
-	local msg = ...
-	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, nil, msg)
-
-	local itemLinks = G_RLF:ExtractItemLinks(msg)
-	local isItem = true
-	if not itemLinks or #itemLinks == 0 then
-		itemLinks = G_RLF:ExtractCurrencyLinks(msg)
-		isItem = false
-	end
-
-	if isItem then
-		G_RLF:LogDebug(
-			"Currency message contains an item link",
-			addonName,
-			self.moduleName,
-			nil,
-			"Item links found in message"
-		)
-	end
-
-	if not itemLinks or #itemLinks == 0 then
+---@param msg string
+---@return string? currencyLink, number? quantityChange
+function Currency:ParseCurrencyChangeMessage(msg)
+	local currencyLink, quantityChange = extractCurrencyAndAmount(msg, classicCurrencyPatterns)
+	if not currencyLink then
 		G_RLF:LogDebug(
 			"Skip showing currency",
 			addonName,
 			self.moduleName,
 			nil,
-			"SKIP: No item or currency links found in message",
+			"SKIP: No currency link found in message",
 			msg
 		)
-		return
+		return nil, nil
 	end
 
-	local itemLink = itemLinks[1]
-	local amount = tonumber(msg:match("r ?x(%d+)") or 1) or 1
-	local currencyInfo, basicInfo
-	if isItem then
-		local itemId = C.Item.GetItemIDForItemInfo(itemLink)
-		if not itemId then
+	quantityChange = quantityChange or 1
+
+	return currencyLink, quantityChange
+end
+
+function Currency:CHAT_MSG_CURRENCY(eventName, ...)
+	local msg = ...
+	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, nil, msg)
+
+	return self:fn(function()
+		local currencyLink, quantityChange = self:ParseCurrencyChangeMessage(msg)
+		if not currencyLink or not quantityChange then
 			G_RLF:LogDebug(
 				"Skip showing currency",
 				addonName,
 				self.moduleName,
 				nil,
-				"SKIP: No item ID found for item link = " .. tostring(itemLink)
+				"SKIP: No currency link or quantity change found in message",
+				msg
 			)
 			return
 		end
 
-		local info = G_RLF.ItemInfo:new(itemId, C.Item.GetItemInfo(itemLink))
-		if not info then
-			G_RLF:LogDebug(
-				"Skip showing currency",
-				addonName,
-				self.moduleName,
-				nil,
-				"SKIP: No item info found for item link = " .. tostring(itemLink)
-			)
-			return
-		end
-
-		local total = C.Item.GetItemCount(info.itemLink, true, false, true, true)
-
-		---@type CurrencyInfo
-		currencyInfo = {
-			name = info.itemName,
-			description = "",
-			currencyID = info.itemId,
-			---@diagnostic disable-next-line: assign-type-mismatch
-			iconFileID = info.itemTexture,
-			quantity = amount,
-			quality = info.itemQuality or G_RLF.ItemQualEnum.Common,
-			totalEarned = total,
-			isHeader = false,
-			isHeaderExpanded = false,
-			isAccountTransferable = false,
-			isAccountWide = false,
-			currencyListDepth = 0,
-			isTypeUnused = false,
-			isShowInBackpack = false,
-			rechargingAmountPerCycle = 0,
-			rechargingCycleDurationMS = 0,
-			maxQuantity = 0,
-			trackedQuantity = 0,
-			canEarnPerWeek = true,
-			quantityEarnedThisWeek = 0,
-			isTradeable = false,
-			maxWeeklyQuantity = 0,
-			discovered = true,
-			useTotalEarnedForMaxQty = false,
-		}
-		---@type CurrencyDisplayInfo
-		basicInfo = {
-			name = info.itemName,
-			displayAmount = amount,
-			description = "",
-			---@diagnostic disable-next-line: assign-type-mismatch
-			icon = info.itemTexture,
-			quality = info.itemQuality or G_RLF.ItemQualEnum.Common,
-			actualAmount = amount,
-		}
-	else
-		currencyInfo = C_CurrencyInfo.GetCurrencyInfoFromLink(itemLink)
+		local currencyInfo = C_CurrencyInfo.GetCurrencyInfoFromLink(currencyLink)
 		if not currencyInfo then
 			G_RLF:LogDebug(
 				"Skip showing currency",
 				addonName,
 				self.moduleName,
 				nil,
-				"SKIP: No currency info found for currency link = " .. tostring(itemLink)
+				"SKIP: No currency info found for currency link = " .. tostring(currencyLink)
 			)
 			return
 		end
 
 		if currencyInfo.quantity == 0 then
-			currencyInfo.quantity = amount
+			currencyInfo.quantity = quantityChange
 		end
 
 		if currencyInfo.currencyID == 0 then
-			local currencyId = G_RLF:ExtractCurrencyID(itemLink)
+			local currencyId = G_RLF:ExtractCurrencyID(currencyLink)
 			if currencyId == 0 or currencyId == nil then
 				G_RLF:LogDebug(
 					"Skip showing currency",
 					addonName,
 					self.moduleName,
 					nil,
-					"SKIP: No currency ID found for currency link = " .. tostring(itemLink)
+					"SKIP: No currency ID found for currency link = " .. tostring(currencyLink)
 				)
 				return
 			end
 			currencyInfo.currencyID = currencyId
 		end
 
-		basicInfo = C_CurrencyInfo.GetBasicCurrencyInfo(currencyInfo.currencyID, amount)
+		local basicInfo = C_CurrencyInfo.GetBasicCurrencyInfo(currencyInfo.currencyID, quantityChange)
 		if not basicInfo then
+			---@diagnostic disable-next-line: missing-fields
 			basicInfo = {
-				displayAmount = amount,
+				displayAmount = quantityChange,
 			}
 		end
-	end
 
-	local e = self.Element:new(itemLink, currencyInfo, basicInfo)
-	if e then
-		e:Show()
-	else
-		G_RLF:LogDebug("Skip showing currency", addonName, self.moduleName, nil, "SKIP: Element was nil")
-	end
+		local currencyId = currencyInfo.currencyID
+		if currencyId and isHiddenCurrency(currencyId) then
+			G_RLF:LogDebug(
+				"Skip showing currency",
+				addonName,
+				self.moduleName,
+				tostring(currencyId),
+				"SKIP: This is a known hidden currency",
+				msg
+			)
+			return
+		end
+
+		local e = self.Element:new(currencyLink, currencyInfo, basicInfo)
+		if e then
+			e:Show()
+		else
+			G_RLF:LogDebug("Skip showing currency", addonName, self.moduleName, nil, "SKIP: Element was nil")
+		end
+	end)
 end
 
 function Currency:PERKS_PROGRAM_CURRENCY_AWARDED(eventName, quantityChange)
