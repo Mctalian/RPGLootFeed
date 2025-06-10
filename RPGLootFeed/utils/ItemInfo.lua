@@ -208,6 +208,19 @@ function ItemInfo:IsLegendary()
 	return self.itemQuality == Enum.ItemQuality.Legendary
 end
 
+function ItemInfo:IsAppearanceCollected()
+	if GetExpansionLevel() < G_RLF.Expansion.SL then
+		-- The API I use to check appearance collection is only available in Shadowlands and later
+		-- I'll keep this in mind and see if I can find a way to do this in other expansions
+		return true -- basically disable highlighting for older expansions by assuming all appearances are collected
+	end
+	if not self:IsEquippableItem() then
+		return true -- non-equippable items are not tracked for appearances
+	end
+
+	return C_TransmogCollection.PlayerHasTransmogByItemInfo(self.itemLink)
+end
+
 ---Determine the highest armor proficiency the character has; Clients prior to Cata only
 ---@return number | nil
 local function ClassicSkillLineCheck()

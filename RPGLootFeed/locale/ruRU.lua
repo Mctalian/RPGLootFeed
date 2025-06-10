@@ -19,6 +19,7 @@ end
 -- L["Chosen Icon"] = "Your chosen icon: %s"
 -- L["Enable Transmog in Feed"] = "Enable Transmog in Feed"
 -- L["EnableTransmogDesc"] = "Enable showing newly collected appearances in the Loot Feed"
+-- L["Highlight New Transmog Items"] = "Highlight New Transmog Items"
 -- L["InvalidAtlasTexture"] = "%s is not a valid Atlas texture. TextureAtlasViewer addon can help!"
 -- L["Play Sound for New Transmog Items"] = "Play Sound for New Transmog Items"
 -- L["PlaySoundForTransmogDesc"] = "Play a sound when you loot a transmog item for which you have not collected the appearance"

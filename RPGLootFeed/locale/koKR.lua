@@ -23,6 +23,7 @@ end
 -- L["Enable Transmog in Feed"] = "Enable Transmog in Feed"
 -- L["EnableTransmogDesc"] = "Enable showing newly collected appearances in the Loot Feed"
 -- L["Highest Price"] = "Highest Price"
+-- L["Highlight New Transmog Items"] = "Highlight New Transmog Items"
 -- L["Highlight Quest Items"] = "Highlight Quest Items"
 -- L["HighlightQuestDesc"] = "Highlight quest items in the Loot Feed"
 -- L["HighlightTransmogDesc"] = "Highlight items that you have not collected the appearance for in the Loot Feed"

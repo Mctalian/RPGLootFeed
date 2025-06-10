@@ -410,6 +410,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 	element.isBetterThanEquipped = IsBetterThanEquipped(info)
 	element.hasTertiaryOrSocket = HasItemRollBonus(stats)
 	element.isQuestItem = info:IsQuestItem()
+	element.isNewTransmog = not info:IsAppearanceCollected()
 	function element:PlaySoundIfEnabled()
 		local soundsConfig = G_RLF.db.global.item.sounds
 		if self.isMount and soundsConfig.mounts.enabled and soundsConfig.mounts.sound ~= "" then
@@ -463,6 +464,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 			or (self.isBetterThanEquipped and itemHighlights.betterThanEquipped)
 			or (self.isQuestItem and itemHighlights.quest)
 			or (self.hasTertiaryOrSocket and itemHighlights.tertiaryOrSocket)
+			or (self.isNewTransmog and itemHighlights.transmog)
 	end
 
 	return element

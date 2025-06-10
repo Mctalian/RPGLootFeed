@@ -716,15 +716,19 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							end,
 							order = 5,
 						},
-						-- highlightTransmog = {
-						--   type = "toggle",
-						--   name = G_RLF.L["Highlight Transmog Items"],
-						--   desc = G_RLF.L["HighlightTransmogDesc"],
-						--   width = "double",
-						--   get = function(info) return G_RLF.db.global.item.itemHighlights.transmog end,
-						--   set = function(info, value) G_RLF.db.global.item.itemHighlights.transmog = value end,
-						--   order = 6,
-						-- },
+						highlightTransmog = {
+							type = "toggle",
+							name = G_RLF.L["Highlight New Transmog Items"],
+							desc = G_RLF.L["HighlightTransmogDesc"],
+							width = "double",
+							get = function(info)
+								return G_RLF.db.global.item.itemHighlights.transmog
+							end,
+							set = function(info, value)
+								G_RLF.db.global.item.itemHighlights.transmog = value
+							end,
+							order = 6,
+						},
 					},
 				},
 				itemSounds = {
