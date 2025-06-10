@@ -342,6 +342,12 @@ _G.FACTION_STANDING_DECREASED = "Rep with %s dec by %d."
 _G.FACTION_STANDING_DECREASED_ACCOUNT_WIDE = "AccRep with %s dec by %d."
 --#endregion
 
+--#region:CURRENCY* Global strings
+_G.CURRENCY_GAINED = "You receive currency: %s."
+_G.CURRENCY_GAINED_MULTIPLE = "You receive currency: %s x%d."
+_G.CURRENCY_GAINED_MULTIPLE_BONUS = "You receive currency: %s x%d. (Bonus Objective)"
+--#endregion
+
 --#region:Global consts
 _G.LE_PARTY_CATEGORY_INSTANCE = 2
 _G.MAX_WOW_CHAT_CHANNELS = 20

@@ -147,6 +147,15 @@ function G_RLF:CreatePatternSegmentsForStringNumber(localeString)
 		-- Mainly for deDE which uses a slightly different format token
 		midStart, midEnd = string.find(localeString, "%%2$d", preEnd + 1)
 	end
+	if midStart == nil then
+		-- If no %%d is found, we assume the string does not contain a number
+		-- But we still need to allow ExtractDynamicsFromPattern to find the string
+		-- between prePattern and midPattern
+		midStart = preEnd + 1
+		midEnd = localeString:len()
+		local midPattern = string.sub(localeString, preEnd + 1, midStart - 1)
+		return { prePattern, midPattern, "" }
+	end
 	local midPattern = string.sub(localeString, preEnd + 1, midStart - 1)
 	local postPattern = string.sub(localeString, midEnd + 1)
 	return { prePattern, midPattern, postPattern }
@@ -160,9 +169,9 @@ function G_RLF:ExtractDynamicsFromPattern(localeString, segments)
 		local msgLoop = localeString:sub(preMatchEnd + 1)
 		local midMatchStart, midMatchEnd = string.find(msgLoop, midPattern, 1, true)
 		if midMatchStart then
+			local str = msgLoop:sub(1, midMatchStart - 1)
 			local postMatchStart, postMatchEnd = string.find(msgLoop, postPattern, midMatchEnd, true)
 			if postMatchStart then
-				local str = msgLoop:sub(1, midMatchStart - 1)
 				local num
 				if midMatchEnd == postMatchStart then
 					num = msgLoop:sub(midMatchEnd + 1)
@@ -171,6 +180,7 @@ function G_RLF:ExtractDynamicsFromPattern(localeString, segments)
 				end
 				return str, tonumber(num)
 			end
+			return str, nil
 		end
 	end
 

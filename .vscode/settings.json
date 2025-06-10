@@ -82,7 +82,11 @@
     "GetItemButtonCount",
     "ItemButtonConstants",
     "WOW_PROJECT_MISTS_CLASSIC",
-    "GetCurrencyLink"
+    "GetCurrencyLink",
+    "CURRENCY",
+    "CURRENCY_GAINED",
+    "CURRENCY_GAINED_MULTIPLE",
+    "CURRENCY_GAINED_MULTIPLE_BONUS"
   ],
   "wowAPI.luals.frameXML": true,
   "Lua.workspace.library": [
