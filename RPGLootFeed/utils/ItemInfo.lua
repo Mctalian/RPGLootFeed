@@ -193,23 +193,19 @@ end
 ---Determine if the item is a mount
 ---@return boolean
 function ItemInfo:IsMount()
-	-- Highlight Mounts
-	if self.classID == Enum.ItemClass.Miscellaneous and self.subclassID == Enum.ItemMiscellaneousSubclass.Mount then
-		return true
-	end
+	return self.classID == Enum.ItemClass.Miscellaneous and self.subclassID == Enum.ItemMiscellaneousSubclass.Mount
+end
 
-	return false
+---Determine if the item is a quest item
+---@return boolean
+function ItemInfo:IsQuestItem()
+	return self.classID == Enum.ItemClass.Questitem
 end
 
 ---Determine if the item is Legendary
 ---@return boolean
 function ItemInfo:IsLegendary()
-	-- Highlight Legendary Items
-	if self.itemQuality == Enum.ItemQuality.Legendary then
-		return true
-	end
-
-	return false
+	return self.itemQuality == Enum.ItemQuality.Legendary
 end
 
 ---Determine the highest armor proficiency the character has; Clients prior to Cata only

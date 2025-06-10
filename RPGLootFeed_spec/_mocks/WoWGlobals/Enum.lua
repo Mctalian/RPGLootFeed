@@ -4,7 +4,7 @@ _G.Enum = {
 	ItemArmorSubclass = {
 		Plate = 4,
 	},
-	ItemClass = { Armor = 4, Miscellaneous = 15 },
+	ItemClass = { Armor = 4, Questitem = 12, Miscellaneous = 15 },
 	ItemMiscellaneousSubclass = { Mount = 5 },
 	ItemQuality = {
 		Poor = 0,
