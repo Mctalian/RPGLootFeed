@@ -25,6 +25,7 @@ functions.CreateFramePool = stub(_G, "CreateFramePool").returns({})
 functions.GetChannelName = stub(_G, "GetChannelName")
 functions.GetExpansionLevel = stub(_G, "GetExpansionLevel").returns(10)
 functions.GetInventoryItemLink = stub(_G, "GetInventoryItemLink")
+functions.GetCurrencyLink = stub(_G, "GetCurrencyLink").returns("|cffffffff|Hcurrency:241:0|h[Champion's Seal]|h|r")
 functions.GetFactionInfoByID = stub(_G, "GetFactionInfoByID", function(id)
 	return "Faction" .. id, "Description" .. id, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12
 end)
