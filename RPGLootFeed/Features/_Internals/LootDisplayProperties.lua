@@ -70,6 +70,15 @@ function G_RLF.InitializeLootDisplayProperties(element)
 		if element:isPassingFilter(itemName, itemQuality) then
 			G_RLF:LogDebug("Show", addonName, element.type, element.key, nil, element.quantity)
 			G_RLF:SendMessage(element.eventChannel, element)
+		else
+			G_RLF:LogDebug(
+				"Skip Show, isPassingFilter returned false",
+				addonName,
+				element.type,
+				element.key,
+				tostring(itemName) .. " " .. tostring(itemQuality),
+				element.quantity
+			)
 		end
 	end
 

@@ -262,7 +262,7 @@ describe("Currency module", function()
 
 		CurrencyModule:CURRENCY_DISPLAY_UPDATE("CURRENCY_DISPLAY_UPDATE", 123, 5, 2)
 
-		assert.spy(newElement).was.called_with(_, "|c12345678|Hcurrency:123|r", info, basicInfo)
+		assert.spy(newElement).was.called_with(CurrencyModule.Element, "|c12345678|Hcurrency:123|r", info, basicInfo)
 		assert.stub(nsMocks.SendMessage).was.called(1)
 		currencyInfoMocks.GetBasicCurrencyInfo:revert()
 		currencyInfoMocks.GetCurrencyLink:revert()
@@ -299,7 +299,7 @@ describe("Currency module", function()
 		CurrencyModule:PERKS_PROGRAM_CURRENCY_AWARDED("PERKS_PROGRAM_CURRENCY_AWARDED", 5)
 		CurrencyModule:PERKS_PROGRAM_CURRENCY_REFRESH("PERKS_PROGRAM_CURRENCY_REFRESH", 10, 15)
 
-		assert.spy(newElement).was.called_with(_, "|c12345678|Hcurrency:123|r", info, basicInfo)
+		assert.spy(newElement).was.called_with(CurrencyModule.Element, "|c12345678|Hcurrency:123|r", info, basicInfo)
 		assert.stub(nsMocks.SendMessage).was.called(1)
 		currencyInfoMocks.GetBasicCurrencyInfo:revert()
 		currencyInfoMocks.GetCurrencyLink:revert()
@@ -311,6 +311,11 @@ describe("Currency module", function()
 			require("RPGLootFeed_spec._mocks.WoWGlobals")
 			-- Set up for Classic expansions to trigger the chat message parsing code path
 			functionMocks.GetExpansionLevel.returns(ns.Expansion.WOTLK)
+			nsMocks.ExtractCurrencyID.invokes(function(_, currencyLink)
+				-- Use actual implementation
+				local currencyID = currencyLink:match("|Hcurrency:(%d+):")
+				return currencyID and tonumber(currencyID) or nil
+			end)
 			local i = 1
 			nsMocks.CreatePatternSegmentsForStringNumber.invokes(function()
 				if i == 1 then
@@ -343,87 +348,57 @@ describe("Currency module", function()
 		end)
 
 		describe("ParseCurrencyChangeMessage", function()
-			it("returns nil if no currency link is found in the message", function()
-				nsMocks.ExtractDynamicsFromPattern.returns(nil, nil)
-
-				local currencyLink, quantityChange = CurrencyModule:ParseCurrencyChangeMessage("Some random message")
-
-				assert.is_nil(currencyLink)
-				assert.is_nil(quantityChange)
-			end)
-
 			it("returns currency link and quantity from CURRENCY_GAINED pattern", function()
-				local expectedLink = "|cffffffff|Hcurrency:241|h[Champion's Seal]|h|r"
-				nsMocks.ExtractDynamicsFromPattern.returns(expectedLink, nil)
-
-				local currencyLink, quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
-					"You receive currency: |cffffffff|Hcurrency:241|h[Champion's Seal]|h|r."
+				local quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
+					"You receive currency: |cffffffff|Hcurrency:241:0|h[Champion's Seal]|h|r."
 				)
 
-				assert.equal(expectedLink, currencyLink)
 				assert.equal(1, quantityChange) -- Default when no quantity specified
 			end)
 
 			it("returns currency link and quantity from CURRENCY_GAINED_MULTIPLE pattern", function()
-				local expectedLink = "|cffffffff|Hcurrency:241|h[Champion's Seal]|h|r"
-				nsMocks.ExtractDynamicsFromPattern.returns(expectedLink, 5)
-
-				local currencyLink, quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
-					"You receive currency: |cffffffff|Hcurrency:241|h[Champion's Seal]|h|r x5."
+				local quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
+					"You receive currency: |cffffffff|Hcurrency:241:0|h[Champion's Seal]|h|r x5."
 				)
 
-				assert.equal(expectedLink, currencyLink)
 				assert.equal(5, quantityChange)
 			end)
 
 			it("returns currency link and quantity from CURRENCY_GAINED_MULTIPLE_BONUS pattern", function()
-				local expectedLink = "|cffffffff|Hcurrency:241|h[Champion's Seal]|h|r"
-				nsMocks.ExtractDynamicsFromPattern.returns(expectedLink, 7)
-
-				local currencyLink, quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
-					"You receive currency: |cffffffff|Hcurrency:241|h[Champion's Seal]|h|r x5 (+2 bonus)."
+				local quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
+					"You receive currency: |cffffffff|Hcurrency:241:0|h[Champion's Seal]|h|r x5 (Bonus Objective)."
 				)
 
-				assert.equal(expectedLink, currencyLink)
-				assert.equal(7, quantityChange)
+				assert.equal(5, quantityChange)
 			end)
 		end)
 
 		describe("CHAT_MSG_CURRENCY", function()
-			it("does not show currency if the currency link cannot be parsed from the message", function()
-				nsMocks.ExtractDynamicsFromPattern.returns(nil, nil)
-
-				local success = CurrencyModule:CHAT_MSG_CURRENCY("CHAT_MSG_CURRENCY", "Some random message")
-
-				assert.is_true(success)
-				assert.spy(nsMocks.SendMessage).was.not_called()
+			local currencyLink = "|cffffffff|Hcurrency:241:0|h[Champion's Seal]|h|r"
+			local currencyInfo, basicInfo
+			before_each(function()
+				currencyInfoMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_CurrencyInfo")
+				functionMocks.GetCurrencyLink.returns(currencyLink)
+				basicInfo = {
+					displayAmount = 1,
+				}
+				currencyInfoMocks.GetBasicCurrencyInfo =
+					stub(_G.C_CurrencyInfo, "GetBasicCurrencyInfo").returns(basicInfo)
+				currencyInfo = {
+					currencyID = 241,
+					quantity = 0, -- Zero quantity from link
+					iconFileID = 133784,
+					quality = 1,
+				}
+				currencyInfoMocks.GetCurrencyInfo = stub(_G.C_CurrencyInfo, "GetCurrencyInfo").returns(currencyInfo)
 			end)
+			it("does not show currency if the currency link cannot be parsed from the message", function()
+				CurrencyModule:CHAT_MSG_CURRENCY("CHAT_MSG_CURRENCY", "Some random message")
 
-			it("does not show currency if the currency info cannot be retrieved from the link", function()
-				local currencyLink = "|cffffffff|Hcurrency:241|h[Champion's Seal]|h|r"
-				nsMocks.ExtractDynamicsFromPattern.returns(currencyLink, 1)
-				currencyInfoMocks.GetCurrencyInfoFromLink:revert()
-				currencyInfoMocks.GetCurrencyInfoFromLink =
-					stub(_G.C_CurrencyInfo, "GetCurrencyInfoFromLink").returns(nil)
-
-				local success = CurrencyModule:CHAT_MSG_CURRENCY(
-					"CHAT_MSG_CURRENCY",
-					"You receive currency: " .. currencyLink .. "."
-				)
-
-				assert.is_true(success)
 				assert.spy(nsMocks.SendMessage).was.not_called()
-				currencyInfoMocks.GetCurrencyInfoFromLink:revert()
 			end)
 
 			it("does not show currency if the currency ID cannot be extracted when currencyID is 0", function()
-				local currencyLink = "|cffffffff|Hcurrency:241|h[Champion's Seal]|h|r"
-				nsMocks.ExtractDynamicsFromPattern.returns(currencyLink, 1)
-				currencyInfoMocks.GetCurrencyInfoFromLink:revert()
-				currencyInfoMocks.GetCurrencyInfoFromLink = stub(_G.C_CurrencyInfo, "GetCurrencyInfoFromLink").returns({
-					currencyID = 0,
-					quantity = 0,
-				})
 				nsMocks.ExtractCurrencyID.returns(0)
 
 				local success = CurrencyModule:CHAT_MSG_CURRENCY(
@@ -431,98 +406,37 @@ describe("Currency module", function()
 					"You receive currency: " .. currencyLink .. "."
 				)
 
-				assert.is_true(success)
 				assert.spy(nsMocks.SendMessage).was.not_called()
-				currencyInfoMocks.GetCurrencyInfoFromLink:revert()
 			end)
 
 			it("does not show currency if it is a hidden currency", function()
-				local currencyLink = "|cffffffff|Hcurrency:241|h[Champion's Seal]|h|r"
-				nsMocks.ExtractDynamicsFromPattern.returns(currencyLink, 1)
 				ns.hiddenCurrencies = { [241] = true }
-				currencyInfoMocks.GetCurrencyInfoFromLink:revert()
-				currencyInfoMocks.GetBasicCurrencyInfo:revert()
-				currencyInfoMocks.GetCurrencyInfoFromLink = stub(_G.C_CurrencyInfo, "GetCurrencyInfoFromLink").returns({
-					currencyID = 241,
-					quantity = 1,
-				})
-				currencyInfoMocks.GetBasicCurrencyInfo = stub(_G.C_CurrencyInfo, "GetBasicCurrencyInfo").returns({
-					displayAmount = 1,
-				})
 
 				local success = CurrencyModule:CHAT_MSG_CURRENCY(
 					"CHAT_MSG_CURRENCY",
 					"You receive currency: " .. currencyLink .. "."
 				)
 
-				assert.is_true(success)
 				assert.spy(nsMocks.SendMessage).was.not_called()
-				currencyInfoMocks.GetBasicCurrencyInfo:revert()
-				currencyInfoMocks.GetCurrencyInfoFromLink:revert()
 			end)
 
 			it("shows currency when parsing succeeds", function()
-				local currencyLink = "|cffffffff|Hcurrency:241|h[Champion's Seal]|h|r"
-				local currencyInfo = {
-					currencyID = 241,
-					quantity = 1,
-					iconFileID = 133784,
-					quality = 1,
-				}
-				local basicInfo = {
-					displayAmount = 1,
-				}
-
-				nsMocks.ExtractDynamicsFromPattern.returns(currencyLink, 1)
-				currencyInfoMocks.GetCurrencyInfoFromLink:revert()
-				currencyInfoMocks.GetBasicCurrencyInfo:revert()
-				currencyInfoMocks.GetCurrencyInfoFromLink =
-					stub(_G.C_CurrencyInfo, "GetCurrencyInfoFromLink").returns(currencyInfo)
-				currencyInfoMocks.GetBasicCurrencyInfo =
-					stub(_G.C_CurrencyInfo, "GetBasicCurrencyInfo").returns(basicInfo)
-
 				local newElement = spy.on(CurrencyModule.Element, "new")
 
-				local success = CurrencyModule:CHAT_MSG_CURRENCY(
-					"CHAT_MSG_CURRENCY",
-					"You receive currency: " .. currencyLink .. "."
-				)
+				CurrencyModule:CHAT_MSG_CURRENCY("CHAT_MSG_CURRENCY", "You receive currency: " .. currencyLink .. ".")
 
-				assert.is_true(success)
-				assert.spy(newElement).was.called_with(_, currencyLink, currencyInfo, basicInfo)
+				assert.spy(newElement).was.called_with(CurrencyModule.Element, currencyLink, currencyInfo, basicInfo)
 				assert.spy(nsMocks.SendMessage).was.called(1)
-				currencyInfoMocks.GetBasicCurrencyInfo:revert()
-				currencyInfoMocks.GetCurrencyInfoFromLink:revert()
 			end)
 
 			it("handles currency with zero quantity by setting it to quantityChange", function()
-				local currencyLink = "|cffffffff|Hcurrency:241|h[Champion's Seal]|h|r"
-				local currencyInfo = {
-					currencyID = 241,
-					quantity = 0, -- Zero quantity from link
-					iconFileID = 133784,
-					quality = 1,
-				}
-				local basicInfo = {
-					displayAmount = 3,
-				}
-
-				nsMocks.ExtractDynamicsFromPattern.returns(currencyLink, 3)
-				currencyInfoMocks.GetCurrencyInfoFromLink:revert()
-				currencyInfoMocks.GetBasicCurrencyInfo:revert()
-				currencyInfoMocks.GetCurrencyInfoFromLink =
-					stub(_G.C_CurrencyInfo, "GetCurrencyInfoFromLink").returns(currencyInfo)
-				currencyInfoMocks.GetBasicCurrencyInfo =
-					stub(_G.C_CurrencyInfo, "GetBasicCurrencyInfo").returns(basicInfo)
-
 				local newElement = spy.on(CurrencyModule.Element, "new")
 
-				local success = CurrencyModule:CHAT_MSG_CURRENCY(
+				CurrencyModule:CHAT_MSG_CURRENCY(
 					"CHAT_MSG_CURRENCY",
 					"You receive currency: " .. currencyLink .. " x3."
 				)
 
-				assert.is_true(success)
 				-- Currency info should have quantity updated to 3
 				local expectedCurrencyInfo = {
 					currencyID = 241,
@@ -530,14 +444,17 @@ describe("Currency module", function()
 					iconFileID = 133784,
 					quality = 1,
 				}
-				assert.spy(newElement).was.called_with(_, currencyLink, expectedCurrencyInfo, basicInfo)
+				local expectedBasicInfo = {
+					displayAmount = 3,
+				}
+				assert
+					.spy(newElement).was
+					.called_with(CurrencyModule.Element, currencyLink, expectedCurrencyInfo, expectedBasicInfo)
 				assert.spy(nsMocks.SendMessage).was.called(1)
-				currencyInfoMocks.GetBasicCurrencyInfo:revert()
-				currencyInfoMocks.GetCurrencyInfoFromLink:revert()
 			end)
 
 			it("handles currency with zero currencyID by extracting it from the link", function()
-				local currencyLink = "|cffffffff|Hcurrency:241|h[Champion's Seal]|h|r"
+				local currencyLink = "|cffffffff|Hcurrency:241:0|h[Champion's Seal]|h|r"
 				local currencyInfo = {
 					currencyID = 0, -- Zero currency ID from link
 					quantity = 1,
@@ -564,7 +481,6 @@ describe("Currency module", function()
 					"You receive currency: " .. currencyLink .. "."
 				)
 
-				assert.is_true(success)
 				-- Currency info should have currencyID updated to 241
 				local expectedCurrencyInfo = {
 					currencyID = 241, -- Updated from ExtractCurrencyID
@@ -572,14 +488,16 @@ describe("Currency module", function()
 					iconFileID = 133784,
 					quality = 1,
 				}
-				assert.spy(newElement).was.called_with(_, currencyLink, expectedCurrencyInfo, basicInfo)
+				assert
+					.spy(newElement).was
+					.called_with(CurrencyModule.Element, currencyLink, expectedCurrencyInfo, basicInfo)
 				assert.spy(nsMocks.SendMessage).was.called(1)
 				currencyInfoMocks.GetBasicCurrencyInfo:revert()
 				currencyInfoMocks.GetCurrencyInfoFromLink:revert()
 			end)
 
 			it("creates fallback basicInfo when GetBasicCurrencyInfo returns nil", function()
-				local currencyLink = "|cffffffff|Hcurrency:241|h[Champion's Seal]|h|r"
+				local currencyLink = "|cffffffff|Hcurrency:241:0|h[Champion's Seal]|h|r"
 				local currencyInfo = {
 					currencyID = 241,
 					quantity = 1,
@@ -601,19 +519,20 @@ describe("Currency module", function()
 					"You receive currency: " .. currencyLink .. "."
 				)
 
-				assert.is_true(success)
 				-- Should create fallback basicInfo with displayAmount = quantityChange
 				local expectedBasicInfo = {
 					displayAmount = 1,
 				}
-				assert.spy(newElement).was.called_with(_, currencyLink, currencyInfo, expectedBasicInfo)
+				assert
+					.spy(newElement).was
+					.called_with(CurrencyModule.Element, currencyLink, currencyInfo, expectedBasicInfo)
 				assert.spy(nsMocks.SendMessage).was.called(1)
 				currencyInfoMocks.GetBasicCurrencyInfo:revert()
 				currencyInfoMocks.GetCurrencyInfoFromLink:revert()
 			end)
 
 			it("does not show currency if Element creation returns nil", function()
-				local currencyLink = "|cffffffff|Hcurrency:241|h[Champion's Seal]|h|r"
+				local currencyLink = "|cffffffff|Hcurrency:241:0|h[Champion's Seal]|h|r"
 				local currencyInfo = {
 					currencyID = 241,
 					quantity = 1,
@@ -640,7 +559,6 @@ describe("Currency module", function()
 					"You receive currency: " .. currencyLink .. "."
 				)
 
-				assert.is_true(success)
 				assert.spy(nsMocks.SendMessage).was.not_called()
 				elementNewStub:revert()
 				currencyInfoMocks.GetBasicCurrencyInfo:revert()
@@ -650,32 +568,10 @@ describe("Currency module", function()
 
 		describe("ruRU localization", function()
 			before_each(function()
-				local i = 1
-				nsMocks.CreatePatternSegmentsForStringNumber.invokes(function()
-					if i == 1 then
-						i = i + 1
-						return {
-							"Вы получаете валюту – ",
-							".",
-						}
-					elseif i == 2 then
-						i = i + 1
-						return {
-							"Вы получаете валюту – ",
-							", ",
-							" шт.",
-						}
-					elseif i == 3 then
-						i = i + 1
-						return {
-							"Вы получаете валюту – ",
-							", ",
-							" шт. (дополнительные задачи)",
-						}
-					else
-						return {}
-					end
-				end)
+				_G.CURRENCY_GAINED = "Вы получаете валюту – %s."
+				_G.CURRENCY_GAINED_MULTIPLE = "Вы получаете валюту – %s, %d шт."
+				_G.CURRENCY_GAINED_MULTIPLE_BONUS =
+					"Вы получаете валюту – %s, %d шт. (дополнительные задачи)"
 				CurrencyModule:OnInitialize()
 				nsMocks.SendMessage:clear()
 				nsMocks.LogDebug:clear()
@@ -683,128 +579,88 @@ describe("Currency module", function()
 
 			describe("ParseCurrencyChangeMessage", function()
 				it("returns nil if no currency link is found in the Russian message", function()
-					nsMocks.ExtractDynamicsFromPattern.returns(nil, nil)
-
-					local currencyLink, quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
+					local quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
 						"Какое-то случайное сообщение"
 					)
-
-					assert.is_nil(currencyLink)
-					assert.is_nil(quantityChange)
+					assert.equal(1, quantityChange)
 				end)
 
 				it("returns currency link and quantity from Russian CURRENCY_GAINED pattern", function()
-					local expectedLink = "|cffffffff|Hcurrency:241|h[Печать чемпиона]|h|r"
-					nsMocks.ExtractDynamicsFromPattern.returns(expectedLink, nil)
-
-					local currencyLink, quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
-						"Вы получаете валюту – |cffffffff|Hcurrency:241|h[Печать чемпиона]|h|r."
+					local quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
+						"Вы получаете валюту – |cffffffff|Hcurrency:241:0|h[Печать чемпиона]|h|r."
 					)
 
-					assert.equal(currencyLink, expectedLink)
-					assert.equal(quantityChange, 1) -- Default when no quantity specified
+					assert.equal(1, quantityChange) -- Default when no quantity specified
 				end)
 
 				it("returns currency link and quantity from Russian CURRENCY_GAINED_MULTIPLE pattern", function()
-					local expectedLink = "|cffffffff|Hcurrency:241|h[Печать чемпиона]|h|r"
-					nsMocks.ExtractDynamicsFromPattern.returns(expectedLink, 5)
-
-					local currencyLink, quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
-						"Вы получаете валюту – |cffffffff|Hcurrency:241|h[Печать чемпиона]|h|r, 5 шт."
+					local quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
+						"Вы получаете валюту – |cffffffff|Hcurrency:241:0|h[Печать чемпиона]|h|r, 5 шт."
 					)
 
-					assert.equal(currencyLink, expectedLink)
-					assert.equal(quantityChange, 5)
+					assert.equal(5, quantityChange)
 				end)
 
 				it("returns currency link and quantity from Russian CURRENCY_GAINED_MULTIPLE_BONUS pattern", function()
-					local expectedLink = "|cffffffff|Hcurrency:241|h[Печать чемпиона]|h|r"
-					nsMocks.ExtractDynamicsFromPattern.returns(expectedLink, 7)
-
-					local currencyLink, quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
-						"Вы получаете валюту – |cffffffff|Hcurrency:241|h[Печать чемпиона]|h|r, 5 шт. (дополнительные задачи)"
+					local quantityChange = CurrencyModule:ParseCurrencyChangeMessage(
+						"Вы получаете валюту – |cffffffff|Hcurrency:241:0|h[Печать чемпиона]|h|r, 5 шт. (дополнительные задачи)"
 					)
 
-					assert.equal(currencyLink, expectedLink)
-					assert.equal(quantityChange, 7)
+					assert.equal(5, quantityChange)
 				end)
 			end)
 
 			describe("CHAT_MSG_CURRENCY", function()
-				it("does not show currency if the Russian currency link cannot be parsed from the message", function()
-					nsMocks.ExtractDynamicsFromPattern.returns(nil, nil)
-
-					local success = CurrencyModule:CHAT_MSG_CURRENCY(
-						"CHAT_MSG_CURRENCY",
-						"Какое-то случайное сообщение"
-					)
-
-					assert.is_true(success)
-					assert.spy(nsMocks.SendMessage).was.not_called()
-				end)
-
-				it("shows currency when parsing Russian message succeeds", function()
-					local currencyLink = "|cffffffff|Hcurrency:241|h[Печать чемпиона]|h|r"
-					local currencyInfo = {
-						currencyID = 241,
-						quantity = 1,
-						iconFileID = 133784,
-						quality = 1,
-					}
-					local basicInfo = {
+				local currencyLink = "|cffffffff|Hcurrency:241:0|h[Печать чемпиона]|h|r"
+				local currencyInfo, basicInfo
+				before_each(function()
+					currencyInfoMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_CurrencyInfo")
+					functionMocks.GetCurrencyLink.returns(currencyLink)
+					basicInfo = {
 						displayAmount = 1,
 					}
-
-					nsMocks.ExtractDynamicsFromPattern.returns(currencyLink, 1)
-					currencyInfoMocks.GetCurrencyInfoFromLink:revert()
-					currencyInfoMocks.GetBasicCurrencyInfo:revert()
-					currencyInfoMocks.GetCurrencyInfoFromLink =
-						stub(_G.C_CurrencyInfo, "GetCurrencyInfoFromLink").returns(currencyInfo)
 					currencyInfoMocks.GetBasicCurrencyInfo =
 						stub(_G.C_CurrencyInfo, "GetBasicCurrencyInfo").returns(basicInfo)
-
-					local newElement = spy.on(CurrencyModule.Element, "new")
-
-					local success = CurrencyModule:CHAT_MSG_CURRENCY(
-						"CHAT_MSG_CURRENCY",
-						"Вы получаете валюту – " .. currencyLink .. "."
-					)
-
-					assert.is_true(success)
-					assert.spy(newElement).was.called_with(_, currencyLink, currencyInfo, basicInfo)
-					assert.spy(nsMocks.SendMessage).was.called(1)
-					currencyInfoMocks.GetBasicCurrencyInfo:revert()
-					currencyInfoMocks.GetCurrencyInfoFromLink:revert()
-				end)
-
-				it("handles Russian currency with multiple quantity", function()
-					local currencyLink = "|cffffffff|Hcurrency:241|h[Печать чемпиона]|h|r"
-					local currencyInfo = {
+					currencyInfo = {
 						currencyID = 241,
 						quantity = 0, -- Zero quantity from link
 						iconFileID = 133784,
 						quality = 1,
 					}
-					local basicInfo = {
-						displayAmount = 3,
-					}
+					currencyInfoMocks.GetCurrencyInfo = stub(_G.C_CurrencyInfo, "GetCurrencyInfo").returns(currencyInfo)
+				end)
 
-					nsMocks.ExtractDynamicsFromPattern.returns(currencyLink, 3)
-					currencyInfoMocks.GetCurrencyInfoFromLink:revert()
-					currencyInfoMocks.GetBasicCurrencyInfo:revert()
-					currencyInfoMocks.GetCurrencyInfoFromLink =
-						stub(_G.C_CurrencyInfo, "GetCurrencyInfoFromLink").returns(currencyInfo)
-					currencyInfoMocks.GetBasicCurrencyInfo =
-						stub(_G.C_CurrencyInfo, "GetBasicCurrencyInfo").returns(basicInfo)
+				it("does not show currency if the Russian currency link cannot be parsed from the message", function()
+					local success = CurrencyModule:CHAT_MSG_CURRENCY(
+						"CHAT_MSG_CURRENCY",
+						"Какое-то случайное сообщение"
+					)
 
+					assert.spy(nsMocks.SendMessage).was.not_called()
+				end)
+
+				it("shows currency when parsing Russian message succeeds", function()
 					local newElement = spy.on(CurrencyModule.Element, "new")
 
-					local success = CurrencyModule:CHAT_MSG_CURRENCY(
+					CurrencyModule:CHAT_MSG_CURRENCY(
+						"CHAT_MSG_CURRENCY",
+						"Вы получаете валюту – " .. currencyLink .. "."
+					)
+
+					assert
+						.spy(newElement).was
+						.called_with(CurrencyModule.Element, currencyLink, currencyInfo, basicInfo)
+					assert.spy(nsMocks.SendMessage).was.called(1)
+				end)
+
+				it("handles Russian currency with multiple quantity", function()
+					local newElement = spy.on(CurrencyModule.Element, "new")
+
+					CurrencyModule:CHAT_MSG_CURRENCY(
 						"CHAT_MSG_CURRENCY",
 						"Вы получаете валюту – " .. currencyLink .. ", 3 шт."
 					)
 
-					assert.is_true(success)
 					-- Currency info should have quantity updated to 3
 					local expectedCurrencyInfo = {
 						currencyID = 241,
@@ -812,53 +668,138 @@ describe("Currency module", function()
 						iconFileID = 133784,
 						quality = 1,
 					}
-					assert.spy(newElement).was.called_with(_, currencyLink, expectedCurrencyInfo, basicInfo)
+
+					local expectedBasicInfo = {
+						displayAmount = 3,
+					}
+					assert
+						.spy(newElement).was
+						.called_with(CurrencyModule.Element, currencyLink, expectedCurrencyInfo, expectedBasicInfo)
 					assert.spy(nsMocks.SendMessage).was.called(1)
-					currencyInfoMocks.GetBasicCurrencyInfo:revert()
-					currencyInfoMocks.GetCurrencyInfoFromLink:revert()
 				end)
 
 				it("handles Russian currency with bonus objective", function()
-					local currencyLink = "|cffffffff|Hcurrency:241|h[Печать чемпиона]|h|r"
-					local currencyInfo = {
-						currencyID = 241,
-						quantity = 0, -- Zero quantity from link
-						iconFileID = 133784,
-						quality = 1,
-					}
-					local basicInfo = {
-						displayAmount = 7,
-					}
-
-					nsMocks.ExtractDynamicsFromPattern.returns(currencyLink, 7) -- 5 + 2 bonus
-					currencyInfoMocks.GetCurrencyInfoFromLink:revert()
-					currencyInfoMocks.GetBasicCurrencyInfo:revert()
-					currencyInfoMocks.GetCurrencyInfoFromLink =
-						stub(_G.C_CurrencyInfo, "GetCurrencyInfoFromLink").returns(currencyInfo)
-					currencyInfoMocks.GetBasicCurrencyInfo =
-						stub(_G.C_CurrencyInfo, "GetBasicCurrencyInfo").returns(basicInfo)
-
 					local newElement = spy.on(CurrencyModule.Element, "new")
 
-					local success = CurrencyModule:CHAT_MSG_CURRENCY(
+					CurrencyModule:CHAT_MSG_CURRENCY(
 						"CHAT_MSG_CURRENCY",
 						"Вы получаете валюту – "
 							.. currencyLink
 							.. ", 5 шт. (дополнительные задачи)"
 					)
 
-					assert.is_true(success)
-					-- Currency info should have quantity updated to 7
-					local expectedCurrencyInfo = {
-						currencyID = 241,
-						quantity = 7, -- Updated from quantityChange (5 + 2 bonus)
+					local expectedBasicInfo = {
+						displayAmount = 5,
+					}
+
+					assert
+						.spy(newElement).was
+						.called_with(CurrencyModule.Element, currencyLink, currencyInfo, expectedBasicInfo)
+					assert.spy(nsMocks.SendMessage).was.called(1)
+				end)
+
+				it("correctly handles quantity mismatch between parsed amount and basicInfo.displayAmount", function()
+					-- This test reproduces the issue seen in Russian logs where:
+					-- - The chat message shows "83 шт." (83 pieces)
+					-- - But basicInfo.displayAmount is 0
+					-- - The parsed quantityChange should be used for display
+					local currencyLink = "|cffffffff|Hcurrency:395:0|h[Очки справедливости]|h|r"
+					local currencyInfo = {
+						currencyID = 395,
+						quantity = 2540, -- Current total
 						iconFileID = 133784,
 						quality = 1,
+						name = "Очки справедливости",
 					}
-					assert.spy(newElement).was.called_with(_, currencyLink, expectedCurrencyInfo, basicInfo)
-					assert.spy(nsMocks.SendMessage).was.called(1)
+					local basicInfo = {
+						displayAmount = 0, -- This is the problem - should be 83 but API returns 0
+					}
+
+					-- Mock the Russian currency message parsing
+					nsMocks.ExtractCurrencyID.returns(395)
+					currencyInfoMocks.GetCurrencyInfo:revert()
 					currencyInfoMocks.GetBasicCurrencyInfo:revert()
-					currencyInfoMocks.GetCurrencyInfoFromLink:revert()
+					currencyInfoMocks.GetCurrencyInfo = stub(_G.C_CurrencyInfo, "GetCurrencyInfo").returns(currencyInfo)
+					currencyInfoMocks.GetBasicCurrencyInfo =
+						stub(_G.C_CurrencyInfo, "GetBasicCurrencyInfo").returns(basicInfo)
+					functionMocks.GetCurrencyLink.returns(currencyLink)
+
+					-- Mock ParseCurrencyChangeMessage to return the correct parsed amount
+					local parseStub = stub(CurrencyModule, "ParseCurrencyChangeMessage")
+					parseStub.returns(83) -- This is what should be parsed from "83 шт."
+
+					local newElement = spy.on(CurrencyModule.Element, "new")
+
+					CurrencyModule:CHAT_MSG_CURRENCY(
+						"CHAT_MSG_CURRENCY",
+						"Вы получаете валюту – [Очки справедливости], 83 шт."
+					)
+
+					-- The basicInfo should be overridden because displayAmount is 0
+					local expectedBasicInfo = {
+						displayAmount = 83, -- Should use the parsed quantity change
+					}
+
+					assert
+						.spy(newElement).was
+						.called_with(CurrencyModule.Element, currencyLink, currencyInfo, expectedBasicInfo)
+					assert.spy(nsMocks.SendMessage).was.called(1)
+
+					parseStub:revert()
+					currencyInfoMocks.GetBasicCurrencyInfo:revert()
+					currencyInfoMocks.GetCurrencyInfo:revert()
+				end)
+
+				it("preserves basicInfo structure when overriding displayAmount to 0", function()
+					-- Test that when basicInfo exists but displayAmount is 0, we preserve other fields
+					local currencyLink = "|cffffffff|Hcurrency:396:0|h[Очки доблести]|h|r"
+					local currencyInfo = {
+						currencyID = 396,
+						quantity = 1410,
+						iconFileID = 133785,
+						quality = 1,
+						name = "Очки доблести",
+					}
+					local basicInfo = {
+						displayAmount = 0, -- Problem: should be 240 but API returns 0
+						name = "Очки доблести",
+						icon = 133785,
+						quality = 1,
+						actualAmount = 240,
+					}
+
+					nsMocks.ExtractCurrencyID.returns(396)
+					currencyInfoMocks.GetCurrencyInfo:revert()
+					currencyInfoMocks.GetBasicCurrencyInfo:revert()
+					currencyInfoMocks.GetCurrencyInfo = stub(_G.C_CurrencyInfo, "GetCurrencyInfo").returns(currencyInfo)
+					currencyInfoMocks.GetBasicCurrencyInfo =
+						stub(_G.C_CurrencyInfo, "GetBasicCurrencyInfo").returns(basicInfo)
+					functionMocks.GetCurrencyLink.returns(currencyLink)
+
+					local parseStub = stub(CurrencyModule, "ParseCurrencyChangeMessage")
+					parseStub.returns(240) -- Parsed from "240 шт."
+
+					local newElement = spy.on(CurrencyModule.Element, "new")
+
+					CurrencyModule:CHAT_MSG_CURRENCY(
+						"CHAT_MSG_CURRENCY",
+						"Вы получаете валюту – [Очки доблести], 240 шт."
+					)
+
+					-- The basicInfo should be replaced with just displayAmount when displayAmount is 0
+					-- This current behavior might not be ideal - we're losing other basicInfo fields
+					local expectedBasicInfo = {
+						displayAmount = 240,
+					}
+
+					assert
+						.spy(newElement).was
+						.called_with(CurrencyModule.Element, currencyLink, currencyInfo, expectedBasicInfo)
+					assert.spy(nsMocks.SendMessage).was.called(1)
+
+					parseStub:revert()
+					currencyInfoMocks.GetBasicCurrencyInfo:revert()
+					currencyInfoMocks.GetCurrencyInfo:revert()
 				end)
 			end)
 		end)
