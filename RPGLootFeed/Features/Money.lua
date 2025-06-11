@@ -123,6 +123,17 @@ function Money:PLAYER_MONEY(eventName)
 	self:fn(function()
 		local newMoney = GetMoney()
 		local amountInCopper = newMoney - self.startingMoney
+		if amountInCopper == 0 then
+			G_RLF:LogDebug(
+				"Skipping: No change in money",
+				addonName,
+				self.moduleName,
+				"MONEY",
+				"Amount is 0",
+				amountInCopper
+			)
+			return
+		end
 		self.startingMoney = newMoney
 		if G_RLF.db.global.money.onlyIncome and amountInCopper < 0 then
 			G_RLF:LogDebug("Ignoring money loss in 'only income' mode", addonName, self.moduleName)
