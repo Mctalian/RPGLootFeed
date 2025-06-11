@@ -1,6 +1,27 @@
-.PHONY: all_checks hardcode_string_check missing_translation_check missing_locale_key_check test test-ci local check_untracked_files
+.PHONY: all_checks hardcode_string_check missing_translation_check missing_locale_key_check test test-ci test-file test-pattern test-only local check_untracked_files help
 
 all_checks: hardcode_string_check missing_translation_check missing_locale_key_check
+
+# Show available make targets
+help:
+	@echo "Available targets:"
+	@echo "  test                - Run all tests with coverage"
+	@echo "  test-only           - Run tests tagged with 'only'"
+	@echo "  test-file FILE=...  - Run tests for a specific file"
+	@echo "                        Example: make test-file FILE=RPGLootFeed_spec/Features/Currency_spec.lua"
+	@echo "  test-pattern PATTERN=... - Run tests matching a pattern"
+	@echo "                        Example: make test-pattern PATTERN=\"quantity mismatch\""
+	@echo "  test-ci             - Run tests for CI (TAP output)"
+	@echo "  all_checks          - Run all code quality checks"
+	@echo "  hardcode_string_check - Check for hardcoded strings"
+	@echo "  missing_translation_check - Check for missing translations"
+	@echo "  missing_locale_key_check - Check for missing locale keys"
+	@echo "  generate_hidden_currencies - Generate hidden currencies list"
+	@echo "  lua_deps            - Install Lua dependencies"
+	@echo "  check_untracked_files - Check for untracked git files"
+	@echo "  watch               - Watch for changes and build"
+	@echo "  dev                 - Build for development"
+	@echo "  build               - Build for production"
 
 # Variables
 ROCKSBIN := $(HOME)/.luarocks/bin
@@ -24,6 +45,24 @@ test:
 
 test-only:
 	@$(ROCKSBIN)/busted --tags=only RPGLootFeed_spec
+
+# Run tests for a specific file
+# Usage: make test-file FILE=RPGLootFeed_spec/Features/Currency_spec.lua
+test-file:
+	@if [ -z "$(FILE)" ]; then \
+		echo "Usage: make test-file FILE=path/to/test_file.lua"; \
+		exit 1; \
+	fi
+	@$(ROCKSBIN)/busted --verbose "$(FILE)"
+
+# Run tests matching a specific pattern
+# Usage: make test-pattern PATTERN="quantity mismatch"
+test-pattern:
+	@if [ -z "$(PATTERN)" ]; then \
+		echo "Usage: make test-pattern PATTERN=\"test description\""; \
+		exit 1; \
+	fi
+	@$(ROCKSBIN)/busted --verbose --filter="$(PATTERN)" RPGLootFeed_spec
 
 test-ci:
 	@rm -rf luacov-html && rm -rf luacov.*out && mkdir -p luacov-html && $(ROCKSBIN)/busted --coverage -o=TAP RPGLootFeed_spec && $(ROCKSBIN)/luacov
