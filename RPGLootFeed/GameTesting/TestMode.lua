@@ -9,7 +9,7 @@ local C = LibStub("C_Everywhere")
 ---@class RLF_TestMode: RLF_Module, AceEvent-3.0
 ---@field public SmokeTest fun(s: RLF_TestMode)
 ---@field public IntegrationTest fun(s: RLF_TestMode)
-local TestMode = G_RLF.RLF:NewModule("TestMode", "AceEvent-3.0")
+local TestMode = G_RLF.RLF:NewModule(G_RLF.SupportModule.TestMode, "AceEvent-3.0")
 
 local logger
 local allItemsInitialized = false
@@ -220,7 +220,7 @@ local function generateRandomLoot()
 
 		if rng >= 0.8 then
 			local experienceGained = math.random(100, 10000)
-			local module = G_RLF.RLF:GetModule("Experience") --[[@as RLF_Experience]]
+			local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Experience) --[[@as RLF_Experience]]
 			local e = module.Element:new(experienceGained)
 			e:Show()
 			G_RLF:LogDebug("Experience gained: " .. experienceGained, addonName)
@@ -228,7 +228,7 @@ local function generateRandomLoot()
 
 		if rng <= 0.2 then
 			local copper = math.random(1, 100000000)
-			local module = G_RLF.RLF:GetModule("Money") --[[@as RLF_Money]]
+			local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Money) --[[@as RLF_Money]]
 			local e = module.Element:new(copper)
 			if not e then
 				G_RLF:LogError("Failed to create Money Element", addonName)
@@ -243,7 +243,7 @@ local function generateRandomLoot()
 		if rng > 0.2 and rng <= 0.7 then
 			local info = TestMode.testItems[math.random(#TestMode.testItems)]
 			local amountLooted = math.random(1, 5)
-			local module = G_RLF.RLF:GetModule("ItemLoot") --[[@as RLF_ItemLoot]]
+			local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.ItemLoot) --[[@as RLF_ItemLoot]]
 			local e = module.Element:new(info, amountLooted)
 			e:Show(info.itemName, info.itemQuality)
 			e:PlaySoundIfEnabled()
@@ -253,7 +253,7 @@ local function generateRandomLoot()
 			-- 10% chance of item loot to show up as a party member
 			if rng < 0.3 then
 				local unit = "player"
-				local module = G_RLF.RLF:GetModule("PartyLoot") --[[@as RLF_PartyLoot]]
+				local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.PartyLoot) --[[@as RLF_PartyLoot]]
 				local e = module.Element:new(info, amountLooted, unit)
 				e:Show(info.itemName, info.itemQuality)
 				G_RLF:LogDebug("Party Item looted: " .. info.itemName, addonName)
@@ -264,7 +264,7 @@ local function generateRandomLoot()
 			if GetExpansionLevel() >= G_RLF.Expansion.WOTLK then
 				local currency = TestMode.testCurrencies[math.random(#TestMode.testCurrencies)]
 				local amountLooted = math.random(1, 500)
-				local module = G_RLF.RLF:GetModule("Currency") --[[@as RLF_Currency]]
+				local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Currency) --[[@as RLF_Currency]]
 				local e = module.Element:new(currency.link, currency.info, currency.basicInfo)
 				if not e then
 					G_RLF:LogError("Failed to create Currency Element", addonName)
@@ -278,7 +278,7 @@ local function generateRandomLoot()
 		elseif rng > 0.85 then
 			local reputationGained = math.random(10, 100)
 			local factionName = TestMode.testFactions[math.random(#TestMode.testFactions)]
-			local module = G_RLF.RLF:GetModule("Reputation") --[[@as RLF_Reputation]]
+			local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Reputation) --[[@as RLF_Reputation]]
 			local e = module.Element:new(reputationGained, factionName)
 			e:Show()
 			G_RLF:LogDebug("Reputation gained: " .. reputationGained, addonName)
@@ -294,7 +294,7 @@ end
 
 function TestMode:ToggleTestMode()
 	if not logger then
-		logger = G_RLF.RLF:GetModule("Logger")
+		logger = G_RLF.RLF:GetModule(G_RLF.SupportModule.Logger)
 	end
 	if not isLootDisplayReady then
 		error("LootDisplay did not signal it was ready (or we didn't receive the signal) - cannot start TestMode")

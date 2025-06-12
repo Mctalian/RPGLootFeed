@@ -7,7 +7,7 @@ local G_RLF = ns
 --@alpha@
 -- trunk-ignore-begin(no-invalid-prints/invalid-print)
 ---@type RLF_TestMode
-local TestMode = G_RLF.RLF:GetModule("TestMode") --[[@as RLF_TestMode]]
+local TestMode = G_RLF.RLF:GetModule(G_RLF.SupportModule.TestMode) --[[@as RLF_TestMode]]
 local tests = {}
 local prints = ""
 local successCount = 0
@@ -65,14 +65,14 @@ local function displayResults()
 end
 
 local function runExperienceIntegrationTest()
-	local module = G_RLF.RLF:GetModule("Experience") --[[@as RLF_Experience]]
+	local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Experience) --[[@as RLF_Experience]]
 	local e = module.Element:new(1337)
 	runTestSafely(e.Show, "LootDisplay: Experience", e)
 	return 1
 end
 
 local function runMoneyIntegrationTest()
-	local module = G_RLF.RLF:GetModule("Money") --[[@as RLF_Money]]
+	local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Money) --[[@as RLF_Money]]
 	local e = module.Element:new(12345)
 	if not e then
 		G_RLF:Print("Money element not created, something went wrong")
@@ -83,7 +83,7 @@ local function runMoneyIntegrationTest()
 end
 
 local function runItemLootIntegrationTest()
-	local module = G_RLF.RLF:GetModule("ItemLoot") --[[@as RLF_ItemLoot]]
+	local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.ItemLoot) --[[@as RLF_ItemLoot]]
 	local info = TestMode.testItems[2]
 	local amountLooted = 1
 	local rowsShown = 0
@@ -102,7 +102,7 @@ local function runItemLootIntegrationTest()
 end
 
 local function runPartyLootIntegrationTest()
-	local module = G_RLF.RLF:GetModule("PartyLoot") --[[@as RLF_PartyLoot]]
+	local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.PartyLoot) --[[@as RLF_PartyLoot]]
 	local info = TestMode.testItems[2]
 	local amountLooted = 1
 	local e = module.Element:new(info, amountLooted, "player")
@@ -111,7 +111,7 @@ local function runPartyLootIntegrationTest()
 end
 
 local function runCurrencyIntegrationTest()
-	local module = G_RLF.RLF:GetModule("Currency") --[[@as RLF_Currency]]
+	local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Currency) --[[@as RLF_Currency]]
 	local testObj = TestMode.testCurrencies[2]
 	local amountLooted = 1
 	testObj.basicInfo.displayAmount = amountLooted
@@ -131,7 +131,7 @@ local function runCurrencyIntegrationTest()
 end
 
 local function runReputationIntegrationTest()
-	local module = G_RLF.RLF:GetModule("Reputation") --[[@as RLF_Reputation]]
+	local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Reputation) --[[@as RLF_Reputation]]
 	local testObj = TestMode.testFactions[2]
 	local amountLooted = 664
 	local e = module.Element:new(amountLooted, testObj)
@@ -142,7 +142,7 @@ local function runReputationIntegrationTest()
 end
 
 local function runProfessionIntegrationTest()
-	local module = G_RLF.RLF:GetModule("Professions") --[[@as RLF_Professions]]
+	local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Profession) --[[@as RLF_Professions]]
 	local icon = "4620671"
 	-- So far, MoP Classic and below doesn't have this icon
 	if not G_RLF:IsRetail() then

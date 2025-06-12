@@ -116,7 +116,7 @@ function RLF:OnInitialize()
 		end)
 	end
 
-	TestMode = self:GetModule("TestMode") --[[@as RLF_TestMode]]
+	TestMode = self:GetModule(G_RLF.SupportModule.TestMode) --[[@as RLF_TestMode]]
 end
 
 function RLF:SlashCommand(msg, editBox)
@@ -130,7 +130,7 @@ function RLF:SlashCommand(msg, editBox)
 		-- Quick testing of item links
 		elseif start then
 			local itemLink = msg:sub(stop + 1)
-			local itemModule = G_RLF.RLF:GetModule("ItemLoot") --[[@as RLF_ItemLoot]]
+			local itemModule = G_RLF.RLF:GetModule(G_RLF.FeatureModule.ItemLoot) --[[@as RLF_ItemLoot]]
 			itemModule:CHAT_MSG_LOOT(
 				"CHAT_MSG_LOOT",
 				itemLink,
@@ -155,7 +155,7 @@ function RLF:SlashCommand(msg, editBox)
 			G_RLF.LootDisplay:HideLoot()
 		elseif msg == "log" then
 			---@type RLF_Logger
-			local loggerModule = self:GetModule("Logger") --[[@as RLF_Logger]]
+			local loggerModule = self:GetModule(G_RLF.SupportModule.Logger) --[[@as RLF_Logger]]
 			loggerModule:Show()
 		elseif msg == "history" and G_RLF.db.global.lootHistory.enabled then
 			---@type RLF_LootDisplayFrame
@@ -185,7 +185,7 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 			G_RLF:RGBAToHexFormat(1, 0.5, 0, 1) .. G_RLF.L["Welcome"] .. "|r",
 			G_RLF:RGBAToHexFormat(0.2, 0.5, 0.4, 1) .. currentVersion .. "|r"
 		)
-		local notifModule = G_RLF.RLF:GetModule("Notifications") --[[@as RLF_Notifications]]
+		local notifModule = G_RLF.RLF:GetModule(G_RLF.SupportModule.Notifications) --[[@as RLF_Notifications]]
 		if notifModule then
 			notifModule:ViewAllNotifications()
 		end

@@ -33,9 +33,9 @@ G_RLF.options.args.features.args.transmogConfig = {
 			set = function(info, value)
 				G_RLF.db.global.transmog.enabled = value
 				if value then
-					G_RLF.RLF:EnableModule("Transmog")
+					G_RLF.RLF:EnableModule(G_RLF.FeatureModule.Transmog)
 				else
-					G_RLF.RLF:DisableModule("Transmog")
+					G_RLF.RLF:DisableModule(G_RLF.FeatureModule.Transmog)
 				end
 			end,
 			order = 1,

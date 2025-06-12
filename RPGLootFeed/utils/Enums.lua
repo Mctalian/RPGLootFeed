@@ -81,6 +81,22 @@ G_RLF.FeatureModule = {
 	Transmog = "Transmog",
 }
 
+---@enum G_RLF.BlizzModule
+G_RLF.BlizzModule = {
+	BossBanner = "BossBanner",
+	LootToasts = "LootToasts",
+	MoneyAlerts = "MoneyAlerts",
+}
+
+---@enum G_RLF.SupportModule
+G_RLF.SupportModule = {
+	Communications = "Communications",
+	Logger = "Logger",
+	LootDisplay = "LootDisplay",
+	Notifications = "Notifications",
+	TestMode = "TestMode",
+}
+
 ---@enum G_RLF.PricesEnum
 G_RLF.PricesEnum = {
 	None = "none",

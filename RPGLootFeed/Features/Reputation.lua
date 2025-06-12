@@ -6,7 +6,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_Reputation: RLF_Module, AceEvent-3.0, AceTimer-3.0, AceBucket-3.0
-local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0", "AceBucket-3.0")
+local Rep = G_RLF.RLF:NewModule(G_RLF.FeatureModule.Reputation, "AceEvent-3.0", "AceTimer-3.0", "AceBucket-3.0")
 
 Rep.Element = {}
 

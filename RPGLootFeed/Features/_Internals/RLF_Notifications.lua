@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_Notifications: RLF_Module, AceEvent-3.0
-local Notifications = G_RLF.RLF:NewModule("Notifications", "AceEvent-3.0")
+local Notifications = G_RLF.RLF:NewModule(G_RLF.SupportModule.Notifications, "AceEvent-3.0")
 
 Notifications.Element = {}
 

@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_Experience: RLF_Module, AceEvent-3.0
-local Xp = G_RLF.RLF:NewModule("Experience", "AceEvent-3.0")
+local Xp = G_RLF.RLF:NewModule(G_RLF.FeatureModule.Experience, "AceEvent-3.0")
 local currentXP, currentMaxXP, currentLevel
 
 Xp.Element = {}
