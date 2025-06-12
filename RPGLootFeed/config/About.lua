@@ -19,6 +19,7 @@ About.argOrder = {
 	["joinDiscord"] = 4,
 	["issuesAndRequests"] = 5,
 	["issuesLink"] = 6,
+	["inGameCommunity"] = 7,
 	["author"] = -4,
 	["githubLink"] = -3,
 	["tipsLink"] = -2,
@@ -73,6 +74,17 @@ G_RLF.options.args.about = {
 			order = About.argOrder.issuesLink,
 		},
 
+		inGameCommunity = {
+			type = "input",
+			name = G_RLF.L["InGameCommunity"] .. " (" .. G_RLF.L["Experimental"] .. ")",
+			desc = G_RLF.L["InGameCommunityDesc"],
+			width = "full",
+			get = function()
+				return "zjz5YvzudWG"
+			end,
+			order = About.argOrder.inGameCommunity,
+		},
+
 		author = {
 			type = "description",
 			image = "Interface/AddOns/RPGLootFeed/Icons/mctalian_logo.png",
@@ -105,7 +117,7 @@ G_RLF.options.args.about = {
 				local frFR = "* frFR by polki92"
 				local ruRU = "* ruRU by ZamestoTV"
 				if GetLocale() == "ruRU" then
-					ruRU = ruRU .. ", Карнажж"
+					ruRU = ruRU .. ", Карнажж (Пламегор)"
 				else
 					ruRU = ruRU .. ", Carnage (Flamegor)"
 				end
