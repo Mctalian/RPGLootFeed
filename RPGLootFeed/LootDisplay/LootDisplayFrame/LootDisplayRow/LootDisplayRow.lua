@@ -1051,7 +1051,10 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	self.topLeftColor = element.topLeftColor
 
 	if isLink then
-		local extraWidthStr = " x" .. self.amount
+		local extraWidthStr = ""
+		if self.amount and self.amount > 1 then
+			extraWidthStr = " x" .. self.amount
+		end
 		if type(self.itemCount) == "number" and self.itemCount > 0 then
 			extraWidthStr = extraWidthStr .. " (" .. self.itemCount .. ")"
 		end
@@ -1429,6 +1432,8 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 			return
 		end
 		GameTooltip:SetOwner(self.ClickableButton, "ANCHOR_RIGHT")
+		-- It doesn't look like we can get hover behavior for transmog links but
+		-- they don't provide much information anyway
 		GameTooltip:SetHyperlink(self.link) -- Use the item's link to show the tooltip
 		GameTooltip:Show()
 	end
@@ -1480,8 +1485,31 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 
 	local function handleClick(button)
 		if button == "LeftButton" and not IsModifiedClick() then
-			-- Open the ItemRefTooltip to mimic in-game chat behavior
-			if self.link then
+			if not self.link then
+				return
+			end
+
+			local s = self.link:find("transmogappearance:")
+			if s then
+				-- All this to check if the link is a transmog appearance link
+				-- and get the ID to open the Transmog Collection
+				-- If we just store the ID as well as the link, we can skip this
+				local taS = self.link:find("transmogappearance:")
+				if not taS then
+					return
+				end
+				local shortened = self.link:sub(taS)
+				local barS = shortened:find("|")
+				if not barS then
+					barS = #shortened + 1
+				end
+				shortened = shortened:sub(1, barS - 1)
+				local _, id = strsplit(":", shortened)
+				if id then
+					TransmogUtil.OpenCollectionToItem(id)
+				end
+			elseif self.link then
+				-- Open the ItemRefTooltip to mimic in-game chat behavior
 				SetItemRef(self.link, self.link, button, self.ClickableButton)
 			end
 		elseif button == "LeftButton" and IsShiftKeyDown() then

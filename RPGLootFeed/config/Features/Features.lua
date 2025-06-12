@@ -41,8 +41,10 @@ G_RLF.mainFeatureOrder = {
 	Reputation = 6,
 	Profession = 7,
 	TravelPoints = 8,
+	Transmog = 9,
+	-- Update lastFeature when adding new main features
 }
-local lastFeature = G_RLF.mainFeatureOrder.TravelPoints
+local lastFeature = G_RLF.mainFeatureOrder.Transmog
 
 G_RLF.options.args.features = {
 	type = "group",
@@ -205,6 +207,27 @@ G_RLF.options.args.features = {
 				end
 			end,
 			order = G_RLF.mainFeatureOrder.TravelPoints,
+		},
+		enableTransmog = {
+			type = "toggle",
+			name = G_RLF.L["Enable Transmog in Feed"],
+			desc = G_RLF.L["EnableTransmogDesc"],
+			width = "double",
+			disabled = function()
+				return not G_RLF:IsRetail()
+			end,
+			get = function(info, value)
+				return G_RLF.db.global.transmog.enabled
+			end,
+			set = function(info, value)
+				G_RLF.db.global.transmog.enabled = value
+				if value then
+					G_RLF.RLF:EnableModule(G_RLF.FeatureModule.Transmog)
+				else
+					G_RLF.RLF:DisableModule(G_RLF.FeatureModule.Transmog)
+				end
+			end,
+			order = G_RLF.mainFeatureOrder.Transmog,
 		},
 
 		misc = {

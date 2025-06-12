@@ -454,6 +454,17 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 					ItemLoot.moduleName
 				)
 			end
+		elseif self.isNewTransmog and soundsConfig.transmog.enabled and soundsConfig.transmog.sound ~= "" then
+			local willPlay, handle = PlaySoundFile(soundsConfig.transmog.sound)
+			if not willPlay then
+				G_RLF:LogWarn("Failed to play sound " .. soundsConfig.transmog.sound, addonName, ItemLoot.moduleName)
+			else
+				G_RLF:LogDebug(
+					"Sound queued to play " .. soundsConfig.transmog.sound .. " " .. handle,
+					addonName,
+					ItemLoot.moduleName
+				)
+			end
 		end
 	end
 
