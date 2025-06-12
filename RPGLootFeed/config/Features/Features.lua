@@ -42,9 +42,15 @@ G_RLF.mainFeatureOrder = {
 	Profession = 7,
 	TravelPoints = 8,
 	Transmog = 9,
-	-- Update lastFeature when adding new main features
 }
-local lastFeature = G_RLF.mainFeatureOrder.Transmog
+
+-- Dynamically determine the last feature by finding the maximum order value
+local lastFeature = 0
+for _, value in pairs(G_RLF.mainFeatureOrder) do
+	if type(value) == "number" then
+		lastFeature = math.max(lastFeature, value)
+	end
+end
 
 G_RLF.options.args.features = {
 	type = "group",
