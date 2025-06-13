@@ -219,9 +219,6 @@ G_RLF.options.args.features = {
 			name = G_RLF.L["Enable Transmog in Feed"],
 			desc = G_RLF.L["EnableTransmogDesc"],
 			width = "double",
-			disabled = function()
-				return not G_RLF:IsRetail()
-			end,
 			get = function(info, value)
 				return G_RLF.db.global.transmog.enabled
 			end,

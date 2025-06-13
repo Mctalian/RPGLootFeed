@@ -32,14 +32,14 @@ function Transmog.Element:new(transmogLink, icon)
 	end
 
 	element.secondaryTextFn = function(...)
-		return ""
+		return string.format(_G["ERR_LEARN_TRANSMOG_S"], " "):trim()
 	end
 
 	return element
 end
 
 function Transmog:OnInitialize()
-	if G_RLF:IsRetail() and G_RLF.db.global.transmog.enabled then
+	if G_RLF.db.global.transmog.enabled then
 		self:Enable()
 	else
 		self:Disable()
@@ -47,19 +47,11 @@ function Transmog:OnInitialize()
 end
 
 function Transmog:OnEnable()
-	if not G_RLF:IsRetail() then
-		return
-	end
-
 	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
 	self:RegisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED")
 end
 
 function Transmog:OnDisable()
-	if not G_RLF:IsRetail() then
-		return
-	end
-
 	self:UnregisterEvent("TRANSMOG_COLLECTION_SOURCE_ADDED")
 end
 

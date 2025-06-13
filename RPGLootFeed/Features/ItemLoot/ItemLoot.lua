@@ -470,12 +470,18 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 
 	function element:SetHighlight()
 		local itemHighlights = G_RLF.db.global.item.itemHighlights
-		self.highlight = (self.isMount and itemHighlights.mounts)
-			or (self.isLegendary and itemHighlights.legendary)
-			or (self.isBetterThanEquipped and itemHighlights.betterThanEquipped)
-			or (self.isQuestItem and itemHighlights.quest)
-			or (self.hasTertiaryOrSocket and itemHighlights.tertiaryOrSocket)
-			or (self.isNewTransmog and itemHighlights.transmog)
+		local reason = (self.isMount and itemHighlights.mounts and "Mount")
+			or (self.isLegendary and itemHighlights.legendary and "Legendary")
+			or (self.isBetterThanEquipped and itemHighlights.betterThanEquipped and "Better than Equipped")
+			or (self.isQuestItem and itemHighlights.quest and "Quest Item")
+			or (self.hasTertiaryOrSocket and itemHighlights.tertiaryOrSocket and "Tertiary or Socket")
+			or (self.isNewTransmog and itemHighlights.transmog and "New Transmog")
+			or ""
+
+		self.highlight = reason ~= ""
+		if self.highlight then
+			G_RLF:LogDebug("Highlighted because of " .. reason, addonName, ItemLoot.moduleName, self.key)
+		end
 	end
 
 	return element
