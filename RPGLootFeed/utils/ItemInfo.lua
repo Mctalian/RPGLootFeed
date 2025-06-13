@@ -205,7 +205,7 @@ end
 ---Determine if the item is Legendary
 ---@return boolean
 function ItemInfo:IsLegendary()
-	return self.itemQuality == Enum.ItemQuality.Legendary
+	return self.itemQuality == G_RLF.ItemQualEnum.Legendary
 end
 
 function ItemInfo:IsAppearanceCollected()
@@ -215,7 +215,7 @@ function ItemInfo:IsAppearanceCollected()
 
 	if
 		GetExpansionLevel() < G_RLF.Expansion.SL
-		and self.itemQuality > Enum.ItemQuality.Poor
+		and self.itemQuality > G_RLF.ItemQualEnum.Poor
 		and self:IsEligibleEquipment()
 		and C_TransmogCollection
 		and C_TransmogCollection.GetItemInfo

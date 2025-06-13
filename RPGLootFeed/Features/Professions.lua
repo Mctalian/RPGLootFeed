@@ -23,7 +23,7 @@ function Professions.Element:new(...)
 
 	local key
 	key, element.name, element.icon, element.level, element.maxLevel, element.quantity = ...
-	element.quality = Enum.ItemQuality.Rare
+	element.quality = G_RLF.ItemQualEnum.Rare
 
 	element.key = keyPrefix .. key
 
