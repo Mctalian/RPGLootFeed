@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_TravelPoints: RLF_Module, AceEvent-3.0
-local TravelPoints = G_RLF.RLF:NewModule("TravelPoints", "AceEvent-3.0")
+local TravelPoints = G_RLF.RLF:NewModule(G_RLF.FeatureModule.TravelPoints, "AceEvent-3.0")
 local currentTravelersJourney, maxTravelersJourney
 
 TravelPoints.Element = {}
@@ -27,7 +27,7 @@ function TravelPoints.Element:new(...)
 		return _G["MONTHLY_ACTIVITIES_POINTS"] .. " + " .. ((existingAmount or 0) + element.quantity)
 	end
 	element.icon = G_RLF.DefaultIcons.TRAVELPOINTS
-	element.quality = Enum.ItemQuality.Common
+	element.quality = G_RLF.ItemQualEnum.Common
 
 	element.secondaryTextFn = function()
 		if not currentTravelersJourney then

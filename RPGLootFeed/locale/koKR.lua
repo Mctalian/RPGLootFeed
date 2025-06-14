@@ -14,6 +14,39 @@ end
 --- You may translate these comments, but do not translate "region" or "endregion" as they are used by the localization tool to determine where to place the translations.
 --- To add translations, simply uncomment the line(s) and replace the English text after the equal sign (=) with the translated value.
 
+--#region 1.25.0
+-- L["AtlasIconDescription"] = "NOTE: The inputs below are Atlas textures, not file paths. You can use the TextureAtlasViewer addon to find valid Atlas textures. The sizes of the icons below are based on the Secondary Font Size setting. Please reach out to me if the size of an icon you want is not working for you."
+-- L["Auction House Icon Texture"] = "Auction House Icon Atlas Texture"
+-- L["Auction Price then Vendor Price"] = "Auction Price then Vendor Price"
+-- L["AuctionHouseIconTextureDesc"] = "The texture to use for the auction house icon in the Loot Feed. This is an Atlas texture, not a file path."
+-- L["Chosen Icon"] = "Your chosen icon: %s"
+-- L["Enable Transmog in Feed"] = "Enable Transmog in Feed"
+-- L["EnableTransmogDesc"] = "Enable showing newly collected appearances in the Loot Feed"
+-- L["Experimental"] = "Experimental"
+-- L["Highest Price"] = "Highest Price"
+-- L["Highlight New Transmog Items"] = "Highlight New Transmog Items"
+-- L["Highlight Quest Items"] = "Highlight Quest Items"
+-- L["HighlightQuestDesc"] = "Highlight quest items in the Loot Feed"
+-- L["HighlightTransmogDesc"] = "Highlight items that you have not collected the appearance for in the Loot Feed"
+-- L["InGameCommunity"] = "In-Game Community"
+-- L["InGameCommunityDesc"] = "Join the RPGLootFeed In-Game Community to get help, feedback, and suggestions from the comfort of the game! Copy/paste the code below into the Community Finder to join"
+-- L["InvalidAtlasTexture"] = "%s is not a valid Atlas texture. TextureAtlasViewer addon can help!"
+-- L["Play Sound for New Transmog Items"] = "Play Sound for New Transmog Items"
+-- L["PlaySoundForTransmogDesc"] = "Play a sound when you loot a transmog item for which you have not collected the appearance"
+-- L["RevertAuctionHouseIconToDefaultDesc"] = "Revert the auction house icon texture to the default Atlas texture."
+-- L["RevertVendorIconToDefaultDesc"] = "Revert the vendor icon texture to the default Atlas texture."
+-- L["TestBetterThanEquippedSoundDesc"] = "Test the sound you have selected for items better than what you have equipped"
+-- L["TestLegendarySoundDesc"] = "Test the sound you have selected for Legendary items"
+-- L["TestMountSoundDesc"] = "Test the sound you have selected for Mounts"
+-- L["TestTransmogSoundDesc"] = "Test the sound you have selected for Transmog items"
+-- L["Transmog Config"] = "Transmog Config"
+-- L["Transmog Sound"] = "Transmog Sound"
+-- L["TransmogSoundDesc"] = "The sound to play when a transmog item is looted for which you have not collected the appearance"
+-- L["Vendor Icon Texture"] = "Vendor Icon Atlas Texture"
+-- L["Vendor Price then Auction Price"] = "Vendor Price then Auction Price"
+-- L["VendorIconTextureDesc"] = "The texture to use for the vendor icon in the Loot Feed. This is an Atlas texture, not a file path."
+--#endregion
+
 --#region 1.23.0
 -- L["Only Income"] = "Only Income Mode"
 -- L["OnlyIncomeDesc"] = "If checked, only show income money amounts (i.e. positive money) in the Loot Feed. Money spent, such as repairs, buying items, etc. will not be processed."

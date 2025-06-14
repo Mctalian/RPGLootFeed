@@ -7,7 +7,7 @@ local G_RLF = ns
 local C = LibStub("C_Everywhere")
 
 ---@class RLF_Currency: RLF_Module, AceEvent-3.0
-local Currency = G_RLF.RLF:NewModule("Currency", "AceEvent-3.0")
+local Currency = G_RLF.RLF:NewModule(G_RLF.FeatureModule.Currency, "AceEvent-3.0")
 
 --- @param content string
 --- @param message string
@@ -195,7 +195,7 @@ end
 function Currency:Process(eventName, currencyType, quantityChange)
 	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, currencyType, eventName, quantityChange)
 
-	if currencyType == nil or not quantityChange or quantityChange <= 0 then
+	if currencyType == nil or not quantityChange or quantityChange == 0 then
 		self:LogDebug(
 			"Skip showing currency",
 			"SKIP: Something was missing, don't display",

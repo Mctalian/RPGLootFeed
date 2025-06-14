@@ -113,7 +113,7 @@ describe("Features module", function()
 				v.set(nil, true)
 			end
 
-			assert.stub(stubEnableModule).was.called(8)
+			assert.stub(stubEnableModule).was.called(9)
 			---@diagnostic disable: undefined-field
 			assert.equal(ns.FeatureModule.ItemLoot, stubEnableModule.calls[1].vals[2])
 			assert.equal(ns.FeatureModule.PartyLoot, stubEnableModule.calls[2].vals[2])
@@ -123,27 +123,29 @@ describe("Features module", function()
 			assert.equal(ns.FeatureModule.Reputation, stubEnableModule.calls[6].vals[2])
 			assert.equal(ns.FeatureModule.Profession, stubEnableModule.calls[7].vals[2])
 			assert.equal(ns.FeatureModule.TravelPoints, stubEnableModule.calls[8].vals[2])
+			assert.equal(ns.FeatureModule.Transmog, stubEnableModule.calls[9].vals[2])
 			---@diagnostic enable: undefined-field
 		end)
 
 		it("has a set handler that calls Disable Module when value is false", function()
-			local stubDisabeModule = stub(ns.RLF, "DisableModule")
+			local stubDisableModule = stub(ns.RLF, "DisableModule")
 			for _, v in pairs(featureToggles) do
 				---@diagnostic disable-next-line: redundant-parameter
 				assert.is_not_nil(v.set, v.name .. " should have a set handler")
 				v.set(nil, false)
 			end
 
-			assert.stub(stubDisabeModule).was.called(8)
+			assert.stub(stubDisableModule).was.called(9)
 			---@diagnostic disable: undefined-field
-			assert.equal(ns.FeatureModule.ItemLoot, stubDisabeModule.calls[1].vals[2])
-			assert.equal(ns.FeatureModule.PartyLoot, stubDisabeModule.calls[2].vals[2])
-			assert.equal(ns.FeatureModule.Currency, stubDisabeModule.calls[3].vals[2])
-			assert.equal(ns.FeatureModule.Money, stubDisabeModule.calls[4].vals[2])
-			assert.equal(ns.FeatureModule.Experience, stubDisabeModule.calls[5].vals[2])
-			assert.equal(ns.FeatureModule.Reputation, stubDisabeModule.calls[6].vals[2])
-			assert.equal(ns.FeatureModule.Profession, stubDisabeModule.calls[7].vals[2])
-			assert.equal(ns.FeatureModule.TravelPoints, stubDisabeModule.calls[8].vals[2])
+			assert.equal(ns.FeatureModule.ItemLoot, stubDisableModule.calls[1].vals[2])
+			assert.equal(ns.FeatureModule.PartyLoot, stubDisableModule.calls[2].vals[2])
+			assert.equal(ns.FeatureModule.Currency, stubDisableModule.calls[3].vals[2])
+			assert.equal(ns.FeatureModule.Money, stubDisableModule.calls[4].vals[2])
+			assert.equal(ns.FeatureModule.Experience, stubDisableModule.calls[5].vals[2])
+			assert.equal(ns.FeatureModule.Reputation, stubDisableModule.calls[6].vals[2])
+			assert.equal(ns.FeatureModule.Profession, stubDisableModule.calls[7].vals[2])
+			assert.equal(ns.FeatureModule.TravelPoints, stubDisableModule.calls[8].vals[2])
+			assert.equal(ns.FeatureModule.Transmog, stubDisableModule.calls[9].vals[2])
 			---@diagnostic enable: undefined-field
 		end)
 	end)

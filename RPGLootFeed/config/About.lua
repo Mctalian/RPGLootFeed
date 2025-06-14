@@ -19,6 +19,7 @@ About.argOrder = {
 	["joinDiscord"] = 4,
 	["issuesAndRequests"] = 5,
 	["issuesLink"] = 6,
+	["inGameCommunity"] = 7,
 	["author"] = -4,
 	["githubLink"] = -3,
 	["tipsLink"] = -2,
@@ -73,6 +74,17 @@ G_RLF.options.args.about = {
 			order = About.argOrder.issuesLink,
 		},
 
+		inGameCommunity = {
+			type = "input",
+			name = G_RLF.L["InGameCommunity"] .. " (" .. G_RLF.L["Experimental"] .. ")",
+			desc = G_RLF.L["InGameCommunityDesc"],
+			width = "full",
+			get = function()
+				return "zjz5YvzudWG"
+			end,
+			order = About.argOrder.inGameCommunity,
+		},
+
 		author = {
 			type = "description",
 			image = "Interface/AddOns/RPGLootFeed/Icons/mctalian_logo.png",
@@ -99,16 +111,23 @@ G_RLF.options.args.about = {
 		},
 		credits = {
 			type = "description",
-			name = string.format(
-				G_RLF.L["Credits"],
-				"\n",
-				"\n"
-					.. "* frFR by polki92\n"
-					.. "* zhCN by byezero\n"
-					.. "* esMX by Lalz420\n"
-					.. "* ruRU by ZamestoTV\n"
-					.. "\n"
-			),
+			name = function()
+				local translationCredits = G_RLF.L["Credits"]
+				local esMX = "* esMX by Lalz420"
+				local frFR = "* frFR by polki92"
+				local ruRU = "* ruRU by ZamestoTV"
+				if GetLocale() == "ruRU" then
+					ruRU = ruRU .. ", Карнажж (Пламегор)"
+				else
+					ruRU = ruRU .. ", Carnage (Flamegor)"
+				end
+				local zhCN = "* zhCN by byezero"
+				return string.format(
+					translationCredits,
+					"\n",
+					"\n" .. esMX .. "\n" .. frFR .. "\n" .. ruRU .. "\n" .. zhCN .. "\n" .. "\n"
+				)
+			end,
 			order = About.argOrder.credits,
 		},
 	},

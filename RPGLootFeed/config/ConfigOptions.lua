@@ -49,7 +49,7 @@ G_RLF.options = {
 			type = "execute",
 			name = G_RLF.L["Toggle Test Mode"],
 			func = function()
-				local TestMode = G_RLF.RLF:GetModule("TestMode") --[[@as RLF_TestMode]]
+				local TestMode = G_RLF.RLF:GetModule(G_RLF.SupportModule.TestMode) --[[@as RLF_TestMode]]
 				TestMode:ToggleTestMode()
 			end,
 			order = G_RLF.level1OptionsOrder.testMode,

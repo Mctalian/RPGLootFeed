@@ -34,9 +34,9 @@ G_RLF.options.args.features.args.professionConfig = {
 			set = function(_, value)
 				G_RLF.db.global.prof.enabled = value
 				if value then
-					G_RLF.RLF:EnableModule("Profession")
+					G_RLF.RLF:EnableModule(G_RLF.FeatureModule.Profession)
 				else
-					G_RLF.RLF:DisableModule("Profession")
+					G_RLF.RLF:DisableModule(G_RLF.FeatureModule.Profession)
 				end
 			end,
 			order = 1,

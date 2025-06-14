@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_Logger: RLF_Module, AceBucket-3.0, AceEvent-3.0
-local Logger = G_RLF.RLF:NewModule("Logger", "AceBucket-3.0", "AceEvent-3.0")
+local Logger = G_RLF.RLF:NewModule(G_RLF.SupportModule.Logger, "AceBucket-3.0", "AceEvent-3.0")
 
 local gui = LibStub("AceGUI-3.0") --[[@as AceGUI-3.0]]
 
@@ -57,6 +57,7 @@ local Experience = G_RLF.FeatureModule.Experience
 local Profession = G_RLF.FeatureModule.Profession
 local PartyLoot = G_RLF.FeatureModule.PartyLoot
 local TravelPoints = G_RLF.FeatureModule.TravelPoints
+local Transmog = G_RLF.FeatureModule.Transmog
 local eventType = {
 	[ItemLoot] = true,
 	[Currency] = true,
@@ -66,6 +67,7 @@ local eventType = {
 	[Profession] = true,
 	[PartyLoot] = true,
 	[TravelPoints] = true,
+	[Transmog] = true,
 }
 local function OnEventTypeChange(_, _, k, v)
 	eventType[k] = v
@@ -191,6 +193,7 @@ function Logger:createFilterBarComponents()
 				[Profession] = Profession,
 				[PartyLoot] = PartyLoot,
 				[TravelPoints] = TravelPoints,
+				[Transmog] = Transmog,
 			})
 			fB.logTypes:SetCallback("OnValueChanged", OnEventTypeChange)
 			for k, v in pairs(eventType) do
@@ -277,6 +280,7 @@ local function getType(logEntry)
 		[Profession] = "|cFF8B4513[PROF]|r", -- Brown for profession
 		[PartyLoot] = "|cFF00FFFF[PRTY]|r", -- Cyan for party loot
 		[TravelPoints] = "|cFF8A2BE2[TRVL]|r", -- BlueViolet for travel points
+		[Transmog] = "|cFFFF69B4[TMOG]|r", -- Pink for transmog
 	}
 
 	-- Return an empty string for "General" and the corresponding value for others

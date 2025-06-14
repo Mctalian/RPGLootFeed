@@ -6,7 +6,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_Reputation: RLF_Module, AceEvent-3.0, AceTimer-3.0, AceBucket-3.0
-local Rep = G_RLF.RLF:NewModule("Reputation", "AceEvent-3.0", "AceTimer-3.0", "AceBucket-3.0")
+local Rep = G_RLF.RLF:NewModule(G_RLF.FeatureModule.Reputation, "AceEvent-3.0", "AceTimer-3.0", "AceBucket-3.0")
 
 Rep.Element = {}
 
@@ -168,16 +168,16 @@ function Rep.Element:new(...)
 		else
 			element.icon = G_RLF.DefaultIcons.REPUTATION
 		end
-		element.quality = Enum.ItemQuality.Heirloom
+		element.quality = G_RLF.ItemQualEnum.Heirloom
 	elseif factionIdIconMap[element.factionId] then
 		element.icon = factionIdIconMap[element.factionId]
-		element.quality = Enum.ItemQuality.Rare
+		element.quality = G_RLF.ItemQualEnum.Rare
 	elseif element.repType == RepType.DelveCompanion then
 		element.icon = 5315246 -- interface/icons/inv_cape_special_explorer_b_03
-		element.quality = Enum.ItemQuality.Rare
+		element.quality = G_RLF.ItemQualEnum.Rare
 	else
 		element.icon = G_RLF.DefaultIcons.REPUTATION
-		element.quality = Enum.ItemQuality.Rare
+		element.quality = G_RLF.ItemQualEnum.Rare
 	end
 
 	element.itemCount = nil
@@ -219,7 +219,7 @@ function Rep.Element:new(...)
 			if factionData.hasRewardPending then
 				local stylingDb = G_RLF.DbAccessor:Styling(G_RLF.Frames.MAIN)
 				local atlasIcon = "ParagonReputation_Bag"
-				local sizeCoeff = G_RLF.AtlastIconCoefficients[atlasIcon]
+				local sizeCoeff = G_RLF.AtlasIconCoefficients[atlasIcon] or 1
 				local atlasIconSize = stylingDb.fontSize * sizeCoeff
 				str = str .. CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0) .. "    "
 			end

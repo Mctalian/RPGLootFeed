@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_Money: RLF_Module, AceEvent-3.0
-local Money = G_RLF.RLF:NewModule("Money", "AceEvent-3.0")
+local Money = G_RLF.RLF:NewModule(G_RLF.FeatureModule.Money, "AceEvent-3.0")
 
 Money.Element = {}
 
@@ -19,7 +19,7 @@ function Money.Element:new(...)
 	if not G_RLF.db.global.money.enableIcon then
 		element.icon = nil
 	end
-	element.quality = Enum.ItemQuality.Poor
+	element.quality = G_RLF.ItemQualEnum.Poor
 	element.IsEnabled = function()
 		return Money:IsEnabled()
 	end

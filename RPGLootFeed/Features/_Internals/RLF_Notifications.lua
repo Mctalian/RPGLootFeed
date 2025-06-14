@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_Notifications: RLF_Module, AceEvent-3.0
-local Notifications = G_RLF.RLF:NewModule("Notifications", "AceEvent-3.0")
+local Notifications = G_RLF.RLF:NewModule(G_RLF.SupportModule.Notifications, "AceEvent-3.0")
 
 Notifications.Element = {}
 
@@ -30,7 +30,7 @@ function Notifications.Element:new(...)
 		return secondaryText
 	end
 	element.icon = "Interface/Addons/RPGLootFeed/Icons/logo.blp"
-	element.quality = Enum.ItemQuality.Legendary
+	element.quality = G_RLF.ItemQualEnum.Legendary
 	element.highlight = true
 
 	return element
