@@ -14,7 +14,7 @@ end
 --- To add translations, simply uncomment the line(s) and replace the English text after the equal sign (=) with the translated value.
 
 --#region 1.25.0
-L["AtlasIconDescription"] = "Исходные данные ниже взяты из Atlas Texture, а не из путей к файлам. Вы можете использовать аддон TextureAtlasViewer для поиска действующих текстур Atlas. Размеры приведенных ниже иконок основаны на параметрах вторичного размера шрифта. Пожалуйста, обратитесь ко мне, если размер иконки, который вы хотите, у вас не работает."
+L["AtlasIconDescription"] = "Исходные данные ниже взяты из Atlas Texture, а не из путей к файлам. Вы можете использовать аддон TextureAtlasViewer для поиска действующих текстур Atlas. Размеры приведенных ниже иконок основаны на параметре размера вторичного шрифта. Пожалуйста, обратитесь ко мне, если размер иконки, который вы хотите, у вас не работает."
 L["Auction House Icon Texture"] = "Иконка аукциона из Atlas Texture"
 L["Auction Price then Vendor Price"] = "Цена на аукционе, затем у продавца"
 L["AuctionHouseIconTextureDesc"] = "Текстура, которую можно использовать для иконки аукциона в ленте добычи. Это текстура Atlas, а не путь к файлу."
@@ -43,7 +43,7 @@ L["Transmog Sound"] = "Звук трансмога"
 L["TransmogSoundDesc"] = "Звук, который будет воспроизведен, когда вы получаете новую модель трансмога."
 L["Vendor Icon Texture"] = "Иконка продавца из Atlas Texture"
 L["Vendor Price then Auction Price"] = "Цена у продавца, затем на аукционе"
-L["VendorIconTextureDesc"] = "Текстура, которую можно использовать для иконки продавца в ленте добычи. Это Atlas texture, а не путь к файлу."
+L["VendorIconTextureDesc"] = "Текстура, которую можно использовать для иконки продавца в ленте добычи. Это текстура Atlas, а не путь к файлу."
 --#endregion
 
 --#region 1.23.0
