@@ -1010,7 +1010,7 @@ end
 function LootDisplayRowMixin:CreateScriptedEffects()
 	-- Create a container frame for the scripted effects if it doesn't exist
 	if not self.effectContainer then
-		self.effectContainer = CreateFrame("ModelScene", nil, self.Icon)
+		self.effectContainer = CreateFrame("ModelScene", nil, self.Icon, "ScriptAnimatedModelSceneTemplate")
 		self.effectContainer:SetAllPoints(self.Icon)
 		self.effectContainer:SetFrameLevel(self.Icon:GetFrameLevel() + 10)
 	end
@@ -1050,7 +1050,10 @@ function LootDisplayRowMixin:PlayTransmogEffect()
 end
 
 function LootDisplayRowMixin:StopScriptedEffects()
-	self.effectContainer:ClearEffects()
+	if self.effectContainer then
+		self.effectContainer:ClearEffects()
+	end
+
 	for i, timer in ipairs(self.scriptedEffectTimers) do
 		timer:Cancel()
 	end
@@ -1869,7 +1872,7 @@ end
 function LootDisplayRowMixin:HighlightIcon()
 	if self.highlight then
 		RunNextFrame(function()
-			if self.type == G_RLF.FeatureModule.Transmog then
+			if self.type == G_RLF.FeatureModule.Transmog and G_RLF:IsRetail() then
 				self:PlayTransmogEffect()
 			else
 				-- Show the glow texture and play the animation

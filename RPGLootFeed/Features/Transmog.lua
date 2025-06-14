@@ -23,6 +23,7 @@ function Transmog.Element:new(transmogLink, icon)
 	element.key = "TMOG_" .. transmogLink
 	element.icon = icon or G_RLF.DefaultIcons.TRANSMOG
 	element.quality = G_RLF.ItemQualEnum.Epic
+	element.highlight = G_RLF:IsRetail()
 	element.textFn = function(_, truncatedLink)
 		if not truncatedLink or truncatedLink == "" then
 			return transmogLink

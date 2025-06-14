@@ -155,6 +155,22 @@ local function runProfessionIntegrationTest()
 	return 1
 end
 
+local function runTransmogIntegrationTest()
+	local appearanceId = 285269
+	if not G_RLF:IsRetail() then
+		return 0
+	end
+	local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Transmog) --[[@as RLF_Transmog]]
+	runTestSafely(
+		module.TRANSMOG_COLLECTION_SOURCE_ADDED,
+		"LootDisplay: Transmog",
+		module,
+		"TRANSMOG_COLLECTION_SOURCE_ADDED",
+		appearanceId
+	)
+	return 1
+end
+
 function TestMode:IntegrationTest()
 	if not self.integrationTestReady then
 		G_RLF:Print("Integration test not ready")
@@ -193,6 +209,9 @@ function TestMode:IntegrationTest()
 	end
 	newRowsExpected = newRowsExpected + runReputationIntegrationTest()
 	newRowsExpected = newRowsExpected + runProfessionIntegrationTest()
+	if G_RLF.db.global.transmog.enabled then
+		newRowsExpected = newRowsExpected + runTransmogIntegrationTest()
+	end
 
 	assertEqual(frame ~= nil, true, "G_RLF.RLF_MainLootFrame")
 	C_Timer.After(
