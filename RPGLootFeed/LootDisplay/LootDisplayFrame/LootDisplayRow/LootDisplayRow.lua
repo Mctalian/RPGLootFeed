@@ -143,6 +143,9 @@ function LootDisplayRowMixin:StopAllAnimations()
 	if self.ElementFadeInAnimation then
 		self.ElementFadeInAnimation:Stop()
 	end
+
+	-- Stop scripted effects
+	self:StopScriptedEffects()
 end
 
 function LootDisplayRowMixin:Reset()
@@ -999,6 +1002,59 @@ function LootDisplayRowMixin:StyleIconHighlight()
 		self.glowAnimationGroup.scaleUp:SetDuration(0.5)
 		self.glowAnimationGroup.scaleUp:SetSmoothing("OUT")
 	end
+
+	-- Add scripted animation effects support
+	self:CreateScriptedEffects()
+end
+
+function LootDisplayRowMixin:CreateScriptedEffects()
+	-- Create a container frame for the scripted effects if it doesn't exist
+	if not self.effectContainer then
+		self.effectContainer = CreateFrame("ModelScene", nil, self.Icon)
+		self.effectContainer:SetAllPoints(self.Icon)
+		self.effectContainer:SetFrameLevel(self.Icon:GetFrameLevel() + 10)
+	end
+
+	-- Initialize scripted animation effect timers
+	if not self.scriptedEffectTimers then
+		self.scriptedEffectTimers = {}
+	end
+end
+
+function LootDisplayRowMixin:PlayTransmogEffect()
+	if not self.effectContainer then
+		self:CreateScriptedEffects()
+	end
+
+	-- Clear any existing effects
+	self:StopScriptedEffects()
+
+	-- Effect IDs from the transmog system (these are the same ones used in the WoW source)
+	local effectID1 = 135 -- Lightning effect
+	local effectID2 = 136 -- Secondary lightning effect
+
+	-- Create and play the effects with staggered timing
+	self.effectContainer:AddEffect(effectID1, self.effectContainer)
+	table.insert(
+		self.scriptedEffectTimers,
+		C_Timer.NewTimer(0.25, function()
+			self.effectContainer:AddEffect(effectID2, self.effectContainer)
+		end)
+	)
+	table.insert(
+		self.scriptedEffectTimers,
+		C_Timer.NewTimer(0.5, function()
+			self.effectContainer:AddEffect(effectID1, self.effectContainer)
+		end)
+	)
+end
+
+function LootDisplayRowMixin:StopScriptedEffects()
+	self.effectContainer:ClearEffects()
+	for i, timer in ipairs(self.scriptedEffectTimers) do
+		timer:Cancel()
+	end
+	self.scriptedEffectTimers = {}
 end
 
 function LootDisplayRowMixin:Styles()
@@ -1813,10 +1869,14 @@ end
 function LootDisplayRowMixin:HighlightIcon()
 	if self.highlight then
 		RunNextFrame(function()
-			-- Show the glow texture and play the animation
-			self.glowTexture:SetAlpha(0.75)
-			self.glowTexture:Show()
-			self.glowAnimationGroup:Play()
+			if self.type == G_RLF.FeatureModule.Transmog then
+				self:PlayTransmogEffect()
+			else
+				-- Show the glow texture and play the animation
+				self.glowTexture:SetAlpha(0.75)
+				self.glowTexture:Show()
+				self.glowAnimationGroup:Play()
+			end
 		end)
 	end
 end

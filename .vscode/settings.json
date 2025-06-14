@@ -86,7 +86,8 @@
     "CURRENCY",
     "CURRENCY_GAINED",
     "CURRENCY_GAINED_MULTIPLE",
-    "CURRENCY_GAINED_MULTIPLE_BONUS"
+    "CURRENCY_GAINED_MULTIPLE_BONUS",
+    "YOU_COLLECTED_LABEL"
   ],
   "wowAPI.luals.frameXML": true,
   "Lua.workspace.library": [
