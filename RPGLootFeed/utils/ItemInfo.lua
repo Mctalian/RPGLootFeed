@@ -223,8 +223,30 @@ function ItemInfo:IsAppearanceCollected()
 	then
 		local appearanceId, modId = C_TransmogCollection.GetItemInfo(self.itemLink)
 		if not appearanceId or not modId then
+			G_RLF:LogDebug(
+				string.format(
+					"ItemInfo:IsAppearanceCollected: Unable to determine appearanceId or modId for item %s (%d)",
+					self.itemLink,
+					self.itemId
+				),
+				addonName,
+				"General",
+				tostring(self.itemId)
+			)
 			return true -- If we can't determine, assume it's collected
 		end
+		G_RLF:LogDebug(
+			string.format(
+				"ItemInfo:IsAppearanceCollected: Checking appearanceId %d, modId %d for item %s (%d)",
+				appearanceId,
+				modId,
+				self.itemLink,
+				self.itemId
+			),
+			addonName,
+			"General",
+			tostring(self.itemId)
+		)
 		return C_TransmogCollection.PlayerHasTransmog(self.itemId, modId)
 	end
 
