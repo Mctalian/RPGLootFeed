@@ -82,6 +82,9 @@ G_RLF.options.args.about = {
 			get = function()
 				return "zjz5YvzudWG"
 			end,
+			hidden = function()
+				return not G_RLF:IsRetail()
+			end,
 			order = About.argOrder.inGameCommunity,
 		},
 
