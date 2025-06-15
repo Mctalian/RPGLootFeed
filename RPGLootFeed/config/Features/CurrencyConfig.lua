@@ -42,9 +42,9 @@ G_RLF.options.args.features.args.currencyConfig = {
 			set = function(_, value)
 				G_RLF.db.global.currency.enabled = value
 				if value then
-					G_RLF.RLF:EnableModule("Currency")
+					G_RLF.RLF:EnableModule(G_RLF.FeatureModule.Currency)
 				else
-					G_RLF.RLF:DisableModule("Currency")
+					G_RLF.RLF:DisableModule(G_RLF.FeatureModule.Currency)
 				end
 			end,
 			disabled = function()

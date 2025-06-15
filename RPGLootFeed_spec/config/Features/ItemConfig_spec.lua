@@ -6,10 +6,11 @@ local it = busted.it
 local setup = busted.setup
 
 describe("ItemConfig module", function()
-	local ns
+	local ns, functionMocks
 	setup(function()
 		-- Define the global namespace
 		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.ConfigFeaturesInit)
+		functionMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
 		-- Load the ItemConfig module before each test
 		assert(loadfile("RPGLootFeed/config/Features/ItemConfig.lua"))("TestAddon", ns)
 	end)

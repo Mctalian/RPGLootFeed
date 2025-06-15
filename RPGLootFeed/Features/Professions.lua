@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_Professions: RLF_Module, AceEvent-3.0
-local Professions = G_RLF.RLF:NewModule("Professions", "AceEvent-3.0")
+local Professions = G_RLF.RLF:NewModule(G_RLF.FeatureModule.Profession, "AceEvent-3.0")
 
 Professions.Element = {}
 
@@ -23,7 +23,7 @@ function Professions.Element:new(...)
 
 	local key
 	key, element.name, element.icon, element.level, element.maxLevel, element.quantity = ...
-	element.quality = Enum.ItemQuality.Rare
+	element.quality = G_RLF.ItemQualEnum.Rare
 
 	element.key = keyPrefix .. key
 

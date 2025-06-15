@@ -41,8 +41,16 @@ G_RLF.mainFeatureOrder = {
 	Reputation = 6,
 	Profession = 7,
 	TravelPoints = 8,
+	Transmog = 9,
 }
-local lastFeature = G_RLF.mainFeatureOrder.TravelPoints
+
+-- Dynamically determine the last feature by finding the maximum order value
+local lastFeature = 0
+for _, value in pairs(G_RLF.mainFeatureOrder) do
+	if type(value) == "number" then
+		lastFeature = math.max(lastFeature, value)
+	end
+end
 
 G_RLF.options.args.features = {
 	type = "group",
@@ -205,6 +213,24 @@ G_RLF.options.args.features = {
 				end
 			end,
 			order = G_RLF.mainFeatureOrder.TravelPoints,
+		},
+		enableTransmog = {
+			type = "toggle",
+			name = G_RLF.L["Enable Transmog in Feed"],
+			desc = G_RLF.L["EnableTransmogDesc"],
+			width = "double",
+			get = function(info, value)
+				return G_RLF.db.global.transmog.enabled
+			end,
+			set = function(info, value)
+				G_RLF.db.global.transmog.enabled = value
+				if value then
+					G_RLF.RLF:EnableModule(G_RLF.FeatureModule.Transmog)
+				else
+					G_RLF.RLF:DisableModule(G_RLF.FeatureModule.Transmog)
+				end
+			end,
+			order = G_RLF.mainFeatureOrder.Transmog,
 		},
 
 		misc = {

@@ -778,7 +778,7 @@ G_RLF.options.args.features.args.partyLootConfig = {
 					end,
 					set = function(_, value)
 						G_RLF.db.global.partyLoot.onlyEpicAndAboveInRaid = value
-						local partyLoot = G_RLF.RLF:GetModule("PartyLoot") --[[@as RLF_PartyLoot]]
+						local partyLoot = G_RLF.RLF:GetModule(G_RLF.FeatureModule.PartyLoot) --[[@as RLF_PartyLoot]]
 						partyLoot:SetPartyLootFilters()
 					end,
 					order = 3,
@@ -793,7 +793,7 @@ G_RLF.options.args.features.args.partyLootConfig = {
 					end,
 					set = function(_, value)
 						G_RLF.db.global.partyLoot.onlyEpicAndAboveInInstance = value
-						local partyLoot = G_RLF.RLF:GetModule("PartyLoot") --[[@as RLF_PartyLoot]]
+						local partyLoot = G_RLF.RLF:GetModule(G_RLF.FeatureModule.PartyLoot) --[[@as RLF_PartyLoot]]
 						partyLoot:SetPartyLootFilters()
 					end,
 					order = 4,

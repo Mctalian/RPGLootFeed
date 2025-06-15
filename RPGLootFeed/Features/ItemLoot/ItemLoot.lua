@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_ItemLoot: RLF_Module, AceEvent-3.0, AceBucket-3.0
-local ItemLoot = G_RLF.RLF:NewModule("ItemLoot", "AceEvent-3.0", "AceBucket-3.0")
+local ItemLoot = G_RLF.RLF:NewModule(G_RLF.FeatureModule.ItemLoot, "AceEvent-3.0", "AceBucket-3.0")
 
 local C = LibStub("C_Everywhere")
 
@@ -48,6 +48,22 @@ local IndestructibleMap = {
 	["ITEM_MOD_CR_STURDINESS_SHORT"] = TertiaryStats.Indestructible,
 }
 
+--- Convert params into a string with an icon and price
+--- @param icon string
+--- @param fontSize number
+--- @param price number
+--- @return string
+local function getPriceString(icon, fontSize, price)
+	if not icon or not fontSize or not price then
+		return ""
+	end
+	local sizeCoeff = G_RLF.AtlasIconCoefficients[icon] or 1
+	local atlasIconSize = fontSize * sizeCoeff
+	return CreateAtlasMarkup(icon, atlasIconSize, atlasIconSize, 0, 0)
+		.. " "
+		.. C_CurrencyInfo.GetCoinTextureString(price)
+end
+
 function ItemLoot:ItemQualityName(enumValue)
 	for k, v in pairs(Enum.ItemQuality) do
 		if v == enumValue then
@@ -81,13 +97,22 @@ local function getItemStats(info)
 		isSocketed = false,
 		socketString = "",
 	}
-	local stats = C.Item.GetItemStats(info.itemLink)
+	local stats
+	if C_Item.GetItemStats then
+		stats = C_Item.GetItemStats(info.itemLink)
+	else
+		-- Fallback for older WoW versions
+		stats = GetItemStats(info.itemLink)
+	end
+
 	if not stats then
+		G_RLF:LogDebug("No stats found for item: " .. info.itemLink, addonName, ItemLoot.moduleName)
 		return itemRolls
 	end
 
 	for k, v in pairs(stats) do
 		if k:find("ITEM_MOD_CR_") and v > 0 then
+			G_RLF:LogDebug("Found tertiary stat: " .. k, addonName, ItemLoot.moduleName)
 			if TertiaryStatMap[k] then
 				itemRolls.tertiaryStat = TertiaryStatMap[k]
 			elseif IndestructibleMap[k] then
@@ -98,12 +123,16 @@ local function getItemStats(info)
 		end
 
 		if k:find("EMPTY_SOCKET_") and v > 0 then
+			G_RLF:LogDebug("Found empty socket type: " .. k, addonName, ItemLoot.moduleName)
 			if SocketFDIDMap[k] then
 				itemRolls.isSocketed = true
 				itemRolls.socketString = "|T" .. SocketFDIDMap[k] .. ":0|t"
 			else
 				G_RLF:LogWarn("Unknown socket type: " .. k, addonName, ItemLoot.moduleName)
 			end
+		elseif k:find("SOCKET") and v > 0 then
+			-- Handle the case where the socket is not in the map but still has a value
+			G_RLF:LogDebug("Found some sort of socket? " .. k .. " " .. tostring(v), addonName, ItemLoot.moduleName)
 		end
 	end
 
@@ -135,6 +164,14 @@ local function IsBetterThanEquipped(info)
 			return false
 		end
 
+		if equippedInfo.itemQuality > G_RLF.ItemQualEnum.Poor and info.itemQuality == G_RLF.ItemQualEnum.Poor then
+			-- If the equipped item is better than poor and the new item is poor, we don't consider it an upgrade
+			return false
+		end
+		if equippedInfo.itemQuality > G_RLF.ItemQualEnum.Common and info.itemQuality == G_RLF.ItemQualEnum.Common then
+			-- If the equipped item is better than common and the new item is common, we don't consider it an upgrade
+			return false
+		end
 		if equippedInfo.itemLevel and equippedInfo.itemLevel < info.itemLevel then
 			return true
 		elseif equippedInfo.itemLevel == info.itemLevel then
@@ -230,7 +267,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 	element.isKeystone = info.keystoneInfo ~= nil
 	if element.isKeystone then
 		-- Force icon to be the item texture, not using the link
-		element.quality = Enum.ItemQuality.Epic
+		element.quality = G_RLF.ItemQualEnum.Epic
 		if fromLink then
 			fromInfo = ItemInfo:new(C.Item.GetItemIDForItemInfo(fromLink), C.Item.GetItemInfo(fromLink))
 		end
@@ -242,7 +279,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 
 	element.topLeftText = nil
 	element.topLeftColor = nil
-	if info:IsEquippableItem() and info.itemQuality > Enum.ItemQuality.Poor then
+	if info:IsEquippableItem() and info.itemQuality > G_RLF.ItemQualEnum.Poor then
 		element.topLeftText = tostring(info.itemLevel)
 		local r, g, b = C_Item.GetItemQualityColor(info.itemQuality)
 		element.topLeftColor = { r, g, b }
@@ -286,7 +323,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 					toStr = G_RLF:RGBAToHexFormat(1.0, 0.12, 0.12, 1) .. toItemLevel .. "|r"
 				end
 				local atlasIcon = "npe_arrowrightglow"
-				local sizeCoeff = G_RLF.AtlastIconCoefficients[atlasIcon]
+				local sizeCoeff = G_RLF.AtlasIconCoefficients[atlasIcon] or 1
 				local atlasIconSize = secondaryFontSize * sizeCoeff
 				local atlasArrow = CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0)
 				return "    " .. fromStr .. " " .. atlasArrow .. " " .. toStr
@@ -306,7 +343,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 				toStr = G_RLF:RGBAToHexFormat(1.0, 0.12, 0.12, 1) .. toItemLevel .. "|r"
 			end
 			local atlasIcon = "npe_arrowrightglow"
-			local sizeCoeff = G_RLF.AtlastIconCoefficients[atlasIcon]
+			local sizeCoeff = G_RLF.AtlasIconCoefficients[atlasIcon] or 1
 			local atlasIconSize = secondaryFontSize * sizeCoeff
 			local atlasArrow = CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0)
 			return "    " .. fromStr .. " " .. atlasArrow .. " " .. toStr
@@ -345,51 +382,56 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 		end
 
 		local quantity = ...
-		local atlasIcon
-		local unitPrice
+		local effectiveQuantity = quantity or 1
+		local vendorIcon = G_RLF.db.global.item.vendorIconTexture
+		local auctionIcon = G_RLF.db.global.item.auctionHouseIconTexture
+		local vendorPrice, auctionPrice = 0, 0
 		local pricesForSellableItems = G_RLF.db.global.item.pricesForSellableItems
-		if pricesForSellableItems == G_RLF.PricesEnum.Vendor then
-			if not element.sellPrice or element.sellPrice == 0 then
-				return ""
-			end
-			if G_RLF:IsRetail() then
-				atlasIcon = "spellicon-256x256-selljunk"
-			-- So far, MoP Classic and below don't have the retail icon available
-			else
-				atlasIcon = "bags-junkcoin"
-			end
-			unitPrice = element.sellPrice
-		elseif pricesForSellableItems == G_RLF.PricesEnum.AH then
-			local marketPrice = G_RLF.AuctionIntegrations.activeIntegration:GetAHPrice(itemLink)
-			if not marketPrice or marketPrice == 0 then
-				return ""
-			end
-			unitPrice = marketPrice
-			if G_RLF:IsRetail() then
-				atlasIcon = "auctioneer"
-			-- So far, MoP Classic and below don't have the retail icon available
-			else
-				atlasIcon = "Auctioneer"
-			end
+		if element.sellPrice and element.sellPrice > 0 then
+			vendorPrice = element.sellPrice
 		end
-		if unitPrice then
-			local str = "    "
-			if atlasIcon then
-				local sizeCoeff = G_RLF.AtlastIconCoefficients[atlasIcon]
-				local atlasIconSize = secondaryFontSize * sizeCoeff
-				str = str .. CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0) .. "  "
+		local marketPrice = G_RLF.AuctionIntegrations.activeIntegration:GetAHPrice(itemLink)
+		if marketPrice and marketPrice > 0 then
+			auctionPrice = marketPrice
+		end
+		local showVendorPrice = vendorPrice > 0
+		local showAuctionPrice = auctionPrice > 0
+		local str = ""
+		if pricesForSellableItems == G_RLF.PricesEnum.Vendor and showVendorPrice then
+			str = str .. getPriceString(vendorIcon, secondaryFontSize, vendorPrice * effectiveQuantity)
+		elseif pricesForSellableItems == G_RLF.PricesEnum.AH and showAuctionPrice then
+			str = str .. getPriceString(auctionIcon, secondaryFontSize, auctionPrice * effectiveQuantity)
+		elseif pricesForSellableItems == G_RLF.PricesEnum.VendorAH then
+			if showVendorPrice then
+				str = str .. getPriceString(vendorIcon, secondaryFontSize, vendorPrice * effectiveQuantity) .. "    "
 			end
-			str = str .. C_CurrencyInfo.GetCoinTextureString(unitPrice * (quantity or 1))
-			return str
+			if showAuctionPrice then
+				str = str .. getPriceString(auctionIcon, secondaryFontSize, auctionPrice * effectiveQuantity)
+			end
+		elseif pricesForSellableItems == G_RLF.PricesEnum.AHVendor then
+			if showAuctionPrice then
+				str = str .. getPriceString(auctionIcon, secondaryFontSize, auctionPrice * effectiveQuantity) .. "    "
+			end
+			if showVendorPrice then
+				str = str .. getPriceString(vendorIcon, secondaryFontSize, vendorPrice * effectiveQuantity)
+			end
+		elseif pricesForSellableItems == G_RLF.PricesEnum.Highest then
+			if auctionPrice > vendorPrice then
+				str = str .. getPriceString(auctionIcon, secondaryFontSize, auctionPrice * effectiveQuantity)
+			elseif showVendorPrice then
+				str = str .. getPriceString(vendorIcon, secondaryFontSize, vendorPrice * effectiveQuantity)
+			end
 		end
 
-		return ""
+		return str
 	end
 
 	element.isMount = IsMount(info)
 	element.isLegendary = IsLegendary(info)
 	element.isBetterThanEquipped = IsBetterThanEquipped(info)
 	element.hasTertiaryOrSocket = HasItemRollBonus(stats)
+	element.isQuestItem = info:IsQuestItem()
+	element.isNewTransmog = not info:IsAppearanceCollected()
 	function element:PlaySoundIfEnabled()
 		local soundsConfig = G_RLF.db.global.item.sounds
 		if self.isMount and soundsConfig.mounts.enabled and soundsConfig.mounts.sound ~= "" then
@@ -433,15 +475,34 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 					ItemLoot.moduleName
 				)
 			end
+		elseif self.isNewTransmog and soundsConfig.transmog.enabled and soundsConfig.transmog.sound ~= "" then
+			local willPlay, handle = PlaySoundFile(soundsConfig.transmog.sound)
+			if not willPlay then
+				G_RLF:LogWarn("Failed to play sound " .. soundsConfig.transmog.sound, addonName, ItemLoot.moduleName)
+			else
+				G_RLF:LogDebug(
+					"Sound queued to play " .. soundsConfig.transmog.sound .. " " .. handle,
+					addonName,
+					ItemLoot.moduleName
+				)
+			end
 		end
 	end
 
 	function element:SetHighlight()
 		local itemHighlights = G_RLF.db.global.item.itemHighlights
-		self.highlight = (self.isMount and itemHighlights.mounts)
-			or (self.isLegendary and itemHighlights.legendary)
-			or (self.isBetterThanEquipped and itemHighlights.betterThanEquipped)
-			or (self.hasTertiaryOrSocket and itemHighlights.tertiaryOrSocket)
+		local reason = (self.isMount and itemHighlights.mounts and "Mount")
+			or (self.isLegendary and itemHighlights.legendary and "Legendary")
+			or (self.isBetterThanEquipped and itemHighlights.betterThanEquipped and "Better than Equipped")
+			or (self.isQuestItem and itemHighlights.quest and "Quest Item")
+			or (self.hasTertiaryOrSocket and itemHighlights.tertiaryOrSocket and "Tertiary or Socket")
+			or (self.isNewTransmog and itemHighlights.transmog and "New Transmog")
+			or ""
+
+		self.highlight = reason ~= ""
+		if self.highlight then
+			G_RLF:LogDebug("Highlighted because of " .. reason, addonName, ItemLoot.moduleName, self.key)
+		end
 	end
 
 	return element

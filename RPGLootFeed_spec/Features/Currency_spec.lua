@@ -172,10 +172,10 @@ describe("Currency module", function()
 		assert.stub(nsMocks.SendMessage).was.not_called()
 	end)
 
-	it("does not show loot if the quantityChange is lte 0", function()
+	it("does not show loot if the quantityChange is equal to 0", function()
 		ns.db.global.currency.enabled = true
 
-		CurrencyModule:CURRENCY_DISPLAY_UPDATE("CURRENCY_DISPLAY_UPDATE", 123, nil, -1)
+		CurrencyModule:CURRENCY_DISPLAY_UPDATE("CURRENCY_DISPLAY_UPDATE", 123, nil, 0)
 
 		assert.stub(nsMocks.SendMessage).was.not_called()
 	end)

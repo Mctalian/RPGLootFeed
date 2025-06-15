@@ -5,7 +5,8 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class BossBannerOverride: RLF_Module, AceEvent-3.0, AceHook-3.0, AceTimer-3.0
-local BossBannerOverride = G_RLF.RLF:NewModule("BossBanner", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
+local BossBannerOverride =
+	G_RLF.RLF:NewModule(G_RLF.BlizzModule.BossBanner, "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 
 function BossBannerOverride:OnInitialize()
 	if GetExpansionLevel() >= G_RLF.Expansion.WOD then

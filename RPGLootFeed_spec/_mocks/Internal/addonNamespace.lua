@@ -325,6 +325,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 					defaultRepColor = { 1, 1, 1, 1 },
 				},
 				travelPoints = {},
+				transmog = {},
 				styling = {},
 				lootHistory = {},
 				minimap = {},

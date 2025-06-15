@@ -78,6 +78,23 @@ G_RLF.FeatureModule = {
 	Reputation = "Reputation",
 	Profession = "Professions",
 	TravelPoints = "TravelPoints",
+	Transmog = "Transmog",
+}
+
+---@enum G_RLF.BlizzModule
+G_RLF.BlizzModule = {
+	BossBanner = "BossBanner",
+	LootToasts = "LootToasts",
+	MoneyAlerts = "MoneyAlerts",
+}
+
+---@enum G_RLF.SupportModule
+G_RLF.SupportModule = {
+	Communications = "Communications",
+	Logger = "Logger",
+	LootDisplay = "LootDisplay",
+	Notifications = "Notifications",
+	TestMode = "TestMode",
 }
 
 ---@enum G_RLF.PricesEnum
@@ -85,6 +102,9 @@ G_RLF.PricesEnum = {
 	None = "none",
 	Vendor = "vendor",
 	AH = "ah",
+	VendorAH = "vendor_ah",
+	AHVendor = "ah_vendor",
+	Highest = "highest",
 }
 
 ---@enum G_RLF.EnterAnimationType
@@ -131,6 +151,7 @@ G_RLF.DefaultIcons = {
 	XP = "894556",
 	PROFESSION = "133740",
 	TRAVELPOINTS = "4635200",
+	TRANSMOG = "3889767",
 }
 
 ---@enum G_RLF.Frames
