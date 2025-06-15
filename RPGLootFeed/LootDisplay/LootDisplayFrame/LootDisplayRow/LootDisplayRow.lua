@@ -1009,20 +1009,64 @@ end
 
 function LootDisplayRowMixin:CreateScriptedEffects()
 	-- Create a container frame for the scripted effects if it doesn't exist
-	if not self.effectContainer then
-		self.effectContainer = CreateFrame("ModelScene", nil, self.Icon, "ScriptAnimatedModelSceneTemplate")
-		self.effectContainer:SetAllPoints(self.Icon)
-		self.effectContainer:SetFrameLevel(self.Icon:GetFrameLevel() + 10)
+	if not self.leftModelScene then
+		self.leftModelScene = CreateFrame("ModelScene", nil, self.Icon, "ScriptAnimatedModelSceneTemplate")
+		-- x Size coefficient ~ 0.2692307692307692 of the icon size
+		-- y Size coefficient ~ 1.153846153846154 of the icon size
+		-- TOPLEFT x = 0, y coefficient ~ -0.3076923076923077 of the icon size
+		-- TODO: set size
+	end
+
+	if not self.rightModelScene then
+		self.rightModelScene = CreateFrame("ModelScene", nil, self.Icon, "ScriptAnimatedModelSceneTemplate")
+		-- x Size coefficient ~ 0.2692307692307692 of the icon size
+		-- y Size coefficient ~ 1.153846153846154 of the icon size
+		-- TOPRIGHT x = -0.0961538461538462, y coefficient ~ -0.3076923076923077 of the icon size
+		-- TODO: set size
 	end
 
 	-- Initialize scripted animation effect timers
 	if not self.scriptedEffectTimers then
 		self.scriptedEffectTimers = {}
 	end
+
+	local changed = false
+
+	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
+	local iconSize = sizingDb.iconSize
+	local feedWidth = sizingDb.feedWidth
+	local rowHeight = sizingDb.rowHeight
+	if
+		self.cachedModelSceneIconSizeRef ~= iconSize
+		or self.cachedModelSceneFeedWidthRef ~= feedWidth
+		or self.cachedModelSceneRowHeightRef ~= rowHeight
+	then
+		self.cachedModelSceneIconSizeRef = iconSize
+		self.cachedModelSceneFeedWidthRef = feedWidth
+		self.cachedModelSceneRowHeightRef = rowHeight
+		self.Icon:SetClipsChildren(true)
+		changed = true
+	end
+
+	if changed then
+		local leftXOffset = iconSize * -0.35
+		local leftYOffset = rowHeight * 0.1
+		local leftXSize = iconSize * 1.1
+		local leftYSize = iconSize * 1.1
+		self.leftModelScene:SetPoint("TOPLEFT", self.Icon, "TOPLEFT", leftXOffset, leftYOffset)
+		self.leftModelScene:SetSize(leftXSize, leftYSize)
+
+		local rightXOffset = iconSize * 0.1
+		local rightYOffset = leftYOffset
+		local rightXSize = leftXSize
+		local rightYSize = leftYSize
+		self.rightModelScene:SetPoint("TOPRIGHT", self.Icon, "TOPRIGHT", rightXOffset, rightYOffset)
+		self.rightModelScene:SetSize(rightXSize, rightYSize)
+	end
 end
 
 function LootDisplayRowMixin:PlayTransmogEffect()
-	if not self.effectContainer then
+	if not self.leftModelScene or not self.rightModelScene then
 		self:CreateScriptedEffects()
 	end
 
@@ -1034,24 +1078,47 @@ function LootDisplayRowMixin:PlayTransmogEffect()
 	local effectID2 = 136 -- Secondary lightning effect
 
 	-- Create and play the effects with staggered timing
-	self.effectContainer:AddEffect(effectID1, self.effectContainer)
+	self.leftModelScene:AddEffect(effectID1, self.leftModelScene)
 	table.insert(
 		self.scriptedEffectTimers,
 		C_Timer.NewTimer(0.25, function()
-			self.effectContainer:AddEffect(effectID2, self.effectContainer)
+			self.leftModelScene:AddEffect(effectID2, self.leftModelScene)
 		end)
 	)
 	table.insert(
 		self.scriptedEffectTimers,
 		C_Timer.NewTimer(0.5, function()
-			self.effectContainer:AddEffect(effectID1, self.effectContainer)
+			self.leftModelScene:AddEffect(effectID1, self.leftModelScene)
+		end)
+	)
+
+	table.insert(
+		self.scriptedEffectTimers,
+		C_Timer.NewTimer(0.3, function()
+			self.rightModelScene:AddEffect(effectID1, self.rightModelScene)
+		end)
+	)
+	table.insert(
+		self.scriptedEffectTimers,
+		C_Timer.NewTimer(0.55, function()
+			self.rightModelScene:AddEffect(effectID2, self.rightModelScene)
+		end)
+	)
+	table.insert(
+		self.scriptedEffectTimers,
+		C_Timer.NewTimer(0.8, function()
+			self.rightModelScene:AddEffect(effectID1, self.rightModelScene)
 		end)
 	)
 end
 
 function LootDisplayRowMixin:StopScriptedEffects()
-	if self.effectContainer then
-		self.effectContainer:ClearEffects()
+	if self.leftModelScene then
+		self.leftModelScene:ClearEffects()
+	end
+
+	if self.rightModelScene then
+		self.rightModelScene:ClearEffects()
 	end
 
 	for i, timer in ipairs(self.scriptedEffectTimers) do
