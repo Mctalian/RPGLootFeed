@@ -124,7 +124,7 @@ function G_RLF.Notifications:NotifyGlow()
 	local button = self:GetButton()
 
 	if button == nil then
-		local notifModule = G_RLF.RLF:GetModule("Notifications") --[[@as RLF_Notifications]]
+		local notifModule = G_RLF.RLF:GetModule(G_RLF.SupportModule.Notifications) --[[@as RLF_Notifications]]
 		notifModule:ViewAllNotifications()
 		return
 	end

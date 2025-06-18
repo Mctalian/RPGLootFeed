@@ -7,7 +7,7 @@ local G_RLF = ns
 local C = LibStub("C_Everywhere")
 
 ---@class RLF_Currency: RLF_Module, AceEvent-3.0
-local Currency = G_RLF.RLF:NewModule("Currency", "AceEvent-3.0")
+local Currency = G_RLF.RLF:NewModule(G_RLF.FeatureModule.Currency, "AceEvent-3.0")
 
 --- @param content string
 --- @param message string

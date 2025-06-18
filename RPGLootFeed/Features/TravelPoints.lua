@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_TravelPoints: RLF_Module, AceEvent-3.0
-local TravelPoints = G_RLF.RLF:NewModule("TravelPoints", "AceEvent-3.0")
+local TravelPoints = G_RLF.RLF:NewModule(G_RLF.FeatureModule.TravelPoints, "AceEvent-3.0")
 local currentTravelersJourney, maxTravelersJourney
 
 TravelPoints.Element = {}

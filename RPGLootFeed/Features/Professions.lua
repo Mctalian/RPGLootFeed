@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_Professions: RLF_Module, AceEvent-3.0
-local Professions = G_RLF.RLF:NewModule("Professions", "AceEvent-3.0")
+local Professions = G_RLF.RLF:NewModule(G_RLF.FeatureModule.Profession, "AceEvent-3.0")
 
 Professions.Element = {}
 
