@@ -58,5 +58,6 @@ functions.UnitXP = stub(_G, "UnitXP").returns(10)
 functions.UnitXPMax = stub(_G, "UnitXPMax").returns(50)
 functions.UnitClass = stub(_G, "UnitClass").returns("Warrior", "WARRIOR", 1)
 functions.GetMoney = stub(_G, "GetMoney").returns(123456)
+functions.CreateAtlasMarkup = stub(_G, "CreateAtlasMarkup").returns("<AtlasMarkup>")
 
 return functions

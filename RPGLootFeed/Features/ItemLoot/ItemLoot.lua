@@ -48,6 +48,22 @@ local IndestructibleMap = {
 	["ITEM_MOD_CR_STURDINESS_SHORT"] = TertiaryStats.Indestructible,
 }
 
+--- Convert params into a string with an icon and price
+--- @param icon string
+--- @param fontSize number
+--- @param price number
+--- @return string
+local function getPriceString(icon, fontSize, price)
+	if not icon or not fontSize or not price then
+		return ""
+	end
+	local sizeCoeff = G_RLF.AtlasIconCoefficients[icon] or 1
+	local atlasIconSize = fontSize * sizeCoeff
+	return CreateAtlasMarkup(icon, atlasIconSize, atlasIconSize, 0, 0)
+		.. " "
+		.. C_CurrencyInfo.GetCoinTextureString(price)
+end
+
 function ItemLoot:ItemQualityName(enumValue)
 	for k, v in pairs(Enum.ItemQuality) do
 		if v == enumValue then
@@ -294,7 +310,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 					toStr = G_RLF:RGBAToHexFormat(1.0, 0.12, 0.12, 1) .. toItemLevel .. "|r"
 				end
 				local atlasIcon = "npe_arrowrightglow"
-				local sizeCoeff = G_RLF.AtlastIconCoefficients[atlasIcon]
+				local sizeCoeff = G_RLF.AtlasIconCoefficients[atlasIcon] or 1
 				local atlasIconSize = secondaryFontSize * sizeCoeff
 				local atlasArrow = CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0)
 				return "    " .. fromStr .. " " .. atlasArrow .. " " .. toStr
@@ -314,7 +330,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 				toStr = G_RLF:RGBAToHexFormat(1.0, 0.12, 0.12, 1) .. toItemLevel .. "|r"
 			end
 			local atlasIcon = "npe_arrowrightglow"
-			local sizeCoeff = G_RLF.AtlastIconCoefficients[atlasIcon]
+			local sizeCoeff = G_RLF.AtlasIconCoefficients[atlasIcon] or 1
 			local atlasIconSize = secondaryFontSize * sizeCoeff
 			local atlasArrow = CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0)
 			return "    " .. fromStr .. " " .. atlasArrow .. " " .. toStr
@@ -353,45 +369,48 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 		end
 
 		local quantity = ...
-		local atlasIcon
-		local unitPrice
+		local effectiveQuantity = quantity or 1
+		local vendorIcon = G_RLF.db.global.item.vendorIconTexture
+		local auctionIcon = G_RLF.db.global.item.auctionHouseIconTexture
+		local vendorPrice, auctionPrice = 0, 0
 		local pricesForSellableItems = G_RLF.db.global.item.pricesForSellableItems
-		if pricesForSellableItems == G_RLF.PricesEnum.Vendor then
-			if not element.sellPrice or element.sellPrice == 0 then
-				return ""
-			end
-			if G_RLF:IsRetail() then
-				atlasIcon = "spellicon-256x256-selljunk"
-			-- So far, MoP Classic and below don't have the retail icon available
-			else
-				atlasIcon = "bags-junkcoin"
-			end
-			unitPrice = element.sellPrice
-		elseif pricesForSellableItems == G_RLF.PricesEnum.AH then
-			local marketPrice = G_RLF.AuctionIntegrations.activeIntegration:GetAHPrice(itemLink)
-			if not marketPrice or marketPrice == 0 then
-				return ""
-			end
-			unitPrice = marketPrice
-			if G_RLF:IsRetail() then
-				atlasIcon = "auctioneer"
-			-- So far, MoP Classic and below don't have the retail icon available
-			else
-				atlasIcon = "Auctioneer"
-			end
+		if element.sellPrice and element.sellPrice > 0 then
+			vendorPrice = element.sellPrice
 		end
-		if unitPrice then
-			local str = "    "
-			if atlasIcon then
-				local sizeCoeff = G_RLF.AtlastIconCoefficients[atlasIcon]
-				local atlasIconSize = secondaryFontSize * sizeCoeff
-				str = str .. CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0) .. "  "
+		local marketPrice = G_RLF.AuctionIntegrations.activeIntegration:GetAHPrice(itemLink)
+		if marketPrice and marketPrice > 0 then
+			auctionPrice = marketPrice
+		end
+		local showVendorPrice = vendorPrice > 0
+		local showAuctionPrice = auctionPrice > 0
+		local str = ""
+		if pricesForSellableItems == G_RLF.PricesEnum.Vendor and showVendorPrice then
+			str = str .. getPriceString(vendorIcon, secondaryFontSize, vendorPrice * effectiveQuantity)
+		elseif pricesForSellableItems == G_RLF.PricesEnum.AH and showAuctionPrice then
+			str = str .. getPriceString(auctionIcon, secondaryFontSize, auctionPrice * effectiveQuantity)
+		elseif pricesForSellableItems == G_RLF.PricesEnum.VendorAH then
+			if showVendorPrice then
+				str = str .. getPriceString(vendorIcon, secondaryFontSize, vendorPrice * effectiveQuantity) .. "    "
 			end
-			str = str .. C_CurrencyInfo.GetCoinTextureString(unitPrice * (quantity or 1))
-			return str
+			if showAuctionPrice then
+				str = str .. getPriceString(auctionIcon, secondaryFontSize, auctionPrice * effectiveQuantity)
+			end
+		elseif pricesForSellableItems == G_RLF.PricesEnum.AHVendor then
+			if showAuctionPrice then
+				str = str .. getPriceString(auctionIcon, secondaryFontSize, auctionPrice * effectiveQuantity) .. "    "
+			end
+			if showVendorPrice then
+				str = str .. getPriceString(vendorIcon, secondaryFontSize, vendorPrice * effectiveQuantity)
+			end
+		elseif pricesForSellableItems == G_RLF.PricesEnum.Highest then
+			if auctionPrice > vendorPrice then
+				str = str .. getPriceString(auctionIcon, secondaryFontSize, auctionPrice * effectiveQuantity)
+			elseif showVendorPrice then
+				str = str .. getPriceString(vendorIcon, secondaryFontSize, vendorPrice * effectiveQuantity)
+			end
 		end
 
-		return ""
+		return str
 	end
 
 	element.isMount = IsMount(info)
