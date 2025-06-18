@@ -437,6 +437,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 	element.isBetterThanEquipped = IsBetterThanEquipped(info)
 	element.hasTertiaryOrSocket = HasItemRollBonus(stats)
 	element.isQuestItem = info:IsQuestItem()
+	element.isNewTransmog = not info:IsAppearanceCollected()
 	function element:PlaySoundIfEnabled()
 		local soundsConfig = G_RLF.db.global.item.sounds
 		if self.isMount and soundsConfig.mounts.enabled and soundsConfig.mounts.sound ~= "" then
@@ -480,6 +481,17 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 					ItemLoot.moduleName
 				)
 			end
+		elseif self.isNewTransmog and soundsConfig.transmog.enabled and soundsConfig.transmog.sound ~= "" then
+			local willPlay, handle = PlaySoundFile(soundsConfig.transmog.sound)
+			if not willPlay then
+				G_RLF:LogWarn("Failed to play sound " .. soundsConfig.transmog.sound, addonName, ItemLoot.moduleName)
+			else
+				G_RLF:LogDebug(
+					"Sound queued to play " .. soundsConfig.transmog.sound .. " " .. handle,
+					addonName,
+					ItemLoot.moduleName
+				)
+			end
 		end
 	end
 
@@ -490,6 +502,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 			or (self.isBetterThanEquipped and itemHighlights.betterThanEquipped and "Better than Equipped")
 			or (self.isQuestItem and itemHighlights.quest and "Quest Item")
 			or (self.hasTertiaryOrSocket and itemHighlights.tertiaryOrSocket and "Tertiary or Socket")
+			or (self.isNewTransmog and itemHighlights.transmog and "New Transmog")
 			or ""
 
 		self.highlight = reason ~= ""

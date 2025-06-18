@@ -8,12 +8,13 @@ local it = busted.it
 describe("ItemInfo", function()
 	---@type test_G_RLF, RLF_ItemInfo
 	local ns, ItemInfo
-	local itemMocks, functionMocks
+	local itemMocks, functionMocks, transmogCollectionMocks
 
 	before_each(function()
 		functionMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
 		itemMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_Item")
+		transmogCollectionMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_TransmogCollection")
 		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.All)
 
 		assert(loadfile("RPGLootFeed/utils/ItemInfo.lua"))("TestAddon", ns)
@@ -212,6 +213,64 @@ describe("ItemInfo", function()
 			return
 		end
 		assert.is_false(item:IsQuestItem())
+	end)
+
+	it("checks if the item appearance has been collected", function()
+		transmogCollectionMocks.PlayerHasTransmogByItemInfo.returns(true)
+		local item = ItemInfo:new(
+			18803,
+			"Test Appearance",
+			"itemLink",
+			2,
+			10,
+			1,
+			"Armor",
+			"Cloth",
+			1,
+			"INVTYPE_CLOAK",
+			"texture",
+			100,
+			4,
+			1,
+			1,
+			1,
+			1,
+			false
+		)
+		if not item then
+			assert.is_not_nil(item)
+			return
+		end
+		assert.is_true(item:IsAppearanceCollected())
+	end)
+
+	it("checks if the item appearance has not been collected", function()
+		transmogCollectionMocks.PlayerHasTransmogByItemInfo.returns(false)
+		local item = ItemInfo:new(
+			18803,
+			"Test Appearance",
+			"itemLink",
+			2,
+			10,
+			1,
+			"Armor",
+			"Cloth",
+			1,
+			"INVTYPE_CLOAK",
+			"texture",
+			100,
+			4,
+			1,
+			1,
+			1,
+			1,
+			false
+		)
+		if not item then
+			assert.is_not_nil(item)
+			return
+		end
+		assert.is_false(item:IsAppearanceCollected())
 	end)
 
 	it("checks if an item is legendary", function()

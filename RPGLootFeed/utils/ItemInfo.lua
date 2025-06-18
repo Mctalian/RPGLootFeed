@@ -205,12 +205,56 @@ end
 ---Determine if the item is Legendary
 ---@return boolean
 function ItemInfo:IsLegendary()
-	-- Highlight Legendary Items
-	if self.itemQuality == Enum.ItemQuality.Legendary then
-		return true
+	return self.itemQuality == G_RLF.ItemQualEnum.Legendary
+end
+
+function ItemInfo:IsAppearanceCollected()
+	if not self:IsEquippableItem() then
+		return true -- non-equippable items are not tracked for appearances
 	end
 
-	return false
+	if
+		GetExpansionLevel() < G_RLF.Expansion.SL
+		and self.itemQuality > G_RLF.ItemQualEnum.Poor
+		and self:IsEligibleEquipment()
+		and C_TransmogCollection
+		and C_TransmogCollection.GetItemInfo
+		and C_TransmogCollection.PlayerHasTransmog
+	then
+		local appearanceId, modId = C_TransmogCollection.GetItemInfo(self.itemLink)
+		if not appearanceId or not modId then
+			G_RLF:LogDebug(
+				string.format(
+					"ItemInfo:IsAppearanceCollected: Unable to determine appearanceId or modId for item %s (%d)",
+					self.itemLink,
+					self.itemId
+				),
+				addonName,
+				"General",
+				tostring(self.itemId)
+			)
+			return true -- If we can't determine, assume it's collected
+		end
+		G_RLF:LogDebug(
+			string.format(
+				"ItemInfo:IsAppearanceCollected: Checking appearanceId %d, modId %d for item %s (%d)",
+				appearanceId,
+				modId,
+				self.itemLink,
+				self.itemId
+			),
+			addonName,
+			"General",
+			tostring(self.itemId)
+		)
+		return C_TransmogCollection.PlayerHasTransmog(self.itemId, modId)
+	end
+
+	if C_TransmogCollection and C_TransmogCollection.PlayerHasTransmogByItemInfo then
+		return C_TransmogCollection.PlayerHasTransmogByItemInfo(self.itemLink)
+	end
+
+	return true -- If we can't determine, assume it's collected
 end
 
 ---Determine the highest armor proficiency the character has; Clients prior to Cata only

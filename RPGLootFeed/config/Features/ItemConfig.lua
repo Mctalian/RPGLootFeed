@@ -82,6 +82,10 @@ G_RLF.defaults.global.item = {
 			enabled = false,
 			sound = "",
 		},
+		transmog = {
+			enabled = false,
+			sound = "",
+		},
 	},
 	textStyleOverrides = {
 		quest = {
@@ -722,6 +726,19 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							end,
 							order = 5,
 						},
+						highlightTransmog = {
+							type = "toggle",
+							name = G_RLF.L["Highlight New Transmog Items"],
+							desc = G_RLF.L["HighlightTransmogDesc"],
+							width = "double",
+							get = function(info)
+								return G_RLF.db.global.item.itemHighlights.transmog
+							end,
+							set = function(info, value)
+								G_RLF.db.global.item.itemHighlights.transmog = value
+							end,
+							order = 6,
+						},
 					},
 				},
 				itemSounds = {
@@ -819,6 +836,36 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							end,
 							width = "full",
 							order = 6,
+						},
+						transmog = {
+							type = "toggle",
+							name = G_RLF.L["Play Sound for New Transmog Items"],
+							desc = G_RLF.L["PlaySoundForTransmogDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.item.sounds.transmog.enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.transmog.enabled = value
+							end,
+							order = 7,
+						},
+						transmogSound = {
+							type = "select",
+							name = G_RLF.L["Transmog Sound"],
+							desc = G_RLF.L["TransmogSoundDesc"],
+							values = "SoundOptionValues",
+							get = function()
+								return G_RLF.db.global.item.sounds.transmog.sound
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.sounds.transmog.sound = value
+							end,
+							disabled = function()
+								return not G_RLF.db.global.item.sounds.transmog.enabled
+							end,
+							width = "full",
+							order = 8,
 						},
 					},
 				},
