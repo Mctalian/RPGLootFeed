@@ -195,7 +195,7 @@ end
 function Currency:Process(eventName, currencyType, quantityChange)
 	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, currencyType, eventName, quantityChange)
 
-	if currencyType == nil or not quantityChange or quantityChange <= 0 then
+	if currencyType == nil or not quantityChange or quantityChange == 0 then
 		self:LogDebug(
 			"Skip showing currency",
 			"SKIP: Something was missing, don't display",
