@@ -1,5 +1,6 @@
 --@strip-comments@
 ---Translator ZamestoTV v1.22.3
+---Translator Карнажж v1.23.0, v1.25.0
 ---@type string, G_RLF
 local _, G_RLF = ...
 
@@ -12,11 +13,55 @@ end
 --- You may translate these comments, but do not translate "region" or "endregion" as they are used by the localization tool to determine where to place the translations.
 --- To add translations, simply uncomment the line(s) and replace the English text after the equal sign (=) with the translated value.
 
+--#region 1.25.0
+L["AtlasIconDescription"] = "Исходные данные ниже взяты из Atlas Texture, а не из путей к файлам. Вы можете использовать аддон TextureAtlasViewer для поиска действующих текстур Atlas. Размеры приведенных ниже иконок основаны на параметре размера вторичного шрифта. Пожалуйста, обратитесь ко мне, если размер иконки, который вы хотите, у вас не работает."
+L["Auction House Icon Texture"] = "Иконка аукциона из Atlas Texture"
+L["Auction Price then Vendor Price"] = "Цена на аукционе, затем у продавца"
+L["AuctionHouseIconTextureDesc"] = "Текстура, которую можно использовать для иконки аукциона в ленте добычи. Это текстура Atlas, а не путь к файлу."
+L["Chosen Icon"] = "Выбранная вами иконка: %s"
+L["Enable Blizzard Transmog Sound"] = "Включить звук трансмога Blizzard"
+L["Enable Transmog Effect"] = "Включить эффект трансмога"
+L["Enable Transmog in Feed"] = "Включить трансмог в ленту"
+L["EnableBlizzardTransmogSoundDesc"] = "Звук трансмога Blizzard будет воспроизведен, когда вы получаете новую модель трансмога."
+L["EnableTransmogDesc"] = "Показывать новые модели трансмога в ленте добычи."
+L["EnableTransmogEffectDesc"] = "Анимированная текстура будет отображаться на левой и правой сторонах ленты добычи при получении новой модели трансмога, аналогично эффекту уведомлений трансмога Blizzard."
+L["Experimental"] = "Экспериментальный"
+L["Highest Price"] = "Наибольшая цена"
+L["Highlight New Transmog Items"] = "Подсвечивать новые модели трансмога"
+L["Highlight Quest Items"] = "Подсвечивать предметы для заданий"
+L["HighlightQuestDesc"] = "Подсвечивать предметы для заданий в ленте добычи."
+L["HighlightTransmogDesc"] = "Подсвечивать модели трансмога, которых у вас ещё нет, в ленте добычи."
+L["InGameCommunity"] = "Внутриигровое сообщество"
+L["InGameCommunityDesc"] = "Присоединяйтесь к внутриигровому сообществу RPGlootFeed, чтобы получить помощь, обратную связь и внести предложения для комфортной игры! Скопируйте/вставьте код ниже, чтобы присоединиться к сообществу."
+L["InvalidAtlasTexture"] = "%s не является действующей текстурой Atlas. Аддон TextUreAtlasViewer может помочь!"
+L["Item Text Style Overrides"] = "Изменение стиля названий предметов"
+L["Override Text Style for Quest Items"] = "Изменить стиль названий предметов  для заданий"
+L["Play Sound for New Transmog Items"] = "Воспроизвести звук для новой модели трансмога"
+L["PlaySoundForTransmogDesc"] = "Воспроизведите звук, когда вы получаете предмет с новой моделью трансмога."
+L["Quest Item Color Text"] = "Цвет названий предметов для заданий"
+L["QuestItemColorTextDesc"] = "Цвет названий предметов для заданий в ленте добычи. Это переопределит цвет качества ссылки."
+L["QuestItemStyleOverrideDesc"] = "Стиль названий предметов для заданий будет изменен следующими настройками стиля текста предметов для заданий."
+L["RevertAuctionHouseIconToDefaultDesc"] = "Вернуть текстуру иконки аукциона по умолчанию из Atlas Texture."
+L["RevertVendorIconToDefaultDesc"] = "Вернуть текстуру иконки продавца по умолчанию из Atlas Texture."
+L["Test Transmog Sound"] = "Проверить звук трансмога"
+L["TestBetterThanEquippedSoundDesc"] = "Проверить выбранный звук для предметов, которые лучше экипированных"
+L["TestLegendarySoundDesc"] = "Проверить выбранный звук для легендарных предметов"
+L["TestMountSoundDesc"] = "Проверить выбранный звук для маунтов"
+L["TestTransmogSoundDesc"] = "Проверить выбранный звук для новых моделей трансмога"
+L["Transmog Config"] = "Настройка трансмога"
+L["Transmog Options"] = "Опции трансмога"
+L["Transmog Sound"] = "Звук трансмога"
+L["TransmogSoundDesc"] = "Звук, который будет воспроизведен, когда вы получаете новую модель трансмога."
+L["Vendor Icon Texture"] = "Иконка продавца из Atlas Texture"
+L["Vendor Price then Auction Price"] = "Цена у продавца, затем на аукционе"
+L["VendorIconTextureDesc"] = "Текстура, которую можно использовать для иконки продавца в ленте добычи. Это текстура Atlas, а не путь к файлу."
+--#endregion
+
 --#region 1.23.0
--- L["Only Income"] = "Only Income Mode"
--- L["OnlyIncomeDesc"] = "If checked, only show income money amounts (i.e. positive money) in the Loot Feed. Money spent, such as repairs, buying items, etc. will not be processed."
--- L["Show Money Icon"] = "Show Money Icon"
--- L["ShowMoneyIconDesc"] = "If checked, show the money icon in the Loot Feed next to the money amount."
+L["Only Income"] = "Показывать только доход"
+L["OnlyIncomeDesc"] = "Показывать только доход (т.е. положительные суммы денег) в ленте добычи. Потраченные деньги, такие как ремонт, покупка товаров и т. д. не будут показаны."
+L["Show Money Icon"] = "Показывать иконку перед деньгами"
+L["ShowMoneyIconDesc"] = "Показывать иконку перед суммой денег в ленте добычи."
 --#endregion
 
 --#region 1.0.0 - 1.22.0
