@@ -66,6 +66,8 @@ G_RLF.defaults.global.item = {
 	---@type string
 	auctionHouseSource = G_RLF.L["None"] --[[@as string]],
 	pricesForSellableItems = PricesEnum.Vendor,
+	vendorIconTexture = G_RLF:IsRetail() and "spellicon-256x256-selljunk" or "bags-junkcoin",
+	auctionHouseIconTexture = G_RLF:IsRetail() and "auctioneer" or "Auctioneer",
 	---@class RLF_ConfigItemLoot.Sounds
 	sounds = {
 		mounts = {
@@ -187,18 +189,34 @@ G_RLF.options.args.features.args.itemLootConfig = {
 								}
 								if G_RLF.AuctionIntegrations.numActiveIntegrations > 0 then
 									values[PricesEnum.AH] = G_RLF.L["Auction Price"]
+									values[PricesEnum.VendorAH] = G_RLF.L["Vendor Price then Auction Price"]
+									values[PricesEnum.AHVendor] = G_RLF.L["Auction Price then Vendor Price"]
+									values[PricesEnum.Highest] = G_RLF.L["Highest Price"]
 								end
 								return values
 							end,
-							sorting = {
-								PricesEnum.None,
-								PricesEnum.Vendor,
-								PricesEnum.AH,
-							},
+							sorting = function()
+								local order = {
+									PricesEnum.None,
+									PricesEnum.Vendor,
+								}
+								if G_RLF.AuctionIntegrations.numActiveIntegrations > 0 then
+									table.insert(order, PricesEnum.AH)
+									table.insert(order, PricesEnum.VendorAH)
+									table.insert(order, PricesEnum.AHVendor)
+									table.insert(order, PricesEnum.Highest)
+								end
+
+								return order
+							end,
 							get = function(info)
 								if
-									G_RLF.db.global.item.pricesForSellableItems == PricesEnum.AH
-									and G_RLF.AuctionIntegrations.numActiveIntegrations == 0
+									(
+										G_RLF.db.global.item.pricesForSellableItems == PricesEnum.AH
+										or G_RLF.db.global.item.pricesForSellableItems == PricesEnum.VendorAH
+										or G_RLF.db.global.item.pricesForSellableItems == PricesEnum.AHVendor
+										or G_RLF.db.global.item.pricesForSellableItems == PricesEnum.Highest
+									) and G_RLF.AuctionIntegrations.numActiveIntegrations == 0
 								then
 									G_RLF.db.global.item.pricesForSellableItems = PricesEnum.Vendor
 								end
@@ -243,7 +261,8 @@ G_RLF.options.args.features.args.itemLootConfig = {
 								return values
 							end,
 							disabled = function()
-								return G_RLF.db.global.item.pricesForSellableItems ~= PricesEnum.AH
+								return G_RLF.db.global.item.pricesForSellableItems == PricesEnum.Vendor
+									or G_RLF.db.global.item.pricesForSellableItems == PricesEnum.None
 							end,
 							hidden = function()
 								local activeIntegrations = G_RLF.AuctionIntegrations.activeIntegrations
@@ -279,6 +298,78 @@ G_RLF.options.args.features.args.itemLootConfig = {
 								end
 							end,
 							order = 2,
+						},
+						atlasIconDescription = {
+							type = "description",
+							name = G_RLF.L["AtlasIconDescription"],
+							order = 2.99,
+						},
+						vendorIconTexture = {
+							type = "input",
+							name = G_RLF.L["Vendor Icon Texture"],
+							desc = G_RLF.L["VendorIconTextureDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.item.vendorIconTexture
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.vendorIconTexture = value
+							end,
+							validate = "ValidateAtlas",
+							order = 3,
+						},
+						testVendorIcon = {
+							type = "description",
+							name = function()
+								local icon = G_RLF.db.global.item.vendorIconTexture
+								return ItemConfig:TestIcon(icon)
+							end,
+							width = "normal",
+							order = 3.1,
+						},
+						revertVendorToDefault = {
+							type = "execute",
+							name = CreateAtlasMarkup("common-icon-undo", 16, 16),
+							desc = G_RLF.L["RevertVendorIconToDefaultDesc"],
+							func = function()
+								G_RLF.db.global.item.vendorIconTexture = G_RLF.db.defaults.global.item.vendorIconTexture
+							end,
+							width = 0.35,
+							order = 3.2,
+						},
+						auctionHouseIconTexture = {
+							type = "input",
+							name = G_RLF.L["Auction House Icon Texture"],
+							desc = G_RLF.L["AuctionHouseIconTextureDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.item.auctionHouseIconTexture
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.auctionHouseIconTexture = value
+							end,
+							validate = "ValidateAtlas",
+							order = 4,
+						},
+						testAuctionHouseIcon = {
+							type = "description",
+							name = function()
+								local icon = G_RLF.db.global.item.auctionHouseIconTexture
+								return ItemConfig:TestIcon(icon)
+							end,
+							width = "normal",
+							order = 4.1,
+						},
+						revertAuctionHouseToDefault = {
+							type = "execute",
+							name = CreateAtlasMarkup("common-icon-undo", 16, 16),
+							desc = G_RLF.L["RevertAuctionHouseIconToDefaultDesc"],
+							func = function()
+								G_RLF.db.global.item.auctionHouseIconTexture =
+									G_RLF.db.defaults.global.item.auctionHouseIconTexture
+							end,
+							width = 0.35,
+							order = 4.2,
 						},
 					},
 				},
@@ -741,4 +832,22 @@ function ItemConfig:SoundOptionValues()
 		sounds[v] = k
 	end
 	return sounds
+end
+
+function ItemConfig:TestIcon(icon)
+	local styleDb = G_RLF.DbAccessor:Styling()
+	local secondaryFontSize = styleDb.secondaryFontSize
+	local sizeCoeff = G_RLF.AtlasIconCoefficients[icon] or 1
+	local atlasIconSize = secondaryFontSize * sizeCoeff
+	return string.format(G_RLF.L["Chosen Icon"], CreateAtlasMarkup(icon, atlasIconSize, atlasIconSize))
+end
+
+function ItemConfig:ValidateAtlas(_, value)
+	local info = C_Texture.GetAtlasInfo(value)
+
+	if info then
+		return true
+	end
+
+	return string.format(G_RLF.L["InvalidAtlasTexture"], value)
 end

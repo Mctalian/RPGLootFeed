@@ -101,6 +101,9 @@ G_RLF.PricesEnum = {
 	None = "none",
 	Vendor = "vendor",
 	AH = "ah",
+	VendorAH = "vendor_ah",
+	AHVendor = "ah_vendor",
+	Highest = "highest",
 }
 
 ---@enum G_RLF.EnterAnimationType
