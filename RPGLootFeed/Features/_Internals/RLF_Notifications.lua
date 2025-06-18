@@ -30,7 +30,7 @@ function Notifications.Element:new(...)
 		return secondaryText
 	end
 	element.icon = "Interface/Addons/RPGLootFeed/Icons/logo.blp"
-	element.quality = Enum.ItemQuality.Legendary
+	element.quality = G_RLF.ItemQualEnum.Legendary
 	element.highlight = true
 
 	return element

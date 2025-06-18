@@ -230,7 +230,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 	element.isKeystone = info.keystoneInfo ~= nil
 	if element.isKeystone then
 		-- Force icon to be the item texture, not using the link
-		element.quality = Enum.ItemQuality.Epic
+		element.quality = G_RLF.ItemQualEnum.Epic
 		if fromLink then
 			fromInfo = ItemInfo:new(C.Item.GetItemIDForItemInfo(fromLink), C.Item.GetItemInfo(fromLink))
 		end
@@ -242,7 +242,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 
 	element.topLeftText = nil
 	element.topLeftColor = nil
-	if info:IsEquippableItem() and info.itemQuality > Enum.ItemQuality.Poor then
+	if info:IsEquippableItem() and info.itemQuality > G_RLF.ItemQualEnum.Poor then
 		element.topLeftText = tostring(info.itemLevel)
 		local r, g, b = C_Item.GetItemQualityColor(info.itemQuality)
 		element.topLeftColor = { r, g, b }

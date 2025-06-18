@@ -168,16 +168,16 @@ function Rep.Element:new(...)
 		else
 			element.icon = G_RLF.DefaultIcons.REPUTATION
 		end
-		element.quality = Enum.ItemQuality.Heirloom
+		element.quality = G_RLF.ItemQualEnum.Heirloom
 	elseif factionIdIconMap[element.factionId] then
 		element.icon = factionIdIconMap[element.factionId]
-		element.quality = Enum.ItemQuality.Rare
+		element.quality = G_RLF.ItemQualEnum.Rare
 	elseif element.repType == RepType.DelveCompanion then
 		element.icon = 5315246 -- interface/icons/inv_cape_special_explorer_b_03
-		element.quality = Enum.ItemQuality.Rare
+		element.quality = G_RLF.ItemQualEnum.Rare
 	else
 		element.icon = G_RLF.DefaultIcons.REPUTATION
-		element.quality = Enum.ItemQuality.Rare
+		element.quality = G_RLF.ItemQualEnum.Rare
 	end
 
 	element.itemCount = nil
