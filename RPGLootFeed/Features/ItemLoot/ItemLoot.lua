@@ -97,13 +97,22 @@ local function getItemStats(info)
 		isSocketed = false,
 		socketString = "",
 	}
-	local stats = C.Item.GetItemStats(info.itemLink)
+	local stats
+	if C_Item.GetItemStats then
+		stats = C_Item.GetItemStats(info.itemLink)
+	else
+		-- Fallback for older WoW versions
+		stats = GetItemStats(info.itemLink)
+	end
+
 	if not stats then
+		G_RLF:LogDebug("No stats found for item: " .. info.itemLink, addonName, ItemLoot.moduleName)
 		return itemRolls
 	end
 
 	for k, v in pairs(stats) do
 		if k:find("ITEM_MOD_CR_") and v > 0 then
+			G_RLF:LogDebug("Found tertiary stat: " .. k, addonName, ItemLoot.moduleName)
 			if TertiaryStatMap[k] then
 				itemRolls.tertiaryStat = TertiaryStatMap[k]
 			elseif IndestructibleMap[k] then
@@ -114,12 +123,16 @@ local function getItemStats(info)
 		end
 
 		if k:find("EMPTY_SOCKET_") and v > 0 then
+			G_RLF:LogDebug("Found empty socket type: " .. k, addonName, ItemLoot.moduleName)
 			if SocketFDIDMap[k] then
 				itemRolls.isSocketed = true
 				itemRolls.socketString = "|T" .. SocketFDIDMap[k] .. ":0|t"
 			else
 				G_RLF:LogWarn("Unknown socket type: " .. k, addonName, ItemLoot.moduleName)
 			end
+		elseif k:find("SOCKET") and v > 0 then
+			-- Handle the case where the socket is not in the map but still has a value
+			G_RLF:LogDebug("Found some sort of socket? " .. k .. " " .. tostring(v), addonName, ItemLoot.moduleName)
 		end
 	end
 
@@ -417,6 +430,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 	element.isLegendary = IsLegendary(info)
 	element.isBetterThanEquipped = IsBetterThanEquipped(info)
 	element.hasTertiaryOrSocket = HasItemRollBonus(stats)
+	element.isQuestItem = info:IsQuestItem()
 	function element:PlaySoundIfEnabled()
 		local soundsConfig = G_RLF.db.global.item.sounds
 		if self.isMount and soundsConfig.mounts.enabled and soundsConfig.mounts.sound ~= "" then
@@ -465,10 +479,17 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 
 	function element:SetHighlight()
 		local itemHighlights = G_RLF.db.global.item.itemHighlights
-		self.highlight = (self.isMount and itemHighlights.mounts)
-			or (self.isLegendary and itemHighlights.legendary)
-			or (self.isBetterThanEquipped and itemHighlights.betterThanEquipped)
-			or (self.hasTertiaryOrSocket and itemHighlights.tertiaryOrSocket)
+		local reason = (self.isMount and itemHighlights.mounts and "Mount")
+			or (self.isLegendary and itemHighlights.legendary and "Legendary")
+			or (self.isBetterThanEquipped and itemHighlights.betterThanEquipped and "Better than Equipped")
+			or (self.isQuestItem and itemHighlights.quest and "Quest Item")
+			or (self.hasTertiaryOrSocket and itemHighlights.tertiaryOrSocket and "Tertiary or Socket")
+			or ""
+
+		self.highlight = reason ~= ""
+		if self.highlight then
+			G_RLF:LogDebug("Highlighted because of " .. reason, addonName, ItemLoot.moduleName, self.key)
+		end
 	end
 
 	return element

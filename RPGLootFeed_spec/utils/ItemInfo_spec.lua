@@ -158,6 +158,62 @@ describe("ItemInfo", function()
 		assert.is_false(item:IsMount())
 	end)
 
+	it("checks if an item is a quest item", function()
+		local item = ItemInfo:new(
+			18803,
+			"Test Quest Item",
+			"itemLink",
+			2,
+			10,
+			1,
+			"Quest",
+			"Item",
+			1,
+			"INVTYPE_QUEST",
+			"texture",
+			100,
+			12,
+			0,
+			1,
+			1,
+			1,
+			false
+		)
+		if not item then
+			assert.is_not_nil(item)
+			return
+		end
+		assert.is_true(item:IsQuestItem())
+	end)
+
+	it("checks if an item is not a quest item", function()
+		local item = ItemInfo:new(
+			18803,
+			"Test Item",
+			"itemLink",
+			2,
+			10,
+			1,
+			"Weapon",
+			"Sword",
+			1,
+			"INVTYPE_WEAPON",
+			"texture",
+			100,
+			2,
+			1,
+			1,
+			1,
+			1,
+			false
+		)
+		if not item then
+			assert.is_not_nil(item)
+			return
+		end
+		assert.is_false(item:IsQuestItem())
+	end)
+
 	it("checks if an item is legendary", function()
 		local item = ItemInfo:new(
 			18803,
