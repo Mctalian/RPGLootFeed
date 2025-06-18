@@ -54,3 +54,7 @@ function G_RLF:ProfileFunction(func, funcName)
 		return unpack(result)
 	end
 end
+
+--@alpha@
+_G.G_RLF = G_RLF
+--@end-alpha@
