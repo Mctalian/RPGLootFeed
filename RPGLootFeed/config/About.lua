@@ -19,6 +19,7 @@ About.argOrder = {
 	["joinDiscord"] = 4,
 	["issuesAndRequests"] = 5,
 	["issuesLink"] = 6,
+	["inGameCommunity"] = 7,
 	["author"] = -4,
 	["githubLink"] = -3,
 	["tipsLink"] = -2,
@@ -71,6 +72,20 @@ G_RLF.options.args.about = {
 				return "https://github.com/McTalian/RPGLootFeed/issues/new/choose"
 			end,
 			order = About.argOrder.issuesLink,
+		},
+
+		inGameCommunity = {
+			type = "input",
+			name = G_RLF.L["InGameCommunity"] .. " (" .. G_RLF.L["Experimental"] .. ")",
+			desc = G_RLF.L["InGameCommunityDesc"],
+			width = "full",
+			get = function()
+				return "zjz5YvzudWG"
+			end,
+			hidden = function()
+				return not G_RLF:IsRetail()
+			end,
+			order = About.argOrder.inGameCommunity,
 		},
 
 		author = {
