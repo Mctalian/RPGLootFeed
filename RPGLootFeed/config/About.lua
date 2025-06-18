@@ -99,16 +99,23 @@ G_RLF.options.args.about = {
 		},
 		credits = {
 			type = "description",
-			name = string.format(
-				G_RLF.L["Credits"],
-				"\n",
-				"\n"
-					.. "* frFR by polki92\n"
-					.. "* zhCN by byezero\n"
-					.. "* esMX by Lalz420\n"
-					.. "* ruRU by ZamestoTV\n"
-					.. "\n"
-			),
+			name = function()
+				local translationCredits = G_RLF.L["Credits"]
+				local esMX = "* esMX by Lalz420"
+				local frFR = "* frFR by polki92"
+				local ruRU = "* ruRU by ZamestoTV"
+				if GetLocale() == "ruRU" then
+					ruRU = ruRU .. ", Карнажж (Пламегор)"
+				else
+					ruRU = ruRU .. ", Carnage (Flamegor)"
+				end
+				local zhCN = "* zhCN by byezero"
+				return string.format(
+					translationCredits,
+					"\n",
+					"\n" .. esMX .. "\n" .. frFR .. "\n" .. ruRU .. "\n" .. zhCN .. "\n" .. "\n"
+				)
+			end,
 			order = About.argOrder.credits,
 		},
 	},
