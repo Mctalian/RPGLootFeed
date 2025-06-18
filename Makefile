@@ -1,4 +1,4 @@
-.PHONY: all_checks hardcode_string_check missing_translation_check missing_locale_key_check test test-ci test-file test-pattern test-only local check_untracked_files help
+.PHONY: all_checks hardcode_string_check missing_translation_check organize_translations missing_locale_key_check test test-ci test-file test-pattern test-only local check_untracked_files help
 
 all_checks: hardcode_string_check missing_translation_check missing_locale_key_check
 
@@ -15,6 +15,7 @@ help:
 	@echo "  all_checks          - Run all code quality checks"
 	@echo "  hardcode_string_check - Check for hardcoded strings"
 	@echo "  missing_translation_check - Check for missing translations"
+	@echo "  organize_translations - Organize translations"
 	@echo "  missing_locale_key_check - Check for missing locale keys"
 	@echo "  generate_hidden_currencies - Generate hidden currencies list"
 	@echo "  lua_deps            - Install Lua dependencies"
@@ -33,6 +34,9 @@ hardcode_string_check:
 # Target for running the missing translation checker
 missing_translation_check:
 	@poetry run python .scripts/missing_translation_check.py
+
+organize_translations:
+	@poetry run python .scripts/organize_translations.py
 
 missing_locale_key_check:
 	@poetry run python .scripts/check_for_missing_locale_keys.py
