@@ -89,7 +89,7 @@ function G_RLF.InitializeLootDisplayProperties(element)
 	element.logFn = function(text, amount, new)
 		local amountLogText = tostring(amount)
 		local sign = "+"
-		if element.quantity < 0 then
+		if element.quantity ~= nil and element.quantity < 0 then
 			sign = "-"
 		end
 		if not new then

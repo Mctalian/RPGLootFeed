@@ -78,6 +78,7 @@ G_RLF.FeatureModule = {
 	Reputation = "Reputation",
 	Profession = "Professions",
 	TravelPoints = "TravelPoints",
+	Transmog = "Transmog",
 }
 
 ---@enum G_RLF.BlizzModule
@@ -150,6 +151,7 @@ G_RLF.DefaultIcons = {
 	XP = "894556",
 	PROFESSION = "133740",
 	TRAVELPOINTS = "4635200",
+	TRANSMOG = "3889767",
 }
 
 ---@enum G_RLF.Frames

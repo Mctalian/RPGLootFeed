@@ -11,4 +11,5 @@
     <Script file="ReputationConfig.lua"/>
     <Script file="ProfessionConfig.lua"/>
     <Script file="TravelPointsConfig.lua"/>
+    <Script file="TransmogConfig.lua"/>
 </Ui>

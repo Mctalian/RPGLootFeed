@@ -143,6 +143,9 @@ function LootDisplayRowMixin:StopAllAnimations()
 	if self.ElementFadeInAnimation then
 		self.ElementFadeInAnimation:Stop()
 	end
+
+	-- Stop scripted effects
+	self:StopScriptedEffects()
 end
 
 function LootDisplayRowMixin:Reset()
@@ -190,6 +193,12 @@ function LootDisplayRowMixin:Reset()
 	end
 	if self.HighlightBGOverlay then
 		self.HighlightBGOverlay:SetAlpha(0)
+	end
+	if self.leftSideTexture then
+		self.leftSideTexture:Hide()
+	end
+	if self.rightSideTexture then
+		self.rightSideTexture:Hide()
 	end
 
 	self.UnitPortrait:SetTexture(nil)
@@ -999,6 +1008,147 @@ function LootDisplayRowMixin:StyleIconHighlight()
 		self.glowAnimationGroup.scaleUp:SetDuration(0.5)
 		self.glowAnimationGroup.scaleUp:SetSmoothing("OUT")
 	end
+
+	-- Add scripted animation effects support
+	if G_RLF:IsRetail() then
+		self:CreateScriptedEffects()
+	end
+end
+
+function LootDisplayRowMixin:CreateScriptedEffects()
+	if not self.leftSideTexture then
+		self.leftSideTexture = self.Icon:CreateTexture(nil, "ARTWORK")
+	end
+
+	if not self.rightSideTexture then
+		self.rightSideTexture = self.Icon:CreateTexture(nil, "ARTWORK")
+	end
+
+	if not self.leftModelScene then
+		self.leftModelScene = CreateFrame("ModelScene", nil, self, "ScriptAnimatedModelSceneTemplate")
+	end
+
+	if not self.rightModelScene then
+		self.rightModelScene = CreateFrame("ModelScene", nil, self, "ScriptAnimatedModelSceneTemplate")
+	end
+
+	-- Initialize scripted animation effect timers
+	if not self.scriptedEffectTimers then
+		self.scriptedEffectTimers = {}
+	end
+
+	local changed = false
+
+	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
+	local feedWidth = sizingDb.feedWidth
+	local rowHeight = sizingDb.rowHeight
+	if self.cachedModelSceneFeedWidthRef ~= feedWidth or self.cachedModelSceneRowHeightRef ~= rowHeight then
+		self.cachedModelSceneFeedWidthRef = feedWidth
+		self.cachedModelSceneRowHeightRef = rowHeight
+		changed = true
+	end
+
+	if changed then
+		local scaledHeight = 7 / 6 * rowHeight
+		local scaledWidth = 0.03 * feedWidth
+		self.leftSideTexture:ClearAllPoints()
+		self.leftSideTexture:SetTexture("Interface\\LootFrame\\CosmeticToast")
+		self.leftSideTexture:SetTexCoord(0.03, 0.06, 0.05, 0.95)
+		self.leftSideTexture:SetPoint("TOPLEFT", self, "TOPLEFT")
+		self.leftSideTexture:SetSize(scaledWidth, scaledHeight)
+
+		self.rightSideTexture:ClearAllPoints()
+		self.rightSideTexture:SetTexture("Interface\\LootFrame\\CosmeticToast")
+		self.rightSideTexture:SetTexCoord(0.535, 0.565, 0.05, 0.95)
+		self.rightSideTexture:SetPoint("TOPRIGHT", self, "TOPRIGHT")
+		self.rightSideTexture:SetSize(scaledWidth, scaledHeight)
+
+		local modelSceneHeight = 0.7 * scaledHeight
+		local modelSceneWidth = 0.8 * scaledWidth
+		self.leftModelScene:SetPoint("TOPLEFT", self.leftSideTexture, "TOPLEFT")
+		self.leftModelScene:SetSize(modelSceneWidth, modelSceneHeight)
+
+		self.rightModelScene:SetPoint("TOPRIGHT", self.rightSideTexture, "TOPRIGHT")
+		self.rightModelScene:SetSize(modelSceneWidth, modelSceneHeight)
+
+		self.leftSideTexture:Hide()
+		self.rightSideTexture:Hide()
+	end
+end
+
+function LootDisplayRowMixin:PlayTransmogEffect()
+	if not self.leftModelScene or not self.rightModelScene then
+		self:CreateScriptedEffects()
+	end
+
+	-- Clear any existing effects
+	self:StopScriptedEffects()
+
+	if G_RLF.db.global.transmog.enableBlizzardTransmogSound then
+		PlaySound(SOUNDKIT.UI_COSMETIC_ITEM_TOAST_SHOW)
+	end
+
+	if not G_RLF.db.global.transmog.enableTransmogEffect then
+		self.leftSideTexture:Hide()
+		self.rightSideTexture:Hide()
+		return
+	end
+
+	self.leftSideTexture:Show()
+	self.rightSideTexture:Show()
+
+	-- Effect IDs from the transmog system (these are the same ones used in the WoW source)
+	local effectID1 = 135 -- Lightning effect
+	local effectID2 = 136 -- Secondary lightning effect
+
+	-- Create and play the effects with staggered timing
+	self.leftModelScene:AddEffect(effectID1, self.leftModelScene)
+	table.insert(
+		self.scriptedEffectTimers,
+		C_Timer.NewTimer(0.25, function()
+			self.leftModelScene:AddEffect(effectID2, self.leftModelScene)
+		end)
+	)
+	table.insert(
+		self.scriptedEffectTimers,
+		C_Timer.NewTimer(0.5, function()
+			self.leftModelScene:AddEffect(effectID1, self.leftModelScene)
+		end)
+	)
+
+	table.insert(
+		self.scriptedEffectTimers,
+		C_Timer.NewTimer(0.3, function()
+			self.rightModelScene:AddEffect(effectID1, self.rightModelScene)
+		end)
+	)
+	table.insert(
+		self.scriptedEffectTimers,
+		C_Timer.NewTimer(0.55, function()
+			self.rightModelScene:AddEffect(effectID2, self.rightModelScene)
+		end)
+	)
+	table.insert(
+		self.scriptedEffectTimers,
+		C_Timer.NewTimer(0.8, function()
+			self.rightModelScene:AddEffect(effectID1, self.rightModelScene)
+		end)
+	)
+end
+
+function LootDisplayRowMixin:StopScriptedEffects()
+	if self.leftModelScene then
+		self.leftModelScene:ClearEffects()
+	end
+
+	if self.rightModelScene then
+		self.rightModelScene:ClearEffects()
+	end
+
+	for i, timer in ipairs(self.scriptedEffectTimers) do
+		timer:Cancel()
+	end
+	self.scriptedEffectTimers = {}
 end
 
 function LootDisplayRowMixin:Styles()
@@ -1051,7 +1201,10 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	self.topLeftColor = element.topLeftColor
 
 	if isLink then
-		local extraWidthStr = " x" .. self.amount
+		local extraWidthStr = ""
+		if self.amount and self.amount > 1 then
+			extraWidthStr = " x" .. self.amount
+		end
 		if type(self.itemCount) == "number" and self.itemCount > 0 then
 			extraWidthStr = extraWidthStr .. " (" .. self.itemCount .. ")"
 		end
@@ -1429,6 +1582,8 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 			return
 		end
 		GameTooltip:SetOwner(self.ClickableButton, "ANCHOR_RIGHT")
+		-- It doesn't look like we can get hover behavior for transmog links but
+		-- they don't provide much information anyway
 		GameTooltip:SetHyperlink(self.link) -- Use the item's link to show the tooltip
 		GameTooltip:Show()
 	end
@@ -1480,8 +1635,31 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 
 	local function handleClick(button)
 		if button == "LeftButton" and not IsModifiedClick() then
-			-- Open the ItemRefTooltip to mimic in-game chat behavior
-			if self.link then
+			if not self.link then
+				return
+			end
+
+			local s = self.link:find("transmogappearance:")
+			if s then
+				-- All this to check if the link is a transmog appearance link
+				-- and get the ID to open the Transmog Collection
+				-- If we just store the ID as well as the link, we can skip this
+				local taS = self.link:find("transmogappearance:")
+				if not taS then
+					return
+				end
+				local shortened = self.link:sub(taS)
+				local barS = shortened:find("|")
+				if not barS then
+					barS = #shortened + 1
+				end
+				shortened = shortened:sub(1, barS - 1)
+				local _, id = strsplit(":", shortened)
+				if id then
+					TransmogUtil.OpenCollectionToItem(id)
+				end
+			elseif self.link then
+				-- Open the ItemRefTooltip to mimic in-game chat behavior
 				SetItemRef(self.link, self.link, button, self.ClickableButton)
 			end
 		elseif button == "LeftButton" and IsShiftKeyDown() then
@@ -1785,10 +1963,14 @@ end
 function LootDisplayRowMixin:HighlightIcon()
 	if self.highlight then
 		RunNextFrame(function()
-			-- Show the glow texture and play the animation
-			self.glowTexture:SetAlpha(0.75)
-			self.glowTexture:Show()
-			self.glowAnimationGroup:Play()
+			if self.type == G_RLF.FeatureModule.Transmog and G_RLF:IsRetail() then
+				self:PlayTransmogEffect()
+			else
+				-- Show the glow texture and play the animation
+				self.glowTexture:SetAlpha(0.75)
+				self.glowTexture:Show()
+				self.glowAnimationGroup:Play()
+			end
 		end)
 	end
 end

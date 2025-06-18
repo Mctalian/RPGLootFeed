@@ -86,7 +86,9 @@
     "CURRENCY",
     "CURRENCY_GAINED",
     "CURRENCY_GAINED_MULTIPLE",
-    "CURRENCY_GAINED_MULTIPLE_BONUS"
+    "CURRENCY_GAINED_MULTIPLE_BONUS",
+    "YOU_COLLECTED_LABEL",
+    "GetItemStats"
   ],
   "wowAPI.luals.frameXML": true,
   "Lua.workspace.library": [
@@ -110,5 +112,6 @@
     "string": "disable",
     "table": "disable",
     "utf8": "disable"
-  }
+  },
+  "Lua.type.weakUnionCheck": true
 }
