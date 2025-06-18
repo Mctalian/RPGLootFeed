@@ -305,7 +305,13 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 		if not truncatedLink then
 			return itemLink
 		end
-		return truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
+		local text = truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
+		if element.isQuestItem and G_RLF.db.global.item.textStyleOverrides.quest.enabled then
+			local r, g, b, a = unpack(G_RLF.db.global.item.textStyleOverrides.quest.color)
+			-- Replace the color in the link portion of the text with the quest color
+			text = text:gsub("|c.-|", G_RLF:RGBAToHexFormat(r, g, b, a) .. "|")
+		end
+		return text
 	end
 
 	element.secondaryTextFn = function(...)

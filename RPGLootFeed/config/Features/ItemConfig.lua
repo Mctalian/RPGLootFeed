@@ -83,6 +83,12 @@ G_RLF.defaults.global.item = {
 			sound = "",
 		},
 	},
+	textStyleOverrides = {
+		quest = {
+			enabled = false,
+			color = { 1, 1, 0, 1 }, -- Yellow
+		},
+	},
 }
 
 G_RLF.options.args.features.args.itemLootConfig = {
@@ -813,6 +819,44 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							end,
 							width = "full",
 							order = 6,
+						},
+					},
+				},
+				itemStyleOverrides = {
+					type = "group",
+					name = G_RLF.L["Item Text Style Overrides"],
+					inline = true,
+					order = 5,
+					args = {
+						questStyleOverrideEnabled = {
+							type = "toggle",
+							name = G_RLF.L["Override Text Style for Quest Items"],
+							desc = G_RLF.L["QuestItemStyleOverrideDesc"],
+							width = "double",
+							get = function()
+								return G_RLF.db.global.item.textStyleOverrides.quest.enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.textStyleOverrides.quest.enabled = value
+							end,
+							order = 1,
+						},
+						questStyleOverrideColor = {
+							type = "color",
+							name = G_RLF.L["Quest Item Color Text"],
+							desc = G_RLF.L["QuestItemColorTextDesc"],
+							width = "double",
+							hasAlpha = true,
+							disabled = function()
+								return not G_RLF.db.global.item.textStyleOverrides.quest.enabled
+							end,
+							get = function()
+								return unpack(G_RLF.db.global.item.textStyleOverrides.quest.color)
+							end,
+							set = function(_, r, g, b, a)
+								G_RLF.db.global.item.textStyleOverrides.quest.color = { r, g, b, a }
+							end,
+							order = 2,
 						},
 					},
 				},
