@@ -135,6 +135,14 @@ local function IsBetterThanEquipped(info)
 			return false
 		end
 
+		if equippedInfo.itemQuality > G_RLF.ItemQualEnum.Poor and info.itemQuality == G_RLF.ItemQualEnum.Poor then
+			-- If the equipped item is better than poor and the new item is poor, we don't consider it an upgrade
+			return false
+		end
+		if equippedInfo.itemQuality > G_RLF.ItemQualEnum.Common and info.itemQuality == G_RLF.ItemQualEnum.Common then
+			-- If the equipped item is better than common and the new item is common, we don't consider it an upgrade
+			return false
+		end
 		if equippedInfo.itemLevel and equippedInfo.itemLevel < info.itemLevel then
 			return true
 		elseif equippedInfo.itemLevel == info.itemLevel then
