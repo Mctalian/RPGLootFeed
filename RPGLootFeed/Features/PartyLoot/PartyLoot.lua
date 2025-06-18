@@ -37,7 +37,7 @@ function PartyLoot.Element:new(...)
 	element.icon = info.itemTexture
 
 	if info.keystoneInfo ~= nil then
-		element.quality = Enum.ItemQuality.Epic
+		element.quality = G_RLF.ItemQualEnum.Epic
 	end
 
 	function element:isPassingFilter(itemName, itemQuality)
@@ -194,7 +194,7 @@ function PartyLoot:OnPartyReadyToShow(info, amount, unit)
 	if not unit then
 		return
 	end
-	if onlyEpicPartyLoot and info.itemQuality < Enum.ItemQuality.Epic then
+	if onlyEpicPartyLoot and info.itemQuality < G_RLF.ItemQualEnum.Epic then
 		return
 	end
 	if G_RLF.db.global.partyLoot.itemQualityFilter[info.itemQuality] == false then

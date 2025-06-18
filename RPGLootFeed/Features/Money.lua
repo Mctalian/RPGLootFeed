@@ -19,7 +19,7 @@ function Money.Element:new(...)
 	if not G_RLF.db.global.money.enableIcon then
 		element.icon = nil
 	end
-	element.quality = Enum.ItemQuality.Poor
+	element.quality = G_RLF.ItemQualEnum.Poor
 	element.IsEnabled = function()
 		return Money:IsEnabled()
 	end
