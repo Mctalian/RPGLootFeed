@@ -438,6 +438,12 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 	element.hasTertiaryOrSocket = HasItemRollBonus(stats)
 	element.isQuestItem = info:IsQuestItem()
 	element.isNewTransmog = not info:IsAppearanceCollected()
+
+	if element.isQuestItem and G_RLF.db.global.item.textStyleOverrides.quest.enabled then
+		-- This should change the color of the quantity text
+		element.r, element.g, element.b, element.a = unpack(G_RLF.db.global.item.textStyleOverrides.quest.color)
+	end
+
 	function element:PlaySoundIfEnabled()
 		local soundsConfig = G_RLF.db.global.item.sounds
 		if self.isMount and soundsConfig.mounts.enabled and soundsConfig.mounts.sound ~= "" then
