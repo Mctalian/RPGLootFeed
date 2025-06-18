@@ -1010,12 +1010,14 @@ function LootDisplayRowMixin:StyleIconHighlight()
 	end
 
 	-- Add scripted animation effects support
-	if G_RLF:IsRetail() then
-		self:CreateScriptedEffects()
-	end
+	self:CreateScriptedEffects()
 end
 
 function LootDisplayRowMixin:CreateScriptedEffects()
+	if not G_RLF:IsRetail() then
+		return
+	end
+
 	if not self.leftSideTexture then
 		self.leftSideTexture = self.Icon:CreateTexture(nil, "ARTWORK")
 	end
@@ -1077,7 +1079,11 @@ function LootDisplayRowMixin:CreateScriptedEffects()
 end
 
 function LootDisplayRowMixin:PlayTransmogEffect()
-	if not self.leftModelScene or not self.rightModelScene then
+	if not G_RLF:IsRetail() then
+		return
+	end
+
+	if not self.leftModelScene or not self.rightModelScene or not self.scriptedEffectTimers then
 		self:CreateScriptedEffects()
 	end
 
@@ -1137,6 +1143,10 @@ function LootDisplayRowMixin:PlayTransmogEffect()
 end
 
 function LootDisplayRowMixin:StopScriptedEffects()
+	if not G_RLF:IsRetail() then
+		return
+	end
+
 	if self.leftModelScene then
 		self.leftModelScene:ClearEffects()
 	end
@@ -1145,9 +1155,12 @@ function LootDisplayRowMixin:StopScriptedEffects()
 		self.rightModelScene:ClearEffects()
 	end
 
-	for i, timer in ipairs(self.scriptedEffectTimers) do
-		timer:Cancel()
+	if self.scriptedEffectTimers then
+		for i, timer in ipairs(self.scriptedEffectTimers) do
+			timer:Cancel()
+		end
 	end
+
 	self.scriptedEffectTimers = {}
 end
 
