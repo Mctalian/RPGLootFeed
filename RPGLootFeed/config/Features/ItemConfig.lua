@@ -760,6 +760,20 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							end,
 							order = 1,
 						},
+						playSelectedMountSound = {
+							type = "execute",
+							name = CreateAtlasMarkup("common-icon-forwardarrow", 16, 16),
+							desc = G_RLF.L["TestMountSoundDesc"],
+							func = function()
+								PlaySoundFile(G_RLF.db.global.item.sounds.mounts.sound)
+							end,
+							disabled = function()
+								return not G_RLF.db.global.item.sounds.mounts.enabled
+									or G_RLF.db.global.item.sounds.mounts.sound == ""
+							end,
+							width = 0.35,
+							order = 1.5,
+						},
 						mountSound = {
 							type = "select",
 							name = G_RLF.L["Mount Sound"],
@@ -789,6 +803,20 @@ G_RLF.options.args.features.args.itemLootConfig = {
 								G_RLF.db.global.item.sounds.legendary.enabled = value
 							end,
 							order = 3,
+						},
+						playSelectedLegendarySound = {
+							type = "execute",
+							name = CreateAtlasMarkup("common-icon-forwardarrow", 16, 16),
+							desc = G_RLF.L["TestLegendarySoundDesc"],
+							func = function()
+								PlaySoundFile(G_RLF.db.global.item.sounds.legendary.sound)
+							end,
+							disabled = function()
+								return not G_RLF.db.global.item.sounds.legendary.enabled
+									or G_RLF.db.global.item.sounds.legendary.sound == ""
+							end,
+							width = 0.35,
+							order = 3.5,
 						},
 						legendarySound = {
 							type = "select",
@@ -820,6 +848,20 @@ G_RLF.options.args.features.args.itemLootConfig = {
 							end,
 							order = 5,
 						},
+						playSelectedBetterThanEquippedSound = {
+							type = "execute",
+							name = CreateAtlasMarkup("common-icon-forwardarrow", 16, 16),
+							desc = G_RLF.L["TestBetterThanEquippedSoundDesc"],
+							func = function()
+								PlaySoundFile(G_RLF.db.global.item.sounds.betterThanEquipped.sound)
+							end,
+							disabled = function()
+								return not G_RLF.db.global.item.sounds.betterThanEquipped.enabled
+									or G_RLF.db.global.item.sounds.betterThanEquipped.sound == ""
+							end,
+							width = 0.35,
+							order = 5.5,
+						},
 						betterThanEquippedSound = {
 							type = "select",
 							name = G_RLF.L["Better Than Equipped Sound"],
@@ -849,6 +891,20 @@ G_RLF.options.args.features.args.itemLootConfig = {
 								G_RLF.db.global.item.sounds.transmog.enabled = value
 							end,
 							order = 7,
+						},
+						playSelectedTransmogSound = {
+							type = "execute",
+							name = CreateAtlasMarkup("common-icon-forwardarrow", 16, 16),
+							desc = G_RLF.L["TestTransmogSoundDesc"],
+							func = function()
+								PlaySoundFile(G_RLF.db.global.item.sounds.transmog.sound)
+							end,
+							disabled = function()
+								return not G_RLF.db.global.item.sounds.transmog.enabled
+									or G_RLF.db.global.item.sounds.transmog.sound == ""
+							end,
+							width = 0.35,
+							order = 7.5,
 						},
 						transmogSound = {
 							type = "select",
