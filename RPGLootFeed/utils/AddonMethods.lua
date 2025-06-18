@@ -10,7 +10,7 @@ function G_RLF:fn(func, ...)
 	local function errorhandler(err)
 		local suffix = "\n\n==== Addon Info " .. addonName .. " " .. G_RLF.addonVersion .. " ====\n\n"
 		local status, trace = pcall(function()
-			local logger = G_RLF.RLF:GetModule("Logger") --[[@as RLF_Logger]]
+			local logger = G_RLF.RLF:GetModule(G_RLF.SupportModule.Logger) --[[@as RLF_Logger]]
 			if s.moduleName then
 				return logger:Trace(s.moduleName)
 			end
@@ -203,7 +203,7 @@ function G_RLF:OpenOptions(button)
 			table.insert(tmpMenu, {
 				text = string.format(G_RLF.L["View Notifications"], unseenNotifications),
 				func = function()
-					local notifModule = G_RLF.RLF:GetModule("Notifications") --[[@as RLF_Notifications]]
+					local notifModule = G_RLF.RLF:GetModule(G_RLF.SupportModule.Notifications) --[[@as RLF_Notifications]]
 					if notifModule then
 						notifModule:ViewAllNotifications()
 					end

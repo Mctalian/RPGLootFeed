@@ -100,9 +100,9 @@ G_RLF.options.args.features.args.itemLootConfig = {
 			set = function(_, value)
 				G_RLF.db.global.item.enabled = value
 				if value then
-					G_RLF.RLF:EnableModule("ItemLoot")
+					G_RLF.RLF:EnableModule(G_RLF.FeatureModule.ItemLoot)
 				else
-					G_RLF.RLF:DisableModule("ItemLoot")
+					G_RLF.RLF:DisableModule(G_RLF.FeatureModule.ItemLoot)
 				end
 			end,
 			order = 1,

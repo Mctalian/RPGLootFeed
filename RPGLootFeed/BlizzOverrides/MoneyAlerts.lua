@@ -5,7 +5,8 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class MoneyAlertOverride: RLF_Module, AceEvent-3.0, AceHook-3.0, AceTimer-3.0
-local MoneyAlertOverride = G_RLF.RLF:NewModule("MoneyAlerts", "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
+local MoneyAlertOverride =
+	G_RLF.RLF:NewModule(G_RLF.BlizzModule.MoneyAlerts, "AceEvent-3.0", "AceHook-3.0", "AceTimer-3.0")
 
 function MoneyAlertOverride:OnInitialize()
 	self:RegisterEvent("PLAYER_ENTERING_WORLD", "MoneyAlertHook")

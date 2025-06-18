@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class LootDisplay: RLF_Module, AceBucket-3.0, AceEvent-3.0, AceHook-3.0
-local LootDisplay = G_RLF.RLF:NewModule("LootDisplay", "AceBucket-3.0", "AceEvent-3.0", "AceHook-3.0")
+local LootDisplay = G_RLF.RLF:NewModule(G_RLF.SupportModule.LootDisplay, "AceBucket-3.0", "AceEvent-3.0", "AceHook-3.0")
 
 local lsm = G_RLF.lsm
 
@@ -73,7 +73,7 @@ function LootDisplay:OnEnable()
 
 	RunNextFrame(function()
 		---@type RLF_TestMode
-		local TestModeModule = G_RLF.RLF:GetModule("TestMode") --[[@as RLF_TestMode]]
+		local TestModeModule = G_RLF.RLF:GetModule(G_RLF.SupportModule.TestMode) --[[@as RLF_TestMode]]
 		TestModeModule:OnLootDisplayReady()
 	end)
 

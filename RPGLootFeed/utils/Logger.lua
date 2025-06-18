@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_Logger: RLF_Module, AceBucket-3.0, AceEvent-3.0
-local Logger = G_RLF.RLF:NewModule("Logger", "AceBucket-3.0", "AceEvent-3.0")
+local Logger = G_RLF.RLF:NewModule(G_RLF.SupportModule.Logger, "AceBucket-3.0", "AceEvent-3.0")
 
 local gui = LibStub("AceGUI-3.0") --[[@as AceGUI-3.0]]
 

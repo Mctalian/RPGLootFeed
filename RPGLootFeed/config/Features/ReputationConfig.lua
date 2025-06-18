@@ -36,9 +36,9 @@ G_RLF.options.args.features.args.repConfig = {
 			set = function(_, value)
 				G_RLF.db.global.rep.enabled = value
 				if value then
-					G_RLF.RLF:EnableModule("Reputation")
+					G_RLF.RLF:EnableModule(G_RLF.FeatureModule.Reputation)
 				else
-					G_RLF.RLF:DisableModule("Reputation")
+					G_RLF.RLF:DisableModule(G_RLF.FeatureModule.Reputation)
 				end
 			end,
 			order = 1,

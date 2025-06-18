@@ -5,7 +5,7 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class RLF_Communications: RLF_Module, AceEvent-3.0, AceComm-3.0
-local Communications = G_RLF.RLF:NewModule("Communications", "AceEvent-3.0", "AceComm-3.0")
+local Communications = G_RLF.RLF:NewModule(G_RLF.SupportModule.Communications, "AceEvent-3.0", "AceComm-3.0")
 
 function Communications:OnInitialize()
 	G_RLF:LogDebug("Communications:OnInitialize")

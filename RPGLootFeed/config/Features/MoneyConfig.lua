@@ -42,9 +42,9 @@ G_RLF.options.args.features.args.moneyConfig = {
 			set = function(_, value)
 				G_RLF.db.global.money.enabled = value
 				if value then
-					G_RLF.RLF:EnableModule("Money")
+					G_RLF.RLF:EnableModule(G_RLF.FeatureModule.Money)
 				else
-					G_RLF.RLF:DisableModule("Money")
+					G_RLF.RLF:DisableModule(G_RLF.FeatureModule.Money)
 				end
 			end,
 			order = 1,
