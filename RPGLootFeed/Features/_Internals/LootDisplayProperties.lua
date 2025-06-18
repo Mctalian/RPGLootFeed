@@ -22,6 +22,8 @@ local lootDisplayProperties = {
 	"g",
 	"b",
 	"a",
+	"topLeftText",
+	"topLeftColor",
 	"logFn",
 	"eventChannel",
 }
@@ -45,6 +47,8 @@ local lootDisplayProperties = {
 ---@field public g number
 ---@field public b number
 ---@field public a number
+---@field public topLeftText string
+---@field public topLeftColor string
 ---@field public logFn fun(text: string, amount: number, new: boolean): nil
 ---@field public Show fun(s: RLF_BaseLootElement, itemName?: string, itemQuality?: number): nil
 ---@field public isPassingFilter fun(s: RLF_BaseLootElement, itemName: string, itemQuality: number): boolean
