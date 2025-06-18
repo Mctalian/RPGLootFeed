@@ -703,24 +703,19 @@ G_RLF.options.args.features.args.itemLootConfig = {
 						--   set = function(info, value) G_RLF.db.global.item.itemHighlights.bop = value end,
 						--   order = 4,
 						-- },
-						-- highlightQuest = {
-						--   type = "toggle",
-						--   name = G_RLF.L["Highlight Quest Items"],
-						--   desc = G_RLF.L["HighlightQuestDesc"],
-						--   width = "double",
-						--   get = function(info) return G_RLF.db.global.item.itemHighlights.quest end,
-						--   set = function(info, value) G_RLF.db.global.item.itemHighlights.quest = value end,
-						--   order = 5,
-						-- },
-						-- highlightTransmog = {
-						--   type = "toggle",
-						--   name = G_RLF.L["Highlight Transmog Items"],
-						--   desc = G_RLF.L["HighlightTransmogDesc"],
-						--   width = "double",
-						--   get = function(info) return G_RLF.db.global.item.itemHighlights.transmog end,
-						--   set = function(info, value) G_RLF.db.global.item.itemHighlights.transmog = value end,
-						--   order = 6,
-						-- },
+						highlightQuest = {
+							type = "toggle",
+							name = G_RLF.L["Highlight Quest Items"],
+							desc = G_RLF.L["HighlightQuestDesc"],
+							width = "double",
+							get = function(info)
+								return G_RLF.db.global.item.itemHighlights.quest
+							end,
+							set = function(info, value)
+								G_RLF.db.global.item.itemHighlights.quest = value
+							end,
+							order = 5,
+						},
 					},
 				},
 				itemSounds = {
