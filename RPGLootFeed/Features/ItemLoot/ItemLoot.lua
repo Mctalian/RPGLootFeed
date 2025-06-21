@@ -106,33 +106,43 @@ local function getItemStats(info)
 	end
 
 	if not stats then
-		G_RLF:LogDebug("No stats found for item: " .. info.itemLink, addonName, ItemLoot.moduleName)
+		G_RLF:LogDebug(
+			"No stats found for item: " .. info.itemLink,
+			addonName,
+			ItemLoot.moduleName,
+			tostring(info.itemId)
+		)
 		return itemRolls
 	end
 
 	for k, v in pairs(stats) do
 		if k:find("ITEM_MOD_CR_") and v > 0 then
-			G_RLF:LogDebug("Found tertiary stat: " .. k, addonName, ItemLoot.moduleName)
+			G_RLF:LogDebug("Found tertiary stat: " .. k, addonName, ItemLoot.moduleName, tostring(info.itemId))
 			if TertiaryStatMap[k] then
 				itemRolls.tertiaryStat = TertiaryStatMap[k]
 			elseif IndestructibleMap[k] then
 				itemRolls.isIndestructible = true
 			else
-				G_RLF:LogWarn("Unknown tertiary stat: " .. k, addonName, ItemLoot.moduleName)
+				G_RLF:LogWarn("Unknown tertiary stat: " .. k, addonName, ItemLoot.moduleName, tostring(info.itemId))
 			end
 		end
 
 		if k:find("EMPTY_SOCKET_") and v > 0 then
-			G_RLF:LogDebug("Found empty socket type: " .. k, addonName, ItemLoot.moduleName)
+			G_RLF:LogDebug("Found empty socket type: " .. k, addonName, ItemLoot.moduleName, tostring(info.itemId))
 			if SocketFDIDMap[k] then
 				itemRolls.isSocketed = true
 				itemRolls.socketString = "|T" .. SocketFDIDMap[k] .. ":0|t"
 			else
-				G_RLF:LogWarn("Unknown socket type: " .. k, addonName, ItemLoot.moduleName)
+				G_RLF:LogWarn("Unknown socket type: " .. k, addonName, ItemLoot.moduleName, tostring(info.itemId))
 			end
 		elseif k:find("SOCKET") and v > 0 then
 			-- Handle the case where the socket is not in the map but still has a value
-			G_RLF:LogDebug("Found some sort of socket? " .. k .. " " .. tostring(v), addonName, ItemLoot.moduleName)
+			G_RLF:LogDebug(
+				"Found some sort of socket? " .. k .. " " .. tostring(v),
+				addonName,
+				ItemLoot.moduleName,
+				tostring(info.itemId)
+			)
 		end
 	end
 
@@ -355,7 +365,7 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 			return "    " .. fromStr .. " " .. atlasArrow .. " " .. toStr
 		end
 
-		if info:IsEligibleEquipment() then
+		if info:IsEquippableItem() then
 			local secondaryText = ""
 			if HasItemRollBonus(stats) then
 				if stats.isSocketed then
