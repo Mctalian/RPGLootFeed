@@ -116,25 +116,38 @@ function LootDisplayFrameMixin:CreateTab()
 
 	-- Handle click event to show the history frame
 	self.tab:SetScript("OnClick", function()
-		self:ToggleHistoryFrame()
+		G_RLF.HistoryService:ToggleHistoryFrame()
 	end)
 end
 
 --- Function to update the loot history tab visibility
 function LootDisplayFrameMixin:UpdateTabVisibility()
-	local inCombat = UnitAffectingCombat("player")
-	local hasItems = self:getNumberOfRows() > 0
 	local isEnabled = G_RLF.db.global.lootHistory.enabled
-	local hideTab = G_RLF.db.global.lootHistory.hideTab
-
-	if not inCombat and not hasItems and isEnabled then
-		self.tab:Show()
-	else
-		self:HideHistoryFrame()
+	if not isEnabled then
+		self.tab:Hide()
+		return
 	end
 
+	local hideTab = G_RLF.db.global.lootHistory.hideTab
 	if hideTab then
 		self.tab:Hide()
+		return
+	end
+
+	local inCombat = UnitAffectingCombat("player")
+	local hasItems = self:getNumberOfRows() > 0
+
+	if not inCombat and not hasItems then
+		G_RLF:LogDebug("Not in combat and no items, showing tab")
+		if self.tab then
+			self.tab:Show()
+		end
+	else
+		G_RLF:LogDebug("In combat or has items, hiding frame")
+		G_RLF.HistoryService:HideHistoryFrame()
+		if self.tab then
+			self.tab:Hide()
+		end
 	end
 end
 
@@ -166,7 +179,11 @@ function LootDisplayFrameMixin:Load(frame)
 
 	self:InitQueueLabel()
 	self:ConfigureTestArea()
-	self:CreateTab()
+	if self.frameType == G_RLF.Frames.MAIN then
+		self:CreateTab()
+	else
+		self.tab = nil -- No tab for party frame
+	end
 end
 
 function LootDisplayFrameMixin:InitQueueLabel()
@@ -482,14 +499,6 @@ function LootDisplayFrameMixin:UpdateHistoryFrame(offset)
 	self.historyContent:SetSize(feedWidth, contentSize)
 end
 
-function LootDisplayFrameMixin:ToggleHistoryFrame()
-	if not self.historyFrame or not self.historyFrame:IsVisible() then
-		self:ShowHistoryFrame()
-	else
-		self:HideHistoryFrame(true)
-	end
-end
-
 function LootDisplayFrameMixin:ShowHistoryFrame()
 	if not self.historyFrame then
 		self:CreateHistoryFrame()
@@ -498,29 +507,10 @@ function LootDisplayFrameMixin:ShowHistoryFrame()
 	self.historyFrame:Show()
 end
 
-function LootDisplayFrameMixin:HideHistoryFrame(otherFrame)
-	if self.tab then
-		self.tab:Hide()
-	end
+function LootDisplayFrameMixin:HideHistoryFrame()
 	if self.historyFrame then
 		self.historyFrame:Hide()
 		self.historyFrame:SetVerticalScroll(0)
-	end
-
-	if otherFrame then
-		return
-	end
-
-	if self.frameType == G_RLF.Frames.MAIN then
-		local partyFrame = G_RLF.RLF_PartyLootFrame
-		if partyFrame then
-			partyFrame:HideHistoryFrame(true)
-		end
-	else
-		local mainFrame = G_RLF.RLF_MainLootFrame
-		if mainFrame then
-			mainFrame:HideHistoryFrame(true)
-		end
 	end
 end
 

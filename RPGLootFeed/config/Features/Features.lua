@@ -269,10 +269,6 @@ G_RLF.options.args.features = {
 						---@type RLF_LootDisplayFrame
 						local frame = G_RLF.RLF_MainLootFrame
 						frame:UpdateTabVisibility()
-						local partyFrame = G_RLF.RLF_PartyLootFrame
-						if partyFrame then
-							partyFrame:ToggleHistoryFrame()
-						end
 					end,
 					order = 1,
 				},
@@ -307,10 +303,6 @@ G_RLF.options.args.features = {
 						---@type RLF_LootDisplayFrame
 						local frame = G_RLF.RLF_MainLootFrame
 						frame:UpdateTabVisibility()
-						local partyFrame = G_RLF.RLF_PartyLootFrame
-						if partyFrame then
-							partyFrame:ToggleHistoryFrame()
-						end
 					end,
 					order = 2.5,
 				},

@@ -159,12 +159,7 @@ function RLF:SlashCommand(msg, editBox)
 			loggerModule:Show()
 		elseif msg == "history" and G_RLF.db.global.lootHistory.enabled then
 			---@type RLF_LootDisplayFrame
-			local frame = G_RLF.RLF_MainLootFrame
-			frame:ToggleHistoryFrame()
-			local partyFrame = G_RLF.RLF_PartyLootFrame
-			if partyFrame then
-				partyFrame:ToggleHistoryFrame()
-			end
+			G_RLF.HistoryService:ToggleHistoryFrame()
 		else
 			G_RLF.acd:Open(addonName)
 		end
@@ -176,6 +171,8 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 	if self.optionsFrame == nil then
 		self.optionsFrame = G_RLF.acd:AddToBlizOptions(addonName, addonName)
 	end
+
+	G_RLF.RLF_MainLootFrame:UpdateTabVisibility()
 
 	local isNewVersion = currentVersion ~= G_RLF.db.global.lastVersionLoaded
 	if isLogin and isReload == false and isNewVersion then
