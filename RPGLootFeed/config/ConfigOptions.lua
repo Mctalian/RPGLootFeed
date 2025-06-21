@@ -66,13 +66,7 @@ G_RLF.options = {
 			type = "execute",
 			name = G_RLF.L["Toggle Loot History"],
 			func = function()
-				---@type RLF_LootDisplayFrame
-				local frame = G_RLF.RLF_MainLootFrame
-				frame:ToggleHistoryFrame()
-				local partyFrame = G_RLF.RLF_PartyLootFrame
-				if partyFrame then
-					partyFrame:ToggleHistoryFrame()
-				end
+				G_RLF.HistoryService:ToggleHistoryFrame()
 			end,
 			order = G_RLF.level1OptionsOrder.lootHistory,
 		},
