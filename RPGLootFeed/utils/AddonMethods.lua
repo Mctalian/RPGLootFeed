@@ -215,11 +215,7 @@ function G_RLF:OpenOptions(button)
 			table.insert(tmpMenu, {
 				text = G_RLF.L["Toggle Loot History"],
 				func = function()
-					G_RLF.RLF_MainLootFrame:ToggleHistoryFrame()
-					local partyFrame = G_RLF.RLF_PartyLootFrame
-					if partyFrame then
-						partyFrame:ToggleHistoryFrame()
-					end
+					G_RLF.HistoryService:ToggleHistoryFrame()
 				end,
 				notCheckable = true,
 			})
