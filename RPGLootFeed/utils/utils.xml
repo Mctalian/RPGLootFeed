@@ -11,4 +11,5 @@
   <Script file="Logger.lua"/>
   <Script file="Maps.lua"/>
   <Script file="Queue.lua"/>
+  <Script file="HistoryService.lua"/>
 </Ui>
