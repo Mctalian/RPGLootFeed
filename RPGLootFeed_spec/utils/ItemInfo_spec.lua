@@ -22,311 +22,382 @@ describe("ItemInfo", function()
 		ItemInfo = ns.ItemInfo
 	end)
 
-	it("creates a new ItemInfo instance", function()
-		local item = ItemInfo:new(
-			18803,
-			"Test Item",
-			"itemLink",
-			2,
-			10,
-			1,
-			"Weapon",
-			"Sword",
-			1,
-			"INVTYPE_WEAPON",
-			"texture",
-			100,
-			2,
-			1,
-			1,
-			1,
-			1,
-			false
-		)
-		if not item then
-			assert.is_not_nil(item)
-			return
-		end
-		assert.are.equal(item.itemId, 18803)
-		assert.are.equal(item.itemName, "Test Item")
+	describe("new", function()
+		it("creates a new ItemInfo instance", function()
+			local item = ItemInfo:new(
+				18803,
+				"Test Item",
+				"itemLink",
+				2,
+				10,
+				1,
+				"Weapon",
+				"Sword",
+				1,
+				"INVTYPE_WEAPON",
+				"texture",
+				100,
+				2,
+				1,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.are.equal(item.itemId, 18803)
+			assert.are.equal(item.itemName, "Test Item")
+		end)
+
+		it("returns nil if itemName is not provided", function()
+			local item = ItemInfo:new(
+				18803,
+				nil,
+				"itemLink",
+				2,
+				10,
+				1,
+				"Weapon",
+				"Sword",
+				1,
+				"INVTYPE_WEAPON",
+				"texture",
+				100,
+				2,
+				1,
+				1,
+				1,
+				1,
+				false
+			)
+			assert.is_nil(item)
+		end)
+
+		it("retrieves the item ID if not provided", function()
+			local item = ItemInfo:new(
+				nil,
+				"Test Item",
+				"itemLink",
+				2,
+				10,
+				1,
+				"Weapon",
+				"Sword",
+				1,
+				"INVTYPE_WEAPON",
+				"texture",
+				100,
+				2,
+				1,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.are.equal(item.itemId, 18803)
+		end)
 	end)
 
-	it("returns nil if itemName is not provided", function()
-		local item = ItemInfo:new(
-			18803,
-			nil,
-			"itemLink",
-			2,
-			10,
-			1,
-			"Weapon",
-			"Sword",
-			1,
-			"INVTYPE_WEAPON",
-			"texture",
-			100,
-			2,
-			1,
-			1,
-			1,
-			1,
-			false
-		)
-		assert.is_nil(item)
+	describe("IsMount", function()
+		it("checks if an item is a mount", function()
+			local item = ItemInfo:new(
+				18803,
+				"Test Mount",
+				"itemLink",
+				2,
+				10,
+				1,
+				"Miscellaneous",
+				"Mount",
+				1,
+				"INVTYPE_WEAPON",
+				"texture",
+				100,
+				15,
+				5,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.is_true(item:IsMount())
+		end)
+
+		it("checks if an item is not a mount", function()
+			local item = ItemInfo:new(
+				18803,
+				"Test Item",
+				"itemLink",
+				2,
+				10,
+				1,
+				"Weapon",
+				"Sword",
+				1,
+				"INVTYPE_WEAPON",
+				"texture",
+				100,
+				2,
+				1,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.is_false(item:IsMount())
+		end)
 	end)
 
-	it("retrieves the item ID if not provided", function()
-		local item = ItemInfo:new(
-			nil,
-			"Test Item",
-			"itemLink",
-			2,
-			10,
-			1,
-			"Weapon",
-			"Sword",
-			1,
-			"INVTYPE_WEAPON",
-			"texture",
-			100,
-			2,
-			1,
-			1,
-			1,
-			1,
-			false
-		)
-		if not item then
-			assert.is_not_nil(item)
-			return
-		end
-		assert.are.equal(item.itemId, 18803)
+	describe("IsQuestItem", function()
+		it("checks if an item is a quest item", function()
+			local item = ItemInfo:new(
+				18803,
+				"Test Quest Item",
+				"itemLink",
+				2,
+				10,
+				1,
+				"Quest",
+				"Item",
+				1,
+				"INVTYPE_QUEST",
+				"texture",
+				100,
+				12,
+				0,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.is_true(item:IsQuestItem())
+		end)
+
+		it("checks if an item is not a quest item", function()
+			local item = ItemInfo:new(
+				18803,
+				"Test Item",
+				"itemLink",
+				2,
+				10,
+				1,
+				"Weapon",
+				"Sword",
+				1,
+				"INVTYPE_WEAPON",
+				"texture",
+				100,
+				2,
+				1,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.is_false(item:IsQuestItem())
+		end)
 	end)
 
-	it("checks if an item is a mount", function()
-		local item = ItemInfo:new(
-			18803,
-			"Test Mount",
-			"itemLink",
-			2,
-			10,
-			1,
-			"Miscellaneous",
-			"Mount",
-			1,
-			"INVTYPE_WEAPON",
-			"texture",
-			100,
-			15,
-			5,
-			1,
-			1,
-			1,
-			false
-		)
-		if not item then
-			assert.is_not_nil(item)
-			return
-		end
-		assert.is_true(item:IsMount())
+	describe("IsAppearanceCollected", function()
+		it("checks if the item appearance has been collected", function()
+			transmogCollectionMocks.PlayerHasTransmogByItemInfo.returns(true)
+			local item = ItemInfo:new(
+				18803,
+				"Test Appearance",
+				"itemLink",
+				2,
+				10,
+				1,
+				"Armor",
+				"Cloth",
+				1,
+				"INVTYPE_CLOAK",
+				"texture",
+				100,
+				4,
+				1,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.is_true(item:IsAppearanceCollected())
+		end)
+
+		it("returns true if the appearance id is nil", function()
+			transmogCollectionMocks.GetItemInfo.returns(nil, nil)
+			local item = ItemInfo:new(
+				18803,
+				"Test Appearance",
+				"itemLink",
+				2,
+				10,
+				1,
+				"Armor",
+				"Cloth",
+				1,
+				"INVTYPE_CLOAK",
+				"texture",
+				100,
+				4,
+				1,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.is_true(item:IsAppearanceCollected())
+
+			transmogCollectionMocks.GetItemInfo.returns(18803, 1)
+		end)
+
+		it("handles classic", function()
+			functionMocks.GetExpansionLevel.returns(ns.Expansion.CATA)
+			transmogCollectionMocks.PlayerHasTransmog.returns(false)
+			local item = ItemInfo:new(
+				18803, -- itemId
+				"Test Appearance", -- itemName
+				"itemLink", -- itemLink
+				2, -- itemQuality
+				10, -- itemLevel
+				1, -- itemMinLevel
+				"Armor", -- itemType
+				"Cloth", -- itemSubType
+				1, -- itemStackCount
+				"INVTYPE_CLOAK", -- itemEquipLoc
+				"texture", -- itemTexture
+				100, -- sellPrice
+				4, -- classID
+				1, -- subclassID
+				1, -- bindType
+				1, -- expansionID
+				1, -- setID
+				false -- isCraftingReagent
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.is_false(item:IsAppearanceCollected())
+		end)
+
+		it("checks if the item appearance has not been collected", function()
+			transmogCollectionMocks.PlayerHasTransmogByItemInfo.returns(false)
+			local item = ItemInfo:new(
+				18803,
+				"Test Appearance",
+				"itemLink",
+				2,
+				10,
+				1,
+				"Armor",
+				"Cloth",
+				1,
+				"INVTYPE_CLOAK",
+				"texture",
+				100,
+				4,
+				1,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.is_false(item:IsAppearanceCollected())
+		end)
 	end)
 
-	it("checks if an item is not a mount", function()
-		local item = ItemInfo:new(
-			18803,
-			"Test Item",
-			"itemLink",
-			2,
-			10,
-			1,
-			"Weapon",
-			"Sword",
-			1,
-			"INVTYPE_WEAPON",
-			"texture",
-			100,
-			2,
-			1,
-			1,
-			1,
-			1,
-			false
-		)
-		if not item then
-			assert.is_not_nil(item)
-			return
-		end
-		assert.is_false(item:IsMount())
-	end)
+	describe("IsLegendary", function()
+		it("checks if an item is legendary", function()
+			local item = ItemInfo:new(
+				18803,
+				"Test Legendary",
+				"itemLink",
+				5,
+				10,
+				1,
+				"Weapon",
+				"Sword",
+				1,
+				"INVTYPE_WEAPON",
+				"texture",
+				100,
+				2,
+				1,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.is_true(item:IsLegendary())
+		end)
 
-	it("checks if an item is a quest item", function()
-		local item = ItemInfo:new(
-			18803,
-			"Test Quest Item",
-			"itemLink",
-			2,
-			10,
-			1,
-			"Quest",
-			"Item",
-			1,
-			"INVTYPE_QUEST",
-			"texture",
-			100,
-			12,
-			0,
-			1,
-			1,
-			1,
-			false
-		)
-		if not item then
-			assert.is_not_nil(item)
-			return
-		end
-		assert.is_true(item:IsQuestItem())
-	end)
-
-	it("checks if an item is not a quest item", function()
-		local item = ItemInfo:new(
-			18803,
-			"Test Item",
-			"itemLink",
-			2,
-			10,
-			1,
-			"Weapon",
-			"Sword",
-			1,
-			"INVTYPE_WEAPON",
-			"texture",
-			100,
-			2,
-			1,
-			1,
-			1,
-			1,
-			false
-		)
-		if not item then
-			assert.is_not_nil(item)
-			return
-		end
-		assert.is_false(item:IsQuestItem())
-	end)
-
-	it("checks if the item appearance has been collected", function()
-		transmogCollectionMocks.PlayerHasTransmogByItemInfo.returns(true)
-		local item = ItemInfo:new(
-			18803,
-			"Test Appearance",
-			"itemLink",
-			2,
-			10,
-			1,
-			"Armor",
-			"Cloth",
-			1,
-			"INVTYPE_CLOAK",
-			"texture",
-			100,
-			4,
-			1,
-			1,
-			1,
-			1,
-			false
-		)
-		if not item then
-			assert.is_not_nil(item)
-			return
-		end
-		assert.is_true(item:IsAppearanceCollected())
-	end)
-
-	it("checks if the item appearance has not been collected", function()
-		transmogCollectionMocks.PlayerHasTransmogByItemInfo.returns(false)
-		local item = ItemInfo:new(
-			18803,
-			"Test Appearance",
-			"itemLink",
-			2,
-			10,
-			1,
-			"Armor",
-			"Cloth",
-			1,
-			"INVTYPE_CLOAK",
-			"texture",
-			100,
-			4,
-			1,
-			1,
-			1,
-			1,
-			false
-		)
-		if not item then
-			assert.is_not_nil(item)
-			return
-		end
-		assert.is_false(item:IsAppearanceCollected())
-	end)
-
-	it("checks if an item is legendary", function()
-		local item = ItemInfo:new(
-			18803,
-			"Test Legendary",
-			"itemLink",
-			5,
-			10,
-			1,
-			"Weapon",
-			"Sword",
-			1,
-			"INVTYPE_WEAPON",
-			"texture",
-			100,
-			2,
-			1,
-			1,
-			1,
-			1,
-			false
-		)
-		if not item then
-			assert.is_not_nil(item)
-			return
-		end
-		assert.is_true(item:IsLegendary())
-	end)
-
-	it("checks if an item is not legendary", function()
-		local item = ItemInfo:new(
-			18803,
-			"Test Item",
-			"itemLink",
-			2,
-			10,
-			1,
-			"Weapon",
-			"Sword",
-			1,
-			"INVTYPE_WEAPON",
-			"texture",
-			100,
-			2,
-			1,
-			1,
-			1,
-			1,
-			false
-		)
-		if not item then
-			assert.is_not_nil(item)
-			return
-		end
-		assert.is_false(item:IsLegendary())
+		it("checks if an item is not legendary", function()
+			local item = ItemInfo:new(
+				18803,
+				"Test Item",
+				"itemLink",
+				2,
+				10,
+				1,
+				"Weapon",
+				"Sword",
+				1,
+				"INVTYPE_WEAPON",
+				"texture",
+				100,
+				2,
+				1,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.is_false(item:IsLegendary())
+		end)
 	end)
 
 	describe("IsEligibleEquipment", function()
