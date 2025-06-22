@@ -95,8 +95,8 @@
     "${addons}/busted/module/library",
     "${3rd}/luassert/library",
     "${addons}/luassert/module/library",
-    "~/.vscode-server/extensions/ketho.wow-api-0.20.7/Annotations/Core",
-    "~/.vscode-server/extensions/ketho.wow-api-0.20.7/Annotations/FrameXML"
+    "~/.vscode-server/extensions/ketho.wow-api-0.20.8/Annotations/Core",
+    "~/.vscode-server/extensions/ketho.wow-api-0.20.8/Annotations/FrameXML"
   ],
   "Lua.workspace.userThirdParty": [],
   "Lua.workspace.checkThirdParty": false,
@@ -112,6 +112,5 @@
     "string": "disable",
     "table": "disable",
     "utf8": "disable"
-  },
-  "Lua.type.weakUnionCheck": true
+  }
 }
