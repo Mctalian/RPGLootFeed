@@ -33,7 +33,12 @@ function Transmog.Element:new(transmogLink, icon)
 	end
 
 	element.secondaryTextFn = function(...)
-		return string.format(_G["ERR_LEARN_TRANSMOG_S"], " "):trim()
+		local str = string.format(_G["ERR_LEARN_TRANSMOG_S"], " "):trim()
+		-- Some locales have the string placeholder in the middle of the string, so we should replace any triple spaces
+		str = str:gsub("   ", " ")
+		-- Let's remove the trailing period if it exists
+		str = str:gsub("%.$", "")
+		return str
 	end
 
 	return element
@@ -79,3 +84,5 @@ function Transmog:TRANSMOG_COLLECTION_SOURCE_ADDED(eventName, itemModifiedAppear
 		G_RLF:LogWarn("Could not create Transmog Element", addonName, self.moduleName)
 	end
 end
+
+return Transmog
