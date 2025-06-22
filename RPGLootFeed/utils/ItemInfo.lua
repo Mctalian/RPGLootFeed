@@ -213,21 +213,13 @@ function ItemInfo:IsAppearanceCollected()
 		return true -- non-equippable items are not tracked for appearances
 	end
 
-	if
-		GetExpansionLevel() < G_RLF.Expansion.SL
-		and self.itemQuality > G_RLF.ItemQualEnum.Poor
-		and self:IsEligibleEquipment()
-		and C_TransmogCollection
-		and C_TransmogCollection.GetItemInfo
-		and C_TransmogCollection.PlayerHasTransmog
-	then
+	if C_TransmogCollection and C_TransmogCollection.GetItemInfo then
 		local appearanceId, modId = C_TransmogCollection.GetItemInfo(self.itemLink)
 		if not appearanceId or not modId then
 			G_RLF:LogDebug(
 				string.format(
-					"ItemInfo:IsAppearanceCollected: Unable to determine appearanceId or modId for item %s (%d)",
-					self.itemLink,
-					self.itemId
+					"ItemInfo:IsAppearanceCollected: Unable to determine appearanceId or modId for item %s",
+					self.itemLink
 				),
 				addonName,
 				"General",
@@ -235,23 +227,30 @@ function ItemInfo:IsAppearanceCollected()
 			)
 			return true -- If we can't determine, assume it's collected
 		end
-		G_RLF:LogDebug(
-			string.format(
-				"ItemInfo:IsAppearanceCollected: Checking appearanceId %d, modId %d for item %s (%d)",
-				appearanceId,
-				modId,
-				self.itemLink,
-				self.itemId
-			),
-			addonName,
-			"General",
-			tostring(self.itemId)
-		)
-		return C_TransmogCollection.PlayerHasTransmog(self.itemId, modId)
-	end
 
-	if C_TransmogCollection and C_TransmogCollection.PlayerHasTransmogByItemInfo then
-		return C_TransmogCollection.PlayerHasTransmogByItemInfo(self.itemLink)
+		-- Classic implementation
+		if
+			GetExpansionLevel() < G_RLF.Expansion.SL
+			and self.itemQuality > G_RLF.ItemQualEnum.Poor
+			and C_TransmogCollection.PlayerHasTransmog
+		then
+			G_RLF:LogDebug(
+				string.format(
+					"ItemInfo:IsAppearanceCollected: Checking appearanceId %d, modId %d for item %s",
+					appearanceId,
+					modId,
+					self.itemLink
+				),
+				addonName,
+				"General",
+				tostring(self.itemId)
+			)
+			return C_TransmogCollection.PlayerHasTransmog(self.itemId, modId)
+		end
+		-- Retail implementation
+		if C_TransmogCollection.PlayerHasTransmogByItemInfo then
+			return C_TransmogCollection.PlayerHasTransmogByItemInfo(self.itemLink)
+		end
 	end
 
 	return true -- If we can't determine, assume it's collected
@@ -301,24 +300,62 @@ end
 
 function ItemInfo:IsEligibleEquipment()
 	if self.classID ~= Enum.ItemClass.Armor then
+		G_RLF:LogDebug(
+			string.format("ItemInfo:IsEligibleEquipment: Item class %d is not Armor", self.classID),
+			addonName,
+			"General",
+			tostring(self.itemId)
+		)
 		return false
 	end
 
 	if not self.itemEquipLoc then
+		G_RLF:LogDebug(
+			string.format("ItemInfo:IsEligibleEquipment: Item %s has no itemEquipLoc", self.itemLink),
+			addonName,
+			"General",
+			tostring(self.itemId)
+		)
 		return false
 	end
 
 	local armorClass = GetHighestArmorClass()
 	if not armorClass then
+		G_RLF:LogDebug(
+			"ItemInfo:IsEligibleEquipment: Unable to determine highest armor class",
+			addonName,
+			"General",
+			tostring(self.itemId)
+		)
 		return false
 	end
 
 	if self.subclassID ~= armorClass and self.subclassID ~= Enum.ItemArmorSubclass.Generic then
+		G_RLF:LogDebug(
+			string.format(
+				"ItemInfo:IsEligibleEquipment: Item subclass %d does not match highest armor class %d",
+				self.subclassID,
+				armorClass
+			),
+			addonName,
+			"General",
+			tostring(self.itemId)
+		)
 		return false
 	end
 
 	local slot = G_RLF.equipSlotMap[self.itemEquipLoc]
 	if not slot then
+		G_RLF:LogDebug(
+			string.format(
+				"ItemInfo:IsEligibleEquipment: Item %s has an invalid itemEquipLoc %s",
+				self.itemLink,
+				self.itemEquipLoc
+			),
+			addonName,
+			"General",
+			tostring(self.itemId)
+		)
 		return false
 	end
 
