@@ -324,7 +324,9 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 				rep = {
 					defaultRepColor = { 1, 1, 1, 1 },
 				},
-				travelPoints = {},
+				travelPoints = {
+					textColor = { 1, 1, 1, 1 },
+				},
 				transmog = {},
 				styling = {},
 				lootHistory = {},
