@@ -5,17 +5,18 @@ local addonName, ns = ...
 local G_RLF = ns
 
 ---@class HistoryService
-G_RLF.HistoryService = {}
-
-G_RLF.HistoryService.historyShown = false
+G_RLF.HistoryService = {
+	---@type boolean
+	historyShown = false,
+}
 
 function G_RLF.HistoryService:ToggleHistoryFrame()
 	if not G_RLF.db.global.lootHistory.enabled then
 		return
 	end
 
-	local show = not G_RLF.HistoryService.historyShown
-	G_RLF.HistoryService.historyShown = show
+	local show = not self.historyShown
+	self.historyShown = show
 
 	if show then
 		G_RLF.RLF_MainLootFrame:ShowHistoryFrame()
@@ -33,8 +34,8 @@ function G_RLF.HistoryService:ToggleHistoryFrame()
 end
 
 function G_RLF.HistoryService:HideHistoryFrame()
-	if G_RLF.HistoryService.historyShown then
-		G_RLF.HistoryService.historyShown = false
+	if self.historyShown then
+		self.historyShown = false
 		G_RLF.RLF_MainLootFrame:HideHistoryFrame()
 		local partyFrame = G_RLF.RLF_PartyLootFrame
 		if partyFrame then
