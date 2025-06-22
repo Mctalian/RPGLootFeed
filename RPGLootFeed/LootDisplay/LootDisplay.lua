@@ -241,6 +241,15 @@ function LootDisplay:UpdateFadeDelay(frame)
 	lootFrames[frame]:UpdateFadeDelay()
 end
 
+function LootDisplay:ReInitQueueLabel(frame)
+	frame = frame or G_RLF.Frames.MAIN
+	if lootFrames[frame] == nil then
+		return
+	end
+
+	lootFrames[frame]:InitQueueLabel()
+end
+
 --- Handle the BAG_UPDATE_DELAYED event
 function LootDisplay:BAG_UPDATE_DELAYED()
 	G_RLF:LogInfo("BAG_UPDATE_DELAYED", "WOWEVENT", self.moduleName, nil, "BAG_UPDATE_DELAYED")

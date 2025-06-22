@@ -268,6 +268,7 @@ function PartyLootConfig:GetStylingOptions(order)
 						G_RLF.db.global.partyLoot.styling[k] = v
 					end
 					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+					G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 				end,
 				order = 0.5,
 				width = "full",
@@ -283,6 +284,7 @@ function PartyLootConfig:GetStylingOptions(order)
 				set = function(info, value)
 					G_RLF.db.global.partyLoot.styling.leftAlign = value
 					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+					G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 				end,
 				order = 1,
 			},
@@ -296,7 +298,8 @@ function PartyLootConfig:GetStylingOptions(order)
 				end,
 				set = function(info, value)
 					G_RLF.db.global.partyLoot.styling.growUp = value
-					G_RLF.LootDisplay:UpdateRowPositions()
+					G_RLF.LootDisplay:UpdateRowPositions(G_RLF.Frames.PARTY)
+					G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 				end,
 				order = 2,
 			},
@@ -431,6 +434,7 @@ function PartyLootConfig:GetStylingOptions(order)
 				end,
 				set = function(info, value)
 					G_RLF.db.global.partyLoot.styling.useFontObjects = value
+					G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 				end,
 				order = 7,
 			},
@@ -462,6 +466,7 @@ function PartyLootConfig:GetStylingOptions(order)
 				set = function(info, value)
 					G_RLF.db.global.partyLoot.styling.font = value
 					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+					G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 				end,
 				order = 8,
 			},
@@ -488,6 +493,7 @@ function PartyLootConfig:GetStylingOptions(order)
 						set = function(info, value)
 							G_RLF.db.global.partyLoot.styling.fontFace = value
 							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+							G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 						end,
 						order = 1,
 					},
@@ -506,6 +512,7 @@ function PartyLootConfig:GetStylingOptions(order)
 						set = function(info, value)
 							G_RLF.db.global.partyLoot.styling.fontSize = value
 							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+							G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 						end,
 						order = 2,
 					},
@@ -547,6 +554,7 @@ function PartyLootConfig:GetStylingOptions(order)
 						set = function(info, key, value)
 							G_RLF.db.global.partyLoot.styling.fontFlags[key] = value
 							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+							G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 						end,
 						order = 4,
 					},
@@ -562,6 +570,7 @@ function PartyLootConfig:GetStylingOptions(order)
 						set = function(info, r, g, b, a)
 							G_RLF.db.global.partyLoot.styling.fontShadowColor = { r, g, b, a }
 							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+							G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 						end,
 						order = 5,
 						width = "double",
@@ -585,6 +594,7 @@ function PartyLootConfig:GetStylingOptions(order)
 						set = function(info, value)
 							G_RLF.db.global.partyLoot.styling.fontShadowOffsetX = value
 							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+							G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 						end,
 						order = 6,
 					},
@@ -601,6 +611,7 @@ function PartyLootConfig:GetStylingOptions(order)
 						set = function(info, value)
 							G_RLF.db.global.partyLoot.styling.fontShadowOffsetY = value
 							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+							G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 						end,
 						order = 7,
 					},

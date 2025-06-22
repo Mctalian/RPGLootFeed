@@ -90,7 +90,8 @@
     "YOU_COLLECTED_LABEL",
     "GetItemStats",
     "SOUNDKIT",
-    "TransmogUtil"
+    "TransmogUtil",
+    "RLF_MainLootFrame"
   ],
   "wowAPI.luals.frameXML": true,
   "Lua.workspace.library": [
