@@ -378,7 +378,7 @@ function G_RLF:CalculateTextWidth(text, frame)
 		G_RLF.tempFontString:SetFont(fontPath, stylingDb.fontSize, G_RLF:FontFlagsToString())
 	end
 	G_RLF.tempFontString:SetText(text)
-	local width = G_RLF.tempFontString:GetStringWidth()
+	local width = G_RLF.tempFontString:GetUnboundedStringWidth()
 	return width
 end
 
@@ -405,6 +405,18 @@ function G_RLF:TruncateItemLink(itemLink, extraWidth, frame)
 
 	-- If the width exceeds maxWidth, truncate and add ellipses
 	if itemNameWidth > maxWidth then
+		G_RLF:LogDebug(
+			"Truncating item name: "
+				.. itemName
+				.. " to fit within max width: "
+				.. maxWidth
+				.. ", original link width: "
+				.. itemNameWidth
+				.. ", extraWidth: "
+				.. extraWidth,
+			addonName,
+			"General"
+		)
 		-- Approximate truncation by progressively shortening the name
 		while G_RLF:CalculateTextWidth("[" .. itemName .. "...]", frame) > maxWidth and #itemName > 0 do
 			itemName = string.sub(itemName, 1, -2)
