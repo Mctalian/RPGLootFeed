@@ -15,6 +15,25 @@ _G.handledError = function(err)
 end
 ---@diagnostic disable-next-line: undefined-field
 _G.unpack = table.unpack
+---@diagnostic disable-next-line: duplicate-set-field
+_G.strtrim = function(str, chars)
+	if not str then
+		return str
+	end
+
+	-- Default characters to trim: space, tab, carriage return, newline
+	chars = chars or " \t\r\n"
+
+	-- Create pattern for characters to trim (escape special pattern characters)
+	local pattern_chars = chars:gsub("([%^%$%(%)%%%.%[%]%*%+%-%?])", "%%%1")
+
+	-- Trim from left and right
+	local trimmed = str:gsub("^[" .. pattern_chars .. "]*", ""):gsub("[" .. pattern_chars .. "]*$", "")
+
+	return trimmed
+end
+
+string.trim = _G.strtrim
 
 functions.RunNextFrame = stub(_G, "RunNextFrame", function(func)
 	func()
