@@ -69,6 +69,7 @@ G_RLF.options.args.styles = {
 			set = function(info, value)
 				G_RLF.db.global.styling.leftAlign = value
 				G_RLF.LootDisplay:UpdateRowStyles()
+				G_RLF.LootDisplay:ReInitQueueLabel()
 			end,
 			order = 1,
 		},
@@ -83,6 +84,7 @@ G_RLF.options.args.styles = {
 			set = function(info, value)
 				G_RLF.db.global.styling.growUp = value
 				G_RLF.LootDisplay:UpdateRowPositions()
+				G_RLF.LootDisplay:ReInitQueueLabel()
 			end,
 			order = 2,
 		},
@@ -294,6 +296,7 @@ G_RLF.options.args.styles = {
 			end,
 			set = function(info, value)
 				G_RLF.db.global.styling.useFontObjects = value
+				G_RLF.LootDisplay:ReInitQueueLabel()
 			end,
 			order = 7,
 		},
@@ -325,6 +328,7 @@ G_RLF.options.args.styles = {
 			set = function(info, value)
 				G_RLF.db.global.styling.font = value
 				G_RLF.LootDisplay:UpdateRowStyles()
+				G_RLF.LootDisplay:ReInitQueueLabel()
 			end,
 			order = 8,
 		},
@@ -351,6 +355,7 @@ G_RLF.options.args.styles = {
 					set = function(info, value)
 						G_RLF.db.global.styling.fontFace = value
 						G_RLF.LootDisplay:UpdateRowStyles()
+						G_RLF.LootDisplay:ReInitQueueLabel()
 					end,
 					order = 1,
 				},
@@ -369,6 +374,7 @@ G_RLF.options.args.styles = {
 					set = function(info, value)
 						G_RLF.db.global.styling.fontSize = value
 						G_RLF.LootDisplay:UpdateRowStyles()
+						G_RLF.LootDisplay:ReInitQueueLabel()
 					end,
 					order = 2,
 				},
@@ -391,6 +397,7 @@ G_RLF.options.args.styles = {
 					set = function(info, value)
 						G_RLF.db.global.styling.secondaryFontSize = value
 						G_RLF.LootDisplay:UpdateRowStyles()
+						G_RLF.LootDisplay:ReInitQueueLabel()
 					end,
 					order = 3,
 				},
@@ -411,6 +418,7 @@ G_RLF.options.args.styles = {
 					set = function(info, key, value)
 						G_RLF.db.global.styling.fontFlags[key] = value
 						G_RLF.LootDisplay:UpdateRowStyles()
+						G_RLF.LootDisplay:ReInitQueueLabel()
 					end,
 					order = 4,
 				},
@@ -426,6 +434,7 @@ G_RLF.options.args.styles = {
 					set = function(info, r, g, b, a)
 						G_RLF.db.global.styling.fontShadowColor = { r, g, b, a }
 						G_RLF.LootDisplay:UpdateRowStyles()
+						G_RLF.LootDisplay:ReInitQueueLabel()
 					end,
 					order = 5,
 					width = "double",
@@ -449,6 +458,7 @@ G_RLF.options.args.styles = {
 					set = function(info, value)
 						G_RLF.db.global.styling.fontShadowOffsetX = value
 						G_RLF.LootDisplay:UpdateRowStyles()
+						G_RLF.LootDisplay:ReInitQueueLabel()
 					end,
 					order = 6,
 				},
@@ -465,6 +475,7 @@ G_RLF.options.args.styles = {
 					set = function(info, value)
 						G_RLF.db.global.styling.fontShadowOffsetY = value
 						G_RLF.LootDisplay:UpdateRowStyles()
+						G_RLF.LootDisplay:ReInitQueueLabel()
 					end,
 					order = 7,
 				},

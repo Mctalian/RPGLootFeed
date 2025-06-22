@@ -187,7 +187,9 @@ function LootDisplayFrameMixin:Load(frame)
 end
 
 function LootDisplayFrameMixin:InitQueueLabel()
-	self.QueueLabel = UIParent:CreateFontString(nil, "OVERLAY")
+	if not self.QueueLabel then
+		self.QueueLabel = UIParent:CreateFontString(nil, "OVERLAY")
+	end
 	local anchorPoint = self.vertDir .. self.horizDir
 	local relativePoint = self.opposite .. self.horizDir
 	local stylingDb = G_RLF.DbAccessor:Styling(self.frameType)
@@ -200,6 +202,7 @@ function LootDisplayFrameMixin:InitQueueLabel()
 		end
 		self.QueueLabel:SetFont(fontPath, stylingDb.fontSize, G_RLF:FontFlagsToString())
 	end
+	self.QueueLabel:ClearAllPoints()
 	self.QueueLabel:SetPoint(anchorPoint, self, relativePoint, 0, 0)
 	self.QueueLabel:Hide()
 end
@@ -209,6 +212,7 @@ function LootDisplayFrameMixin:ShowQueueLabel()
 		return
 	end
 	local vertDir, opposite, _, horizDir = self:getPositioningDetails()
+	self.QueueLabel:ClearAllPoints()
 	self.QueueLabel:SetPoint(vertDir .. horizDir, self, opposite .. horizDir, 0, 0)
 	self.QueueLabel:Show()
 end
@@ -428,7 +432,7 @@ function LootDisplayFrameMixin:Dump()
 end
 
 function LootDisplayFrameMixin:UpdateRowPositions()
-	self.vertDir, self.opposite, self.yOffset = self:getPositioningDetails()
+	self.vertDir, self.opposite, self.yOffset, self.horizDir = self:getPositioningDetails()
 	local index = 1
 	for row in self.rows:iterate() do
 		row:UpdatePosition(self)
