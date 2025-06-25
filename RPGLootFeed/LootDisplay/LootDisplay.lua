@@ -407,7 +407,7 @@ function G_RLF:TruncateItemLink(itemLink, extraWidth, frame)
 
 	local sizingDb = G_RLF.DbAccessor:Sizing(frame)
 	local iconSize = sizingDb.iconSize
-	local maxWidth = sizingDb.feedWidth - iconSize - (iconSize / 4) - (iconSize / 2) - extraWidth
+	local maxWidth = sizingDb.feedWidth - (iconSize / 4) - iconSize - (iconSize / 4) - extraWidth
 
 	-- Calculate the width of the item name plus the link start and end
 	local itemNameWidth = G_RLF:CalculateTextWidth("[" .. itemName .. "]", frame)

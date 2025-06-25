@@ -1214,18 +1214,29 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	self.topLeftColor = element.topLeftColor
 
 	if isLink then
+		local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
+		local iconSize = sizingDb.iconSize
 		local extraWidthStr = ""
-		if self.amount and self.amount > 1 then
+		if self.amount then
 			extraWidthStr = " x" .. self.amount
 		end
+		local extraWidth = 0
 		if type(self.itemCount) == "number" and self.itemCount > 0 then
-			extraWidthStr = extraWidthStr .. " (" .. self.itemCount .. ")"
-		end
+			local wrapChar = nil
+			if element.type == G_RLF.FeatureModule.ItemLoot then
+				wrapChar = G_RLF.db.global.item.itemCountTextWrapChar
+			elseif element.type == G_RLF.FeatureModule.Currency then
+				wrapChar = G_RLF.db.global.currency.currencyTotalTextWrapChar
+			end
 
-		local extraWidth = G_RLF:CalculateTextWidth(extraWidthStr, self.frameType)
+			local leftChar, rightChar = G_RLF:GetWrapChars(wrapChar)
+
+			extraWidth = (iconSize / 4)
+				+ G_RLF:CalculateTextWidth(leftChar .. self.itemCount .. rightChar .. "  ", self.frameType)
+		end
+		extraWidth = extraWidth + G_RLF:CalculateTextWidth(extraWidthStr, self.frameType)
 		if self.unit then
-			local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
-			local portraitSize = sizingDb.iconSize * 0.8
+			local portraitSize = iconSize * 0.8
 			extraWidth = extraWidth + portraitSize - (portraitSize / 2)
 		end
 		self.link = G_RLF:TruncateItemLink(textFn(), extraWidth)
@@ -1770,25 +1781,10 @@ function LootDisplayRowMixin:ShowItemCountText(itemCount, options)
 	local WrapChar = G_RLF.WrapCharEnum
 	options = options or {}
 	local color = options.color or G_RLF:RGBAToHexFormat(unpack({ 0.737, 0.737, 0.737, 1 }))
-	local wrapChar = options.wrapChar or WrapChar.DEFAULT
 	local showSign = options.showSign or false
+	local wrapChar = options.wrapChar
 
-	local sChar, eChar
-	if wrapChar == WrapChar.SPACE then
-		sChar, eChar = " ", " "
-	elseif wrapChar == WrapChar.PARENTHESIS then
-		sChar, eChar = "(", ")"
-	elseif wrapChar == WrapChar.BRACKET then
-		sChar, eChar = "[", "]"
-	elseif wrapChar == WrapChar.BRACE then
-		sChar, eChar = "{", "}"
-	elseif wrapChar == WrapChar.ANGLE then
-		sChar, eChar = "<", ">"
-	elseif wrapChar == WrapChar.BAR then
-		sChar, eChar = "|", "|"
-	else
-		sChar, eChar = "", ""
-	end
+	local sChar, eChar = G_RLF:GetWrapChars(wrapChar)
 
 	if itemCount and (itemCount > 1 or (showSign and itemCount >= 1)) then
 		local sign = ""

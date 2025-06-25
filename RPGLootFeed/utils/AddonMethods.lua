@@ -339,3 +339,27 @@ function G_RLF:ExtractCurrencyID(currencyLink)
 	local currencyID = currencyLink:match("|Hcurrency:(%d+):")
 	return currencyID and tonumber(currencyID) or nil
 end
+
+---@param wrapChar G_RLF.WrapCharEnum
+function G_RLF:GetWrapChars(wrapChar)
+	local WrapChar = G_RLF.WrapCharEnum
+	wrapChar = wrapChar or WrapChar.DEFAULT
+
+	local sChar, eChar
+	if wrapChar == WrapChar.SPACE then
+		sChar, eChar = " ", " "
+	elseif wrapChar == WrapChar.PARENTHESIS then
+		sChar, eChar = "(", ")"
+	elseif wrapChar == WrapChar.BRACKET then
+		sChar, eChar = "[", "]"
+	elseif wrapChar == WrapChar.BRACE then
+		sChar, eChar = "{", "}"
+	elseif wrapChar == WrapChar.ANGLE then
+		sChar, eChar = "<", ">"
+	elseif wrapChar == WrapChar.BAR then
+		sChar, eChar = "|", "|"
+	else
+		sChar, eChar = "", ""
+	end
+	return sChar, eChar
+end
