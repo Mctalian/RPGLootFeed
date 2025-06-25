@@ -232,6 +232,7 @@ function ItemInfo:IsAppearanceCollected()
 		if
 			GetExpansionLevel() < G_RLF.Expansion.SL
 			and self.itemQuality > G_RLF.ItemQualEnum.Poor
+			and self:IsEligibleEquipment()
 			and C_TransmogCollection.PlayerHasTransmog
 		then
 			G_RLF:LogDebug(
@@ -247,8 +248,17 @@ function ItemInfo:IsAppearanceCollected()
 			)
 			return C_TransmogCollection.PlayerHasTransmog(self.itemId, modId)
 		end
+		-- Pre Warband implementation
+		if
+			GetExpansionLevel() >= G_RLF.Expansion.SL
+			and GetExpansionLevel() < G_RLF.Expansion.TWW
+			and self:IsEligibleEquipment()
+			and C_TransmogCollection.PlayerHasTransmogByItemInfo
+		then
+			return C_TransmogCollection.PlayerHasTransmogByItemInfo(self.itemLink)
+		end
 		-- Retail implementation
-		if C_TransmogCollection.PlayerHasTransmogByItemInfo then
+		if G_RLF:IsRetail() and C_TransmogCollection.PlayerHasTransmogByItemInfo then
 			return C_TransmogCollection.PlayerHasTransmogByItemInfo(self.itemLink)
 		end
 	end

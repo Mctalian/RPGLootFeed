@@ -5,7 +5,8 @@ all_checks: hardcode_string_check missing_translation_check missing_locale_key_c
 # Show available make targets
 help:
 	@echo "Available targets:"
-	@echo "  test                - Run all tests with coverage"
+	@echo "  test                - Run all tests without coverage"
+	@echo "  test-cov           - Run all tests with coverage"
 	@echo "  test-only           - Run tests tagged with 'only'"
 	@echo "  test-file FILE=...  - Run tests for a specific file"
 	@echo "                        Example: make test-file FILE=RPGLootFeed_spec/Features/Currency_spec.lua"
@@ -45,10 +46,14 @@ generate_hidden_currencies:
 	@poetry run python .scripts/get_wowhead_hidden_currencies.py RPGLootFeed/Features/Currency/HiddenCurrencies.lua
 
 test:
-	@rm -rf luacov-html && rm -rf luacov.*out && mkdir -p luacov-html && $(ROCKSBIN)/busted --coverage RPGLootFeed_spec && $(ROCKSBIN)/luacov && echo "\nCoverage report generated at luacov-html/index.html"
+	@$(ROCKSBIN)/busted RPGLootFeed_spec
 
 test-only:
 	@$(ROCKSBIN)/busted --tags=only RPGLootFeed_spec
+
+# Run tests with coverage
+test-cov:
+	@rm -rf luacov-html && rm -rf luacov.*out && mkdir -p luacov-html && $(ROCKSBIN)/busted --coverage RPGLootFeed_spec && $(ROCKSBIN)/luacov && echo "\nCoverage report generated at luacov-html/index.html"
 
 # Run tests for a specific file
 # Usage: make test-file FILE=RPGLootFeed_spec/Features/Currency_spec.lua
