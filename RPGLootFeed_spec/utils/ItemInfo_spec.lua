@@ -283,8 +283,10 @@ describe("ItemInfo", function()
 		end)
 
 		it("handles classic", function()
+			ns.armorClassMapping = { MAGE = 1 }
 			functionMocks.GetExpansionLevel.returns(ns.Expansion.CATA)
 			transmogCollectionMocks.PlayerHasTransmog.returns(false)
+			functionMocks.UnitClass.returns("Mage", "MAGE", 1)
 			local item = ItemInfo:new(
 				18803, -- itemId
 				"Test Appearance", -- itemName
@@ -309,7 +311,9 @@ describe("ItemInfo", function()
 				assert.is_not_nil(item)
 				return
 			end
-			assert.is_false(item:IsAppearanceCollected())
+			local result = item:IsAppearanceCollected()
+			functionMocks.UnitClass.returns("Warrior", "WARRIOR", 1)
+			assert.is_false(result)
 		end)
 
 		it("checks if the item appearance has not been collected", function()
