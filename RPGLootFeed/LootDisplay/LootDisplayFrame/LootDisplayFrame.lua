@@ -96,7 +96,6 @@ function LootDisplayFrameMixin:CreateTab()
 	self.tab:SetAlpha(0.2)
 	self.tab:Hide()
 
-	-- self.tab:SetText("History")
 	-- Add an icon to the button
 	local icon = self.tab:CreateTexture(nil, "ARTWORK")
 	icon:SetTexture("Interface\\Icons\\INV_Misc_Book_09") -- Replace with the desired icon path
@@ -122,6 +121,10 @@ end
 
 --- Function to update the loot history tab visibility
 function LootDisplayFrameMixin:UpdateTabVisibility()
+	if not self.tab then
+		return
+	end
+
 	local isEnabled = G_RLF.db.global.lootHistory.enabled
 	if not isEnabled then
 		self.tab:Hide()
@@ -138,16 +141,10 @@ function LootDisplayFrameMixin:UpdateTabVisibility()
 	local hasItems = self:getNumberOfRows() > 0
 
 	if not inCombat and not hasItems then
-		G_RLF:LogDebug("Not in combat and no items, showing tab")
-		if self.tab then
-			self.tab:Show()
-		end
+		self.tab:Show()
 	else
-		G_RLF:LogDebug("In combat or has items, hiding frame")
 		G_RLF.HistoryService:HideHistoryFrame()
-		if self.tab then
-			self.tab:Hide()
-		end
+		self.tab:Hide()
 	end
 end
 
