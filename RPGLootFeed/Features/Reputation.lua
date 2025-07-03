@@ -87,6 +87,8 @@ local function buildFactionLocaleMap(findName)
 		return
 	end
 
+	G_RLF.db.locale.factionMap[_G["GUILD"]] = 1168
+
 	for i = 1, numFactions do
 		local factionData
 		if G_RLF:IsRetail() then
