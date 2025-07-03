@@ -167,7 +167,12 @@ function Rep.Element:new(...)
 		if rep < 0 then
 			sign = "-"
 		end
-		return sign .. math.abs(rep) .. " " .. factionName
+		local factionDisplayName = factionName
+		if factionDisplayName == _G["GUILD"] then
+			-- Use the actual guild name
+			factionDisplayName = factionData.name or _G["GUILD"]
+		end
+		return sign .. math.abs(rep) .. " " .. factionDisplayName
 	end
 
 	if factionData ~= nil and factionData.textureKit then
@@ -250,9 +255,10 @@ function Rep.Element:new(...)
 			end
 		else
 			if
-				factionData.currentStanding ~= 0
-				or factionData.currentReactionThreshold ~= 0
-				or factionData.nextReactionThreshold ~= 0
+				(factionData.currentStanding ~= 0 or factionData.nextReactionThreshold ~= 0)
+				-- currentReactionThreshold can be 0 (usually for neutral standing)
+				-- but we want to make sure we don't get a division by zero
+				and factionData.currentReactionThreshold ~= factionData.nextReactionThreshold
 			then
 				str = str
 					.. (factionData.currentStanding - factionData.currentReactionThreshold)
@@ -461,7 +467,9 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 				repType = RepType.DelveCompanion
 			else
 				local friendInfo = C_GossipInfo.GetFriendshipReputation(fId)
-				if G_RLF:IsRetail() then
+				if GetExpansionLevel() >= G_RLF.Expansion.CATA and faction == _G["GUILD"] then
+					factionData = C_Reputation.GetGuildFactionData()
+				elseif G_RLF:IsRetail() then
 					factionData = C_Reputation.GetFactionDataByID(fId)
 				-- So far up through MoP Classic, there is no C_Reputation.GetFactionDataByID
 				else
