@@ -331,6 +331,8 @@ _G.FACTION_BAR_COLORS = {
 }
 --#endregion
 
+_G.GUILD = "Guild"
+
 --#region:FACTION_STANDING* Global strings
 _G.FACTION_STANDING_INCREASED = "Rep with %s inc by %d."
 _G.FACTION_STANDING_INCREASED_ACCOUNT_WIDE = "AccRep with %s inc by %d."
