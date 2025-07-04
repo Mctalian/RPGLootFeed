@@ -19,10 +19,7 @@ local RepType = {
 	Friendship = 5,
 }
 
---- Season 1
--- local CURRENT_SEASON_DELVE_JOURNEY = 2644
---- Season 2
-local CURRENT_SEASON_DELVE_JOURNEY = 2683
+local CURRENT_SEASON_DELVE_JOURNEY = C_DelvesUI.GetDelvesFactionForSeason()
 
 -- Precompute pattern segments to optimize runtime message parsing
 local function precomputePatternSegments(patterns)
@@ -107,6 +104,11 @@ local function buildFactionLocaleMap(findName)
 	end
 end
 
+--- Use C_MajorFactions.GetMajorFactionIDs(LE_EXPANSION_WAR_WITHIN) to get the major faction IDs
+--- Use C_MajorFactions.GetMajorFactionData to get the textureKit (the key)
+--- Search Wago Files for "interface/icons/ui_majorfactions_interface/icons/ui_majorfactions_" to find the icons
+--- https://wago.tools/files?search=interface%2Ficons%2Fui_majorfaction
+--- The format of the string could change from expansion to expansion (it was "ui_majorfaction_" in DF)
 local majorFactionTextureKitIconMap = {
 	["centaur"] = 4687627, -- Maruuk Centaur
 	["expedition"] = 4687628, -- Dragonscale Expedition
@@ -120,9 +122,13 @@ local majorFactionTextureKitIconMap = {
 	["web"] = 5891370, -- Severed Threads
 	["rocket"] = 6252691, -- The Cartels of Undermine
 	["stars"] = 6351805, -- Gallagio Loyalty Rewards Club
-	["nightfall"] = 6694197, -- 11.1.5?
+	["nightfall"] = 6694197, -- Flame's Radiance
+	["karesh"] = 6937965, -- Manaforge Vandals
 }
 
+--- A bit of a grab bag
+--- Search wago files for "interface/icons/ui_notoriety" and get the Azh-Kahet factions
+--- Search wago files for "interface/icons reputationcurrencies" and you get the Goblin factions
 local factionIdIconMap = {
 	[2601] = 5862764, -- The Weaver
 	[2605] = 5862762, -- The General
