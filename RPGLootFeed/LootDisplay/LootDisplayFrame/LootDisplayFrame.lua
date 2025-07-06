@@ -352,6 +352,7 @@ function LootDisplayFrameMixin:LeaseRow(key)
 	return row
 end
 
+--- @param row RLF_LootDisplayRow
 function LootDisplayFrameMixin:ReleaseRow(row)
 	if not row.key then
 		error("Row without key: " .. row:Dump())

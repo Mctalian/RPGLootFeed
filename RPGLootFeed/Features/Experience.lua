@@ -80,32 +80,36 @@ end
 
 function Xp:PLAYER_XP_UPDATE(eventName, unitTarget)
 	G_RLF:LogInfo(eventName, "WOWEVENT", self.moduleName, unitTarget)
-	self:fn(function()
-		if unitTarget == "player" then
-			local newLevel = UnitLevel(unitTarget)
-			local newCurrentXP = UnitXP(unitTarget)
-			local delta = 0
-			if newLevel == nil then
-				G_RLF:LogWarn("Could not get player level", addonName, self.moduleName)
-				return
-			end
-			currentLevel = currentLevel or newLevel
-			if newLevel > currentLevel then
-				delta = (currentMaxXP - currentXP) + newCurrentXP
-			else
-				delta = newCurrentXP - currentXP
-			end
-			currentXP = newCurrentXP
-			currentLevel = newLevel
-			currentMaxXP = UnitXPMax(unitTarget)
-			if delta > 0 then
-				local e = self.Element:new(delta)
-				e:Show()
-			else
-				G_RLF:LogWarn(eventName .. " fired but delta was not positive", addonName, self.moduleName)
-			end
-		end
-	end)
+	if unitTarget ~= "player" then
+		return
+	end
+
+	local oldLevel = currentLevel
+	local oldCurrentXP = currentXP
+	local oldMaxXP = currentMaxXP
+	local newLevel = UnitLevel(unitTarget)
+	if newLevel == nil then
+		G_RLF:LogWarn("Could not get player level", addonName, self.moduleName)
+		return
+	end
+	currentLevel = newLevel
+	currentXP = UnitXP(unitTarget)
+	currentMaxXP = UnitXPMax(unitTarget)
+	local delta = 0
+	if newLevel > oldLevel then
+		delta = (oldMaxXP - oldCurrentXP) + currentXP
+	else
+		delta = currentXP - oldCurrentXP
+	end
+
+	if delta > 0 then
+		self:fn(function()
+			local e = self.Element:new(delta)
+			e:Show()
+		end)
+	else
+		G_RLF:LogWarn(eventName .. " fired but delta was not positive", addonName, self.moduleName)
+	end
 end
 
 return Xp
