@@ -304,8 +304,10 @@ local function processFromQueue(frame)
 	local queue = lootQueues[frame]
 	local snapshotQueueSize = queue:size()
 	if snapshotQueueSize > 0 then
-		local sizingDb = G_RLF.DbAccessor:Sizing(frame)
-		local rowsToProcess = math.min(snapshotQueueSize, sizingDb.maxRows)
+		-- In my testing this was fine, but it's possible it could cause performance issues
+		-- if the queue is large. This is what to revert if performance issues arise.
+		-- local sizingDb = G_RLF.DbAccessor:Sizing(frame)
+		local rowsToProcess = snapshotQueueSize -- math.min(snapshotQueueSize, sizingDb.maxRows)
 		G_RLF:LogDebug("Processing " .. rowsToProcess .. " items from element queue")
 		for i = 1, rowsToProcess do
 			if queue:isEmpty() then
