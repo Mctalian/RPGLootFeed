@@ -216,33 +216,43 @@ describe("Transmog module", function()
 				.called_with(_, "Could not get appearance source info", "TestAddon", TransmogModule.moduleName)
 		end)
 
-		it("TRANSMOG_COLLECTION_SOURCE_ADDED does not create element when transmogLink is empty", function()
-			local itemModifiedAppearanceID = 12345
+		it(
+			"TRANSMOG_COLLECTION_SOURCE_ADDED does not create element when transmogLink and itemLink are empty",
+			function()
+				local itemModifiedAppearanceID = 12345
 
-			-- Mock successful API response but with empty transmogLink
-			transmogCollectionMocks.GetAppearanceSourceInfo.returns(
-				1, -- category
-				67890, -- itemAppearanceId
-				false, -- canHaveIllusion
-				"Interface\\Icons\\TestIcon", -- icon
-				true, -- isCollected
-				"|cffffffff|Hitem:12345::::::::80:::::|h[Test Item]|h|r", -- itemLink
-				"", -- transmogLink (empty)
-				1, -- sourceType
-				"Armor" -- itemSubClass
-			)
+				-- Mock successful API response but with empty transmogLink
+				transmogCollectionMocks.GetAppearanceSourceInfo.returns(
+					1, -- category
+					67890, -- itemAppearanceId
+					false, -- canHaveIllusion
+					"Interface\\Icons\\TestIcon", -- icon
+					true, -- isCollected
+					"", -- itemLink (empty)
+					"", -- transmogLink (empty)
+					1, -- sourceType
+					"Armor" -- itemSubClass
+				)
 
-			local elementNewSpy = spy.on(TransmogModule.Element, "new")
-			local logWarnSpy = spy.on(ns, "LogWarn")
+				local elementNewSpy = spy.on(TransmogModule.Element, "new")
+				local logWarnSpy = spy.on(ns, "LogWarn")
 
-			TransmogModule:TRANSMOG_COLLECTION_SOURCE_ADDED(
-				"TRANSMOG_COLLECTION_SOURCE_ADDED",
-				itemModifiedAppearanceID
-			)
+				TransmogModule:TRANSMOG_COLLECTION_SOURCE_ADDED(
+					"TRANSMOG_COLLECTION_SOURCE_ADDED",
+					itemModifiedAppearanceID
+				)
 
-			assert.spy(elementNewSpy).was.not_called()
-			assert.spy(logWarnSpy).was.called_with(_, "Transmog link is empty", "TestAddon", TransmogModule.moduleName)
-		end)
+				assert.spy(elementNewSpy).was.not_called()
+				assert
+					.spy(logWarnSpy).was
+					.called_with(
+						_,
+						"Item link is also empty for " .. itemModifiedAppearanceID,
+						"TestAddon",
+						TransmogModule.moduleName
+					)
+			end
+		)
 
 		it("TRANSMOG_COLLECTION_SOURCE_ADDED logs warning when element creation fails", function()
 			local itemModifiedAppearanceID = 12345

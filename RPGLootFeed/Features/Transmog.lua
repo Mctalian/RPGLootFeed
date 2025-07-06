@@ -73,7 +73,33 @@ function Transmog:TRANSMOG_COLLECTION_SOURCE_ADDED(eventName, itemModifiedAppear
 	end
 
 	if not transmogLink or transmogLink == "" then
-		G_RLF:LogWarn("Transmog link is empty", addonName, self.moduleName)
+		G_RLF:LogWarn("Transmog link is empty for " .. itemModifiedAppearanceID, addonName, self.moduleName)
+		if itemLink and itemLink ~= "" then
+			local item = Item:CreateFromItemLink(itemLink)
+			if item then
+				item:ContinueOnItemLoad(function()
+					category, itemAppearanceId, canHaveIllusion, icon, isCollected, itemLink, transmogLink, sourceType, itemSubClass =
+						C_TransmogCollection.GetAppearanceSourceInfo(itemModifiedAppearanceID)
+					if not transmogLink or transmogLink == "" then
+						G_RLF:LogWarn(
+							"Transmog link is still empty for " .. itemModifiedAppearanceID,
+							addonName,
+							self.moduleName
+						)
+						transmogLink = itemLink
+					end
+
+					local e = self.Element:new(transmogLink, icon)
+					if e then
+						e:Show()
+					else
+						G_RLF:LogWarn("Could not create Transmog Element", addonName, self.moduleName)
+					end
+				end)
+			end
+		else
+			G_RLF:LogWarn("Item link is also empty for " .. itemModifiedAppearanceID, addonName, self.moduleName)
+		end
 		return
 	end
 
