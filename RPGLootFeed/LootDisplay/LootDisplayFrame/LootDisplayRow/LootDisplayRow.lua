@@ -777,11 +777,13 @@ function LootDisplayRowMixin:StyleExitAnimation()
 		or self.cachedExitAnimationDuration ~= exitDuration
 		or self.cachedExitFadeOutDelay ~= exitDelay
 		or self.cachedExitDisableAnimation ~= disableExitAnimation
+		or self.bustCacheExitAnimation == true
 	then
 		self.cachedExitAnimationType = exitAnimationType
 		self.cachedExitAnimationDuration = exitDuration
 		self.cachedExitFadeOutDelay = exitDelay
 		self.cachedExitDisableAnimation = disableExitAnimation
+		self.bustCacheExitAnimation = false
 		animationChanged = true
 	end
 
@@ -1356,6 +1358,7 @@ function LootDisplayRowMixin:HandlerOnRightClick()
 			elseif self.ExitAnimation.fadeOut then
 				self.ExitAnimation.fadeOut:SetStartDelay(0)
 			end
+			self.bustCacheExitAnimation = true
 
 			-- Start the fade-out animation
 			self.ExitAnimation:Play()
@@ -1705,6 +1708,7 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 			elseif self.ExitAnimation.fadeOut then
 				self.ExitAnimation.fadeOut:SetStartDelay(0)
 			end
+			self.bustCacheExitAnimation = true
 
 			-- Start the fade-out animation
 			self.ExitAnimation:Play()
