@@ -777,7 +777,7 @@ function LootDisplayRowMixin:StyleExitAnimation()
 		or self.cachedExitAnimationDuration ~= exitDuration
 		or self.cachedExitFadeOutDelay ~= exitDelay
 		or self.cachedExitDisableAnimation ~= disableExitAnimation
-		or self.bustCacheExitAnimation == true
+		or self.bustCacheExitAnimation
 	then
 		self.cachedExitAnimationType = exitAnimationType
 		self.cachedExitAnimationDuration = exitDuration
