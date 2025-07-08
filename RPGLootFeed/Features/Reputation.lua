@@ -19,7 +19,10 @@ local RepType = {
 	Friendship = 5,
 }
 
-local CURRENT_SEASON_DELVE_JOURNEY = C_DelvesUI.GetDelvesFactionForSeason()
+local CURRENT_SEASON_DELVE_JOURNEY = 0
+if G_RLF:IsRetail() or GetExpansionLevel() == G_RLF.Expansion.TWW then
+	CURRENT_SEASON_DELVE_JOURNEY = C_DelvesUI.GetDelvesFactionForSeason()
+end
 
 -- Precompute pattern segments to optimize runtime message parsing
 local function precomputePatternSegments(patterns)
