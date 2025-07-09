@@ -136,16 +136,25 @@ end
 
 local numTestFactions = 3
 local function initializeTestFactions()
-	for i = 1, numTestFactions do
+	local j, i = 1, 1
+	while j <= numTestFactions do
+		i = i + 1
 		local factionInfo
 		if G_RLF:IsRetail() then
-			factionInfo = C.Reputation.GetFactionDataByIndex(i)
+			factionInfo = C_Reputation.GetFactionDataByIndex(i)
 		-- So far up through MoP Classic, there is no C_Reputation.GetFactionDataByIndex
 		else
 			factionInfo = G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(i)
 		end
-		if factionInfo and factionInfo.name then
-			table.insert(TestMode.testFactions, factionInfo.name)
+		if factionInfo then
+			if
+				factionInfo.name
+				and factionInfo.name ~= ""
+				and (not factionInfo.isHeader or factionInfo.isHeaderWithRep)
+			then
+				table.insert(TestMode.testFactions, factionInfo.name)
+				j = j + 1
+			end
 		end
 	end
 
@@ -279,8 +288,8 @@ local function generateRandomLoot()
 			local reputationGained = math.random(10, 100)
 			local factionName = TestMode.testFactions[math.random(#TestMode.testFactions)]
 			local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Reputation) --[[@as RLF_Reputation]]
-			local e = module.Element:new(reputationGained, factionName)
-			e:Show()
+			local msg = string.format(_G["FACTION_STANDING_INCREASED"], factionName, reputationGained)
+			module:CHAT_MSG_COMBAT_FACTION_CHANGE("CHAT_MSG_COMBAT_FACTION_CHANGE", msg)
 			G_RLF:LogDebug("Reputation gained: " .. reputationGained, addonName)
 		end
 	end
