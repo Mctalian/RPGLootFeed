@@ -186,9 +186,9 @@ function RLF:PLAYER_ENTERING_WORLD(event, isLogin, isReload)
 		if notifModule then
 			notifModule:ViewAllNotifications()
 		end
-		if G_RLF.db.global.blizzOverrides.enableAutoLoot then
-			C_CVar.SetCVar("autoLootDefault", "1")
-		end
+	end
+	if G_RLF.db.global.blizzOverrides.enableAutoLoot then
+		C_CVar.SetCVar("autoLootDefault", "1")
 	end
 	G_RLF.AuctionIntegrations:Init()
 	if G_RLF.db.global.money.overrideMoneyLootSound then
