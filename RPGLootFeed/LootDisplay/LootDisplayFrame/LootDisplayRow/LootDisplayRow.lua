@@ -433,7 +433,11 @@ function LootDisplayRowMixin:StyleUnitPortrait()
 				SetPortraitTexture(self.UnitPortrait, self.unit)
 			end
 		end)
-		self.UnitPortrait:Show()
+		if G_RLF.db.global.partyLoot.enablePartyAvatar then
+			self.UnitPortrait:Show()
+		else
+			self.UnitPortrait:Hide()
+		end
 		if false then -- TODO: Coming soon
 			self.RLFUser:Show()
 		end
@@ -600,7 +604,7 @@ function LootDisplayRowMixin:StyleText()
 		self.ItemCountText:ClearAllPoints()
 		self.PrimaryText:SetJustifyH(anchor)
 		if self.icon then
-			if self.unit then
+			if self.unit and G_RLF.db.global.partyLoot.enablePartyAvatar then
 				self.PrimaryText:SetPoint(anchor, self.UnitPortrait, iconAnchor, xOffset, 0)
 			else
 				self.PrimaryText:SetPoint(anchor, self.Icon, iconAnchor, xOffset, 0)
@@ -614,7 +618,11 @@ function LootDisplayRowMixin:StyleText()
 			self.SecondaryText:SetJustifyH(anchor)
 			if self.icon then
 				if self.unit then
-					self.SecondaryText:SetPoint(anchor, self.UnitPortrait, iconAnchor, xOffset, 0)
+					if G_RLF.db.global.partyLoot.enablePartyAvatar then
+						self.SecondaryText:SetPoint(anchor, self.UnitPortrait, iconAnchor, xOffset, 0)
+					else
+						self.SecondaryText:SetPoint(anchor, self.Icon, iconAnchor, xOffset, 0)
+					end
 					if self.elementSecondaryTextColor then
 						self.SecondaryText:SetTextColor(
 							self.elementSecondaryTextColor.r,
