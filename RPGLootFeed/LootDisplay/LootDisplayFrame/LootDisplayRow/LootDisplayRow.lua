@@ -1608,9 +1608,12 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 		if inCombat then
 			return
 		end
+		if not LinkUtil.IsLinkType(self.link, "item") then
+			-- It doesn't look like we can get hover behavior for transmog links but
+			-- they don't provide much information anyway
+			return
+		end
 		GameTooltip:SetOwner(self.ClickableButton, "ANCHOR_RIGHT")
-		-- It doesn't look like we can get hover behavior for transmog links but
-		-- they don't provide much information anyway
 		GameTooltip:SetHyperlink(self.link) -- Use the item's link to show the tooltip
 		GameTooltip:Show()
 	end
