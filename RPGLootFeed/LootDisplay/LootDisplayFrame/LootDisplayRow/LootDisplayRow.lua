@@ -612,6 +612,7 @@ function LootDisplayRowMixin:StyleText()
 		if enabledSecondaryRowText and self.secondaryText ~= nil and self.secondaryText ~= "" then
 			self.SecondaryText:ClearAllPoints()
 			self.SecondaryText:SetJustifyH(anchor)
+			self.SecondaryText:SetTextColor(unpack(defaultColor))
 			if self.icon then
 				if self.unit then
 					self.SecondaryText:SetPoint(anchor, self.UnitPortrait, iconAnchor, xOffset, 0)
