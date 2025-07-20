@@ -20,6 +20,7 @@ G_RLF.defaults.global.currency = {
 	lowestColor = { 1, 1, 1, 1 },
 	midColor = { 1, 0.608, 0, 1 },
 	upperColor = { 1, 0, 0, 1 },
+	enableIcon = true,
 }
 
 G_RLF.options.args.features.args.currencyConfig = {
@@ -61,6 +62,22 @@ G_RLF.options.args.features.args.currencyConfig = {
 			end,
 			order = 2,
 			args = {
+				showIcon = {
+					type = "toggle",
+					name = G_RLF.L["Show Currency Icon"],
+					desc = G_RLF.L["ShowCurrencyIconDesc"],
+					width = "double",
+					disabled = function()
+						return G_RLF.db.global.misc.hideAllIcons
+					end,
+					get = function()
+						return G_RLF.db.global.currency.enableIcon
+					end,
+					set = function(_, value)
+						G_RLF.db.global.currency.enableIcon = value
+					end,
+					order = 0.5,
+				},
 				totalTextOptions = {
 					type = "group",
 					inline = true,

@@ -1021,11 +1021,11 @@ function LootDisplayRowMixin:CreateScriptedEffects()
 	end
 
 	if not self.leftSideTexture then
-		self.leftSideTexture = self.Icon:CreateTexture(nil, "ARTWORK")
+		self.leftSideTexture = self:CreateTexture(nil, "ARTWORK")
 	end
 
 	if not self.rightSideTexture then
-		self.rightSideTexture = self.Icon:CreateTexture(nil, "ARTWORK")
+		self.rightSideTexture = self:CreateTexture(nil, "ARTWORK")
 	end
 
 	if not self.leftModelScene then

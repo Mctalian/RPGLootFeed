@@ -16,6 +16,7 @@ G_RLF.defaults.global.xp = {
 	showCurrentLevel = true,
 	currentLevelColor = { 0.749, 0.737, 0.012, 1 },
 	currentLevelTextWrapChar = G_RLF.WrapCharEnum.ANGLE,
+	enableIcon = true,
 }
 
 G_RLF.options.args.features.args.experienceConfig = {
@@ -46,6 +47,22 @@ G_RLF.options.args.features.args.experienceConfig = {
 				return not G_RLF.db.global.xp.enabled
 			end,
 			args = {
+				showIcon = {
+					type = "toggle",
+					name = G_RLF.L["Show Experience Icon"],
+					desc = G_RLF.L["ShowExperienceIconDesc"],
+					width = "double",
+					disabled = function()
+						return G_RLF.db.global.misc.hideAllIcons
+					end,
+					get = function()
+						return G_RLF.db.global.xp.enableIcon
+					end,
+					set = function(_, value)
+						G_RLF.db.global.xp.enableIcon = value
+					end,
+					order = 0.5,
+				},
 				experienceTextColor = {
 					type = "color",
 					name = G_RLF.L["Experience Text Color"],

@@ -22,6 +22,9 @@ function Transmog.Element:new(transmogLink, icon)
 	element.isLink = true
 	element.key = "TMOG_" .. transmogLink
 	element.icon = icon or G_RLF.DefaultIcons.TRANSMOG
+	if not G_RLF.db.global.transmog.enableIcon or G_RLF.db.global.misc.hideAllIcons then
+		element.icon = nil
+	end
 	element.quality = G_RLF.ItemQualEnum.Epic
 	element.highlight = G_RLF:IsRetail()
 	element.textFn = function(_, truncatedLink)

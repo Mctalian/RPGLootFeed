@@ -44,6 +44,9 @@ function Currency.Element:new(currencyLink, currencyInfo, basicInfo)
 
 	element.key = "CURRENCY_" .. currencyInfo.currencyID
 	element.icon = currencyInfo.iconFileID
+	if not G_RLF.db.global.currency.enableIcon or G_RLF.db.global.misc.hideAllIcons then
+		element.icon = nil
+	end
 	element.quantity = basicInfo.displayAmount
 	element.itemCount = currencyInfo.quantity
 	element.quality = currencyInfo.quality

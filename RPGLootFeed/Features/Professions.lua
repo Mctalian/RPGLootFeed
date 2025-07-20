@@ -24,6 +24,9 @@ function Professions.Element:new(...)
 	local key
 	key, element.name, element.icon, element.level, element.maxLevel, element.quantity = ...
 	element.quality = G_RLF.ItemQualEnum.Rare
+	if not G_RLF.db.global.prof.enableIcon or G_RLF.db.global.misc.hideAllIcons then
+		element.icon = nil
+	end
 
 	element.key = keyPrefix .. key
 

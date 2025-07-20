@@ -27,6 +27,9 @@ function TravelPoints.Element:new(...)
 		return _G["MONTHLY_ACTIVITIES_POINTS"] .. " + " .. ((existingAmount or 0) + element.quantity)
 	end
 	element.icon = G_RLF.DefaultIcons.TRAVELPOINTS
+	if not G_RLF.db.global.travelPoints.enableIcon or G_RLF.db.global.misc.hideAllIcons then
+		element.icon = nil
+	end
 	element.quality = G_RLF.ItemQualEnum.Common
 
 	element.secondaryTextFn = function()

@@ -207,6 +207,10 @@ function Rep.Element:new(...)
 		element.quality = G_RLF.ItemQualEnum.Rare
 	end
 
+	if not G_RLF.db.global.rep.enableIcon or G_RLF.db.global.misc.hideAllIcons then
+		element.icon = nil
+	end
+
 	element.itemCount = nil
 	if factionData then
 		if factionData.renownLevel then

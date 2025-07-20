@@ -16,6 +16,7 @@ G_RLF.defaults.global.transmog = {
 	enabled = true,
 	enableTransmogEffect = true,
 	enableBlizzardTransmogSound = true,
+	enableIcon = true,
 }
 
 G_RLF.options.args.features.args.transmogConfig = {
@@ -51,6 +52,22 @@ G_RLF.options.args.features.args.transmogConfig = {
 			end,
 			order = 2,
 			args = {
+				showIcon = {
+					type = "toggle",
+					name = G_RLF.L["Show Transmog Icon"],
+					desc = G_RLF.L["ShowTransmogIconDesc"],
+					width = "double",
+					disabled = function()
+						return G_RLF.db.global.misc.hideAllIcons
+					end,
+					get = function(info, value)
+						return G_RLF.db.global.transmog.enableIcon
+					end,
+					set = function(info, value)
+						G_RLF.db.global.transmog.enableIcon = value
+					end,
+					order = 0.5,
+				},
 				enableTransmogEffect = {
 					type = "toggle",
 					name = G_RLF.L["Enable Transmog Effect"],

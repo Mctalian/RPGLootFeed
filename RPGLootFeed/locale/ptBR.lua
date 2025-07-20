@@ -15,8 +15,24 @@ end
 --- To add translations, simply uncomment the line(s) and replace the English text after the equal sign (=) with the translated value.
 
 --#region 1.26.0
+-- L["Hide All Icons"] = "Hide All Icons"
+-- L["HideAllIconsDesc"] = "If enabled, all icons will be hidden in the loot feed."
 -- L["Show '1' Quantity"] = "Show '1' Quantity"
+-- L["Show Currency Icon"] = "Show Currency Icon"
+-- L["Show Experience Icon"] = "Show Experience Icon"
+-- L["Show Item Icon"] = "Show Item Icon"
+-- L["Show Profession Icon"] = "Show Profession Icon"
+-- L["Show Reputation Icon"] = "Show Reputation Icon"
+-- L["Show Transmog Icon"] = "Show Transmog Icon"
+-- L["Show Travel Point Icon"] = "Show Travel Point Icon"
+-- L["ShowCurrencyIconDesc"] = "If enabled, the currency icon will be shown for currency rows."
+-- L["ShowExperienceIconDesc"] = "If enabled, the experience icon will be shown for experience rows."
+-- L["ShowItemIconDesc"] = "If enabled, the item icon will be shown for item rows."
 -- L["ShowOneQuantityDesc"] = "If enabled, the quantity 'x1' will be shown for loot that has a quantity of 1. If disabled, single-quantity loot will not show the quantity at all."
+-- L["ShowProfessionIconDesc"] = "If enabled, the profession icon will be shown for profession rows."
+-- L["ShowRepIconDesc"] = "If enabled, the reputation icon will be shown for reputation rows."
+-- L["ShowTransmogIconDesc"] = "If enabled, the transmog icon will be shown for transmog rows."
+-- L["ShowTravelPointIconDesc"] = "If enabled, the travel point icon will be shown for travel point rows."
 --#endregion
 
 --#region 1.25.0

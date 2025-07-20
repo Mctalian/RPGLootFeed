@@ -12,6 +12,7 @@ G_RLF.defaults.global = G_RLF.defaults.global or {}
 ---@class RLF_ConfigMisc
 G_RLF.defaults.global.misc = {
 	showOneQuantity = false,
+	hideAllIcons = false,
 }
 
 ---@class RLF_ConfigLootHistory
@@ -256,6 +257,18 @@ G_RLF.options.args.features = {
 						G_RLF.db.global.misc.showOneQuantity = value
 					end,
 					order = 0.25,
+				},
+				hideAllIcons = {
+					type = "toggle",
+					name = G_RLF.L["Hide All Icons"],
+					desc = G_RLF.L["HideAllIconsDesc"],
+					width = "double",
+					get = function(info, value)
+						return G_RLF.db.global.misc.hideAllIcons
+					end,
+					set = function(info, value)
+						G_RLF.db.global.misc.hideAllIcons = value
+					end,
 				},
 				showMinimapIcon = {
 					type = "toggle",
