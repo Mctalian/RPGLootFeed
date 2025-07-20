@@ -15,6 +15,7 @@ G_RLF.defaults = {
 	---@class RLF_DBLocale
 	locale = {
 		factionMap = {},
+		accountWideFactionMap = {},
 	},
 	---@class RLF_DBGlobal
 	global = {

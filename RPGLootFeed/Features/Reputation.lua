@@ -42,11 +42,18 @@ local function countMappedFactions()
 			count = count + 1
 		end
 	end
+	if G_RLF:IsRetail() then
+		for k, v in pairs(G_RLF.db.locale.accountWideFactionMap) do
+			if v then
+				count = count + 1
+			end
+		end
+	end
 
 	return count
 end
 
-local function buildFactionLocaleMap(findName)
+local function buildFactionLocaleMap(findName, isAccountWide)
 	-- Classic:GetFactionInfo(factionIndex)
 	local mappedFactions = countMappedFactions()
 	local hasMoreFactions = false
@@ -76,7 +83,9 @@ local function buildFactionLocaleMap(findName)
 						factionData = G_RLF.ClassicToRetail:ConvertFactionInfoByIndex(i)
 					end
 					if factionData and factionData.name then
-						if not G_RLF.db.locale.factionMap[factionData.name] then
+						if G_RLF:IsRetail() and factionData.isAccountWide then
+							G_RLF.db.locale.accountWideFactionMap[factionData.name] = factionData.factionID
+						else
 							G_RLF.db.locale.factionMap[factionData.name] = factionData.factionID
 						end
 					end
@@ -97,11 +106,15 @@ local function buildFactionLocaleMap(findName)
 		end
 
 		if factionData then
-			if not G_RLF.db.locale.factionMap[factionData.name] then
+			if factionData.isAccountWide then
+				G_RLF.db.locale.accountWideFactionMap[factionData.name] = factionData.factionID
+			else
 				G_RLF.db.locale.factionMap[factionData.name] = factionData.factionID
 			end
-			if findName and factionData.name == findName then
-				break
+			if findName then
+				if isAccountWide == factionData.isAccountWide and factionData.name == findName then
+					break
+				end
 			end
 		end
 	end
@@ -200,6 +213,12 @@ function Rep.Element:new(...)
 			element.itemCount = factionData.renownLevel
 		elseif element.repType == RepType.DelveCompanion then
 			element.itemCount = factionData.currentLevel
+		elseif element.repType == RepType.Friendship then
+			element.itemCount = factionData.reaction
+		elseif element.repType == RepType.BaseFaction and factionData.reaction then
+			local gender = UnitSex("player")
+			---@diagnostic disable-next-line: missing-parameter -- GetText only has one required parameter
+			element.itemCount = GetText("FACTION_STANDING_LABEL" .. factionData.reaction, gender)
 		end
 	end
 
@@ -277,7 +296,7 @@ function Rep.Element:new(...)
 	return element
 end
 
-local increasePatterns, decreasePatterns
+local increasePatterns, decreasePatterns, accountWideIncreasePatterns, accountWideDecreasePatterns
 function Rep:OnInitialize()
 	locale = GetLocale()
 
@@ -291,15 +310,24 @@ function Rep:OnInitialize()
 	local decrease_consts = {
 		FACTION_STANDING_DECREASED,
 	}
+	local account_wide_increase_consts = {}
+	local account_wide_decrease_consts = {}
 
 	if G_RLF:IsRetail() then
-		table.insert(increase_consts, FACTION_STANDING_INCREASED_ACCOUNT_WIDE)
-		table.insert(increase_consts, FACTION_STANDING_INCREASED_ACH_BONUS_ACCOUNT_WIDE)
-		table.insert(decrease_consts, FACTION_STANDING_DECREASED_ACCOUNT_WIDE)
+		table.insert(account_wide_increase_consts, FACTION_STANDING_INCREASED_ACCOUNT_WIDE)
+		table.insert(account_wide_increase_consts, FACTION_STANDING_INCREASED_ACH_BONUS_ACCOUNT_WIDE)
+		table.insert(account_wide_decrease_consts, FACTION_STANDING_DECREASED_ACCOUNT_WIDE)
 	end
 
 	increasePatterns = precomputePatternSegments(increase_consts)
 	decreasePatterns = precomputePatternSegments(decrease_consts)
+	if G_RLF:IsRetail() then
+		accountWideIncreasePatterns = precomputePatternSegments(account_wide_increase_consts)
+		accountWideDecreasePatterns = precomputePatternSegments(account_wide_decrease_consts)
+	else
+		accountWideIncreasePatterns = {}
+		accountWideDecreasePatterns = {}
+	end
 
 	RunNextFrame(function()
 		buildFactionLocaleMap()
@@ -366,7 +394,25 @@ end
 
 function Rep:ParseFactionChangeMessage(message)
 	local isDelveCompanion = false
-	local faction, repChange = extractFactionAndRep(message, increasePatterns)
+	local isAccountWide = false
+	local faction, repChange
+	if G_RLF:IsRetail() then
+		faction, repChange = extractFactionAndRep(message, accountWideIncreasePatterns)
+		if not faction then
+			faction, repChange = extractFactionAndRep(message, accountWideDecreasePatterns)
+			if repChange then
+				repChange = -repChange
+			end
+		end
+
+		if faction then
+			isAccountWide = true
+		end
+	end
+
+	if not faction then
+		faction, repChange = extractFactionAndRep(message, increasePatterns)
+	end
 	if not faction then
 		faction, repChange = extractFactionAndRep(message, decreasePatterns)
 		if repChange then
@@ -384,7 +430,7 @@ function Rep:ParseFactionChangeMessage(message)
 			isDelveCompanion = true
 		end
 	end
-	return faction, repChange, isDelveCompanion
+	return faction, repChange, isDelveCompanion, isAccountWide
 end
 
 function Rep:PLAYER_ENTERING_WORLD(eventName, isLogin, isReload)
@@ -406,7 +452,7 @@ end
 function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 	G_RLF:LogInfo(eventName .. " " .. message, "WOWEVENT", self.moduleName)
 	return self:fn(function()
-		local faction, repChange, isDelveCompanion = self:ParseFactionChangeMessage(message)
+		local faction, repChange, isDelveCompanion, isAccountWide = self:ParseFactionChangeMessage(message)
 
 		if not faction or not repChange then
 			G_RLF:LogError(
@@ -422,12 +468,21 @@ function Rep:CHAT_MSG_COMBAT_FACTION_CHANGE(eventName, message)
 
 		--- @type number, number, number, ColorMixin
 		local r, g, b, color
-		local factionMapEntry = G_RLF.db.locale.factionMap[faction]
+		local factionMapEntry
+		if isAccountWide then
+			factionMapEntry = G_RLF.db.locale.accountWideFactionMap[faction]
+		else
+			factionMapEntry = G_RLF.db.locale.factionMap[faction]
+		end
 		if factionMapEntry == nil then
 			-- attempt to find the missing faction's ID
 			G_RLF:LogDebug(faction .. " not cached for " .. locale, addonName, self.moduleName)
-			buildFactionLocaleMap(faction)
-			factionMapEntry = G_RLF.db.locale.factionMap[faction]
+			buildFactionLocaleMap(faction, isAccountWide)
+			if isAccountWide then
+				factionMapEntry = G_RLF.db.locale.accountWideFactionMap[faction]
+			else
+				factionMapEntry = G_RLF.db.locale.factionMap[faction]
+			end
 		end
 
 		local repType, fId, factionData
