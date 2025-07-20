@@ -13,6 +13,11 @@ end
 --- You may translate these comments, but do not translate "region" or "endregion" as they are used by the localization tool to determine where to place the translations.
 --- To add translations, simply uncomment the line(s) and replace the English text after the equal sign (=) with the translated value.
 
+--#region 1.26.0
+-- L["Show '1' Quantity"] = "Show '1' Quantity"
+-- L["ShowOneQuantityDesc"] = "If enabled, the quantity 'x1' will be shown for loot that has a quantity of 1. If disabled, single-quantity loot will not show the quantity at all."
+--#endregion
+
 --#region 1.25.0
 L["AtlasIconDescription"] = "Исходные данные ниже взяты из Atlas Texture, а не из путей к файлам. Вы можете использовать аддон TextureAtlasViewer для поиска действующих текстур Atlas. Размеры приведенных ниже иконок основаны на параметре размера вторичного шрифта. Пожалуйста, обратитесь ко мне, если размер иконки, который вы хотите, у вас не работает."
 L["Auction House Icon Texture"] = "Иконка аукциона из Atlas Texture"

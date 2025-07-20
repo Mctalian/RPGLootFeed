@@ -62,7 +62,16 @@ function Currency.Element:new(currencyLink, currencyInfo, basicInfo)
 		if not truncatedLink then
 			return currencyLink
 		end
-		return truncatedLink .. " x" .. ((existingQuantity or 0) + element.quantity)
+		local text = truncatedLink
+		local quantityText
+		local effectiveQuantity = (existingQuantity or 0) + element.quantity
+		if effectiveQuantity == 1 and not G_RLF.db.global.misc.showOneQuantity then
+			quantityText = ""
+		else
+			quantityText = " x" .. effectiveQuantity
+		end
+		text = text .. quantityText
+		return text
 	end
 
 	element.secondaryTextFn = function(...)

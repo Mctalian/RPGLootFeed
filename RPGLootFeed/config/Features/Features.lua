@@ -9,6 +9,11 @@ local Features = {}
 ---@class RLF_DBGlobal
 G_RLF.defaults.global = G_RLF.defaults.global or {}
 
+---@class RLF_ConfigMisc
+G_RLF.defaults.global.misc = {
+	showOneQuantity = false,
+}
+
 ---@class RLF_ConfigLootHistory
 G_RLF.defaults.global.lootHistory = {
 	enabled = true,
@@ -239,6 +244,19 @@ G_RLF.options.args.features = {
 			name = G_RLF.L["Miscellaneous"],
 			order = lastFeature + 1,
 			args = {
+				showOneQuantity = {
+					type = "toggle",
+					name = G_RLF.L["Show '1' Quantity"],
+					desc = G_RLF.L["ShowOneQuantityDesc"],
+					width = "double",
+					get = function(info, value)
+						return G_RLF.db.global.misc.showOneQuantity
+					end,
+					set = function(info, value)
+						G_RLF.db.global.misc.showOneQuantity = value
+					end,
+					order = 0.25,
+				},
 				showMinimapIcon = {
 					type = "toggle",
 					name = G_RLF.L["Show Minimap Icon"],
