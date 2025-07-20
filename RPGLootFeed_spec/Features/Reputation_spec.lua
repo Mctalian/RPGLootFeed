@@ -63,9 +63,17 @@ describe("Reputation module", function()
 		assert.spy(nsMocks.SendMessage).was.not_called()
 	end)
 
-	it("handles rep increases", function()
+	it("handles rep increases #only", function()
 		local elementMock = mock(RepModule.Element, false)
-		nsMocks.ExtractDynamicsFromPattern.returns("Faction A", 10)
+		local timesCalled = 0
+		nsMocks.ExtractDynamicsFromPattern.invokes(function()
+			timesCalled = timesCalled + 1
+			--- 3 Account-wide patterns, then to normal faction standing patterns
+			if timesCalled == 4 then
+				return "Faction A", 10
+			end
+			return nil, nil
+		end)
 		local success =
 			RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE("CHAT_MSG_COMBAT_FACTION_CHANGE", "Rep with Faction A inc by 10.")
 
@@ -78,7 +86,15 @@ describe("Reputation module", function()
 
 	it("handles rep increases despite locale cache miss", function()
 		local elementMock = mock(RepModule.Element, false)
-		nsMocks.ExtractDynamicsFromPattern.returns("Faction B", 100)
+		local timesCalled = 0
+		nsMocks.ExtractDynamicsFromPattern.invokes(function()
+			timesCalled = timesCalled + 1
+			--- 3 Account-wide patterns, then to normal faction standing patterns
+			if timesCalled == 4 then
+				return "Faction B", 100
+			end
+			return nil, nil
+		end)
 		local success =
 			RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE("CHAT_MSG_COMBAT_FACTION_CHANGE", "Rep with Faction B inc by 100.")
 

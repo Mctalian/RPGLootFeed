@@ -301,9 +301,11 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 				currency = {},
 				item = {
 					itemQualitySettings = {},
+					enableIcon = true,
 				},
 				prof = {
 					skillColor = { 1, 1, 1, 1 },
+					enableIcon = true,
 				},
 				partyLoot = {
 					enabled = true,
@@ -317,18 +319,26 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 					sizing = {},
 					styling = {},
 					ignoreItemIds = {},
+					enableIcon = true,
 				},
-				money = {},
+				money = {
+					enableIcon = true,
+				},
 				xp = {
+					enableIcon = true,
 					experienceTextColor = { 1, 1, 1, 1 },
 				},
 				rep = {
+					enableIcon = true,
 					defaultRepColor = { 1, 1, 1, 1 },
 				},
 				travelPoints = {
+					enableIcon = true,
 					textColor = { 1, 1, 1, 1 },
 				},
-				transmog = {},
+				transmog = {
+					enableIcon = true,
+				},
 				styling = {},
 				lootHistory = {},
 				minimap = {},
@@ -336,9 +346,15 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 				sizing = {},
 				positioning = {},
 				notifications = {},
+				misc = {
+					hideAllIcons = false,
+				},
 			},
 			locale = {
 				factionMap = {},
+				accountWideFactionMap = {
+					["Faction A"] = 1,
+				},
 			},
 			profile = {},
 		}
