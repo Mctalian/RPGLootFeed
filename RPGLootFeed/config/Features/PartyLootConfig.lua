@@ -694,6 +694,7 @@ G_RLF.defaults.global.partyLoot = {
 	---@type number[]
 	ignoreItemIds = {},
 	enableIcon = true,
+	enablePartyAvatar = true,
 }
 
 G_RLF.options.args.features.args.partyLootConfig = {
@@ -739,6 +740,19 @@ G_RLF.options.args.features.args.partyLootConfig = {
 						G_RLF.db.global.partyLoot.enableIcon = value
 					end,
 					order = 0.5,
+				},
+				showPartyAvatar = {
+					type = "toggle",
+					name = G_RLF.L["Show Party Avatar"],
+					desc = G_RLF.L["ShowPartyAvatarDesc"],
+					width = "double",
+					get = function()
+						return G_RLF.db.global.partyLoot.enablePartyAvatar
+					end,
+					set = function(_, value)
+						G_RLF.db.global.partyLoot.enablePartyAvatar = value
+					end,
+					order = 1,
 				},
 				hideServerNames = {
 					type = "toggle",
