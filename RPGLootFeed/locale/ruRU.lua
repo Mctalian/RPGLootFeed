@@ -1,6 +1,6 @@
 --@strip-comments@
 ---Translator ZamestoTV v1.22.3
----Translator Карнажж v1.23.0, v1.25.0
+---Translator Карнажж v1.23.0, v1.25.0, v1.26.0
 ---@type string, G_RLF
 local _, G_RLF = ...
 
@@ -14,26 +14,26 @@ end
 --- To add translations, simply uncomment the line(s) and replace the English text after the equal sign (=) with the translated value.
 
 --#region 1.26.0
--- L["Hide All Icons"] = "Hide All Icons"
--- L["HideAllIconsDesc"] = "If enabled, all icons will be hidden in the loot feed."
--- L["Show '1' Quantity"] = "Show '1' Quantity"
--- L["Show Currency Icon"] = "Show Currency Icon"
--- L["Show Experience Icon"] = "Show Experience Icon"
--- L["Show Item Icon"] = "Show Item Icon"
--- L["Show Party Avatar"] = "Show Party Avatar"
--- L["Show Profession Icon"] = "Show Profession Icon"
--- L["Show Reputation Icon"] = "Show Reputation Icon"
--- L["Show Transmog Icon"] = "Show Transmog Icon"
--- L["Show Travel Point Icon"] = "Show Travel Point Icon"
--- L["ShowCurrencyIconDesc"] = "If enabled, the currency icon will be shown for currency rows."
--- L["ShowExperienceIconDesc"] = "If enabled, the experience icon will be shown for experience rows."
--- L["ShowItemIconDesc"] = "If enabled, the item icon will be shown for item rows."
--- L["ShowOneQuantityDesc"] = "If enabled, the quantity 'x1' will be shown for loot that has a quantity of 1. If disabled, single-quantity loot will not show the quantity at all."
--- L["ShowPartyAvatarDesc"] = "If enabled, the party avatar will be shown for party loot rows."
--- L["ShowProfessionIconDesc"] = "If enabled, the profession icon will be shown for profession rows."
--- L["ShowRepIconDesc"] = "If enabled, the reputation icon will be shown for reputation rows."
--- L["ShowTransmogIconDesc"] = "If enabled, the transmog icon will be shown for transmog rows."
--- L["ShowTravelPointIconDesc"] = "If enabled, the travel point icon will be shown for travel point rows."
+L["Hide All Icons"] = "Скрыть все иконки"
+L["HideAllIconsDesc"] = "Если включено, все иконки будут скрыты в ленте добычи."
+L["Show '1' Quantity"] = "Показывать количество '1'"
+L["Show Currency Icon"] = "Показывать иконку валюты"
+L["Show Experience Icon"] = "Показывать иконку опыта"
+L["Show Item Icon"] = "Показывать иконку предмета"
+L["Show Party Avatar"] = "Показывать аватары группы"
+L["Show Profession Icon"] = "Показывать иконку профессии"
+L["Show Reputation Icon"] = "Показывать иконку репутации"
+L["Show Transmog Icon"] = "Показывать иконку трансмога"
+L["Show Travel Point Icon"] = "Показывать иконку очков путешестий"
+L["ShowCurrencyIconDesc"] = "Если включено, иконка валюты будет показана в ленте добычи."
+L["ShowExperienceIconDesc"] = "Если включено, иконка опыта будет показана в ленте."
+L["ShowItemIconDesc"] = "Если включено, иконка предмета будет показана в ленте добычи."
+L["ShowOneQuantityDesc"] = "Если включено, количество 'x1' будет показано для единичной добычи. Если отключено, единичная добыча не будет показывать количество."
+L["ShowPartyAvatarDesc"] = "Если включено, аватары группы будут показаны в ленте добычи."
+L["ShowProfessionIconDesc"] = "Если включено, иконка профессии будет показана в ленте."
+L["ShowRepIconDesc"] = "Если включено, иконка репутации будет показана в ленте."
+L["ShowTransmogIconDesc"] = "Если включено, иконка новой модели трансмога будет показана в ленте добычи."
+L["ShowTravelPointIconDesc"] = "Если включено, иконка очков путешествий будет показана в ленте добычи."
 --#endregion
 
 --#region 1.25.0
