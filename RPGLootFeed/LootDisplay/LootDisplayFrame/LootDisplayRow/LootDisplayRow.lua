@@ -98,6 +98,8 @@ function LootDisplayRowMixin:Init()
 	self.ClickableButton:SetScript("OnLeave", nil)
 	self.ClickableButton:SetScript("OnMouseUp", nil)
 	self.ClickableButton:SetScript("OnEvent", nil)
+	self.PrimaryText:SetTextColor(unpack(defaultColor))
+	self.SecondaryText:SetTextColor(unpack(defaultColor))
 
 	self.showForSeconds = G_RLF.db.global.animations.exit.fadeOutDelay
 
