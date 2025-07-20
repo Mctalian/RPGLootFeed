@@ -184,6 +184,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 			},
 			locale = {
 				factionMap = {},
+				accountWideFactionMap = {},
 			},
 			profile = {},
 		}

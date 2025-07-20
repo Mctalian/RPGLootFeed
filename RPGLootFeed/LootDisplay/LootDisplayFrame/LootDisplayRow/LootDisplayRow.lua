@@ -1790,13 +1790,19 @@ function LootDisplayRowMixin:ShowItemCountText(itemCount, options)
 
 	local sChar, eChar = G_RLF:GetWrapChars(wrapChar)
 
-	if itemCount and (itemCount > 1 or (showSign and itemCount >= 1)) then
-		local sign = ""
-		if showSign then
-			sign = "+"
+	if itemCount then
+		local itemCountType = type(itemCount)
+		if itemCountType == "number" and (itemCount > 1 or (showSign and itemCount >= 1)) then
+			local sign = ""
+			if showSign then
+				sign = "+"
+			end
+			self.ItemCountText:SetText(color .. sChar .. sign .. itemCount .. eChar .. "|r")
+			self.ItemCountText:Show()
+		elseif itemCountType == "string" and itemCount ~= "" then
+			self.ItemCountText:SetText(color .. sChar .. itemCount .. eChar .. "|r")
+			self.ItemCountText:Show()
 		end
-		self.ItemCountText:SetText(color .. sChar .. sign .. itemCount .. eChar .. "|r")
-		self.ItemCountText:Show()
 	else
 		self.ItemCountText:Hide()
 	end
