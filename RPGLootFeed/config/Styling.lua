@@ -145,7 +145,7 @@ G_RLF.options.args.styles = {
 					desc = G_RLF.L["RowBorderThicknessDesc"],
 					min = 1,
 					max = 10,
-					step = 1,
+					bigStep = 1,
 					disabled = function(info, value)
 						return G_RLF.db.global.styling.enableRowBorder == false
 					end,
