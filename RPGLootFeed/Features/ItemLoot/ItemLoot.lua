@@ -398,14 +398,31 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 			local alwaysShowSubTypes = { Cloth = true, Leather = true, Mail = true, Plate = true }
 			local equipLocShowSubType = { INVTYPE_WEAPONMAINHAND = true, INVTYPE_WEAPONOFFHAND = true, };
 			local equipLocShowOnlySubType = { INVTYPE_WEAPON = true, INVTYPE_2HWEAPON = true }
+			local extraText = ""
 			if info.itemEquipLoc and info.itemSubType and alwaysShowSubTypes[info.itemSubType] then
-				secondaryText = secondaryText .. " [" .. _G[info.itemEquipLoc] .. " - " .. info.itemSubType .. "]"
+				extraText = " [" .. _G[info.itemEquipLoc] .. " - " .. info.itemSubType .. "]"
 			elseif info.itemEquipLoc and equipLocShowSubType[info.itemEquipLoc] and info.itemSubType then 
-				secondaryText = secondaryText .. " [" .. _G[info.itemEquipLoc] .. " - " .. info.itemSubType .. "]"
+				extraText = " [" .. _G[info.itemEquipLoc] .. " - " .. info.itemSubType .. "]"
 			elseif info.itemEquipLoc and equipLocShowOnlySubType[info.itemEquipLoc] and info.itemSubType then 
-				secondaryText = secondaryText .. " [" .. info.itemSubType .. "]"
+				extraText = " [" .. info.itemSubType .. "]"
 			elseif info.itemEquipLoc then
-				secondaryText = secondaryText .. " [" .. _G[info.itemEquipLoc] .. "]"
+				extraText = " [" .. _G[info.itemEquipLoc] .. "]"
+			end
+			if extraText then
+				if not info:IsEligibleEquipment() and info.classID == Enum.ItemClass.Armor then 
+					extraText = string.format(
+						"%s%s|r",
+						G_RLF:RGBAToHexFormat(1, 0, 0, 1),
+						extraText
+					)
+				else 
+					extraText = string.format(
+						"%s%s|r",
+						G_RLF:RGBAToHexFormat(1, 1, 1, 1),
+						extraText
+					)
+				end
+				return secondaryText .. extraText
 			end
 			return secondaryText
 		end
