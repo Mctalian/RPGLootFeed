@@ -393,8 +393,21 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 						G_RLF.tertiaryToString[TertiaryStats.Indestructible]
 					)
 				end
-				return secondaryText
 			end
+			
+			local alwaysShowSubTypes = { Cloth = true, Leather = true, Mail = true, Plate = true }
+			local equipLocShowSubType = { INVTYPE_WEAPONMAINHAND = true, INVTYPE_WEAPONOFFHAND = true, };
+			local equipLocShowOnlySubType = { INVTYPE_WEAPON = true, INVTYPE_2HWEAPON = true }
+			if info.itemEquipLoc and info.itemSubType and alwaysShowSubTypes[info.itemSubType] then
+				secondaryText = secondaryText .. " [" .. _G[info.itemEquipLoc] .. " - " .. info.itemSubType .. "]"
+			elseif info.itemEquipLoc and equipLocShowSubType[info.itemEquipLoc] and info.itemSubType then 
+				secondaryText = secondaryText .. " [" .. _G[info.itemEquipLoc] .. " - " .. info.itemSubType .. "]"
+			elseif info.itemEquipLoc and equipLocShowOnlySubType[info.itemEquipLoc] and info.itemSubType then 
+				secondaryText = secondaryText .. " [" .. info.itemSubType .. "]"
+			elseif info.itemEquipLoc then
+				secondaryText = secondaryText .. " [" .. _G[info.itemEquipLoc] .. "]"
+			end
+			return secondaryText
 		end
 
 		local quantity = ...

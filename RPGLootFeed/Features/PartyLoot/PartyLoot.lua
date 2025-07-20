@@ -110,6 +110,19 @@ function PartyLoot.Element:new(...)
 		end
 	end
 
+	local alwaysShowSubTypes = { Cloth = true, Leather = true, Mail = true, Plate = true }
+	local equipLocShowSubType = { INVTYPE_WEAPONMAINHAND = true, INVTYPE_WEAPONOFFHAND = true, };
+	local equipLocShowOnlySubType = { INVTYPE_WEAPON = true, INVTYPE_2HWEAPON = true }
+	if info.itemEquipLoc and info.itemSubType and alwaysShowSubTypes[info.itemSubType] then
+		element.secondaryText = element.secondaryText .. " |cffffffff[" .. _G[info.itemEquipLoc] .. " - " .. info.itemSubType .. "]|r"
+	elseif info.itemEquipLoc and equipLocShowSubType[info.itemEquipLoc] and info.itemSubType then 
+		element.secondaryText = element.secondaryText .. " |cffffffff[" .. _G[info.itemEquipLoc] .. " - " .. info.itemSubType .. "]|r"
+	elseif info.itemEquipLoc and equipLocShowOnlySubType[info.itemEquipLoc] and info.itemSubType then 
+		element.secondaryText = element.secondaryText .. " |cffffffff[" .. info.itemSubType .. "]|r"
+	elseif info.itemEquipLoc then
+		element.secondaryText = element.secondaryText .. " |cffffffff[" .. _G[info.itemEquipLoc] .. "]|r"
+	end
+
 	element.unitClass = select(2, UnitClass(element.unit))
 	if GetExpansionLevel() >= G_RLF.Expansion.BFA then
 		element.secondaryTextColor = C_ClassColor.GetClassColor(select(2, UnitClass(element.unit)))
