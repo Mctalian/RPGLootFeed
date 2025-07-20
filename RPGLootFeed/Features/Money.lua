@@ -16,7 +16,7 @@ function Money.Element:new(...)
 
 	element.type = "Money"
 	element.icon = G_RLF.DefaultIcons.MONEY
-	if not G_RLF.db.global.money.enableIcon then
+	if not G_RLF.db.global.money.enableIcon or G_RLF.db.global.misc.hideAllIcons then
 		element.icon = nil
 	end
 	element.quality = G_RLF.ItemQualEnum.Poor

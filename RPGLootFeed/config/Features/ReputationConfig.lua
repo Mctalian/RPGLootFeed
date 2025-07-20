@@ -17,6 +17,7 @@ G_RLF.defaults.global.rep = {
 	enableRepLevel = true,
 	repLevelColor = { 0.5, 0.5, 1, 1 },
 	repLevelTextWrapChar = G_RLF.WrapCharEnum.ANGLE,
+	enableIcon = true,
 }
 
 G_RLF.options.args.features.args.repConfig = {
@@ -52,6 +53,22 @@ G_RLF.options.args.features.args.repConfig = {
 			end,
 			order = 1.1,
 			args = {
+				showIcon = {
+					type = "toggle",
+					name = G_RLF.L["Show Reputation Icon"],
+					desc = G_RLF.L["ShowRepIconDesc"],
+					width = "double",
+					disabled = function()
+						return G_RLF.db.global.misc.hideAllIcons
+					end,
+					get = function()
+						return G_RLF.db.global.rep.enableIcon
+					end,
+					set = function(_, value)
+						G_RLF.db.global.rep.enableIcon = value
+					end,
+					order = 0.5,
+				},
 				defaultRepColor = {
 					type = "color",
 					hasAlpha = true,

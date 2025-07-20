@@ -17,7 +17,7 @@ local function startswith(str, start)
 end
 
 function PartyLootConfig:GetPositioningOptions(order)
-	order = order or 1.1
+	order = order or 9.1
 	return {
 		type = "group",
 		inline = true,
@@ -137,7 +137,7 @@ function PartyLootConfig:GetPositioningOptions(order)
 end
 
 function PartyLootConfig:GetSizingOptions(order)
-	order = order or 1.2
+	order = order or 9.2
 	return {
 		type = "group",
 		inline = true,
@@ -247,7 +247,7 @@ function PartyLootConfig:GetSizingOptions(order)
 end
 
 function PartyLootConfig:GetStylingOptions(order)
-	order = order or 1.3
+	order = order or 9.3
 	return {
 		type = "group",
 		inline = true,
@@ -693,6 +693,7 @@ G_RLF.defaults.global.partyLoot = {
 	},
 	---@type number[]
 	ignoreItemIds = {},
+	enableIcon = true,
 }
 
 G_RLF.options.args.features.args.partyLootConfig = {
@@ -723,27 +724,22 @@ G_RLF.options.args.features.args.partyLootConfig = {
 			end,
 			order = 2,
 			args = {
-				separateFrame = {
+				showIcon = {
 					type = "toggle",
-					name = G_RLF.L["Separate Frame"],
-					desc = G_RLF.L["SeparateFrameDesc"],
+					name = G_RLF.L["Show Item Icon"],
+					desc = G_RLF.L["ShowItemIconDesc"],
 					width = "double",
+					disabled = function()
+						return G_RLF.db.global.misc.hideAllIcons
+					end,
 					get = function()
-						return G_RLF.db.global.partyLoot.separateFrame
+						return G_RLF.db.global.partyLoot.enableIcon
 					end,
 					set = function(_, value)
-						G_RLF.db.global.partyLoot.separateFrame = value
-						if value then
-							G_RLF.LootDisplay:CreatePartyFrame()
-						else
-							G_RLF.LootDisplay:DestroyPartyFrame()
-						end
+						G_RLF.db.global.partyLoot.enableIcon = value
 					end,
-					order = 1,
+					order = 0.5,
 				},
-				positioning = PartyLootConfig:GetPositioningOptions(),
-				sizing = PartyLootConfig:GetSizingOptions(),
-				styling = PartyLootConfig:GetStylingOptions(),
 				hideServerNames = {
 					type = "toggle",
 					name = G_RLF.L["Hide Server Names"],
@@ -827,6 +823,27 @@ G_RLF.options.args.features.args.partyLootConfig = {
 					end,
 					order = 5,
 				},
+				separateFrame = {
+					type = "toggle",
+					name = G_RLF.L["Separate Frame"],
+					desc = G_RLF.L["SeparateFrameDesc"],
+					width = "double",
+					get = function()
+						return G_RLF.db.global.partyLoot.separateFrame
+					end,
+					set = function(_, value)
+						G_RLF.db.global.partyLoot.separateFrame = value
+						if value then
+							G_RLF.LootDisplay:CreatePartyFrame()
+						else
+							G_RLF.LootDisplay:DestroyPartyFrame()
+						end
+					end,
+					order = 9,
+				},
+				positioning = PartyLootConfig:GetPositioningOptions(),
+				sizing = PartyLootConfig:GetSizingOptions(),
+				styling = PartyLootConfig:GetStylingOptions(),
 			},
 		},
 	},

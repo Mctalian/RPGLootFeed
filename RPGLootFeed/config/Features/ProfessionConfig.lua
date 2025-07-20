@@ -15,6 +15,7 @@ G_RLF.defaults.global.prof = {
 	showSkillChange = true,
 	skillColor = { 0.333, 0.333, 1.0, 1.0 },
 	skillTextWrapChar = G_RLF.WrapCharEnum.BRACKET,
+	enableIcon = true,
 }
 
 G_RLF.options.args.features.args.professionConfig = {
@@ -50,6 +51,22 @@ G_RLF.options.args.features.args.professionConfig = {
 			end,
 			order = 1.1,
 			args = {
+				showIcon = {
+					type = "toggle",
+					name = G_RLF.L["Show Profession Icon"],
+					desc = G_RLF.L["ShowProfessionIconDesc"],
+					width = "double",
+					disabled = function()
+						return G_RLF.db.global.misc.hideAllIcons
+					end,
+					get = function()
+						return G_RLF.db.global.prof.enableIcon
+					end,
+					set = function(_, value)
+						G_RLF.db.global.prof.enableIcon = value
+					end,
+					order = 1,
+				},
 				skillChangeOptions = {
 					type = "group",
 					inline = true,

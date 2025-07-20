@@ -268,6 +268,9 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 	end
 
 	element.icon = info.itemTexture
+	if not G_RLF.db.global.item.enableIcon or G_RLF.db.global.misc.hideAllIcons then
+		element.icon = nil
+	end
 	element.sellPrice = info.sellPrice
 	local itemQualitySettings = G_RLF.db.global.item.itemQualitySettings[info.itemQuality]
 	if itemQualitySettings and itemQualitySettings.enabled and itemQualitySettings.duration > 0 then

@@ -58,6 +58,22 @@ G_RLF.options.args.features.args.moneyConfig = {
 			end,
 			order = 1.1,
 			args = {
+				showIcon = {
+					type = "toggle",
+					name = G_RLF.L["Show Money Icon"],
+					desc = G_RLF.L["ShowMoneyIconDesc"],
+					width = "double",
+					disabled = function()
+						return G_RLF.db.global.misc.hideAllIcons
+					end,
+					get = function()
+						return G_RLF.db.global.money.enableIcon
+					end,
+					set = function(_, value)
+						G_RLF.db.global.money.enableIcon = value
+					end,
+					order = 0.5,
+				},
 				-- TODO: Money total is in secondary text row, unlike other total counters
 				-- Will need to make Money consistent with other features to have the same
 				-- options for total counters.
@@ -155,19 +171,6 @@ G_RLF.options.args.features.args.moneyConfig = {
 						G_RLF.db.global.money.accountantMode = value
 					end,
 					order = 3,
-				},
-				showIcon = {
-					type = "toggle",
-					name = G_RLF.L["Show Money Icon"],
-					desc = G_RLF.L["ShowMoneyIconDesc"],
-					width = "double",
-					get = function()
-						return G_RLF.db.global.money.enableIcon
-					end,
-					set = function(_, value)
-						G_RLF.db.global.money.enableIcon = value
-					end,
-					order = 4,
 				},
 				overrideMoneyLootSound = {
 					type = "toggle",

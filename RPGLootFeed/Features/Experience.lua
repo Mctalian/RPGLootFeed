@@ -28,6 +28,9 @@ function Xp.Element:new(...)
 	end
 	element.itemCount = currentLevel
 	element.icon = G_RLF.DefaultIcons.XP
+	if not G_RLF.db.global.xp.enableIcon or G_RLF.db.global.misc.hideAllIcons then
+		element.icon = nil
+	end
 	element.quality = G_RLF.ItemQualEnum.Epic
 
 	element.secondaryTextFn = function()

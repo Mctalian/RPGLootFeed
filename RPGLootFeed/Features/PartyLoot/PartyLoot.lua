@@ -35,6 +35,9 @@ function PartyLoot.Element:new(...)
 	element.itemId = info.itemId
 	element.key = info.itemLink
 	element.icon = info.itemTexture
+	if not G_RLF.db.global.partyLoot.enableIcon or G_RLF.db.global.misc.hideAllIcons then
+		element.icon = nil
+	end
 
 	if info.keystoneInfo ~= nil then
 		element.quality = G_RLF.ItemQualEnum.Epic

@@ -13,6 +13,7 @@ G_RLF.defaults.global = G_RLF.defaults.global or {}
 G_RLF.defaults.global.travelPoints = {
 	enabled = true,
 	textColor = { 1, 0.988, 0.498, 1 },
+	enableIcon = true,
 }
 
 G_RLF.options.args.features.args.travelPoints = {
@@ -49,6 +50,22 @@ G_RLF.options.args.features.args.travelPoints = {
 				return not G_RLF.db.global.travelPoints.enabled
 			end,
 			args = {
+				showIcon = {
+					type = "toggle",
+					name = G_RLF.L["Show Travel Point Icon"],
+					desc = G_RLF.L["ShowTravelPointIconDesc"],
+					width = "double",
+					disabled = function()
+						return G_RLF.db.global.misc.hideAllIcons
+					end,
+					get = function()
+						return G_RLF.db.global.travelPoints.enableIcon
+					end,
+					set = function(_, value)
+						G_RLF.db.global.travelPoints.enableIcon = value
+					end,
+					order = 0.5,
+				},
 				textColor = {
 					type = "color",
 					name = G_RLF.L["Travel Points Text Color"],

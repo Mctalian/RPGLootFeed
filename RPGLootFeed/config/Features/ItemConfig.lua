@@ -93,6 +93,7 @@ G_RLF.defaults.global.item = {
 			color = { 1, 1, 0, 1 }, -- Yellow
 		},
 	},
+	enableIcon = true,
 }
 
 G_RLF.options.args.features.args.itemLootConfig = {
@@ -128,6 +129,22 @@ G_RLF.options.args.features.args.itemLootConfig = {
 			end,
 			order = 1.1,
 			args = {
+				showIcon = {
+					type = "toggle",
+					name = G_RLF.L["Show Item Icon"],
+					desc = G_RLF.L["ShowItemIconDesc"],
+					width = "double",
+					disabled = function()
+						return G_RLF.db.global.misc.hideAllIcons
+					end,
+					get = function()
+						return G_RLF.db.global.item.enableIcon
+					end,
+					set = function(_, value)
+						G_RLF.db.global.item.enableIcon = value
+					end,
+					order = 0.5,
+				},
 				itemCountText = {
 					type = "group",
 					name = G_RLF.L["Item Count Text"],
