@@ -205,6 +205,7 @@ function LootDisplayRowMixin:Reset()
 
 	self.UnitPortrait:SetTexture(nil)
 	self.PrimaryText:SetText(nil)
+	self.PrimaryText:SetTextColor(unpack(defaultColor))
 	self.SecondaryText:SetText(nil)
 	self.SecondaryText:SetTextColor(unpack(defaultColor))
 	self.SecondaryText:Hide()
@@ -225,7 +226,6 @@ function LootDisplayRowMixin:Reset()
 	self.ClickableButton:SetScript("OnLeave", nil)
 	self.ClickableButton:SetScript("OnMouseUp", nil)
 	self.ClickableButton:SetScript("OnEvent", nil)
-	self.PrimaryText:SetTextColor(unpack(defaultColor))
 end
 
 function LootDisplayRowMixin:StyleElementFadeIn()
@@ -618,7 +618,6 @@ function LootDisplayRowMixin:StyleText()
 		if enabledSecondaryRowText and self.secondaryText ~= nil and self.secondaryText ~= "" then
 			self.SecondaryText:ClearAllPoints()
 			self.SecondaryText:SetJustifyH(anchor)
-			self.SecondaryText:SetTextColor(unpack(defaultColor))
 			if self.icon then
 				if self.unit then
 					if G_RLF.db.global.partyLoot.enablePartyAvatar then
