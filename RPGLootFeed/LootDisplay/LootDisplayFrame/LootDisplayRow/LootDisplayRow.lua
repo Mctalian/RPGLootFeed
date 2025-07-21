@@ -1703,6 +1703,8 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 				-- Open the ItemRefTooltip to mimic in-game chat behavior
 				SetItemRef(self.link, self.link, button, self.ClickableButton)
 			end
+		elseif button == "LeftButton" and IsControlKeyDown() then
+			DressUpItemLink(self.link)
 		elseif button == "LeftButton" and IsShiftKeyDown() then
 			-- Custom behavior for right click, if needed
 			if ChatEdit_GetActiveWindow() then
