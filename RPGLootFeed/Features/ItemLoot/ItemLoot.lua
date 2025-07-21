@@ -404,8 +404,12 @@ function ItemLoot.Element:new(info, quantity, fromLink)
 						G_RLF.tertiaryToString[TertiaryStats.Indestructible]
 					)
 				end
-				return secondaryText
 			end
+			local equipmentTypeText = info:GetEquipmentTypeText()
+			if equipmentTypeText then
+				return secondaryText .. equipmentTypeText
+			end
+			return secondaryText
 		end
 
 		local quantity = ...
