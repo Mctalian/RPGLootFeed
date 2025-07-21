@@ -122,6 +122,11 @@ function PartyLoot.Element:new(...)
 		end
 	end
 
+	local equipmentTypeText = info:GetEquipmentTypeText()
+	if equipmentTypeText then
+		element.secondaryText = element.secondaryText .. equipmentTypeText
+	end
+
 	element.unitClass = select(2, UnitClass(element.unit))
 	if GetExpansionLevel() >= G_RLF.Expansion.BFA then
 		element.secondaryTextColor = C_ClassColor.GetClassColor(select(2, UnitClass(element.unit)))
