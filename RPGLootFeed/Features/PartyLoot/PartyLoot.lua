@@ -110,36 +110,9 @@ function PartyLoot.Element:new(...)
 		end
 	end
 
-	if info:IsEquippableItem() then
-		local alwaysShowSubTypes = { Cloth = true, Leather = true, Mail = true, Plate = true }
-		local equipLocShowSubType = { INVTYPE_WEAPONMAINHAND = true, INVTYPE_WEAPONOFFHAND = true, };
-		local equipLocShowOnlySubType = { INVTYPE_WEAPON = true, INVTYPE_2HWEAPON = true }
-		local extraText = ""
-		if info.itemEquipLoc and info.itemSubType and alwaysShowSubTypes[info.itemSubType] then
-			extraText = " [" .. _G[info.itemEquipLoc] .. " - " .. info.itemSubType .. "]"
-		elseif info.itemEquipLoc and equipLocShowSubType[info.itemEquipLoc] and info.itemSubType then 
-			extraText = " [" .. _G[info.itemEquipLoc] .. " - " .. info.itemSubType .. "]"
-		elseif info.itemEquipLoc and equipLocShowOnlySubType[info.itemEquipLoc] and info.itemSubType then 
-			extraText = " [" .. info.itemSubType .. "]"
-		elseif info.itemEquipLoc then
-			extraText = " [" .. _G[info.itemEquipLoc] .. "]"
-		end
-		if extraText then
-			if not info:IsEligibleEquipment() and info.classID == Enum.ItemClass.Armor then 
-				extraText = string.format(
-					"%s%s|r",
-					G_RLF:RGBAToHexFormat(1, 0, 0, 1),
-					extraText
-				)
-			else 
-				extraText = string.format(
-					"%s%s|r",
-					G_RLF:RGBAToHexFormat(1, 1, 1, 1),
-					extraText
-				)
-			end
-			element.secondaryText = element.secondaryText .. extraText
-		end
+	local equipmentTypeText = info:GetEquipmentTypeText()
+	if equipmentTypeText then
+		element.secondaryText = element.secondaryText .. equipmentTypeText
 	end
 
 	element.unitClass = select(2, UnitClass(element.unit))
