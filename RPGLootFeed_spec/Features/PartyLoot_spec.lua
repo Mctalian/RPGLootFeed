@@ -86,6 +86,9 @@ describe("PartyLoot module", function()
 			IsMount = spyIsMount,
 			IsLegendary = spyIsLegendary,
 			IsEligibleEquipment = spyIsEligibleEquipment,
+			GetEquipmentTypeText = function()
+				return "Weapon"
+			end,
 		})
 
 		PartyModule:CHAT_MSG_LOOT(
@@ -136,6 +139,9 @@ describe("PartyLoot module", function()
 			IsMount = spyIsMount,
 			IsLegendary = spyIsLegendary,
 			IsEligibleEquipment = spyIsEligibleEquipment,
+			GetEquipmentTypeText = function()
+				return "Weapon"
+			end,
 		})
 
 		PartyModule.pendingPartyRequests[itemID] = { itemLink, amount, unit }
