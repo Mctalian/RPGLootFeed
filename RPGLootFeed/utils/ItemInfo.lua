@@ -377,7 +377,26 @@ function ItemInfo:GetEquipmentTypeText()
 		return nil
 	end
 
-	local alwaysShowSubTypes = { Cloth = true, Leather = true, Mail = true, Plate = true }
+	if not _G[self.itemEquipLoc] then
+		G_RLF:LogDebug(
+			string.format(
+				"ItemInfo:GetEquipmentTypeText: Item %s has an invalid itemEquipLoc %s",
+				self.itemLink,
+				self.itemEquipLoc
+			),
+			addonName,
+			G_RLF.FeatureModule.ItemLoot,
+			tostring(self.itemId)
+		)
+		return nil
+	end
+
+	local alwaysShowArmorSubTypes = {
+		[Enum.ItemArmorSubclass.Cloth] = true,
+		[Enum.ItemArmorSubclass.Leather] = true,
+		[Enum.ItemArmorSubclass.Mail] = true,
+		[Enum.ItemArmorSubclass.Plate] = true,
+	}
 	local equipLocShowSubType = { INVTYPE_WEAPONMAINHAND = true, INVTYPE_WEAPONOFFHAND = true }
 	local equipLocShowOnlySubType = {
 		INVTYPE_WEAPON = true,
@@ -388,8 +407,8 @@ function ItemInfo:GetEquipmentTypeText()
 	}
 
 	local equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. "]"
-	if self.itemSubType then
-		if alwaysShowSubTypes[self.itemSubType] then
+	if self.itemSubType and self.subclassID then
+		if self.classID == Enum.ItemClass.Armor and alwaysShowArmorSubTypes[self.subclassID] then
 			equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. " - " .. self.itemSubType .. "]"
 		elseif equipLocShowSubType[self.itemEquipLoc] then
 			equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. " - " .. self.itemSubType .. "]"
