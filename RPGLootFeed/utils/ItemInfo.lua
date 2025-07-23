@@ -379,7 +379,13 @@ function ItemInfo:GetEquipmentTypeText()
 
 	local alwaysShowSubTypes = { Cloth = true, Leather = true, Mail = true, Plate = true }
 	local equipLocShowSubType = { INVTYPE_WEAPONMAINHAND = true, INVTYPE_WEAPONOFFHAND = true }
-	local equipLocShowOnlySubType = { INVTYPE_WEAPON = true, INVTYPE_2HWEAPON = true }
+	local equipLocShowOnlySubType = {
+		INVTYPE_WEAPON = true,
+		INVTYPE_2HWEAPON = true,
+		INVTYPE_SHIELD = true,
+		INVTYPE_RANGEDRIGHT = true,
+		INVTYPE_RANGED = true,
+	}
 
 	local equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. "]"
 	if self.itemSubType then
