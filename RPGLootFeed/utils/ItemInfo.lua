@@ -381,15 +381,26 @@ function ItemInfo:GetEquipmentTypeText()
 	local equipLocShowSubType = { INVTYPE_WEAPONMAINHAND = true, INVTYPE_WEAPONOFFHAND = true }
 	local equipLocShowOnlySubType = { INVTYPE_WEAPON = true, INVTYPE_2HWEAPON = true }
 
-	local equipmentTypeText = ""
-	if self.itemSubType and alwaysShowSubTypes[self.itemSubType] then
-		equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. " - " .. self.itemSubType .. "]"
-	elseif equipLocShowSubType[self.itemEquipLoc] and self.itemSubType then
-		equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. " - " .. self.itemSubType .. "]"
-	elseif equipLocShowOnlySubType[self.itemEquipLoc] and self.itemSubType then
-		equipmentTypeText = " [" .. self.itemSubType .. "]"
+	local equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. "]"
+	if self.itemSubType then
+		if alwaysShowSubTypes[self.itemSubType] then
+			equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. " - " .. self.itemSubType .. "]"
+		elseif equipLocShowSubType[self.itemEquipLoc] then
+			equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. " - " .. self.itemSubType .. "]"
+		elseif equipLocShowOnlySubType[self.itemEquipLoc] then
+			equipmentTypeText = " [" .. self.itemSubType .. "]"
+		end
 	else
-		equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. "]"
+		G_RLF:LogDebug(
+			string.format(
+				"ItemInfo:GetEquipmentTypeText: Item %s has no itemSubType. subClassID? %d",
+				self.itemLink,
+				self.subclassID or -1
+			),
+			addonName,
+			G_RLF.FeatureModule.ItemLoot,
+			tostring(self.itemId)
+		)
 	end
 
 	if not self:IsEligibleEquipment() and self.classID == Enum.ItemClass.Armor then

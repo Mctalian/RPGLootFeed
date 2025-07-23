@@ -563,7 +563,7 @@ function ItemLoot:OnEnable()
 	self:RegisterEvent("CHAT_MSG_LOOT")
 	self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
-	if GetExpansionLevel() == G_RLF.Expansion.CATA then
+	if GetExpansionLevel() >= G_RLF.Expansion.CATA and GetExpansionLevel() <= G_RLF.Expansion.MOP then
 		self:SetEquippableArmorClass()
 	end
 end
@@ -586,7 +586,7 @@ function ItemLoot:SetEquippableArmorClass()
 		if not self.armorLevelListener then
 			self.armorLevelListener = self:RegisterBucketEvent("PLAYER_LEVEL_UP", 1, "SetEquippableArmorClass")
 		end
-		G_RLF.armorClassMapping = G_RLF.cataArmorClassMappingLowLevel
+		G_RLF.armorClassMapping = G_RLF.legacyArmorClassMappingLowLevel
 		return
 	end
 
