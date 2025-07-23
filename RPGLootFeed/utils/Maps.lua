@@ -22,7 +22,7 @@ G_RLF.standardArmorClassMapping = {
 
 G_RLF.armorClassMapping = G_RLF.standardArmorClassMapping
 
-G_RLF.cataArmorClassMappingLowLevel = {
+G_RLF.legacyArmorClassMappingLowLevel = {
 	WARRIOR = Enum.ItemArmorSubclass.Mail,
 	PALADIN = Enum.ItemArmorSubclass.Mail,
 	HUNTER = Enum.ItemArmorSubclass.Leather,
