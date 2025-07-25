@@ -36,7 +36,7 @@ local lootDisplayProperties = {
 ---@field public sellPrice number
 ---@field public highlight boolean
 ---@field public isLink boolean
----@field public icon number
+---@field public icon number?
 ---@field public eventChannel string
 ---@field public quantity number
 ---@field public quality number
