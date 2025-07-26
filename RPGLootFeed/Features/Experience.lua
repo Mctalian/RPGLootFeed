@@ -8,6 +8,23 @@ local G_RLF = ns
 local Xp = G_RLF.RLF:NewModule(G_RLF.FeatureModule.Experience, "AceEvent-3.0")
 local currentXP, currentMaxXP, currentLevel
 
+-- Context provider function to be registered when module is enabled
+local function createExperienceContextProvider()
+	return function(context, data)
+		-- Basic XP display
+		context.xpLabel = G_RLF.L["XP"]
+
+		-- Current XP percentage for secondary text
+		if currentXP and currentMaxXP and currentMaxXP > 0 then
+			local percentage = math.floor((currentXP / currentMaxXP) * 100)
+			context.currentXPPercentage = string.format("%.2f", percentage) .. "%%" -- need to escape % since it's being used in a gsub later
+		else
+			-- When XP data is not available, provide empty percentage
+			context.currentXPPercentage = ""
+		end
+	end
+end
+
 Xp.Element = {}
 
 function Xp.Element:new(...)
@@ -15,17 +32,18 @@ function Xp.Element:new(...)
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 
-	element.type = "Experience"
+	element.type = G_RLF.FeatureModule.Experience
 	element.IsEnabled = function()
 		return Xp:IsEnabled()
 	end
 
 	element.key = "EXPERIENCE"
 	element.quantity = ...
-	element.r, element.g, element.b, element.a = unpack(G_RLF.db.global.xp.experienceTextColor)
-	element.textFn = function(existingXP)
-		return "+" .. ((existingXP or 0) + element.quantity) .. " " .. G_RLF.L["XP"]
+	if not element.quantity or element.quantity == 0 then
+		return
 	end
+
+	element.r, element.g, element.b, element.a = unpack(G_RLF.db.global.xp.experienceTextColor)
 	element.itemCount = currentLevel
 	element.icon = G_RLF.DefaultIcons.XP
 	if not G_RLF.db.global.xp.enableIcon or G_RLF.db.global.misc.hideAllIcons then
@@ -33,19 +51,63 @@ function Xp.Element:new(...)
 	end
 	element.quality = G_RLF.ItemQualEnum.Epic
 
-	element.secondaryTextFn = function()
-		if not currentXP then
-			return ""
-		end
-		if not currentMaxXP then
-			return ""
-		end
-		local color = G_RLF:RGBAToHexFormat(element.r, element.g, element.b, element.a)
+	-- Generate text elements using the new data-driven approach
+	element.textElements = Xp:GenerateTextElements(element.quantity)
 
-		return "    " .. color .. math.floor((currentXP / currentMaxXP) * 10000) / 100 .. "%|r"
+	---@type RLF_LootElementData
+	local elementData = {
+		key = element.key,
+		type = "Experience", -- Use string type for context provider lookup
+		textElements = element.textElements,
+		quantity = element.quantity,
+		icon = element.icon,
+		quality = element.quality,
+	}
+
+	-- Replace the old textFn with a new one that uses TextTemplateEngine
+	element.textFn = function(existingXP)
+		return G_RLF.TextTemplateEngine:ProcessRowElements(1, elementData, existingXP)
+	end
+
+	-- Replace the old secondaryTextFn with new template-based approach
+	element.secondaryTextFn = function(existingXP)
+		return G_RLF.TextTemplateEngine:ProcessRowElements(2, elementData, existingXP)
 	end
 
 	return element
+end
+
+--- Generate text elements for Experience type using the new data-driven approach
+---@param quantity number The experience amount
+---@return table<number, table<string, RLF_TextElement>> textElements Row-indexed elements: [row][elementKey] = element
+function Xp:GenerateTextElements(quantity)
+	local elements = {}
+
+	-- Row 1: Primary experience display
+	elements[1] = {}
+	elements[1].primary = {
+		type = "primary",
+		template = "{sign}{amount} {xpLabel}",
+		order = 1,
+		color = nil, -- Will use configured XP color
+	}
+
+	-- Row 2: Context text element (XP percentage)
+	elements[2] = {}
+	elements[2].contextSpacer = {
+		type = "spacer",
+		spacerCount = 4, -- "    " spacing
+		order = 1,
+	}
+
+	elements[2].context = {
+		type = "context",
+		template = "{currentXPPercentage}",
+		order = 2,
+		color = nil,
+	}
+
+	return elements
 end
 
 local function initXpValues()
@@ -63,12 +125,19 @@ function Xp:OnInitialize()
 end
 
 function Xp:OnDisable()
+	-- Unregister our context provider
+	G_RLF.TextTemplateEngine.contextProviders["Experience"] = nil
+
 	self:UnregisterEvent("PLAYER_ENTERING_WORLD")
 	self:UnregisterEvent("PLAYER_XP_UPDATE")
 end
 
 function Xp:OnEnable()
 	G_RLF:LogDebug("OnEnable", addonName, self.moduleName)
+
+	-- Register our context provider with the TextTemplateEngine
+	G_RLF.TextTemplateEngine:RegisterContextProvider("Experience", createExperienceContextProvider())
+
 	self:RegisterEvent("PLAYER_ENTERING_WORLD")
 	self:RegisterEvent("PLAYER_XP_UPDATE")
 	if currentXP == nil then
@@ -108,7 +177,9 @@ function Xp:PLAYER_XP_UPDATE(eventName, unitTarget)
 	if delta > 0 then
 		self:fn(function()
 			local e = self.Element:new(delta)
-			e:Show()
+			if e then
+				e:Show()
+			end
 		end)
 	else
 		G_RLF:LogWarn(eventName .. " fired but delta was not positive", addonName, self.moduleName)
