@@ -383,8 +383,8 @@ function LootDisplayRowMixin:StyleIcon()
 
 	if changed then
 		self.Icon:ClearAllPoints()
-		self.Icon:SetSize(iconSize, iconSize)
-		self.Icon.IconBorder:SetSize(iconSize, iconSize)
+		G_RLF.PerfPixel.PSize(self.Icon, iconSize, iconSize)
+		G_RLF.PerfPixel.PSize(self.Icon.IconBorder, iconSize, iconSize)
 		local anchor, xOffset = "LEFT", iconSize / 4
 		if not leftAlign then
 			anchor, xOffset = "RIGHT", -xOffset
@@ -414,10 +414,10 @@ function LootDisplayRowMixin:StyleUnitPortrait()
 
 	if sizeChanged then
 		local portraitSize = iconSize * 0.8
-		self.UnitPortrait:SetSize(portraitSize, portraitSize)
+		G_RLF.PerfPixel.PSize(self.UnitPortrait, portraitSize, portraitSize)
 		self.UnitPortrait:ClearAllPoints()
 		local rlfIconSize = portraitSize * 0.6
-		self.RLFUser:SetSize(rlfIconSize, rlfIconSize)
+		G_RLF.PerfPixel.PSize(self.RLFUser, rlfIconSize, rlfIconSize)
 		self.RLFUser:ClearAllPoints()
 
 		local anchor, iconAnchor, xOffset = "LEFT", "RIGHT", iconSize / 4
@@ -675,10 +675,10 @@ function LootDisplayRowMixin:StyleRowBorders()
 
 	if self.cachedBorderSize ~= borderSize then
 		self.cachedBorderSize = borderSize
-		self.StaticTopBorder:SetHeight(borderSize)
-		self.StaticRightBorder:SetWidth(borderSize)
-		self.StaticBottomBorder:SetHeight(borderSize)
-		self.StaticLeftBorder:SetWidth(borderSize)
+		G_RLF.PerfPixel.PHeight(self.StaticTopBorder, borderSize)
+		G_RLF.PerfPixel.PWidth(self.StaticRightBorder, borderSize)
+		G_RLF.PerfPixel.PHeight(self.StaticBottomBorder, borderSize)
+		G_RLF.PerfPixel.PWidth(self.StaticLeftBorder, borderSize)
 	end
 
 	if self.cacheBorderColor ~= borderColor or self.cacheClassColors ~= classColors then
@@ -733,6 +733,10 @@ function LootDisplayRowMixin:StyleHighlightBorder()
 		self.cachedUpdateLoop = animationsDb.update.loop
 
 		local duration = animationsDb.update.duration
+		G_RLF.PerfPixel.PHeight(self.TopBorder, 1)
+		G_RLF.PerfPixel.PWidth(self.RightBorder, 1)
+		G_RLF.PerfPixel.PHeight(self.BottomBorder, 1)
+		G_RLF.PerfPixel.PWidth(self.LeftBorder, 1)
 		local borders = {
 			self.TopBorder,
 			self.RightBorder,
@@ -1002,7 +1006,7 @@ function LootDisplayRowMixin:StyleIconHighlight()
 		self.glowTexture:SetTexCoord(0.00781250, 0.50781250, 0.27734375, 0.52734375)
 	end
 
-	self.glowTexture:SetSize(self.Icon:GetWidth() * 1.75, self.Icon:GetHeight() * 1.75)
+	G_RLF.PerfPixel.PSize(self.glowTexture, self.Icon:GetWidth() * 1.75, self.Icon:GetHeight() * 1.75)
 	self.glowTexture:Hide()
 
 	-- Create the animation group if it doesn't exist
@@ -1069,21 +1073,21 @@ function LootDisplayRowMixin:CreateScriptedEffects()
 		self.leftSideTexture:SetTexture("Interface\\LootFrame\\CosmeticToast")
 		self.leftSideTexture:SetTexCoord(0.03, 0.06, 0.05, 0.95)
 		self.leftSideTexture:SetPoint("TOPLEFT", self, "TOPLEFT")
-		self.leftSideTexture:SetSize(scaledWidth, scaledHeight)
+		G_RLF.PerfPixel.PSize(self.leftSideTexture, scaledWidth, scaledHeight)
 
 		self.rightSideTexture:ClearAllPoints()
 		self.rightSideTexture:SetTexture("Interface\\LootFrame\\CosmeticToast")
 		self.rightSideTexture:SetTexCoord(0.535, 0.565, 0.05, 0.95)
 		self.rightSideTexture:SetPoint("TOPRIGHT", self, "TOPRIGHT")
-		self.rightSideTexture:SetSize(scaledWidth, scaledHeight)
+		G_RLF.PerfPixel.PSize(self.rightSideTexture, scaledWidth, scaledHeight)
 
 		local modelSceneHeight = 0.7 * scaledHeight
 		local modelSceneWidth = 0.8 * scaledWidth
 		self.leftModelScene:SetPoint("TOPLEFT", self.leftSideTexture, "TOPLEFT")
-		self.leftModelScene:SetSize(modelSceneWidth, modelSceneHeight)
+		G_RLF.PerfPixel.PSize(self.leftModelScene, modelSceneWidth, modelSceneHeight)
 
 		self.rightModelScene:SetPoint("TOPRIGHT", self.rightSideTexture, "TOPRIGHT")
-		self.rightModelScene:SetSize(modelSceneWidth, modelSceneHeight)
+		G_RLF.PerfPixel.PSize(self.rightModelScene, modelSceneWidth, modelSceneHeight)
 
 		self.leftSideTexture:Hide()
 		self.rightSideTexture:Hide()
@@ -1869,10 +1873,10 @@ function LootDisplayRowMixin:UpdateIcon(key, icon, quality)
 		end
 
 		if self.Icon.IconOverlay then
-			self.Icon.IconOverlay:SetSize(iconSize, iconSize)
+			G_RLF.PerfPixel.PSize(self.Icon.IconOverlay, iconSize, iconSize)
 		end
 		if self.Icon.ProfessionQualityOverlay then
-			self.Icon.ProfessionQualityOverlay:SetSize(iconSize, iconSize)
+			G_RLF.PerfPixel.PSize(self.Icon.ProfessionQualityOverlay, iconSize, iconSize)
 		end
 
 		if stylingDb.enableTopLeftIconText and self.topLeftText and self.topLeftColor then

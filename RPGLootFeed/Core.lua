@@ -44,6 +44,7 @@ G_RLF.iconGroup = G_RLF.Masque and G_RLF.Masque:Group(addonName)
 local dbName = addonName .. "DB"
 G_RLF.acd = LibStub("AceConfigDialog-3.0") --[[@as AceConfigDialog-3.0]]
 G_RLF.DBIcon = LibStub("LibDBIcon-1.0")
+G_RLF.PerfPixel = LibStub("LibPixelPerfect-1.0")
 
 local TestMode
 function RLF:OnInitialize()
