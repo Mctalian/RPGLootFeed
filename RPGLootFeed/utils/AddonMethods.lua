@@ -149,6 +149,13 @@ function G_RLF:CreatePatternSegmentsForStringNumber(localeString)
 	end
 	local midPattern = string.sub(localeString, preEnd + 1, midStart - 1)
 	local postPattern = string.sub(localeString, midEnd + 1)
+	if string.find(postPattern, "%%") then
+		-- If the postPattern contains a format token, we need to adjust it
+		local postStart, postEnd = string.find(postPattern, "%%")
+		if postStart then
+			postPattern = string.sub(postPattern, 1, postStart - 1)
+		end
+	end
 	return { prePattern, midPattern, postPattern }
 end
 

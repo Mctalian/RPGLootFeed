@@ -134,11 +134,37 @@ local function runReputationIntegrationTest()
 	local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Reputation) --[[@as RLF_Reputation]]
 	local testObj = TestMode.testFactions[2]
 	local amountLooted = 664
-	local e = module.Element:new(amountLooted, testObj)
-	runTestSafely(e.Show, "LootDisplay: Reputation", e)
-	e = module.Element:new(amountLooted, testObj)
-	runTestSafely(e.Show, "LootDisplay: Reputation Quantity Update", e)
-	return 1
+	runTestSafely(
+		module.CHAT_MSG_COMBAT_FACTION_CHANGE,
+		"LootDisplay: Reputation with Bonus",
+		module,
+		"CHAT_MSG_COMBAT_FACTION_CHANGE",
+		string.format(_G.FACTION_STANDING_INCREASED_ACH_BONUS, testObj, amountLooted, amountLooted / 2)
+	)
+	runTestSafely(
+		module.CHAT_MSG_COMBAT_FACTION_CHANGE,
+		"LootDisplay: Reputation with Bonus Update",
+		module,
+		"CHAT_MSG_COMBAT_FACTION_CHANGE",
+		string.format(_G.FACTION_STANDING_INCREASED_ACH_BONUS, testObj, amountLooted, amountLooted / 2)
+	)
+
+	testObj = TestMode.testFactions[1]
+	runTestSafely(
+		module.CHAT_MSG_COMBAT_FACTION_CHANGE,
+		"LootDisplay: Reputation",
+		module,
+		"CHAT_MSG_COMBAT_FACTION_CHANGE",
+		string.format(_G.FACTION_STANDING_INCREASED, testObj, 1030)
+	)
+	runTestSafely(
+		module.CHAT_MSG_COMBAT_FACTION_CHANGE,
+		"LootDisplay: Reputation Update",
+		module,
+		"CHAT_MSG_COMBAT_FACTION_CHANGE",
+		string.format(_G.FACTION_STANDING_INCREASED, testObj, 307)
+	)
+	return 2
 end
 
 local function runProfessionIntegrationTest()
