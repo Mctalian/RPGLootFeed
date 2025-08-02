@@ -96,6 +96,11 @@ local function mockLibStub(lib, silence)
 		stub(libStubReturn[lib], "AddButtonToCompartment")
 	elseif lib == "LibEasyMenu" then
 		stub(libStubReturn[lib], "EasyMenu")
+	elseif lib == "LibPixelPerfect-1.0" then
+		stub(libStubReturn[lib], "PSize")
+		stub(libStubReturn[lib], "PScale")
+		stub(libStubReturn[lib], "PHeight")
+		stub(libStubReturn[lib], "PWidth")
 	else
 		error("Unmocked library: " .. lib)
 	end

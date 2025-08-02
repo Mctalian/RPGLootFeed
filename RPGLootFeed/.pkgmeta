@@ -24,6 +24,7 @@ externals:
     curse-slug: libeasymenu
   Libs/LibSharedMedia-3.0: https://repos.curseforge.com/wow/libsharedmedia-3-0/trunk/LibSharedMedia-3.0
   Libs/LibStub: https://repos.wowace.com/wow/ace3/trunk/LibStub
+  Libs/LibPixelPerfect-1.0: https://github.com/McTalian/LibPixelPerfect-1.0/LibPixelPerfect-1.0
 
 enable-nolib-creation: yes
 github-release-as-changelog: yes
