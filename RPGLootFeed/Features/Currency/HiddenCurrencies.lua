@@ -12,12 +12,26 @@ G_RLF.hiddenCurrencies = {
 	[3315] = true, -- https://wowhead.com/currency=3315/renown-gallagio-loyalty-rewards-club
 	[3314] = true, -- https://wowhead.com/currency=3314/11-raid-renown-gallagio-speed-buff-acct-tracker
 	[3313] = true, -- https://wowhead.com/currency=3313/11-raid-renown-gallagio-raid-buff-acct-tracker
+	[3308] = true, -- https://wowhead.com/currency=3308/11-2-raid-renown-manaforge-speed-buff-acct-tracker
+	[3307] = true, -- https://wowhead.com/currency=3307/11-2-raid-renown-manaforge-raid-buff-acct-tracker
+	[3306] = true, -- https://wowhead.com/currency=3306/manaforge-vandals
+	[3305] = true, -- https://wowhead.com/currency=3305/renown-manaforge-vandals
+	[3304] = true, -- https://wowhead.com/currency=3304/manaforge-vandals
+	[3291] = true, -- https://wowhead.com/currency=3291/gilded-ethereal-crest
+	[3289] = true, -- https://wowhead.com/currency=3289/runed-ethereal-crest
+	[3287] = true, -- https://wowhead.com/currency=3287/carved-ethereal-crest
+	[3285] = true, -- https://wowhead.com/currency=3285/weathered-ethereal-crest
 	[3283] = true, -- https://wowhead.com/currency=3283/flames-radiance
 	[3282] = true, -- https://wowhead.com/currency=3282/gallagio-loyalty-rewards-club
 	[3280] = true, -- https://wowhead.com/currency=3280/11-raid-renown-gallagio-speed-buff-acct-tracker
 	[3279] = true, -- https://wowhead.com/currency=3279/11-raid-renown-gallagio-raid-buff-acct-tracker
+	[3278] = true, -- https://wowhead.com/currency=3278/ethereal-strands
+	[3272] = true, -- https://wowhead.com/currency=3272/delvers-journey
+	[3271] = true, -- https://wowhead.com/currency=3271/renown-season-3-delves
+	[3270] = true, -- https://wowhead.com/currency=3270/11-2-delves-personal-tracker-s3-weekly-elise-turn-in-hidden
+	[3269] = true, -- https://wowhead.com/currency=3269/ethereal-voidsplinter
 	[3254] = true, -- https://wowhead.com/currency=3254/chases-test-currency-dnt
-	[3253] = true, -- https://wowhead.com/currency=3253/11-1-delves-bountiful-tracker-progress-cap-mislaid
+	[3253] = true, -- https://wowhead.com/currency=3253/11-x-delves-bountiful-tracker-progress-cap-mislaid
 	[3248] = true, -- https://wowhead.com/currency=3248/blacksmithing-specialization-reset
 	[3247] = true, -- https://wowhead.com/currency=3247/tailoring-specialization-reset
 	[3246] = true, -- https://wowhead.com/currency=3246/skinning-specialization-reset
@@ -57,7 +71,7 @@ G_RLF.hiddenCurrencies = {
 	[3145] = true, -- https://wowhead.com/currency=3145/11-0-5-20th-anniversary-tracker
 	[3144] = true, -- https://wowhead.com/currency=3144/11-0-5-20th-anniversary-tracker
 	[3143] = true, -- https://wowhead.com/currency=3143/unused-11-0-delves-bountiful-tracker-delvers-journey-cap
-	[3142] = true, -- https://wowhead.com/currency=3142/11-0-delves-bountiful-tracker-brann-exp-cap
+	[3142] = true, -- https://wowhead.com/currency=3142/11-x-delves-bountiful-tracker-brann-exp-cap
 	[3140] = true, -- https://wowhead.com/currency=3140/11-1-5-arathi-renown-rank
 	[3139] = true, -- https://wowhead.com/currency=3139/plunder
 	[3137] = true, -- https://wowhead.com/currency=3137/renown-gallagio-loyalty-rewards-club
@@ -66,6 +80,8 @@ G_RLF.hiddenCurrencies = {
 	[3132] = true, -- https://wowhead.com/currency=3132/11-1-professions-personal-tracker-s2-spark-drops-hidden
 	[3131] = true, -- https://wowhead.com/currency=3131/delvers-journey
 	[3130] = true, -- https://wowhead.com/currency=3130/renown-season-2-delves
+	[3129] = true, -- https://wowhead.com/currency=3129/the-karesh-trust
+	[3128] = true, -- https://wowhead.com/currency=3128/renown-the-karesh-trust
 	[3120] = true, -- https://wowhead.com/currency=3120/the-cartels-of-undermine
 	[3118] = true, -- https://wowhead.com/currency=3118/the-cartels-of-undermine
 	[3116] = true, -- https://wowhead.com/currency=3116/essence-of-kajamite
@@ -74,6 +90,10 @@ G_RLF.hiddenCurrencies = {
 	[3113] = true, -- https://wowhead.com/currency=3113/runed-undermine-crest
 	[3112] = true, -- https://wowhead.com/currency=3112/carved-undermine-crest
 	[3111] = true, -- https://wowhead.com/currency=3111/weathered-undermine-crest
+	[3110] = true, -- https://wowhead.com/currency=3110/gilded-undermine-crest
+	[3109] = true, -- https://wowhead.com/currency=3109/runed-undermine-crest
+	[3108] = true, -- https://wowhead.com/currency=3108/carved-undermine-crest
+	[3107] = true, -- https://wowhead.com/currency=3107/weathered-undermine-crest
 	[3104] = true, -- https://wowhead.com/currency=3104/11-0-delves-system-seasonal-affix-events-maximum
 	[3103] = true, -- https://wowhead.com/currency=3103/11-0-delves-system-seasonal-affix-events-active
 	[3102] = true, -- https://wowhead.com/currency=3102/bronze-celebration-token
