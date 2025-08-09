@@ -397,6 +397,9 @@ function ItemInfo:GetEquipmentTypeText()
 		[Enum.ItemArmorSubclass.Mail] = true,
 		[Enum.ItemArmorSubclass.Plate] = true,
 	}
+	local equipLocNeverShowSubType = {
+		INVTYPE_CLOAK = true,
+	}
 	local equipLocShowSubType = { INVTYPE_WEAPONMAINHAND = true, INVTYPE_WEAPONOFFHAND = true }
 	local equipLocShowOnlySubType = {
 		INVTYPE_WEAPON = true,
@@ -408,7 +411,9 @@ function ItemInfo:GetEquipmentTypeText()
 
 	local equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. "]"
 	if self.itemSubType and self.subclassID then
-		if self.classID == Enum.ItemClass.Armor and alwaysShowArmorSubTypes[self.subclassID] then
+		if equipLocNeverShowSubType[self.itemEquipLoc] then
+			equipmentTypeText = equipmentTypeText
+		elseif self.classID == Enum.ItemClass.Armor and alwaysShowArmorSubTypes[self.subclassID] then
 			equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. " - " .. self.itemSubType .. "]"
 		elseif equipLocShowSubType[self.itemEquipLoc] then
 			equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. " - " .. self.itemSubType .. "]"
