@@ -4,6 +4,42 @@ local addonName, ns = ...
 ---@class G_RLF
 local G_RLF = ns
 
+local TertiaryStats = G_RLF.TertiaryStats
+
+local SocketFDIDMap = {
+	["EMPTY_SOCKET_BLUE"] = 136256,
+	["EMPTY_SOCKET_META"] = 136257,
+	["EMPTY_SOCKET_RED"] = 136258,
+	["EMPTY_SOCKET_YELLOW"] = 136259,
+	["EMPTY_SOCKET_NO_COLOR"] = 458977,
+	["EMPTY_SOCKET_HYDRAULIC"] = 407325,
+	["EMPTY_SOCKET_COGWHEEL"] = 407324,
+	["EMPTY_SOCKET_PRISMATIC"] = 458977,
+	["EMPTY_SOCKET_PUNCHCARDRED"] = 2958630,
+	["EMPTY_SOCKET_PUNCHCARDYELLOW"] = 2958631,
+	["EMPTY_SOCKET_PUNCHCARDBLUE"] = 2958629,
+	["EMPTY_SOCKET_DOMINATION"] = 4095404,
+	["EMPTY_SOCKET_CYPHER"] = 407324,
+	["EMPTY_SOCKET_TINKER"] = 2958630,
+	["EMPTY_SOCKET_PRIMORDIAL"] = 407324,
+	["EMPTY_SOCKET_FRAGRANCE"] = 407324,
+	["EMPTY_SOCKET_SINGING_THUNDER"] = 2958631,
+	["EMPTY_SOCKET_SINGING_SEA"] = 2958629,
+	["EMPTY_SOCKET_SINGING_WIND"] = 2958630,
+	["EMPTY_SOCKET_SINGINGTHUNDER"] = 2958631,
+	["EMPTY_SOCKET_SINGINGSEA"] = 2958629,
+	["EMPTY_SOCKET_SINGINGWIND"] = 2958630,
+}
+
+local TertiaryStatMap = {
+	["ITEM_MOD_CR_SPEED_SHORT"] = TertiaryStats.Speed,
+	["ITEM_MOD_CR_LIFESTEAL_SHORT"] = TertiaryStats.Leech,
+	["ITEM_MOD_CR_AVOIDANCE_SHORT"] = TertiaryStats.Avoid,
+}
+local IndestructibleMap = {
+	["ITEM_MOD_CR_STURDINESS_SHORT"] = TertiaryStats.Indestructible,
+}
+
 ---@class RLF_KeystoneInfo
 ---@field itemId number
 ---@field dungeonId number
@@ -35,6 +71,8 @@ local G_RLF = ns
 ---@field setID number
 ---@field isCraftingReagent boolean
 ---@field keystoneInfo RLF_KeystoneInfo
+---@field itemRolls RLF_ItemRolls
+---@field stats table
 local ItemInfo = {}
 ItemInfo.__index = ItemInfo
 
@@ -78,6 +116,8 @@ function ItemInfo:new(
 	setID,
 	isCraftingReagent
 )
+	---@type RLF_ItemInfo
+	---@diagnostic disable-next-line: missing-fields
 	local instance = {}
 	setmetatable(instance, ItemInfo)
 	if type(itemId) == "string" then
@@ -113,7 +153,98 @@ function ItemInfo:new(
 	instance.itemId = tonumber(instance.itemId)
 	instance:populateKeystoneInfo()
 
+	instance.itemRolls = instance:getItemRolls()
+
 	return instance
+end
+
+---@class RLF_ItemRolls
+---@field tertiaryStat G_RLF.TertiaryStats
+---@field socketString string
+---@field isSocketed boolean
+---@field numSockets number
+---@field isIndestructible boolean
+
+--- Get the tertiary stat and socket string for an item
+--- @return RLF_ItemRolls
+function ItemInfo:getItemRolls()
+	local itemRolls = {
+		isIndestructible = false,
+		tertiaryStat = TertiaryStats.None,
+		isSocketed = false,
+		numSockets = 0,
+		socketString = "",
+	}
+	local stats
+	if C_Item.GetItemStats then
+		stats = C_Item.GetItemStats(self.itemLink)
+	else
+		-- Fallback for older WoW versions
+		stats = GetItemStats(self.itemLink)
+	end
+
+	if not stats then
+		G_RLF:LogDebug(
+			"No stats found for item: " .. self.itemLink,
+			addonName,
+			G_RLF.FeatureModule.ItemLoot,
+			tostring(self.itemId)
+		)
+		return itemRolls
+	end
+
+	self.stats = stats
+
+	for k, v in pairs(stats) do
+		if k:find("ITEM_MOD_CR_") and v > 0 then
+			G_RLF:LogDebug("Found tertiary stat: " .. k, addonName, G_RLF.FeatureModule.ItemLoot, tostring(self.itemId))
+			if TertiaryStatMap[k] then
+				itemRolls.tertiaryStat = TertiaryStatMap[k]
+			elseif IndestructibleMap[k] then
+				itemRolls.isIndestructible = true
+			else
+				G_RLF:LogWarn(
+					"Unknown tertiary stat: " .. k,
+					addonName,
+					G_RLF.FeatureModule.ItemLoot,
+					tostring(self.itemId)
+				)
+			end
+		end
+
+		if k:find("EMPTY_SOCKET_") and v > 0 then
+			G_RLF:LogDebug(
+				"Found empty socket type: " .. k,
+				addonName,
+				G_RLF.FeatureModule.ItemLoot,
+				tostring(self.itemId)
+			)
+			if SocketFDIDMap[k] then
+				itemRolls.isSocketed = true
+				itemRolls.numSockets = itemRolls.numSockets + v
+				itemRolls.socketString = "|T" .. SocketFDIDMap[k] .. ":0|t"
+			else
+				G_RLF:LogWarn(
+					"Unknown socket type: " .. k,
+					addonName,
+					G_RLF.FeatureModule.ItemLoot,
+					tostring(self.itemId)
+				)
+			end
+		elseif k:find("SOCKET") and v > 0 then
+			-- Handle the case where the socket is not in the map but still has a value
+			itemRolls.isSocketed = true
+			itemRolls.numSockets = itemRolls.numSockets + v
+			G_RLF:LogDebug(
+				"Found some sort of socket? " .. k .. " " .. tostring(v),
+				addonName,
+				G_RLF.FeatureModule.ItemLoot,
+				tostring(self.itemId)
+			)
+		end
+	end
+
+	return itemRolls
 end
 
 function ItemInfo:populateKeystoneInfo()
@@ -149,7 +280,7 @@ function ItemInfo:populateKeystoneInfo()
 		return
 	end
 	keystoneInfo.itemId = itemId
-	local numModifiers = fields[14]
+	local numModifiers = tonumber(fields[14]) or 0
 	for i = 1, numModifiers do
 		local modifierValue = tonumber(fields[14 + i * 2])
 		if modifierValue then
@@ -208,6 +339,21 @@ function ItemInfo:IsLegendary()
 	return self.itemQuality == G_RLF.ItemQualEnum.Legendary
 end
 
+---Determine if the item is a Mythic Keystone
+---@return boolean
+function ItemInfo:IsKeystone()
+	return self.keystoneInfo ~= nil
+end
+
+---Get the display quality for this item (e.g., keystones are always Epic)
+---@return number
+function ItemInfo:GetDisplayQuality()
+	if self:IsKeystone() then
+		return G_RLF.ItemQualEnum.Epic
+	end
+	return self.itemQuality
+end
+
 function ItemInfo:IsAppearanceCollected()
 	if not self:IsEquippableItem() then
 		return true -- non-equippable items are not tracked for appearances
@@ -264,6 +410,90 @@ function ItemInfo:IsAppearanceCollected()
 	end
 
 	return true -- If we can't determine, assume it's collected
+end
+
+function ItemInfo:HasItemRollBonus()
+	return self.itemRolls
+		and (
+			self.itemRolls.tertiaryStat ~= TertiaryStats.None
+			or self.itemRolls.isSocketed
+			or self.itemRolls.isIndestructible
+		)
+end
+
+function ItemInfo:GetItemRollText()
+	local secondaryText = ""
+	local stats = self.itemRolls
+	if stats.isSocketed then
+		secondaryText = string.format(
+			"%s%s%s %s|r ",
+			G_RLF:RGBAToHexFormat(0.95, 0.90, 0.60, 1),
+			secondaryText,
+			stats.socketString,
+			G_RLF.L["Socket"]
+		)
+		if stats.numSockets > 1 then
+			secondaryText = stats.numSockets .. "x " .. secondaryText
+		end
+	end
+	if stats.tertiaryStat ~= TertiaryStats.None then
+		secondaryText = string.format(
+			"%s%s%s|r ",
+			G_RLF:RGBAToHexFormat(0.00, 0.55, 0.50, 1),
+			secondaryText,
+			G_RLF.tertiaryToString[stats.tertiaryStat]
+		)
+	end
+	if stats.isIndestructible then
+		secondaryText = string.format(
+			"%s%s%s|r",
+			G_RLF:RGBAToHexFormat(0.80, 0.60, 0.00, 1),
+			secondaryText,
+			G_RLF.tertiaryToString[TertiaryStats.Indestructible]
+		)
+	end
+
+	return secondaryText
+end
+
+function ItemInfo:GetUpgradeText(fromInfo, fontSize)
+	local toItemLevel = self.itemLevel
+	local fromItemLevel = fromInfo and fromInfo.itemLevel or 0
+	if toItemLevel == 0 or fromItemLevel == 0 then
+		return ""
+	end
+	local fromStr = G_RLF:RGBAToHexFormat(1, 1, 1, 1) .. fromItemLevel .. "|r"
+	local toStr
+	if toItemLevel > fromItemLevel then
+		toStr = G_RLF:RGBAToHexFormat(0.12, 1.0, 0, 1) .. toItemLevel .. "|r"
+	elseif toItemLevel == fromItemLevel and not self:IsKeystone() then
+		-- Need to figure out what changed
+		local fromItemRollText = fromInfo:GetItemRollText()
+		local toItemRollText = self:GetItemRollText()
+		if fromItemRollText ~= toItemRollText then
+			fromStr = fromItemRollText
+			toStr = toItemRollText
+
+			if fromStr == "" then
+				fromStr = G_RLF.L["None"]
+			end
+		else
+			G_RLF:LogDebug(
+				"ItemInfo:GetUpgradeText: No upgrade detected, item levels are equal and no item roll changes",
+				addonName,
+				G_RLF.FeatureModule.ItemLoot,
+				tostring(self.itemId)
+			)
+			return ""
+		end
+	else
+		toStr = G_RLF:RGBAToHexFormat(1.0, 0.12, 0.12, 1) .. toItemLevel .. "|r"
+	end
+	local atlasIcon = "npe_arrowrightglow"
+	local sizeCoeff = G_RLF.AtlasIconCoefficients[atlasIcon] or 1
+	local atlasIconSize = fontSize * sizeCoeff
+	local atlasArrow = CreateAtlasMarkup(atlasIcon, atlasIconSize, atlasIconSize, 0, 0)
+	return "    " .. fromStr .. " " .. atlasArrow .. " " .. toStr
 end
 
 ---Determine the highest armor proficiency the character has; Clients prior to Cata only
