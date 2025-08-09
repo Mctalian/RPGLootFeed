@@ -2,6 +2,9 @@ local enums = {}
 
 _G.Enum = {
 	ItemArmorSubclass = {
+		Cloth = 1,
+		Leather = 2,
+		Mail = 3,
 		Plate = 4,
 	},
 	ItemClass = { Armor = 4, Questitem = 12, Miscellaneous = 15 },

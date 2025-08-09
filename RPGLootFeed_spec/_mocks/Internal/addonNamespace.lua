@@ -158,6 +158,7 @@ function addonNamespaceMocks:unitLoadedAfter(loadSection)
 		addonNamespaceMocks.ItemInfo.IsLegendary = stub(ns.ItemInfo, "IsLegendary")
 		addonNamespaceMocks.ItemInfo.IsEligibleEquipment = stub(ns.ItemInfo, "IsEligibleEquipment")
 		addonNamespaceMocks.ItemInfo.IsEquippableItem = stub(ns.ItemInfo, "IsEquippableItem")
+		addonNamespaceMocks.ItemInfo.HasItemRollBonus = stub(ns.ItemInfo, "HasItemRollBonus")
 		addonNamespaceMocks.ItemInfo.GetEquipmentTypeText = stub(ns.ItemInfo, "GetEquipmentTypeText")
 	end
 	if loadSection >= addonNamespaceMocks.LoadSections.UtilsLogger then
