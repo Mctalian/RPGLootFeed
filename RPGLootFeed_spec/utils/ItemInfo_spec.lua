@@ -1203,4 +1203,156 @@ describe("ItemInfo", function()
 			assert.are.equal(13, item.itemLevel)
 		end)
 	end)
+
+	-- New Classic (pre-Cata) eligibility tests leveraging ClassicSkillLineCheck
+	describe("IsEligibleEquipment (Classic pre-Cata)", function()
+		it("treats 'Plate Mail' skill as Plate proficiency", function()
+			-- Force Classic branch
+			functionMocks.GetExpansionLevel.returns(ns.Expansion.WOTLK)
+
+			-- Equip slot map for chest
+			ns.equipSlotMap = { INVTYPE_CHEST = 5 }
+
+			-- Provide subclass display names returned by the API
+			---@diagnostic disable-next-line: duplicate-set-field
+			_G.C_Item.GetItemSubClassInfo = function(itemClass, subClass)
+				if itemClass ~= Enum.ItemClass.Armor then
+					return nil
+				end
+				if subClass == Enum.ItemArmorSubclass.Cloth then
+					return "Cloth"
+				end
+				if subClass == Enum.ItemArmorSubclass.Leather then
+					return "Leather"
+				end
+				if subClass == Enum.ItemArmorSubclass.Mail then
+					return "Mail"
+				end
+				if subClass == Enum.ItemArmorSubclass.Plate then
+					return "Plate"
+				end -- Classic skill line is 'Plate Mail'
+				return nil
+			end
+
+			-- WoW provides strmatch as a global; ensure it exists in tests
+			_G.strmatch = _G.strmatch or string.match
+
+			-- Simulate Classic skill lines including "Plate Mail"
+			_G.GetNumSkillLines = function()
+				return 3
+			end
+			local skills = {
+				{ name = "Armor", isHeader = true },
+				{ name = "Mail", isHeader = false },
+				{ name = "Plate Mail", isHeader = false },
+			}
+			_G.GetSkillLineInfo = function(i)
+				local s = skills[i]
+				if not s then
+					return nil
+				end
+				-- name, isHeader, a, skillRank, b, c, skillMaxRank
+				return s.name, s.isHeader, 0, 300, 0, 0, 300
+			end
+
+			local item = ItemInfo:new(
+				18803,
+				"Plate Chest",
+				"itemLink",
+				2,
+				100,
+				1,
+				"Armor",
+				"Plate",
+				1,
+				"INVTYPE_CHEST",
+				"texture",
+				0,
+				Enum.ItemClass.Armor,
+				Enum.ItemArmorSubclass.Plate,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.is_true(item:IsEligibleEquipment())
+		end)
+
+		it("is ineligible when highest Classic skill is below item subclass", function()
+			-- Force Classic branch
+			functionMocks.GetExpansionLevel.returns(ns.Expansion.WOTLK)
+
+			-- Equip slot map for chest
+			ns.equipSlotMap = { INVTYPE_CHEST = 5 }
+
+			-- Provide subclass display names
+			---@diagnostic disable-next-line: duplicate-set-field
+			_G.C_Item.GetItemSubClassInfo = function(itemClass, subClass)
+				if itemClass ~= Enum.ItemClass.Armor then
+					return nil
+				end
+				if subClass == Enum.ItemArmorSubclass.Cloth then
+					return "Cloth"
+				end
+				if subClass == Enum.ItemArmorSubclass.Leather then
+					return "Leather"
+				end
+				if subClass == Enum.ItemArmorSubclass.Mail then
+					return "Mail"
+				end
+				if subClass == Enum.ItemArmorSubclass.Plate then
+					return "Plate"
+				end
+				return nil
+			end
+
+			_G.strmatch = _G.strmatch or string.match
+
+			-- Only up to Mail skill present
+			_G.GetNumSkillLines = function()
+				return 2
+			end
+			local skills = {
+				{ name = "Armor", isHeader = true },
+				{ name = "Mail", isHeader = false },
+			}
+			_G.GetSkillLineInfo = function(i)
+				local s = skills[i]
+				if not s then
+					return nil
+				end
+				return s.name, s.isHeader, 0, 300, 0, 0, 300
+			end
+
+			local item = ItemInfo:new(
+				18804,
+				"Plate Chest",
+				"itemLink",
+				2,
+				100,
+				1,
+				"Armor",
+				"Plate",
+				1,
+				"INVTYPE_CHEST",
+				"texture",
+				0,
+				Enum.ItemClass.Armor,
+				Enum.ItemArmorSubclass.Plate,
+				1,
+				1,
+				1,
+				false
+			)
+			if not item then
+				assert.is_not_nil(item)
+				return
+			end
+			assert.is_false(item:IsEligibleEquipment())
+		end)
+	end)
 end)
