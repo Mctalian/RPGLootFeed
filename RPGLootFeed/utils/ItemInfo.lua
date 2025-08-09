@@ -496,21 +496,44 @@ function ItemInfo:GetUpgradeText(fromInfo, fontSize)
 	return "    " .. fromStr .. " " .. atlasArrow .. " " .. toStr
 end
 
+local nameToSubClass
+local plateName
 ---Determine the highest armor proficiency the character has; Clients prior to Cata only
 ---@return number | nil
 local function ClassicSkillLineCheck()
+	if not nameToSubClass then
+		nameToSubClass = {}
+		local subClasses = {
+			Enum.ItemArmorSubclass.Cloth,
+			Enum.ItemArmorSubclass.Leather,
+			Enum.ItemArmorSubclass.Mail,
+			Enum.ItemArmorSubclass.Plate,
+		}
+
+		for _, subClass in ipairs(subClasses) do
+			local name = C_Item.GetItemSubClassInfo(Enum.ItemClass.Armor, subClass)
+			if name then
+				nameToSubClass[name] = subClass
+				if subClass == Enum.ItemArmorSubclass.Plate then
+					plateName = name
+				end
+			end
+		end
+	end
+
 	local armorClass = nil
 	for i = 1, GetNumSkillLines() do
 		local skillName, isHeader, a, skillRank, b, c, skillMaxRank = GetSkillLineInfo(i)
 		if not isHeader then
-			if skillName == "Plate Mail" then
+			if nameToSubClass[skillName] and (armorClass == nil or armorClass < nameToSubClass[skillName]) then
+				armorClass = nameToSubClass[skillName]
+			elseif
+				not nameToSubClass[skillName]
+				and plateName
+				and nameToSubClass[plateName]
+				and strmatch(skillName, plateName)
+			then
 				armorClass = Enum.ItemArmorSubclass.Plate
-			elseif skillName == "Mail" and (armorClass == nil or armorClass < Enum.ItemArmorSubclass.Mail) then
-				armorClass = Enum.ItemArmorSubclass.Mail
-			elseif skillName == "Leather" and (armorClass == nil or armorClass < Enum.ItemArmorSubclass.Leather) then
-				armorClass = Enum.ItemArmorSubclass.Leather
-			elseif skillName == "Cloth" and armorClass == nil then
-				armorClass = Enum.ItemArmorSubclass.Cloth
 			end
 		end
 	end
