@@ -34,7 +34,8 @@ describe("Experience module", function()
 		end
 
 		-- Configure RGBAToHexFormat stub to return a proper color code
-		ns.RGBAToHexFormat.returns(ns.RGBAToHexFormat, "|cFFFFFFFF")
+		ns.RGBAToHexFormat.returns("|cFFEDCBA0")
+		ns.db.global.xp.experienceTextColor = { 0.93, 0.55, 0.63, 1.0 }
 
 		-- Load the LootDisplayProperties module to populate `ns`
 		assert(loadfile("RPGLootFeed/Features/_Internals/LootDisplayProperties.lua"))("TestAddon", ns)
@@ -95,7 +96,7 @@ describe("Experience module", function()
 			assert.is_not_nil(elements[1])
 			assert.is_not_nil(elements[1].primary)
 			assert.equal("primary", elements[1].primary.type)
-			assert.equal("{sign}{amount} {xpLabel}", elements[1].primary.template)
+			assert.equal("{sign}{total} {xpLabel}", elements[1].primary.template)
 			assert.equal(1, elements[1].primary.order)
 		end)
 
@@ -142,8 +143,10 @@ describe("Experience module", function()
 			-- Should contain the total amount: 500 + 250 = 750 XP
 			assert.truthy(result)
 			assert.is_string(result)
-			assert.matches("500", result) -- Fixed: using actual element base value
+			assert.matches("750", result)
 			assert.matches("XP", result)
+			assert.matches("|cFFEDCBA0", result)
+			assert.matches("|r", result) -- Ensure color reset at end
 		end)
 
 		it("secondaryTextFn shows XP percentage when XP data available", function()
@@ -151,7 +154,7 @@ describe("Experience module", function()
 			local originalUnitXP = _G.UnitXP
 			local originalUnitXPMax = _G.UnitXPMax
 			_G.UnitXP = function()
-				return 7500
+				return 7526
 			end
 			_G.UnitXPMax = function()
 				return 10000
@@ -163,10 +166,13 @@ describe("Experience module", function()
 			local element = XpModule.Element:new(500)
 			local result = element.secondaryTextFn(250)
 
-			-- Should contain percentage display (7500/10000 = 75%)
+			-- Should contain percentage display (7526/10000 = 75.26%)
 			assert.truthy(result)
 			assert.is_string(result)
-			assert.matches("75.00%%", result) -- Escape the dot and double % for literal match
+			assert.matches("    ", result) -- Check for 4 spaces
+			assert.matches("75.26%%", result) -- Escape the dot and double % for literal match
+			assert.matches("|cFFEDCBA0", result)
+			assert.matches("|r", result) -- Ensure color reset at end
 
 			-- Restore original functions
 			_G.UnitXP = originalUnitXP

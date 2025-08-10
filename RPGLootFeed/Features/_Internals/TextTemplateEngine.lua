@@ -119,6 +119,22 @@ function TextTemplateEngine:AbbreviateNumber(number)
 	return tostring(number)
 end
 
+--- Apply a text color to a string using hex format
+--- @param text string? The text to color
+--- @param color table? The color as an RGBA table
+function TextTemplateEngine:ApplyTextColor(text, color)
+	if not text or text == "" then
+		return ""
+	end
+	if not color or #color < 3 then
+		return text -- No color specified, return original text
+	end
+
+	-- Convert RGB to hex format and apply color
+	local hexColor = G_RLF:RGBAToHexFormat(unpack(color))
+	return hexColor .. text .. "|r" -- Append reset color code at the end
+end
+
 --- Process all text elements for a loot element data
 ---@param elementData RLF_LootElementData The loot element data
 ---@param existingQuantity? number Optional existing quantity
@@ -134,6 +150,7 @@ function TextTemplateEngine:ProcessAllTextElements(elementData, existingQuantity
 			else
 				result[rowNumber][elementKey] =
 					self:ProcessTemplate(textElement.template, elementData, existingQuantity)
+				result[rowNumber][elementKey] = self:ApplyTextColor(result[rowNumber][elementKey], textElement.color)
 			end
 		end
 	end
@@ -188,6 +205,7 @@ function TextTemplateEngine:ProcessRowElements(rowIndex, elementData, existingQu
 			processedText = string.rep(" ", item.element.spacerCount or 1)
 		else
 			processedText = self:ProcessTemplate(item.element.template, elementData, existingQuantity)
+			processedText = self:ApplyTextColor(processedText, item.element.color)
 		end
 
 		table.insert(result, processedText)

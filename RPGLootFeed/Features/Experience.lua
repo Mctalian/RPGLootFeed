@@ -16,7 +16,7 @@ local function createExperienceContextProvider()
 
 		-- Current XP percentage for secondary text
 		if currentXP and currentMaxXP and currentMaxXP > 0 then
-			local percentage = math.floor((currentXP / currentMaxXP) * 100)
+			local percentage = currentXP / currentMaxXP * 100
 			context.currentXPPercentage = string.format("%.2f", percentage) .. "%%" -- need to escape % since it's being used in a gsub later
 		else
 			-- When XP data is not available, provide empty percentage
@@ -43,7 +43,6 @@ function Xp.Element:new(...)
 		return
 	end
 
-	element.r, element.g, element.b, element.a = unpack(G_RLF.db.global.xp.experienceTextColor)
 	element.itemCount = currentLevel
 	element.icon = G_RLF.DefaultIcons.XP
 	if not G_RLF.db.global.xp.enableIcon or G_RLF.db.global.misc.hideAllIcons then
@@ -64,12 +63,10 @@ function Xp.Element:new(...)
 		quality = element.quality,
 	}
 
-	-- Replace the old textFn with a new one that uses TextTemplateEngine
 	element.textFn = function(existingXP)
 		return G_RLF.TextTemplateEngine:ProcessRowElements(1, elementData, existingXP)
 	end
 
-	-- Replace the old secondaryTextFn with new template-based approach
 	element.secondaryTextFn = function(existingXP)
 		return G_RLF.TextTemplateEngine:ProcessRowElements(2, elementData, existingXP)
 	end
@@ -83,13 +80,15 @@ end
 function Xp:GenerateTextElements(quantity)
 	local elements = {}
 
+	local xpTextColor = G_RLF.db.global.xp.experienceTextColor
+
 	-- Row 1: Primary experience display
 	elements[1] = {}
 	elements[1].primary = {
 		type = "primary",
-		template = "{sign}{amount} {xpLabel}",
+		template = "{sign}{total} {xpLabel}",
 		order = 1,
-		color = nil, -- Will use configured XP color
+		color = xpTextColor,
 	}
 
 	-- Row 2: Context text element (XP percentage)
@@ -104,7 +103,7 @@ function Xp:GenerateTextElements(quantity)
 		type = "context",
 		template = "{currentXPPercentage}",
 		order = 2,
-		color = nil,
+		color = xpTextColor,
 	}
 
 	return elements

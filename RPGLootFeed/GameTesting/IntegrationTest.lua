@@ -66,8 +66,18 @@ end
 
 local function runExperienceIntegrationTest()
 	local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Experience) --[[@as RLF_Experience]]
-	local e = module.Element:new(1337)
+	local e = module.Element:new(1336)
+	if not e then
+		G_RLF:Print("Experience element not created, something went wrong")
+		return 1
+	end
 	runTestSafely(e.Show, "LootDisplay: Experience", e)
+	e = module.Element:new(1)
+	if not e then
+		G_RLF:Print("Experience update element not created, something went wrong")
+		return 1
+	end
+	runTestSafely(e.Show, "LootDisplay: Experience Update", e)
 	return 1
 end
 
@@ -169,7 +179,7 @@ end
 
 local function runProfessionIntegrationTest()
 	local module = G_RLF.RLF:GetModule(G_RLF.FeatureModule.Profession) --[[@as RLF_Professions]]
-	local icon = "4620671"
+	local icon = 4620671
 	-- So far, MoP Classic and below doesn't have this icon
 	if not G_RLF:IsRetail() then
 		icon = G_RLF.DefaultIcons.PROFESSION
