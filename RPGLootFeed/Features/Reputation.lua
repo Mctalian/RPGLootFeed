@@ -432,6 +432,7 @@ function Rep:ParseFactionChangeMessage(message)
 		faction, repChange = extractFactionAndRepForDelves(message, self.companionFactionName)
 		if faction then
 			isDelveCompanion = true
+			isAccountWide = true
 		end
 	end
 	return faction, repChange, isDelveCompanion, isAccountWide
@@ -447,8 +448,6 @@ function Rep:PLAYER_ENTERING_WORLD(eventName, isLogin, isReload)
 				self.companionFactionName = factionData.name
 			end
 		end
-	end
-	if GetExpansionLevel() >= G_RLF.Expansion.TWW then
 		self.delversJourney = C_MajorFactions.GetMajorFactionRenownInfo(CURRENT_SEASON_DELVE_JOURNEY)
 	end
 end

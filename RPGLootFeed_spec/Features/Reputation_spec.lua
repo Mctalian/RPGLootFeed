@@ -12,12 +12,12 @@ local spy = busted.spy
 describe("Reputation module", function()
 	local _ = match._
 	local RepModule, ns
-	local reputationMocks, gossipInfoMocks, delvesUIMocks, majorFactionMocks
+	local reputationMocks, gossipInfoMocks, delvesUIMocks, majorFactionMocks, functionMocks
 
 	setup(function()
 		require("RPGLootFeed_spec._mocks.WoWGlobals")
 		require("RPGLootFeed_spec._mocks.WoWGlobals.Enum")
-		require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
+		functionMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.Functions")
 		reputationMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_Reputation")
 		majorFactionMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_MajorFactions")
 		gossipInfoMocks = require("RPGLootFeed_spec._mocks.WoWGlobals.namespaces.C_GossipInfo")
@@ -42,7 +42,7 @@ describe("Reputation module", function()
 		-- Load the list module before each test
 		RepModule = assert(loadfile("RPGLootFeed/Features/Reputation.lua"))("TestAddon", ns)
 		RepModule:OnInitialize()
-		RepModule:PLAYER_ENTERING_WORLD(true, false)
+		RepModule:PLAYER_ENTERING_WORLD("PLAYER_ENTERING_WORLD", true, false)
 		nsMocks.SendMessage:clear()
 		nsMocks.LogWarn:clear()
 	end)
@@ -108,9 +108,33 @@ describe("Reputation module", function()
 
 	it("handles delve companion experience gains", function()
 		local newElement = spy.on(RepModule.Element, "new")
+		functionMocks.GetExpansionLevel.returns(ns.Expansion.TWW)
 		ns.ExtractDynamicsFromPattern = function()
 			return nil, nil
 		end
+		gossipInfoMocks.GetFriendshipReputation.returns({
+			standing = 10,
+			reactionThreshold = 10,
+			nextThreshold = 500,
+		})
+		gossipInfoMocks.GetFriendshipReputationRanks.returns({
+			currentLevel = 1,
+			maxLevel = 10,
+		})
+		reputationMocks.GetFactionDataByID.returns({
+			name = "Brann Bronzebeard",
+			factionID = 2640,
+			reaction = 8,
+			isAccountWide = true,
+		})
+		reputationMocks.GetFactionDataByIndex.returns({
+			name = "Brann Bronzebeard",
+			factionID = 2640,
+			reaction = 8,
+			isAccountWide = true,
+		})
+		RepModule:PLAYER_ENTERING_WORLD("PLAYER_ENTERING_WORLD", true, false)
+
 		local success = RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE(
 			"CHAT_MSG_COMBAT_FACTION_CHANGE",
 			"Brann Bronzebeard has gained 313 experience."
@@ -121,11 +145,12 @@ describe("Reputation module", function()
 		assert.spy(newElement).was.called_with(RepModule.Element, 313, "Brann Bronzebeard", 0, 1, 0, 2640, _, 4)
 		assert.spy(nsMocks.SendMessage).was.called(1)
 		-- Successfully populates the locale cache
-		assert.equal(ns.db.locale.factionMap["Brann Bronzebeard"], 2640)
+		assert.equal(ns.db.locale.accountWideFactionMap["Brann Bronzebeard"], 2640)
 	end)
 
 	it("handles delve companion experience when it causes companion to reach max level", function()
 		local newElement = spy.on(RepModule.Element, "new")
+		functionMocks.GetExpansionLevel.returns(ns.Expansion.TWW)
 		ns.ExtractDynamicsFromPattern = function()
 			return nil, nil
 		end
@@ -139,16 +164,30 @@ describe("Reputation module", function()
 			maxLevel = 10,
 		})
 		reputationMocks.GetFactionDataByID.returns({
+			name = "Brann Bronzebeard",
+			factionID = 2640,
 			reaction = 8,
+			isAccountWide = true,
+		})
+		reputationMocks.GetFactionDataByIndex.returns({
+			name = "Brann Bronzebeard",
+			factionID = 2640,
+			reaction = 8,
+			isAccountWide = true,
 		})
 
 		local expectedFactionData = {
+			name = "Brann Bronzebeard",
+			factionID = 2640,
 			currentLevel = 10,
 			currentXp = 0,
 			reaction = 8,
 			nextLevelAt = 0,
 			maxLevel = 10,
+			isAccountWide = true,
 		}
+
+		RepModule:PLAYER_ENTERING_WORLD("PLAYER_ENTERING_WORLD", true, false)
 
 		local success = RepModule:CHAT_MSG_COMBAT_FACTION_CHANGE(
 			"CHAT_MSG_COMBAT_FACTION_CHANGE",
@@ -160,7 +199,7 @@ describe("Reputation module", function()
 		assert.spy(newElement).was.called_with(_, 313, "Brann Bronzebeard", 0, 1, 0, 2640, expectedFactionData, 4)
 		assert.spy(nsMocks.SendMessage).was.called(1)
 		-- Successfully populates the locale cache
-		assert.equal(ns.db.locale.factionMap["Brann Bronzebeard"], 2640)
+		assert.equal(ns.db.locale.accountWideFactionMap["Brann Bronzebeard"], 2640)
 	end)
 
 	describe("element.textFn", function()
