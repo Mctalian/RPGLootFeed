@@ -303,42 +303,187 @@ function PartyLootConfig:GetStylingOptions(order)
 				end,
 				order = 2,
 			},
-			gradientStart = {
-				type = "color",
-				name = G_RLF.L["Background Gradient Start"],
-				desc = G_RLF.L["GradientStartDesc"],
-				hasAlpha = true,
-				get = function(info, value)
-					local r, g, b, a = unpack(G_RLF.db.global.partyLoot.styling.rowBackgroundGradientStart)
-					return r, g, b, a
-				end,
-				set = function(info, r, g, b, a)
-					G_RLF.db.global.partyLoot.styling.rowBackgroundGradientStart = { r, g, b, a }
-					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
-				end,
+			background = {
+				type = "group",
+				name = G_RLF.L["Background"],
+				inline = true,
 				order = 3,
-			},
-			gradientEnd = {
-				type = "color",
-				name = G_RLF.L["Background Gradient End"],
-				desc = G_RLF.L["GradientEndDesc"],
-				hasAlpha = true,
-				get = function(info, value)
-					local r, g, b, a = unpack(G_RLF.db.global.partyLoot.styling.rowBackgroundGradientEnd)
-					return r, g, b, a
-				end,
-				set = function(info, r, g, b, a)
-					G_RLF.db.global.partyLoot.styling.rowBackgroundGradientEnd = { r, g, b, a }
-					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
-				end,
-				order = 4,
+				args = {
+					backgroundType = {
+						type = "select",
+						name = G_RLF.L["Background Type"],
+						desc = G_RLF.L["BackgroundTypeDesc"],
+						width = "double",
+						values = {
+							-- May add this in at some point if requested
+							-- [G_RLF.RowBackground.NONE] = G_RLF.L["None"]
+							[G_RLF.RowBackground.GRADIENT] = G_RLF.L["Gradient"],
+							[G_RLF.RowBackground.TEXTURED] = G_RLF.L["Textured"],
+						},
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.rowBackgroundType
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.rowBackgroundType = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 1,
+					},
+					gradientStart = {
+						type = "color",
+						name = G_RLF.L["Background Gradient Start"],
+						desc = G_RLF.L["GradientStartDesc"],
+						hasAlpha = true,
+						width = "double",
+						hidden = function()
+							return G_RLF.db.global.partyLoot.styling.rowBackgroundType ~= G_RLF.RowBackground.GRADIENT
+						end,
+						get = function(info, value)
+							local r, g, b, a = unpack(G_RLF.db.global.partyLoot.styling.rowBackgroundGradientStart)
+							return r, g, b, a
+						end,
+						set = function(info, r, g, b, a)
+							G_RLF.db.global.partyLoot.styling.rowBackgroundGradientStart = { r, g, b, a }
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 2.1,
+					},
+					gradientEnd = {
+						type = "color",
+						name = G_RLF.L["Background Gradient End"],
+						desc = G_RLF.L["GradientEndDesc"],
+						hasAlpha = true,
+						width = "double",
+						hidden = function()
+							return G_RLF.db.global.partyLoot.styling.rowBackgroundType ~= G_RLF.RowBackground.GRADIENT
+						end,
+						get = function(info, value)
+							local r, g, b, a = unpack(G_RLF.db.global.partyLoot.styling.rowBackgroundGradientEnd)
+							return r, g, b, a
+						end,
+						set = function(info, r, g, b, a)
+							G_RLF.db.global.partyLoot.styling.rowBackgroundGradientEnd = { r, g, b, a }
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 2.2,
+					},
+					backgroundTexture = {
+						type = "select",
+						dialogControl = "LSM30_Background",
+						name = G_RLF.L["Background Texture"],
+						desc = G_RLF.L["BackgroundTextureDesc"],
+						hidden = function()
+							return G_RLF.db.global.partyLoot.styling.rowBackgroundType ~= G_RLF.RowBackground.TEXTURED
+						end,
+						width = "double",
+						values = function()
+							return G_RLF.lsm:HashTable(G_RLF.lsm.MediaType.BACKGROUND)
+						end,
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.rowBackgroundTexture
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.rowBackgroundTexture = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 2.1,
+					},
+					backgroundTextureColor = {
+						type = "color",
+						name = G_RLF.L["Background Texture Color"],
+						desc = G_RLF.L["BackgroundTextureColorDesc"],
+						hasAlpha = true,
+						width = "double",
+						hidden = function()
+							return G_RLF.db.global.partyLoot.styling.rowBackgroundType ~= G_RLF.RowBackground.TEXTURED
+						end,
+						get = function(info, value)
+							local r, g, b, a = unpack(G_RLF.db.global.partyLoot.styling.rowBackgroundTextureColor)
+							return r, g, b, a
+						end,
+						set = function(info, r, g, b, a)
+							G_RLF.db.global.partyLoot.styling.rowBackgroundTextureColor = { r, g, b, a }
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 2.2,
+					},
+					insetDesc = {
+						type = "description",
+						name = string.format("\n%s", G_RLF.L["BackdropInsetsDesc"]),
+						order = 3,
+					},
+					insetTop = {
+						type = "range",
+						name = G_RLF.L["Top Inset"],
+						desc = G_RLF.L["TopInsetDesc"],
+						min = 0,
+						max = 20,
+						bigStep = 1,
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.backdropInsets.top
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.backdropInsets.top = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 4,
+					},
+					insetRight = {
+						type = "range",
+						name = G_RLF.L["Right Inset"],
+						desc = G_RLF.L["RightInsetDesc"],
+						min = 0,
+						max = 20,
+						bigStep = 1,
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.backdropInsets.right
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.backdropInsets.right = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 5,
+					},
+					insetBottom = {
+						type = "range",
+						name = G_RLF.L["Bottom Inset"],
+						desc = G_RLF.L["BottomInsetDesc"],
+						min = 0,
+						max = 20,
+						bigStep = 1,
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.backdropInsets.bottom
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.backdropInsets.bottom = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 6,
+					},
+					insetLeft = {
+						type = "range",
+						name = G_RLF.L["Left Inset"],
+						desc = G_RLF.L["LeftInsetDesc"],
+						min = 0,
+						max = 20,
+						bigStep = 1,
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.backdropInsets.left
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.backdropInsets.left = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						order = 7,
+					},
+				},
 			},
 			rowBorders = {
 				type = "group",
 				name = G_RLF.L["Row Borders"],
 				desc = G_RLF.L["RowBordersDesc"],
 				inline = true,
-				order = 5,
+				order = 4,
 				args = {
 					rowBordersEnabled = {
 						type = "toggle",
@@ -354,13 +499,36 @@ function PartyLootConfig:GetStylingOptions(order)
 						end,
 						order = 1,
 					},
+					rowBorderTexture = {
+						type = "select",
+						dialogControl = "LSM30_Border",
+						name = G_RLF.L["Border Texture"],
+						desc = G_RLF.L["BorderTextureDesc"],
+						width = "double",
+						values = function()
+							return G_RLF.lsm:HashTable(G_RLF.lsm.MediaType.BORDER)
+						end,
+						get = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.rowBorderTexture
+						end,
+						set = function(info, value)
+							G_RLF.db.global.partyLoot.styling.rowBorderTexture = value
+							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+						end,
+						disabled = function(info, value)
+							return G_RLF.db.global.partyLoot.styling.enableRowBorder == false
+						end,
+						order = 2,
+					},
 					rowBorderThickness = {
 						type = "range",
 						name = G_RLF.L["Row Border Thickness"],
 						desc = G_RLF.L["RowBorderThicknessDesc"],
-						min = 1,
-						max = 10,
-						step = 1,
+						min = 0.1,
+						softMin = 1,
+						max = 24,
+						bigStep = 1,
+						width = "double",
 						disabled = function(info, value)
 							return G_RLF.db.global.partyLoot.styling.enableRowBorder == false
 						end,
@@ -371,7 +539,7 @@ function PartyLootConfig:GetStylingOptions(order)
 							G_RLF.db.global.partyLoot.styling.rowBorderSize = value
 							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
 						end,
-						order = 2,
+						order = 3,
 					},
 					rowBorderColor = {
 						type = "color",
@@ -390,12 +558,13 @@ function PartyLootConfig:GetStylingOptions(order)
 							G_RLF.db.global.partyLoot.styling.rowBorderColor = { r, g, b, a }
 							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
 						end,
-						order = 3,
+						order = 4,
 					},
 					rowBorderClassColors = {
 						type = "toggle",
 						name = G_RLF.L["Use Class Colors for Borders"],
 						desc = G_RLF.L["UseClassColorsForBordersDesc"],
+						width = "double",
 						set = function(info, value)
 							G_RLF.db.global.partyLoot.styling.rowBorderClassColors = value
 							G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
@@ -406,7 +575,7 @@ function PartyLootConfig:GetStylingOptions(order)
 						disabled = function(info, value)
 							return G_RLF.db.global.partyLoot.styling.enableRowBorder == false
 						end,
-						order = 4,
+						order = 5,
 					},
 				},
 			},
@@ -422,7 +591,7 @@ function PartyLootConfig:GetStylingOptions(order)
 					G_RLF.db.global.partyLoot.styling.enabledSecondaryRowText = value
 					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
 				end,
-				order = 6,
+				order = 5,
 			},
 			useFontObjects = {
 				type = "toggle",
@@ -436,7 +605,7 @@ function PartyLootConfig:GetStylingOptions(order)
 					G_RLF.db.global.partyLoot.styling.useFontObjects = value
 					G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 				end,
-				order = 7,
+				order = 6,
 			},
 			font = {
 				type = "select",
@@ -468,7 +637,7 @@ function PartyLootConfig:GetStylingOptions(order)
 					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
 					G_RLF.LootDisplay:ReInitQueueLabel(G_RLF.Frames.PARTY)
 				end,
-				order = 8,
+				order = 7,
 			},
 			customFonts = {
 				type = "group",
@@ -478,7 +647,7 @@ function PartyLootConfig:GetStylingOptions(order)
 					return G_RLF.db.global.partyLoot.styling.useFontObjects == true
 				end,
 				inline = true,
-				order = 9,
+				order = 8,
 				args = {
 					font = {
 						type = "select",
@@ -666,12 +835,22 @@ G_RLF.defaults.global.partyLoot = {
 		enabledSecondaryRowText = false,
 		leftAlign = true,
 		growUp = true,
+		rowBackgroundType = G_RLF.RowBackground.GRADIENT,
+		rowBackgroundTexture = "Solid",
+		rowBackgroundTextureColor = { 0, 0, 0, 1 },
 		rowBackgroundGradientStart = { 0.1, 0.1, 0.1, 0.8 },
 		rowBackgroundGradientEnd = { 0.1, 0.1, 0.1, 0 },
+		backdropInsets = {
+			left = 0,
+			right = 0,
+			top = 0,
+			bottom = 0,
+		},
 		enableRowBorder = false,
 		rowBorderSize = 1,
 		rowBorderColor = { 0, 0, 0, 1 },
 		rowBorderClassColors = false,
+		rowBorderTexture = "None",
 		useFontObjects = true,
 		font = "GameFontNormalSmall",
 		fontFace = "Friz Quadrata TT",

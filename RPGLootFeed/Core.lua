@@ -99,6 +99,9 @@ function RLF:OnInitialize()
 		"LittleRobotSoundFactory - Pickup_Gold_04",
 		"Interface\\AddOns\\RPGLootFeed\\Sounds\\Pickup_Gold_04.ogg"
 	)
+	-- Details also provides this, but in case someone doesn't have it installed
+	-- RLF will register it as well.
+	lsm:Register("border", "1 Pixel", [[Interface\Buttons\WHITE8X8]])
 	G_RLF.DBIcon:Register(addonName, rlfLDB, G_RLF.db.global.minimap)
 	G_RLF.DBIcon:AddButtonToCompartment(addonName)
 	self:Hook(G_RLF.acd, "Open", "OnOptionsOpen")
