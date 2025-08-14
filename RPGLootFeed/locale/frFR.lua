@@ -13,6 +13,31 @@ end
 --- You may translate these comments, but do not translate "region" or "endregion" as they are used by the localization tool to determine where to place the translations.
 --- To add translations, simply uncomment the line(s) and replace the English text after the equal sign (=) with the translated value.
 
+--#region 1.27.0
+-- L["Backdrop Insets"] = "Backdrop Insets"
+-- L["BackdropInsetsDesc"] = "Adjust the insets of a row's backdrop, use this if the background is showing on the border's corners (when using textured borders with rounded edges)."
+-- L["Background Texture"] = "Background Texture"
+-- L["Background Texture Color"] = "Background Texture Color"
+-- L["Background Type"] = "Background Type"
+-- L["BackgroundTextureColorDesc"] = "The color to apply to the selected texture."
+-- L["BackgroundTextureDesc"] = "Choose the background texture from LibSharedMedia"
+-- L["BackgroundTypeDesc"] = "Choose the background type for the loot feed rows."
+-- L["Border Texture"] = "Border Texture"
+-- L["BorderTextureDesc"] = "Choose the border texture from LibSharedMedia"
+-- L["Bottom Inset"] = "Bottom Inset"
+-- L["BottomInsetDesc"] = "The background will be inset from the bottom of the row by this amount."
+-- L["Enable Textured Borders"] = "Enable Textured Borders"
+-- L["EnableTexturedBordersDesc"] = "Use LibSharedMedia border textures instead of solid colors"
+-- L["Gradient"] = "Gradient"
+-- L["Left Inset"] = "Left Inset"
+-- L["LeftInsetDesc"] = "The background will be inset from the left of the row by this amount."
+-- L["Right Inset"] = "Right Inset"
+-- L["RightInsetDesc"] = "The background will be inset from the right of the row by this amount."
+-- L["Textured"] = "Textured"
+-- L["Top Inset"] = "Top Inset"
+-- L["TopInsetDesc"] = "The background will be inset from the top of the row by this amount."
+--#endregion
+
 --#region 1.26.0
 -- L["Hide All Icons"] = "Hide All Icons"
 -- L["HideAllIconsDesc"] = "If enabled, all icons will be hidden in the loot feed."
