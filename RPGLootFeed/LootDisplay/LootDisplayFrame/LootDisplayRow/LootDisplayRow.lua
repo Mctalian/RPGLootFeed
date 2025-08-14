@@ -798,12 +798,19 @@ function LootDisplayRowMixin:StyleRowBackdrop()
 	-- Apply coloring to textured border
 	if classColors then
 		local classColor
+		local a = 1
 		if GetExpansionLevel() >= G_RLF.Expansion.BFA then
 			classColor = C_ClassColor.GetClassColor(select(2, UnitClass(self.unit or "player")))
 		else
 			classColor = RAID_CLASS_COLORS[select(2, UnitClass(self.unit or "player"))]
 		end
-		self:SetBackdropBorderColor(classColor.r, classColor.g, classColor.b, 1)
+		if classColor == nil then
+			G_RLF:LogWarn("Could not find a class color for unit: %s", self.unit or "player")
+			-- Fallback to transparent black
+			classColor = { r = 0, g = 0, b = 0 }
+			a = 0
+		end
+		self:SetBackdropBorderColor(classColor.r, classColor.g, classColor.b, a)
 	else
 		local r, g, b, a = unpack(borderColor)
 		self:SetBackdropBorderColor(r, g, b, a or 1)
