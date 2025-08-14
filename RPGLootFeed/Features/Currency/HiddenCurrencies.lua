@@ -25,7 +25,7 @@ G_RLF.hiddenCurrencies = {
 	[3282] = true, -- https://wowhead.com/currency=3282/gallagio-loyalty-rewards-club
 	[3280] = true, -- https://wowhead.com/currency=3280/11-raid-renown-gallagio-speed-buff-acct-tracker
 	[3279] = true, -- https://wowhead.com/currency=3279/11-raid-renown-gallagio-raid-buff-acct-tracker
-	[3278] = true, -- https://wowhead.com/currency=3278/ethereal-strands
+	[3278] = false, -- https://wowhead.com/currency=3278/ethereal-strands
 	[3272] = true, -- https://wowhead.com/currency=3272/delvers-journey
 	[3271] = true, -- https://wowhead.com/currency=3271/renown-season-3-delves
 	[3270] = true, -- https://wowhead.com/currency=3270/11-2-delves-personal-tracker-s3-weekly-elise-turn-in-hidden

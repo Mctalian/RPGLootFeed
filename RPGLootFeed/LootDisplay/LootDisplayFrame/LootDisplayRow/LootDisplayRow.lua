@@ -171,6 +171,8 @@ function LootDisplayRowMixin:Reset()
 	self.pendingElement = nil
 	self.updatePending = false
 	self.waiting = false
+	self.isCustomLink = false
+	self.customBehavior = nil
 
 	-- Reset UI elements that were part of the template
 	self.TopBorder:SetAlpha(0)
@@ -1313,6 +1315,8 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	self.elementSecondaryText = element.secondaryText or nil
 	---@type ColorMixin|ColorMixin_RCC|nil
 	self.elementSecondaryTextColor = element.secondaryTextColor or nil
+	self.isCustomLink = element.isCustomLink or false
+	self.customBehavior = element.customBehavior
 	local text
 	if element.isSampleRow or (element.showForSeconds ~= nil and element.showForSeconds ~= self.showForSeconds) then
 		self.showForSeconds = element.showForSeconds
@@ -1782,6 +1786,12 @@ function LootDisplayRowMixin:SetupTooltip(isHistoryFrame)
 	local function handleClick(button)
 		if button == "LeftButton" and not IsModifiedClick() then
 			if not self.link then
+				return
+			end
+
+			-- Check for custom behavior first
+			if self.isCustomLink and self.customBehavior and type(self.customBehavior) == "function" then
+				self.customBehavior()
 				return
 			end
 
