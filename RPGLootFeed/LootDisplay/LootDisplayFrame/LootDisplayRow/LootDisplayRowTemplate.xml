@@ -1,7 +1,7 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/"
     xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
     <Script file="LootDisplayRow.lua" />
-    <Frame name="LootDisplayRowTemplate" virtual="true" mixin="LootDisplayRowMixin">
+    <Frame name="LootDisplayRowTemplate" virtual="true" mixin="LootDisplayRowMixin" inherits="BackdropTemplate">
         <Layers>
             <!-- Background Layer -->
             <Layer level="BACKGROUND">
@@ -21,55 +21,6 @@
                         <Anchor point="BOTTOMRIGHT" />
                     </Anchors>
                     <Color r="1" g="1" b="1" a="0.5" /> <!-- Light white with 50% opacity -->
-                </Texture>
-
-                <!-- Static Row Borders -->
-                <!-- Top Border -->
-                <Texture name="$parentStaticTopBorder" parentKey="StaticTopBorder" hidden="true">
-                    <Color r="0" g="0" b="0" a="1" />
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" />
-                        <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" />
-                    </Anchors>
-                    <Size>
-                        <AbsDimension x="0" y="1" />
-                    </Size>
-                </Texture>
-
-                <!-- Bottom Border -->
-                <Texture name="$parentStaticBottomBorder" parentKey="StaticBottomBorder" hidden="true">
-                    <Color r="0" g="0" b="0" a="1" />
-                    <Anchors>
-                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" />
-                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" />
-                    </Anchors>
-                    <Size>
-                        <AbsDimension x="0" y="1" />
-                    </Size>
-                </Texture>
-
-                <!-- Left Border -->
-                <Texture name="$parentStaticLeftBorder" parentKey="StaticLeftBorder" hidden="true">
-                    <Color r="0" g="0" b="0" a="1" />
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" />
-                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" />
-                    </Anchors>
-                    <Size>
-                        <AbsDimension x="1" y="0" />
-                    </Size>
-                </Texture>
-
-                <!-- Right Border -->
-                <Texture name="$parentStaticRightBorder" parentKey="StaticRightBorder" hidden="true">
-                    <Color r="0" g="0" b="0" a="1" />
-                    <Anchors>
-                        <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" />
-                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" />
-                    </Anchors>
-                    <Size>
-                        <AbsDimension x="1" y="0" />
-                    </Size>
                 </Texture>
             </Layer>
 

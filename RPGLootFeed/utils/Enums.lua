@@ -154,6 +154,12 @@ G_RLF.DefaultIcons = {
 	TRANSMOG = 3889767,
 }
 
+G_RLF.RowBackground = {
+	NONE = 0,
+	GRADIENT = 1,
+	TEXTURED = 2,
+}
+
 ---@enum G_RLF.Frames
 G_RLF.Frames = {
 	MAIN = "RLF_MAIN",
