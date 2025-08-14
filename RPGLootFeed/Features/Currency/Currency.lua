@@ -19,6 +19,8 @@ end
 
 Currency.Element = {}
 
+local ETHEREAL_STRANDS_CURRENCY_ID = 3278
+
 --- @param currencyLink string
 --- @param currencyInfo CurrencyInfo
 --- @param basicInfo CurrencyDisplayInfo
@@ -33,6 +35,8 @@ function Currency.Element:new(currencyLink, currencyInfo, basicInfo)
 	end
 
 	element.isLink = true
+	-- Ethereal Strands
+	element.isCustomLink = currencyInfo.currencyID == ETHEREAL_STRANDS_CURRENCY_ID
 
 	if not currencyLink or not currencyInfo or not basicInfo then
 		Currency:LogDebug(
@@ -108,6 +112,24 @@ function Currency.Element:new(currencyLink, currencyInfo, basicInfo)
 		end
 
 		return ""
+	end
+
+	if element.isCustomLink then
+		element.customBehavior = function()
+			local id = element.key:match("CURRENCY_(%d+)")
+			if id == nil or id == "" then
+				Currency:LogDebug("Custom behavior", "SKIP: No ID found in custom currency link")
+				return
+			end
+			local customCurrencyId = tonumber(id)
+
+			if customCurrencyId == ETHEREAL_STRANDS_CURRENCY_ID then
+				GenericTraitUI_LoadUI()
+				GenericTraitFrame:SetSystemID(29)
+				GenericTraitFrame:SetTreeID(1115)
+				ToggleFrame(GenericTraitFrame)
+			end
+		end
 	end
 
 	return element

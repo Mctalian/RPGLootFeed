@@ -36,6 +36,8 @@ local lootDisplayProperties = {
 ---@field public sellPrice number
 ---@field public highlight boolean
 ---@field public isLink boolean
+---@field public isCustomLink boolean?
+---@field public customBehavior? fun(): nil
 ---@field public icon number?
 ---@field public eventChannel string
 ---@field public quantity number
