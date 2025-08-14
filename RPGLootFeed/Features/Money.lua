@@ -43,7 +43,7 @@ end
 Money.Element = {}
 
 function Money.Element:new(...)
-	---@class MoneyV2.Element: RLF_BaseLootElement
+	---@class Money.Element: RLF_BaseLootElement
 	local element = {}
 	G_RLF.InitializeLootDisplayProperties(element)
 
