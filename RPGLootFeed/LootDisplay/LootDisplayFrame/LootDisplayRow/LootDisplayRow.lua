@@ -69,6 +69,8 @@ local G_RLF = ns
 ---@field ExitAnimation RLF_RowExitAnimationGroup
 LootDisplayRowMixin = {}
 
+local FALLBACK_BACKGROUND_TEXTURE = "Interface/Buttons/WHITE8X8"
+
 local defaultColor = { 1, 1, 1, 1 }
 function LootDisplayRowMixin:Init()
 	self.waiting = false
@@ -756,6 +758,7 @@ function LootDisplayRowMixin:StyleRowBackdrop()
 	-- Use textured borders via backdrop
 	local lsm = G_RLF.lsm
 
+	---@type backdropInfo
 	local backdrop = {}
 
 	if borderTexture ~= "None" then
@@ -784,7 +787,7 @@ function LootDisplayRowMixin:StyleRowBackdrop()
 			}
 		end
 	else
-		backdrop.bgFile = "Interface/Buttons/WHITE8X8" -- Fallback to a solid color texture
+		backdrop.bgFile = FALLBACK_BACKGROUND_TEXTURE
 	end
 
 	self:SetBackdrop(backdrop)

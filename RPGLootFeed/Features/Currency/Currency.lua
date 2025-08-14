@@ -128,6 +128,8 @@ function Currency.Element:new(currencyLink, currencyInfo, basicInfo)
 				GenericTraitFrame:SetSystemID(29)
 				GenericTraitFrame:SetTreeID(1115)
 				ToggleFrame(GenericTraitFrame)
+			else
+				Currency:LogDebug("Custom behavior", "SKIP: unhandled custom currency link", element.key)
 			end
 		end
 	end
