@@ -421,9 +421,9 @@ function LootDisplay:CreateSampleRow(frame)
 
 	sampleElement.key = "sample_preview_item"
 	sampleElement.type = "SampleItem"
-	sampleElement.icon = 133785 -- Money icon for visibility
+	sampleElement.icon = G_RLF.DefaultIcons.MONEY
 	sampleElement.quantity = 1
-	sampleElement.quality = G_RLF.ItemQualEnum.Epic -- Epic quality for good visibility
+	sampleElement.quality = G_RLF.ItemQualEnum.Epic
 	sampleElement.textFn = function(existingQuantity, truncatedLink)
 		return "SamplePrimaryText"
 	end
@@ -431,9 +431,9 @@ function LootDisplay:CreateSampleRow(frame)
 	sampleElement.highlight = false
 	sampleElement.isLink = false
 	sampleElement.isSampleRow = true
-	sampleElement.eventChannel = "RLF_NEW_LOOT" -- Use normal channel but with special key
+	sampleElement.eventChannel = "RLF_NEW_LOOT"
 	if frame == G_RLF.Frames.PARTY then
-		sampleElement.eventChannel = "RLF_NEW_PARTY_LOOT" -- Use party channel for party frame
+		sampleElement.eventChannel = "RLF_NEW_PARTY_LOOT"
 	end
 
 	-- Override IsEnabled to always return true for sample
