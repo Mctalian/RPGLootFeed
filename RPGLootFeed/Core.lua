@@ -210,6 +210,8 @@ function RLF:OnOptionsOpen(...)
 		if name == addonName and not isOpen then
 			isOpen = true
 			G_RLF.LootDisplay:SetBoundingBoxVisibility(true)
+			-- Show sample rows in existing frames
+			G_RLF.LootDisplay:ShowSampleRows()
 			self:ScheduleTimer(function()
 				optionsFrame = G_RLF.acd.OpenFrames[name]
 				if self:IsHooked(optionsFrame, "Hide") then
@@ -227,6 +229,8 @@ function RLF:OnOptionsClose(...)
 	G_RLF:fn(function()
 		isOpen = false
 		G_RLF.LootDisplay:SetBoundingBoxVisibility(false)
+		-- Hide sample rows when options close
+		G_RLF.LootDisplay:HideSampleRows()
 		self:Unhook(optionsFrame, "Hide")
 		optionsFrame = nil
 	end)
