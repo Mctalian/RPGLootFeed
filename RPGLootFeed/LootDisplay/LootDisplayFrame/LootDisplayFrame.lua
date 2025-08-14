@@ -245,6 +245,10 @@ function LootDisplayFrameMixin:UpdateSize()
 	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 	self:SetSize(sizingDb.feedWidth, self:getFrameHeight())
 
+	self:UpdateStyles()
+end
+
+function LootDisplayFrameMixin:UpdateStyles()
 	for row in self.rows:iterate() do
 		local row = row --[[@as RLF_LootDisplayRow]]
 		row:UpdateStyles()

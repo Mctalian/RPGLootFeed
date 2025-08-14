@@ -157,7 +157,7 @@ function PartyLootConfig:GetSizingOptions(order)
 					for k, v in pairs(sizingDb) do
 						G_RLF.db.global.partyLoot.sizing[k] = v
 					end
-					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+					G_RLF.LootDisplay:UpdateSize(G_RLF.Frames.PARTY)
 				end,
 				order = 0.5,
 				width = "full",
@@ -174,7 +174,7 @@ function PartyLootConfig:GetSizingOptions(order)
 				end,
 				set = function(_, value)
 					G_RLF.db.global.partyLoot.sizing.feedWidth = value
-					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+					G_RLF.LootDisplay:UpdateSize(G_RLF.Frames.PARTY)
 				end,
 				order = 1,
 			},
@@ -190,7 +190,7 @@ function PartyLootConfig:GetSizingOptions(order)
 				end,
 				set = function(_, value)
 					G_RLF.db.global.partyLoot.sizing.maxRows = value
-					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+					G_RLF.LootDisplay:UpdateSize(G_RLF.Frames.PARTY)
 				end,
 				order = 2,
 			},
@@ -206,7 +206,7 @@ function PartyLootConfig:GetSizingOptions(order)
 				end,
 				set = function(_, value)
 					G_RLF.db.global.partyLoot.sizing.rowHeight = value
-					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+					G_RLF.LootDisplay:UpdateSize(G_RLF.Frames.PARTY)
 				end,
 				order = 3,
 			},
@@ -238,7 +238,7 @@ function PartyLootConfig:GetSizingOptions(order)
 				end,
 				set = function(_, value)
 					G_RLF.db.global.partyLoot.sizing.padding = value
-					G_RLF.LootDisplay:UpdateRowStyles(G_RLF.Frames.PARTY)
+					G_RLF.LootDisplay:UpdateSize(G_RLF.Frames.PARTY)
 				end,
 				order = 5,
 			},

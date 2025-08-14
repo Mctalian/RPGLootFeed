@@ -36,7 +36,7 @@ G_RLF.options.args.sizing = {
 			end,
 			set = function(_, value)
 				G_RLF.db.global.sizing.feedWidth = value
-				G_RLF.LootDisplay:UpdateRowStyles()
+				G_RLF.LootDisplay:UpdateSize()
 			end,
 			order = 1,
 		},
@@ -54,7 +54,7 @@ G_RLF.options.args.sizing = {
 			end,
 			set = function(_, value)
 				G_RLF.db.global.sizing.maxRows = value
-				G_RLF.LootDisplay:UpdateRowStyles()
+				G_RLF.LootDisplay:UpdateSize()
 			end,
 			order = 2,
 		},
@@ -69,7 +69,7 @@ G_RLF.options.args.sizing = {
 			end,
 			set = function(_, value)
 				G_RLF.db.global.sizing.rowHeight = value
-				G_RLF.LootDisplay:UpdateRowStyles()
+				G_RLF.LootDisplay:UpdateSize()
 			end,
 			order = 3,
 		},
@@ -99,7 +99,7 @@ G_RLF.options.args.sizing = {
 			end,
 			set = function(_, value)
 				G_RLF.db.global.sizing.padding = value
-				G_RLF.LootDisplay:UpdateRowStyles()
+				G_RLF.LootDisplay:UpdateSize()
 			end,
 			order = 5,
 		},
