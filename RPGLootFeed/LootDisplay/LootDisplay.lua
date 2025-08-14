@@ -208,6 +208,20 @@ function LootDisplay:UpdateStrata(frame)
 	end
 end
 
+--- Update the size of the frame
+--- @param frame? G_RLF.Frames
+function LootDisplay:UpdateSize(frame)
+	frame = frame or G_RLF.Frames.MAIN
+	if lootFrames[frame] == nil then
+		return
+	end
+
+	lootFrames[frame]:UpdateSize()
+
+	-- Update sample rows if they're currently shown
+	self:RefreshSampleRowsIfShown()
+end
+
 --- Update row styles for the frame
 --- @param frame? G_RLF.Frames
 function LootDisplay:UpdateRowStyles(frame)
