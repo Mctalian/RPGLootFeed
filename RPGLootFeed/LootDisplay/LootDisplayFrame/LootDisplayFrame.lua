@@ -363,7 +363,9 @@ function LootDisplayFrameMixin:ReleaseRow(row)
 		self.keyRowMap.length = self.keyRowMap.length - 1
 	end
 
-	self:StoreRowHistory(row)
+	if not row.isSampleRow then
+		self:StoreRowHistory(row)
+	end
 
 	row:UpdateNeighborPositions(self)
 	self.rows:remove(row)

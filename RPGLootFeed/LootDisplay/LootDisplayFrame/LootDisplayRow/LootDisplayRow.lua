@@ -101,7 +101,12 @@ function LootDisplayRowMixin:Init()
 	self.PrimaryText:SetTextColor(unpack(defaultColor))
 	self.SecondaryText:SetTextColor(unpack(defaultColor))
 
-	self.showForSeconds = G_RLF.db.global.animations.exit.fadeOutDelay
+	-- Sample rows should never fade out
+	if self.isSampleRow then
+		self.showForSeconds = math.pow(2, 19) -- Never fade out
+	else
+		self.showForSeconds = G_RLF.db.global.animations.exit.fadeOutDelay
+	end
 
 	local sizingDb = G_RLF.DbAccessor:Sizing(self.frameType)
 
@@ -166,6 +171,7 @@ function LootDisplayRowMixin:Reset()
 	self.type = nil
 	self.highlight = nil
 	self.isHistoryMode = false
+	self.isSampleRow = false -- Reset sample row flag
 	self.pendingElement = nil
 	self.updatePending = false
 	self.waiting = false
@@ -176,7 +182,6 @@ function LootDisplayRowMixin:Reset()
 	self.BottomBorder:SetAlpha(0)
 	self.LeftBorder:SetAlpha(0)
 
-	self:CreateTopLeftText()
 	self.Icon:Reset()
 	self.Icon.IconBorder:SetVertexColor(G_RLF.noQualColor.r, G_RLF.noQualColor.g, G_RLF.noQualColor.b, 1)
 	self.Icon.NormalTexture:SetTexture(nil)
@@ -187,6 +192,7 @@ function LootDisplayRowMixin:Reset()
 	self.Icon:SetScript("OnLeave", nil)
 	self.Icon:SetScript("OnMouseUp", nil)
 	self.Icon:SetScript("OnEvent", nil)
+	self:CreateTopLeftText()
 
 	self:StopAllAnimations()
 
@@ -777,6 +783,11 @@ end
 
 function LootDisplayRowMixin:StyleExitAnimation()
 	local animationChanged = false
+	if self.isSampleRow then
+		-- Sample rows should never fade out
+		self.showForSeconds = math.pow(2, 19) -- Never fade out
+		self.bustCacheExitAnimation = true
+	end
 
 	---@type RLF_ConfigAnimations
 	local animationsDb = G_RLF.db.global.animations
@@ -1207,12 +1218,13 @@ function LootDisplayRowMixin:BootstrapFromElement(element)
 	local isLink = element.isLink
 	local unit = element.unit
 	local highlight = element.highlight
+	self.isSampleRow = element.isSampleRow or false
 	self.itemCount = element.itemCount
 	self.elementSecondaryText = element.secondaryText or nil
 	---@type ColorMixin|ColorMixin_RCC|nil
 	self.elementSecondaryTextColor = element.secondaryTextColor or nil
 	local text
-	if element.showForSeconds ~= self.showForSeconds and element.showForSeconds ~= nil then
+	if element.isSampleRow or (element.showForSeconds ~= nil and element.showForSeconds ~= self.showForSeconds) then
 		self.showForSeconds = element.showForSeconds
 		self:StyleExitAnimation()
 	end

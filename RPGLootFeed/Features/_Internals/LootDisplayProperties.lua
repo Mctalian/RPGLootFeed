@@ -43,6 +43,7 @@ local lootDisplayProperties = {
 ---@field public totalCount number
 ---@field public itemCount number
 ---@field public showForSeconds number
+---@field public isSampleRow boolean?
 ---@field public r number
 ---@field public g number
 ---@field public b number

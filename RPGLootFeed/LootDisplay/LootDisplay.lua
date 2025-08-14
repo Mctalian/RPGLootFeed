@@ -216,7 +216,10 @@ function LootDisplay:UpdateRowStyles(frame)
 		return
 	end
 
-	lootFrames[frame]:UpdateSize()
+	lootFrames[frame]:UpdateStyles()
+
+	-- Update sample rows if they're currently shown
+	self:RefreshSampleRowsIfShown()
 end
 
 --- Update enter animation for the frame
@@ -228,6 +231,9 @@ function LootDisplay:UpdateEnterAnimation(frame)
 	end
 
 	lootFrames[frame]:UpdateEnterAnimationType()
+
+	-- Update sample rows if they're currently shown
+	self:RefreshSampleRowsIfShown()
 end
 
 --- Update fade delay for the frame
@@ -239,6 +245,9 @@ function LootDisplay:UpdateFadeDelay(frame)
 	end
 
 	lootFrames[frame]:UpdateFadeDelay()
+
+	-- Update sample rows if they're currently shown
+	self:RefreshSampleRowsIfShown()
 end
 
 function LootDisplay:ReInitQueueLabel(frame)
@@ -365,6 +374,88 @@ function LootDisplay:HideLoot()
 
 	if lootFrames[G_RLF.Frames.PARTY] then
 		lootFrames[G_RLF.Frames.PARTY]:ClearFeed()
+	end
+end
+
+--- Show sample rows in existing frames for options preview
+function LootDisplay:ShowSampleRows()
+	if lootFrames[G_RLF.Frames.MAIN] then
+		self:CreateSampleRow(G_RLF.Frames.MAIN)
+	end
+
+	if lootFrames[G_RLF.Frames.PARTY] and G_RLF.db.global.partyLoot.separateFrame then
+		self:CreateSampleRow(G_RLF.Frames.PARTY)
+	end
+end
+
+--- Hide sample rows from existing frames
+function LootDisplay:HideSampleRows()
+	self:HideLoot()
+end
+
+--- Create a sample row in the specified frame
+--- @param frame G_RLF.Frames
+function LootDisplay:CreateSampleRow(frame)
+	if not lootFrames[frame] then
+		return
+	end
+
+	-- Create a sample element using hardcoded data
+	---@class RLF_SampleElement: RLF_BaseLootElement
+	local sampleElement = {}
+	G_RLF.InitializeLootDisplayProperties(sampleElement)
+
+	sampleElement.key = "sample_preview_item"
+	sampleElement.type = "SampleItem"
+	sampleElement.icon = 133785 -- Money icon for visibility
+	sampleElement.quantity = 1
+	sampleElement.quality = G_RLF.ItemQualEnum.Epic -- Epic quality for good visibility
+	sampleElement.textFn = function(existingQuantity, truncatedLink)
+		return "SamplePrimaryText"
+	end
+	sampleElement.secondaryText = "SampleSecondaryText"
+	sampleElement.highlight = false
+	sampleElement.isLink = false
+	sampleElement.isSampleRow = true
+	sampleElement.eventChannel = "RLF_NEW_LOOT" -- Use normal channel but with special key
+	if frame == G_RLF.Frames.PARTY then
+		sampleElement.eventChannel = "RLF_NEW_PARTY_LOOT" -- Use party channel for party frame
+	end
+
+	-- Override IsEnabled to always return true for sample
+	sampleElement.IsEnabled = function(self)
+		return true
+	end
+
+	sampleElement:Show()
+end
+
+--- Update sample rows when settings change
+function LootDisplay:UpdateSampleRows()
+	-- Remove existing sample rows
+	self:HideSampleRows()
+
+	-- Add them back with new settings
+	RunNextFrame(function()
+		self:ShowSampleRows()
+	end)
+end
+
+--- Check if sample rows are currently shown and refresh them
+function LootDisplay:RefreshSampleRowsIfShown()
+	-- Check if we have any sample rows currently displayed
+	local hasSampleRows = false
+
+	if lootFrames[G_RLF.Frames.MAIN] then
+		local row = lootFrames[G_RLF.Frames.MAIN]:GetRow("sample_preview_item")
+		if row and row.isSampleRow then
+			hasSampleRows = true
+		end
+	end
+
+	-- If we have sample rows, refresh them with new settings
+	if hasSampleRows then
+		self:UpdateSampleRows()
 	end
 end
 
