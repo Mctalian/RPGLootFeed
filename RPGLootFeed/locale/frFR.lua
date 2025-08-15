@@ -14,7 +14,6 @@ end
 --- To add translations, simply uncomment the line(s) and replace the English text after the equal sign (=) with the translated value.
 
 --#region 1.27.0
--- L["Backdrop Insets"] = "Backdrop Insets"
 -- L["BackdropInsetsDesc"] = "Adjust the insets of a row's backdrop, use this if the background is showing on the border's corners (when using textured borders with rounded edges)."
 -- L["Background Texture"] = "Background Texture"
 -- L["Background Texture Color"] = "Background Texture Color"
@@ -26,8 +25,6 @@ end
 -- L["BorderTextureDesc"] = "Choose the border texture from LibSharedMedia"
 -- L["Bottom Inset"] = "Bottom Inset"
 -- L["BottomInsetDesc"] = "The background will be inset from the bottom of the row by this amount."
--- L["Enable Textured Borders"] = "Enable Textured Borders"
--- L["EnableTexturedBordersDesc"] = "Use LibSharedMedia border textures instead of solid colors"
 -- L["Gradient"] = "Gradient"
 -- L["Left Inset"] = "Left Inset"
 -- L["LeftInsetDesc"] = "The background will be inset from the left of the row by this amount."
