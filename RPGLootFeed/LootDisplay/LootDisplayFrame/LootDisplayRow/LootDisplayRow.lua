@@ -182,6 +182,7 @@ function LootDisplayRowMixin:Reset()
 	self.BottomBorder:SetAlpha(0)
 	self.LeftBorder:SetAlpha(0)
 
+	self:CreateTopLeftText()
 	self.Icon:Reset()
 	self.Icon.IconBorder:SetVertexColor(G_RLF.noQualColor.r, G_RLF.noQualColor.g, G_RLF.noQualColor.b, 1)
 	self.Icon.NormalTexture:SetTexture(nil)
@@ -192,7 +193,6 @@ function LootDisplayRowMixin:Reset()
 	self.Icon:SetScript("OnLeave", nil)
 	self.Icon:SetScript("OnMouseUp", nil)
 	self.Icon:SetScript("OnEvent", nil)
-	self:CreateTopLeftText()
 
 	self:StopAllAnimations()
 
