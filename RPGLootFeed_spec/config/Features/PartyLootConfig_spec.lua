@@ -10,6 +10,9 @@ describe("PartyLootConfig module", function()
 	setup(function()
 		-- Define the global namespace
 		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.ConfigFeatureItemLoot)
+		assert(loadfile("RPGLootFeed/config/common/common.lua"))("TestAddon", ns)
+		assert(loadfile("RPGLootFeed/config/common/db.utils.lua"))("TestAddon", ns)
+		assert(loadfile("RPGLootFeed/config/common/styling.base.lua"))("TestAddon", ns)
 		-- Load the PartyLootConfig module before each test
 		assert(loadfile("RPGLootFeed/config/Features/PartyLootConfig.lua"))("TestAddon", ns)
 	end)
