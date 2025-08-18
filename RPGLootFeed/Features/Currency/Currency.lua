@@ -108,7 +108,12 @@ function Currency.Element:new(currencyLink, currencyInfo, basicInfo)
 				end
 			end
 
-			return "    " .. color .. numerator .. " / " .. element.cappedQuantity .. "|r"
+			local secondaryText = "    " .. color .. numerator .. " / " .. element.cappedQuantity .. "|r"
+			local id = element.key:match("CURRENCY_(%d+)")
+			if id and id ~= "" and tonumber(id) == ETHEREAL_STRANDS_CURRENCY_ID then
+				secondaryText = secondaryText .. "    (" .. G_RLF.L["ClickToOpenCloakTree"] .. ")"
+			end
+			return secondaryText
 		end
 
 		return ""
