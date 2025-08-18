@@ -11,7 +11,7 @@ local Styling = {}
 G_RLF.defaults.global = G_RLF.defaults.global or {}
 
 G_RLF.ConfigCommon.StylingBase.CloneDefaultDb("global.styling")
----@type RLF_ConfigStyling
+---@class RLF_ConfigStyling
 G_RLF.defaults.global.styling = G_RLF.defaults.global.styling or {}
 
 function Styling:GetLeftAlign()
@@ -245,7 +245,7 @@ end
 
 function Styling:SetFontObject(_, value)
 	G_RLF.db.global.styling.font = value
-	G_RLF.LootDisplay:ReInitQueueLabel()
+	G_RLF.LootDisplay:UpdateRowStyles()
 	G_RLF.LootDisplay:ReInitQueueLabel()
 end
 
