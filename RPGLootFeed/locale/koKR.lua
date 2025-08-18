@@ -14,6 +14,10 @@ end
 --- You may translate these comments, but do not translate "region" or "endregion" as they are used by the localization tool to determine where to place the translations.
 --- To add translations, simply uncomment the line(s) and replace the English text after the equal sign (=) with the translated value.
 
+--#region 1.27.2
+-- L["ClickToOpenCloakTree"] = "Click item name to open cloak tree"
+--#endregion
+
 --#region 1.27.0
 -- L["BackdropInsetsDesc"] = "Adjust the insets of a row's backdrop, use this if the background is showing on the border's corners (when using textured borders with rounded edges)."
 -- L["Background Texture"] = "Background Texture"
