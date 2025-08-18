@@ -1,6 +1,6 @@
 --@strip-comments@
 ---Translator ZamestoTV v1.22.3
----Translator Карнажж v1.23.0, v1.25.0, v1.26.0
+---Translator Карнажж v1.23.0, v1.25.0, v1.26.0, v1.27.0
 ---@type string, G_RLF
 local _, G_RLF = ...
 
@@ -18,25 +18,25 @@ end
 --#endregion
 
 --#region 1.27.0
--- L["BackdropInsetsDesc"] = "Adjust the insets of a row's backdrop, use this if the background is showing on the border's corners (when using textured borders with rounded edges)."
--- L["Background Texture"] = "Background Texture"
--- L["Background Texture Color"] = "Background Texture Color"
--- L["Background Type"] = "Background Type"
--- L["BackgroundTextureColorDesc"] = "The color to apply to the selected texture."
--- L["BackgroundTextureDesc"] = "Choose the background texture from LibSharedMedia"
--- L["BackgroundTypeDesc"] = "Choose the background type for the loot feed rows."
--- L["Border Texture"] = "Border Texture"
--- L["BorderTextureDesc"] = "Choose the border texture from LibSharedMedia"
--- L["Bottom Inset"] = "Bottom Inset"
--- L["BottomInsetDesc"] = "The background will be inset from the bottom of the row by this amount."
--- L["Gradient"] = "Gradient"
--- L["Left Inset"] = "Left Inset"
--- L["LeftInsetDesc"] = "The background will be inset from the left of the row by this amount."
--- L["Right Inset"] = "Right Inset"
--- L["RightInsetDesc"] = "The background will be inset from the right of the row by this amount."
--- L["Textured"] = "Textured"
--- L["Top Inset"] = "Top Inset"
--- L["TopInsetDesc"] = "The background will be inset from the top of the row by this amount."
+L["BackdropInsetsDesc"] = "Настройка отступа фона строки. Используйте это, если фон отображается на углах границ (при использовании текстурированных границ с закругленными краями)."
+L["Background Texture"] = "Фоновая текстура"
+L["Background Texture Color"] = "Цвет фоновой текстуры"
+L["Background Type"] = "Тип фона"
+L["BackgroundTextureColorDesc"] = "Цвет, который нужно применить к выбранной текстуре."
+L["BackgroundTextureDesc"] = "Выберите текстуру фона из LibSharedMedia"
+L["BackgroundTypeDesc"] = "Выберите тип фона для строк ленты добычи."
+L["Border Texture"] = "Текстура границы"
+L["BorderTextureDesc"] = "Выберите текстуру границы из LibSharedMedia"
+L["Bottom Inset"] = "Нижний отступ"
+L["BottomInsetDesc"] = "Фон будет сдвинут от нижнего края строки на это количество."
+L["Gradient"] = "Градиент"
+L["Left Inset"] = "Левый отступ"
+L["LeftInsetDesc"] = "Фон будет сдвинут от левого края строки на это количество."
+L["Right Inset"] = "Правый отступ"
+L["RightInsetDesc"] = "Фон будет сдвинут от правого края строки на это количество."
+L["Textured"] = "Текстурированный"
+L["Top Inset"] = "Верхний отступ"
+L["TopInsetDesc"] = "Фон будет сдвинут от верхнего края строки на это количество."
 --#endregion
 
 --#region 1.26.0
