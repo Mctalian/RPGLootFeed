@@ -238,7 +238,7 @@ end
 
 function PartyLootConfig:SetFontObject(_, value)
 	G_RLF.db.global.partyLoot.styling.font = value
-	G_RLF.LootDisplay:ReInitQueueLabel()
+	G_RLF.LootDisplay:UpdateRowStyles()
 	G_RLF.LootDisplay:ReInitQueueLabel()
 end
 
