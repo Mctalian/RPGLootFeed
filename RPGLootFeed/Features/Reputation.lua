@@ -20,9 +20,6 @@ local RepType = {
 }
 
 local CURRENT_SEASON_DELVE_JOURNEY = 0
-if G_RLF:IsRetail() or GetExpansionLevel() == G_RLF.Expansion.TWW then
-	CURRENT_SEASON_DELVE_JOURNEY = C_DelvesUI.GetDelvesFactionForSeason()
-end
 
 -- Precompute pattern segments to optimize runtime message parsing
 local function precomputePatternSegments(patterns)
@@ -154,7 +151,6 @@ local factionIdIconMap = {
 	[2673] = 6439627, -- Bilgewater Cartel
 	[2675] = 6439628, -- Blackwater Cartel
 	[2677] = 6439630, -- Steamwheedle Cartel
-	[CURRENT_SEASON_DELVE_JOURNEY] = 4635200, -- Delver's Journey
 }
 
 function Rep.Element:new(...)
@@ -590,6 +586,10 @@ end
 --- Checks for updates to known hidden renown factions
 ---@param events table<UpdateFactionEventPayload | MajorFactionRenownLevelChangedEventPayload, number>
 function Rep:CheckForHiddenRenownFactions(events)
+	if CURRENT_SEASON_DELVE_JOURNEY == 0 and (G_RLF:IsRetail() or GetExpansionLevel() == G_RLF.Expansion.TWW) then
+		CURRENT_SEASON_DELVE_JOURNEY = C_DelvesUI.GetDelvesFactionForSeason()
+		factionIdIconMap[CURRENT_SEASON_DELVE_JOURNEY] = 4635200 -- Delver's Journey
+	end
 	local updated = C_MajorFactions.GetMajorFactionRenownInfo(CURRENT_SEASON_DELVE_JOURNEY)
 
 	if not updated then
