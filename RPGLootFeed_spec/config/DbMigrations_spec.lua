@@ -24,6 +24,9 @@ describe("DbMigrations module", function()
 			},
 		}
 
+		assert(loadfile("RPGLootFeed/config/common/common.lua"))("TestAddon", ns)
+		assert(loadfile("RPGLootFeed/config/common/db.utils.lua"))("TestAddon", ns)
+
 		-- Load the module before each test
 		dbMigrations = assert(loadfile("RPGLootFeed/config/DbMigrations.lua"))("TestAddon", ns)
 	end)

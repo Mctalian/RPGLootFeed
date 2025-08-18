@@ -10,6 +10,9 @@ describe("Styling module", function()
 	before_each(function()
 		-- Define the global G_RLF
 		ns = nsMocks:unitLoadedAfter(nsMocks.LoadSections.ConfigFeaturesAll)
+		assert(loadfile("RPGLootFeed/config/common/common.lua"))("TestAddon", ns)
+		assert(loadfile("RPGLootFeed/config/common/db.utils.lua"))("TestAddon", ns)
+		assert(loadfile("RPGLootFeed/config/common/styling.base.lua"))("TestAddon", ns)
 		-- Load the list module before each test
 		assert(loadfile("RPGLootFeed/config/Styling.lua"))("TestAddon", ns)
 	end)
