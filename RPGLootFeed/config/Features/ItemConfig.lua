@@ -52,6 +52,10 @@ G_RLF.defaults.global.item = {
 			enabled = true,
 			duration = 0,
 		},
+		[G_RLF.ItemQualEnum.WoWToken] = {
+			enabled = true,
+			duration = 0,
+		},
 	},
 	itemHighlights = {
 		boe = false,
@@ -650,6 +654,35 @@ G_RLF.options.args.features.args.itemLootConfig = {
 								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.Heirloom].duration = value
 							end,
 							order = 24,
+						},
+						wowTokenEnabled = {
+							type = "toggle",
+							name = _G["ITEM_QUALITY8_DESC"],
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.WoWToken].enabled
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.WoWToken].enabled = value
+							end,
+							order = 25,
+						},
+						wowTokenDuration = {
+							type = "range",
+							name = string.format(G_RLF.L["Duration (seconds)"], _G["ITEM_QUALITY8_DESC"]),
+							desc = string.format(G_RLF.L["DurationDesc"], _G["ITEM_QUALITY8_DESC"]),
+							min = 0,
+							max = 30,
+							step = 1,
+							hidden = function()
+								return not G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.WoWToken].enabled
+							end,
+							get = function()
+								return G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.WoWToken].duration
+							end,
+							set = function(_, value)
+								G_RLF.db.global.item.itemQualitySettings[G_RLF.ItemQualEnum.WoWToken].duration = value
+							end,
+							order = 26,
 						},
 					},
 				},

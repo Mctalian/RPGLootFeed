@@ -51,6 +51,7 @@ else
 		Legendary = 5,
 		Artifact = 6,
 		Heirloom = 7,
+		WoWToken = 8,
 	}
 end
 
