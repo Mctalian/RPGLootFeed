@@ -671,7 +671,7 @@ function ItemInfo:GetEquipmentTypeText()
 	if self.itemSubType and self.subclassID then
 		if equipLocNeverShowSubType[self.itemEquipLoc] then
 			equipmentTypeText = equipmentTypeText
-		elseif alwaysShowArmorSubTypes[self.subclassID] then
+		elseif self.classID == Enum.ItemClass.Armor and alwaysShowArmorSubTypes[self.subclassID] then
 			equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. " - " .. self.itemSubType .. "]"
 		elseif equipLocShowSubType[self.itemEquipLoc] then
 			equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. " - " .. self.itemSubType .. "]"
