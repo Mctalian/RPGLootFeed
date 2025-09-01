@@ -688,7 +688,11 @@ function ItemInfo:GetEquipmentTypeText()
 		)
 	end
 
-	if not self:IsEligibleEquipment() and self.classID == Enum.ItemClass.Armor and not equipLocNeverShowSubType[self.itemEquipLoc] then
+	if
+		not self:IsEligibleEquipment()
+		and self.classID == Enum.ItemClass.Armor
+		and not equipLocNeverShowSubType[self.itemEquipLoc]
+	then
 		equipmentTypeText = string.format("%s%s|r", G_RLF:RGBAToHexFormat(1, 0, 0, 1), equipmentTypeText)
 	else
 		equipmentTypeText = string.format("%s%s|r", G_RLF:RGBAToHexFormat(1, 1, 1, 1), equipmentTypeText)
