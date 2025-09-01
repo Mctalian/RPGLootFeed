@@ -652,6 +652,11 @@ function ItemInfo:GetEquipmentTypeText()
 	}
 	local equipLocNeverShowSubType = {
 		INVTYPE_CLOAK = true,
+		INVTYPE_FINGER = true,
+		INVTYPE_TRINKET = true,
+		INVTYPE_NECK = true,
+		INVTYPE_BODY = true,
+		INVTYPE_TABARD = true,
 	}
 	local equipLocShowSubType = { INVTYPE_WEAPONMAINHAND = true, INVTYPE_WEAPONOFFHAND = true }
 	local equipLocShowOnlySubType = {
@@ -666,7 +671,7 @@ function ItemInfo:GetEquipmentTypeText()
 	if self.itemSubType and self.subclassID then
 		if equipLocNeverShowSubType[self.itemEquipLoc] then
 			equipmentTypeText = equipmentTypeText
-		elseif self.classID == Enum.ItemClass.Armor and alwaysShowArmorSubTypes[self.subclassID] then
+		elseif alwaysShowArmorSubTypes[self.subclassID] then
 			equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. " - " .. self.itemSubType .. "]"
 		elseif equipLocShowSubType[self.itemEquipLoc] then
 			equipmentTypeText = " [" .. _G[self.itemEquipLoc] .. " - " .. self.itemSubType .. "]"
@@ -686,7 +691,7 @@ function ItemInfo:GetEquipmentTypeText()
 		)
 	end
 
-	if not self:IsEligibleEquipment() and self.classID == Enum.ItemClass.Armor then
+	if not self:IsEligibleEquipment() and self.classID == Enum.ItemClass.Armor and not equipLocNeverShowSubType[self.itemEquipLoc] then
 		equipmentTypeText = string.format("%s%s|r", G_RLF:RGBAToHexFormat(1, 0, 0, 1), equipmentTypeText)
 	else
 		equipmentTypeText = string.format("%s%s|r", G_RLF:RGBAToHexFormat(1, 1, 1, 1), equipmentTypeText)
