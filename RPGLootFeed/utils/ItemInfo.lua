@@ -652,9 +652,6 @@ function ItemInfo:GetEquipmentTypeText()
 	}
 	local equipLocNeverShowSubType = {
 		INVTYPE_CLOAK = true,
-		INVTYPE_FINGER = true,
-		INVTYPE_TRINKET = true,
-		INVTYPE_NECK = true,
 		INVTYPE_BODY = true,
 		INVTYPE_TABARD = true,
 	}
