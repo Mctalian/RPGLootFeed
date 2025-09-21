@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Update TOC Interface version
-        uses: Mctalian/toc-interface-updater@v1
+        uses: Mctalian/wow-toc-updater@v1
         with:
           flavor: retail
           ptr: true
